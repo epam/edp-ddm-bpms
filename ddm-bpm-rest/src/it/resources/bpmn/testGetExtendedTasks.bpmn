@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_07qqvxx" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:process id="testGetExtendedTasks_key" name="Test Name" isExecutable="true">
+    <bpmn:startEvent id="Event_01y18ux" name="start" camunda:initiator="initiator">
+      <bpmn:outgoing>Flow_1c1lh9u</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Activity_046yw3m" name="Test User Task" camunda:modelerTemplate="citizenSignTaskTemplate" camunda:formKey="form" camunda:assignee="#{initiator}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="userTaskInputFormDataPrepopulate" />
+        </camunda:inputOutput>
+        <camunda:properties>
+          <camunda:property name="eSign" value="true" />
+          <camunda:property name="LEGAL" value="" />
+          <camunda:property name="formVariables" value="formVariable, formVariable2" />
+          <camunda:property name="ENTREPRENEUR" value="true" />
+          <camunda:property name="INDIVIDUAL" value="" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_13fif3j</bpmn:incoming>
+      <bpmn:outgoing>Flow_0rt96vo</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="Event_19kzymy" name="end">
+      <bpmn:incoming>Flow_0bw3o3b</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="Activity_14zw59w" name="Test User Task2" camunda:assignee="testuser2">
+      <bpmn:incoming>Flow_0rt96vo</bpmn:incoming>
+      <bpmn:outgoing>Flow_0bw3o3b</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1c1lh9u" sourceRef="Event_01y18ux" targetRef="Activity_13ri9z9" />
+    <bpmn:sequenceFlow id="Flow_0rt96vo" sourceRef="Activity_046yw3m" targetRef="Activity_14zw59w" />
+    <bpmn:sequenceFlow id="Flow_0bw3o3b" sourceRef="Activity_14zw59w" targetRef="Event_19kzymy" />
+    <bpmn:sequenceFlow id="Flow_13fif3j" sourceRef="Activity_13ri9z9" targetRef="Activity_046yw3m" />
+    <bpmn:scriptTask id="Activity_13ri9z9" name="Set formVariables" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1c1lh9u</bpmn:incoming>
+      <bpmn:outgoing>Flow_13fif3j</bpmn:outgoing>
+      <bpmn:script>execution.setVariable('formVariable', 'var1')
+        execution.setVariable('formVariable2', 'var2')</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testGetExtendedTasks_key">
+      <bpmndi:BPMNEdge id="Flow_0bw3o3b_di" bpmnElement="Flow_0bw3o3b">
+        <di:waypoint x="610" y="117" />
+        <di:waypoint x="672" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0rt96vo_di" bpmnElement="Flow_0rt96vo">
+        <di:waypoint x="470" y="117" />
+        <di:waypoint x="510" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1c1lh9u_di" bpmnElement="Flow_1c1lh9u">
+        <di:waypoint x="188" y="117" />
+        <di:waypoint x="230" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13fif3j_di" bpmnElement="Flow_13fif3j">
+        <di:waypoint x="330" y="117" />
+        <di:waypoint x="370" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_01y18ux_di" bpmnElement="Event_01y18ux">
+        <dc:Bounds x="152" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="159" y="142" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_046yw3m_di" bpmnElement="Activity_046yw3m">
+        <dc:Bounds x="370" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_19kzymy_di" bpmnElement="Event_19kzymy">
+        <dc:Bounds x="672" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="681" y="142" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_14zw59w_di" bpmnElement="Activity_14zw59w">
+        <dc:Bounds x="510" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1501bdk_di" bpmnElement="Activity_13ri9z9">
+        <dc:Bounds x="230" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

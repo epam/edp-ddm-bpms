@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_17msokp" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:process id="testCephFormDataDelegates_key" name="EK_Test" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="start">
+      <bpmn:outgoing>Flow_0kibm5r</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_07oaldn" name="end">
+      <bpmn:incoming>Flow_1156n0r</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0kibm5r" sourceRef="StartEvent_1" targetRef="Activity_0z3d404" />
+    <bpmn:sequenceFlow id="Flow_1y7yep8" sourceRef="Activity_0z3d404" targetRef="Activity_0me4tx4" />
+    <bpmn:serviceTask id="Activity_0z3d404" name="Put formData to ceph" camunda:delegateExpression="${putFormDataToCephDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="formData">${formData}</camunda:inputParameter>
+          <camunda:inputParameter name="taskDefinitionKey">userTask</camunda:inputParameter>
+        </camunda:inputOutput>
+        <camunda:properties>
+          <camunda:property />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0kibm5r</bpmn:incoming>
+      <bpmn:outgoing>Flow_1y7yep8</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0on3fs3" sourceRef="Activity_0me4tx4" targetRef="waitCheckPutFormData" />
+    <bpmn:serviceTask id="Activity_0me4tx4" name="Get formData from ceph" camunda:class="com.epam.digital.data.platform.bpms.extension.delegate.storage.GetFormDataFromCephDelegate">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="taskDefinitionKey">userTask</camunda:inputParameter>
+          <camunda:outputParameter name="formDataOutput">${formData}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1y7yep8</bpmn:incoming>
+      <bpmn:outgoing>Flow_0on3fs3</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1156n0r" sourceRef="waitCheckPutFormData" targetRef="Event_07oaldn" />
+    <bpmn:userTask id="waitCheckPutFormData" name="Wait tasl to check ceph form data">
+      <bpmn:incoming>Flow_0on3fs3</bpmn:incoming>
+      <bpmn:outgoing>Flow_1156n0r</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testCephFormDataDelegates_key">
+      <bpmndi:BPMNEdge id="Flow_0on3fs3_di" bpmnElement="Flow_0on3fs3">
+        <di:waypoint x="480" y="117" />
+        <di:waypoint x="520" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1y7yep8_di" bpmnElement="Flow_1y7yep8">
+        <di:waypoint x="350" y="117" />
+        <di:waypoint x="380" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kibm5r_di" bpmnElement="Flow_0kibm5r">
+        <di:waypoint x="188" y="117" />
+        <di:waypoint x="250" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1156n0r_di" bpmnElement="Flow_1156n0r">
+        <di:waypoint x="620" y="117" />
+        <di:waypoint x="672" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="159" y="142" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1m9dvjl_di" bpmnElement="Activity_0z3d404">
+        <dc:Bounds x="250" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_00rhpol_di" bpmnElement="Activity_0me4tx4">
+        <dc:Bounds x="380" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ic3qd4_di" bpmnElement="waitCheckPutFormData">
+        <dc:Bounds x="520" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_07oaldn_di" bpmnElement="Event_07oaldn">
+        <dc:Bounds x="672" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="681" y="142" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

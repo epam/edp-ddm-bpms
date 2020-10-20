@@ -1,0 +1,25 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ .Chart.Name }}-{{ .Values.namespace }}
+  namespace: {{ .Values.monitoring.namespace }}
+  labels:
+    app: bpms-{{ .Values.namespace }}
+    relatedNamespace: {{ .Release.Namespace }}
+spec:
+  endpoints:
+    - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+      interval: 30s
+      path: {{ .Values.prometheusScrapePath }}
+      scheme: http
+      targetPort: {{ .Values.service.port }}
+  jobLabel: app
+  namespaceSelector:
+    matchNames:
+      - {{ .Values.namespace }}
+  selector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - {{ .Chart.Name }}

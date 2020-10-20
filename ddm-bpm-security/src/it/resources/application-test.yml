@@ -1,0 +1,28 @@
+spring:
+  jersey:
+    application-path: api
+
+camunda:
+  admin-user-id: camunda
+  admin-group-id: camunda-admin
+  bpm:
+    generic-properties:
+      properties:
+        enableHistoricInstancePermissions: true
+    authorization:
+      enabled: true
+    admin-user:
+      id: ${camunda.admin-user-id}
+      password: camunda
+
+registry-regulation:
+  officer:
+    roles:
+      - name: officer
+        description: 'Officer role'
+      - name: head-officer
+        description: 'Head officer role'
+      - name: task-dispatcher
+        description: 'Task dispatcher role'
+  citizen:
+    roles: [ ]

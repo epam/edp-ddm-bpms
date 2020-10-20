@@ -1,0 +1,28 @@
+{
+  "name": "labName",
+  "edrpou": "11111111",
+  "registrationSource": "держпраці",
+  "registrationNo": "1234567890-primary-add",
+  "createdDate": "2021-03-25",
+  "acceptedBy": "Full Name",
+  "solutionName": "Внести до інформаційного переліку",
+  "solutionDate": "2021-03-24",
+  "letterNo": "1234567890-letterNo",
+  "letterDate": "2021-03-23",
+  "receivedBy": "receiver",
+  "certifiedBy": "multipass",
+  "notes": "smth noted",
+  "factors": [
+    "FactorsPhys1",
+    "laborfact1",
+    "biofactors",
+    "factorPesticide",
+    "chemfactgost1",
+    "chemfacthyge1",
+    "chemfactobrv1",
+    "chemfactodovilni1"
+  ],
+  "applicationTypeId": "addApplication",
+  "solutionTypeId": "ADD=SUCCESS",
+  "laboratoryId": "bb652d3f-a36f-465a-b7ba-232a5a1680c5"
+}

@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: ddm-bpm
+  cloud:
+    kubernetes:
+      config:
+        enabled: true
+        enable-api: false
+        paths:
+          - /app/config/main/application.yml
+          - /app/config/camunda/camunda-global-system-vars.yml
+          - /app/config/registry-regulation/officer-roles/officer-roles.yml
+          - /app/config/registry-regulation/citizen-roles/citizen-roles.yml
+          - /app/config/registry-regulation/trembita-configuration/trembita-configuration.yml
+      secrets:
+        enabled: true
+        enable-api: false
+        paths:
+          - /app/secrets
+logging:
+  config: classpath:log4j2-json-console.xml # stdout log streaming for fluentd
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test, local
+  cloud:
+    kubernetes:
+      config:
+        enabled: false
+logging:
+  config: classpath:log4j2-local-console.xml

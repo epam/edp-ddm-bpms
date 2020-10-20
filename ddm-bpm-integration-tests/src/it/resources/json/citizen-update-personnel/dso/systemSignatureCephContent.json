@@ -1,0 +1,35 @@
+{
+  "data": {
+    "researches": [
+      "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+    ],
+    "hygienistCertificateFile": {
+      "id": "4",
+      "checksum": "44"
+    },
+    "ordersFile": {
+      "id": "5",
+      "checksum": "55"
+    },
+    "hireStaffFile": {
+      "id": "6",
+      "checksum": "66"
+    },
+    "laboratoryId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "staffStatusId": "cc974d44-362c-4caf-8a99-67780635ca68",
+    "specializationEndDate": "2021-02-26",
+    "contractEndDate": "2021-02-22",
+    "dismissalFlag": true,
+    "specializationDate": "2021-02-22",
+    "hygienistFlag": true,
+    "fullName": "John Doe",
+    "staffId": "02e68684-1335-47f0-9bd6-17d937267527",
+    "fixedTermContractFlag": true,
+    "fullTimeFlag": true,
+    "salary": 0,
+    "dismissalDate": "2021-02-22",
+    "education": "education",
+    "seniority": "seniority"
+  },
+  "signature": "test"
+}

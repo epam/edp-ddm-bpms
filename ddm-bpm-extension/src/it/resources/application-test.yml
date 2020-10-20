@@ -1,0 +1,134 @@
+spring:
+  application:
+    name: ddm-bpm-extension
+  rest-template:
+    ssl-checking-enabled: false
+
+registry-rest-api:
+  url: http://localhost:8877/mock-server
+dso:
+  url: http://localhost:8081
+
+ceph:
+  http-endpoint: http://localhost:8100
+  access-key: access-key
+  secret-key: secret-key
+  bucket: bucket
+
+user-settings-service-api:
+  url: http://localhost:8878/user-settings-mock-server
+excerpt-service-api:
+  url: http://localhost:9999/excerpt-mock-service
+platform-gateway:
+  url: http://localhost:9779
+digital-document-service:
+  url: http://localhost:1111/digital-document-service-mock
+
+keycloak:
+  url: http://localhost:8200
+  citizen:
+    realm: citizen-realm
+    client-id: citizen-client-id
+    client-secret: citizen-client-secret
+  officer:
+    realm: officer-realm
+    client-id: officer-client-id
+    client-secret: officer-client-secret
+  system-user:
+    realm: system-user-realm
+    client-id: system-user-client-id
+    client-secret: system-user-client-secret
+
+trembita-exchange-gateway:
+  registries:
+    edr-registry:
+      trembita-url: http://localhost:7788/trembita-mock-server
+      user-id: DDM
+      protocol-version: 4.0
+      authorization-token: token
+      client:
+        x-road-instance: CLIENT-TEST
+        member-class: GOV
+        member-code: 666777666
+        subsystem-code: GOV_test
+      service:
+        x-road-instance: EDR-TEST
+        member-class: GOV
+        member-code: 11115888
+        subsystem-code: EDR_test
+    dracs-registry:
+      trembita-url: http://localhost:7789/trembita-mock-server
+      user-id: DDM
+      protocol-version: 4.0
+      client:
+        x-road-instance: CLIENT-TEST
+        member-class: GOV
+        member-code: 666777666
+        subsystem-code: GOV_test
+      service:
+        x-road-instance: DRACS-TEST
+        member-class: GOV
+        member-code: 11115887
+        subsystem-code: DRACS_test
+    idp-exchange-service-registry:
+      trembita-url: http://localhost:7780/trembita-mock-server
+      user-id: DDM
+      protocol-version: 4.0
+      client:
+        x-road-instance: CLIENT-TEST
+        member-class: GOV
+        member-code: 666777666
+        subsystem-code: GOV_test
+      service:
+        x-road-instance: IDP-TEST
+        member-class: GOV
+        member-code: 11115887
+        subsystem-code: IDP_test
+
+data-platform:
+  kafka:
+    enabled: false
+    bootstrap: localhost:9092
+    topic-properties:
+      num-partitions: 1
+      replication-factor: 1
+    ssl:
+      enabled: false
+    error-handler:
+      initial-interval: 1500
+      max-elapsed-time: 6000
+      multiplier: 2
+    topics:
+      user-notifications: user-notifications
+
+external-system:
+  url: http://localhost:8989
+
+external-systems:
+  system1:
+    url: ${external-system.url}
+    methods:
+      method1:
+        path: /api/get
+        method: GET
+      method2:
+        path: /api/post
+        method: POST
+    auth:
+      type: BASIC
+      secret-name: secret1
+  system-with-partner-token-auth:
+    url: ${external-system.url}
+    methods:
+      method1:
+        path: /api/get
+        method: GET
+    auth:
+      type: PARTNER_TOKEN
+      secret-name: secret2
+      partner-token-auth-url: ${external-system.url}/api/auth/partner
+      token-json-path: $.token
+
+kubernetes:
+  namespace:
+    current: current-namespace

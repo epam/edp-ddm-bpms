@@ -1,0 +1,119 @@
+{
+  "data": {
+    "name": "labName",
+    "subjectCode": "11111111",
+    "accreditationFlag": true,
+    "registrationNo": "123",
+    "FactorsPhys": [
+      {
+        "factorId": "FactorsPhys1",
+        "name": "string"
+      }
+    ],
+    "laborfact": [
+      {
+        "factorId": "laborfact1",
+        "name": "string"
+      }
+    ],
+    "biofactors": [
+      {
+        "factorId": "biofactors",
+        "name": "string"
+      }
+    ],
+    "chemfactgost": [
+      {
+        "factorId": "chemfactgost1",
+        "name": "string"
+      }
+    ],
+    "chemfacthyge": [
+      {
+        "factorId": "chemfacthyge1",
+        "name": "string"
+      }
+    ],
+    "chemfactobrv": [
+      {
+        "factorId": "chemfactobrv1",
+        "name": "string"
+      }
+    ],
+    "chemfactodovilni": [
+      {
+        "factorId": "chemfactodovilni1",
+        "name": "string"
+      }
+    ],
+    "factorPesticide": [
+      {
+        "factorId": "factorPesticide",
+        "name": "string"
+      }
+    ],
+    "zvtFile": [
+      {
+        "id": "1",
+        "checksum": "1a"
+      }
+    ],
+    "zvtCertificateFile": [
+      {
+        "id": "2",
+        "checksum": "2a"
+      }
+    ],
+    "reagentAvailabilityFile": [
+      {
+        "id": "3",
+        "checksum": "3a"
+      }
+    ],
+    "notes": "officer comment",
+    "headOfficerCheckFlag": true,
+    "errorCheckFlag": true,
+    "regComplianceFlag": true,
+    "factorComplianceFlag": true,
+    "zvtComplianceFlag": true,
+    "staffComplianceFlag": true,
+    "reagentComplianceFlag": true,
+    "facilityComplianceFlag": true,
+    "regRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "regRefusalReasonId1"
+      }
+    ],
+    "factorRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "factorRefusalReasonId1"
+      }
+    ],
+    "zvtRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "zvtRefusalReasonId1"
+      }
+    ],
+    "staffRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "staffRefusalReasonId1"
+      }
+    ],
+    "reagentRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "reagentRefusalReasonId1"
+      }
+    ],
+    "facilityRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "facilityRefusalReasonId1"
+      }
+    ]
+  }
+}

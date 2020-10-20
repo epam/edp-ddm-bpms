@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2021 EPAM Systems.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~    https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_19qlhls" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:collaboration id="Collaboration_0egn8dy">
+    <bpmn:participant id="Participant_192fq6s" name="get by id" processRef="get_by_id_from_another_registry" />
+    <bpmn:participant id="Participant_1g8k2jl" name="search" processRef="search_in_another_registry" />
+    <bpmn:participant id="Participant_12d08z6" name="start bp" processRef="start_bp_in_another_registry" />
+  </bpmn:collaboration>
+  <bpmn:process id="get_by_id_from_another_registry" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="start">
+      <bpmn:outgoing>Flow_0fekcrw</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0fekcrw" sourceRef="StartEvent_1" targetRef="Activity_0p3s8xz" />
+    <bpmn:sequenceFlow id="Flow_0rf6l42" sourceRef="Activity_0p3s8xz" targetRef="Activity_0dsz1y9" />
+    <bpmn:endEvent id="Event_0hv8hir" name="end">
+      <bpmn:incoming>Flow_1ofo0pu</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1ofo0pu" sourceRef="Activity_0dsz1y9" targetRef="Event_0hv8hir" />
+    <bpmn:serviceTask id="Activity_0p3s8xz" name="get from another registry datafactory" camunda:delegateExpression="${registryDataFactoryConnectorReadDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="id">test_id</camunda:inputParameter>
+          <camunda:inputParameter name="resource">test_resource</camunda:inputParameter>
+          <camunda:inputParameter name="registry">another_registry</camunda:inputParameter>
+          <camunda:outputParameter name="response">${response}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0fekcrw</bpmn:incoming>
+      <bpmn:outgoing>Flow_0rf6l42</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Activity_0dsz1y9" name="assert response" scriptFormat="groovy">
+      <bpmn:incoming>Flow_0rf6l42</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ofo0pu</bpmn:outgoing>
+      <bpmn:script>assert response.responseBody.prop('variable').value().equals('test_value')</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmn:process id="search_in_another_registry" isExecutable="true">
+    <bpmn:startEvent id="Event_1hwck2i" name="start">
+      <bpmn:outgoing>Flow_1wd4dhy</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_0fnhk47" name="end">
+      <bpmn:incoming>Flow_0j7b8q8</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Activity_0gfo85y" name="search in another registry datafactory" camunda:delegateExpression="${registryDataFactoryConnectorSearchDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="searchConditions">
+            <camunda:map>
+              <camunda:entry key="searchVariable">searchValue</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="resource">test_resource</camunda:inputParameter>
+          <camunda:inputParameter name="registry">another_registry</camunda:inputParameter>
+          <camunda:outputParameter name="response">${response}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1wd4dhy</bpmn:incoming>
+      <bpmn:outgoing>Flow_02szgw8</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Activity_1j7gyuz" name="assert response" scriptFormat="groovy">
+      <bpmn:incoming>Flow_02szgw8</bpmn:incoming>
+      <bpmn:outgoing>Flow_0j7b8q8</bpmn:outgoing>
+      <bpmn:script>assert response.responseBody.elements().get(0).prop('variable').value().equals('test_value')</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_1wd4dhy" sourceRef="Event_1hwck2i" targetRef="Activity_0gfo85y" />
+    <bpmn:sequenceFlow id="Flow_02szgw8" sourceRef="Activity_0gfo85y" targetRef="Activity_1j7gyuz" />
+    <bpmn:sequenceFlow id="Flow_0j7b8q8" sourceRef="Activity_1j7gyuz" targetRef="Event_0fnhk47" />
+  </bpmn:process>
+  <bpmn:process id="start_bp_in_another_registry" isExecutable="true">
+    <bpmn:startEvent id="Event_0lsx0sr" name="start">
+      <bpmn:outgoing>Flow_1n0yryq</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_0tgbwgc" name="end">
+      <bpmn:incoming>Flow_01ncnsy</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Activity_0qqzlz8" name="start bp inanother registry" camunda:delegateExpression="${registryConnectorStartBpDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="startVariables">
+            <camunda:map>
+              <camunda:entry key="startVariable">startValue</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="businessProcessKey">test_business_process_key</camunda:inputParameter>
+          <camunda:inputParameter name="registry">another_registry</camunda:inputParameter>
+          <camunda:outputParameter name="response">${response}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1n0yryq</bpmn:incoming>
+      <bpmn:outgoing>Flow_02cvyc9</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Activity_0kw2hpb" name="assert response" scriptFormat="groovy">
+      <bpmn:incoming>Flow_02cvyc9</bpmn:incoming>
+      <bpmn:outgoing>Flow_01ncnsy</bpmn:outgoing>
+      <bpmn:script>assert response.responseBody.prop('resultVariables').prop('variable').value().equals('test_value')</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_1n0yryq" sourceRef="Event_0lsx0sr" targetRef="Activity_0qqzlz8" />
+    <bpmn:sequenceFlow id="Flow_02cvyc9" sourceRef="Activity_0qqzlz8" targetRef="Activity_0kw2hpb" />
+    <bpmn:sequenceFlow id="Flow_01ncnsy" sourceRef="Activity_0kw2hpb" targetRef="Event_0tgbwgc" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0egn8dy">
+      <bpmndi:BPMNShape id="Participant_192fq6s_di" bpmnElement="Participant_192fq6s" isHorizontal="true">
+        <dc:Bounds x="120" y="110" width="530" height="130" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0fekcrw_di" bpmnElement="Flow_0fekcrw">
+        <di:waypoint x="215" y="177" />
+        <di:waypoint x="270" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0rf6l42_di" bpmnElement="Flow_0rf6l42">
+        <di:waypoint x="370" y="177" />
+        <di:waypoint x="430" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ofo0pu_di" bpmnElement="Flow_1ofo0pu">
+        <di:waypoint x="530" y="177" />
+        <di:waypoint x="592" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="159" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="202" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0hv8hir_di" bpmnElement="Event_0hv8hir">
+        <dc:Bounds x="592" y="159" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="601" y="202" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1vllxio_di" bpmnElement="Activity_0p3s8xz">
+        <dc:Bounds x="270" y="137" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_147u116_di" bpmnElement="Activity_0dsz1y9">
+        <dc:Bounds x="430" y="137" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_1g8k2jl_di" bpmnElement="Participant_1g8k2jl" isHorizontal="true">
+        <dc:Bounds x="120" y="260" width="530" height="130" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1wd4dhy_di" bpmnElement="Flow_1wd4dhy">
+        <di:waypoint x="215" y="327" />
+        <di:waypoint x="270" y="327" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02szgw8_di" bpmnElement="Flow_02szgw8">
+        <di:waypoint x="370" y="327" />
+        <di:waypoint x="430" y="327" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0j7b8q8_di" bpmnElement="Flow_0j7b8q8">
+        <di:waypoint x="530" y="327" />
+        <di:waypoint x="592" y="327" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1hwck2i_di" bpmnElement="Event_1hwck2i">
+        <dc:Bounds x="179" y="309" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="352" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0fnhk47_di" bpmnElement="Event_0fnhk47">
+        <dc:Bounds x="592" y="309" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="601" y="352" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0gfo85y_di" bpmnElement="Activity_0gfo85y">
+        <dc:Bounds x="270" y="287" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1j7gyuz_di" bpmnElement="Activity_1j7gyuz">
+        <dc:Bounds x="430" y="287" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_12d08z6_di" bpmnElement="Participant_12d08z6" isHorizontal="true">
+        <dc:Bounds x="120" y="410" width="530" height="130" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1n0yryq_di" bpmnElement="Flow_1n0yryq">
+        <di:waypoint x="215" y="477" />
+        <di:waypoint x="270" y="477" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02cvyc9_di" bpmnElement="Flow_02cvyc9">
+        <di:waypoint x="370" y="477" />
+        <di:waypoint x="430" y="477" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_01ncnsy_di" bpmnElement="Flow_01ncnsy">
+        <di:waypoint x="530" y="477" />
+        <di:waypoint x="592" y="477" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0lsx0sr_di" bpmnElement="Event_0lsx0sr">
+        <dc:Bounds x="179" y="459" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="502" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0tgbwgc_di" bpmnElement="Event_0tgbwgc">
+        <dc:Bounds x="592" y="459" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="601" y="502" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0qqzlz8_di" bpmnElement="Activity_0qqzlz8">
+        <dc:Bounds x="270" y="437" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0kw2hpb_di" bpmnElement="Activity_0kw2hpb">
+        <dc:Bounds x="430" y="437" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:data="http://data.sh4.red" id="Definitions_162k8l0" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.12.0">
+  <bpmn:process id="testDataFactoryConnectorBatchCreateDelegate_key" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="start">
+      <bpmn:outgoing>Flow_1ppb1br</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_064m862" sourceRef="Activity_0lmb09f" targetRef="Activity_0n8c081" />
+    <bpmn:endEvent id="Event_1rna2u5" name="end">
+      <bpmn:incoming>Flow_1xu5llh</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1xu5llh" sourceRef="Activity_0n8c081" targetRef="Event_1rna2u5" />
+    <bpmn:scriptTask id="Activity_0n8c081" name="Assert CODE response" scriptFormat="groovy">
+      <bpmn:incoming>Flow_064m862</bpmn:incoming>
+      <bpmn:outgoing>Flow_1xu5llh</bpmn:outgoing>
+      <bpmn:script>assert response.statusCode==201</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:serviceTask id="Activity_0lmb09f" name="Batch Create" camunda:delegateExpression="${dataFactoryConnectorBatchCreateDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="resource">test</camunda:inputParameter>
+          <camunda:inputParameter name="payload">${jsonArray}</camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token">${completer('test_token').accessToken}</camunda:inputParameter>
+          <camunda:inputParameter name="x_digital_signature_ceph_key">${sign_submission('test_token').signatureDocumentId}</camunda:inputParameter>
+          <camunda:inputParameter name="x_digital_signature_derived_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-test_derived")}</camunda:inputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1hi1py2</bpmn:incoming>
+      <bpmn:outgoing>Flow_064m862</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1hi1py2" sourceRef="Activity_0m0bqvo" targetRef="Activity_0lmb09f" />
+    <bpmn:scriptTask id="Activity_0m0bqvo" name="Prepare JSON array" scriptFormat="groovy" camunda:resultVariable="jsonArray" data:scriptResultVariableType="">
+      <bpmn:incoming>Flow_0yikbjk</bpmn:incoming>
+      <bpmn:outgoing>Flow_1hi1py2</bpmn:outgoing>
+      <bpmn:script>var data= 
+'''
+[
+   {
+      "data":"test data",
+      "description":"some description"
+   },
+   {
+      "data2":"test data2",
+      "description2":"some description2"
+   }
+]
+'''
+
+execution.setVariable("jsonArray", S(data))</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_0yikbjk" sourceRef="waitConditionTask" targetRef="Activity_0m0bqvo" />
+    <bpmn:sequenceFlow id="Flow_1ppb1br" sourceRef="StartEvent_1" targetRef="waitConditionTask" />
+    <bpmn:userTask id="waitConditionTask" name="Wait to get process instance id" camunda:formKey="testForm">
+      <bpmn:incoming>Flow_1ppb1br</bpmn:incoming>
+      <bpmn:outgoing>Flow_0yikbjk</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testDataFactoryConnectorBatchCreateDelegate_key">
+      <bpmndi:BPMNEdge id="Flow_1ppb1br_di" bpmnElement="Flow_1ppb1br">
+        <di:waypoint x="188" y="117" />
+        <di:waypoint x="240" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0yikbjk_di" bpmnElement="Flow_0yikbjk">
+        <di:waypoint x="340" y="117" />
+        <di:waypoint x="390" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1hi1py2_di" bpmnElement="Flow_1hi1py2">
+        <di:waypoint x="490" y="117" />
+        <di:waypoint x="550" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1xu5llh_di" bpmnElement="Flow_1xu5llh">
+        <di:waypoint x="820" y="117" />
+        <di:waypoint x="862" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_064m862_di" bpmnElement="Flow_064m862">
+        <di:waypoint x="650" y="117" />
+        <di:waypoint x="720" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="159" y="142" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1rna2u5_di" bpmnElement="Event_1rna2u5">
+        <dc:Bounds x="862" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="871" y="142" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1uw3su0_di" bpmnElement="Activity_0n8c081">
+        <dc:Bounds x="720" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1l0ooxo_di" bpmnElement="Activity_0lmb09f">
+        <dc:Bounds x="550" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0b9ygwb_di" bpmnElement="Activity_0m0bqvo">
+        <dc:Bounds x="390" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1n6cukm_di" bpmnElement="waitConditionTask">
+        <dc:Bounds x="240" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

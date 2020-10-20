@@ -1,0 +1,19 @@
+kind: AuthorizationPolicy
+apiVersion: security.istio.io/v1beta1
+metadata:
+  name: authoriz-policy-{{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  rules:
+    - from:
+        - source:
+            notRequestPrincipals:
+              - '*'
+      to:
+        - operation:
+            notPaths:
+              - /actuator/*
+  action: DENY

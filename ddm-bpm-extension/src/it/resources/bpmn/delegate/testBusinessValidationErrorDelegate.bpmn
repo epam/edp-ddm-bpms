@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1k6zqyr" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.11.1">
+  <bpmn:process id="Process_0plk85h" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="start">
+      <bpmn:outgoing>Flow_0s3iljg</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0s3iljg" sourceRef="StartEvent_1" targetRef="Activity_1pov4gh" />
+    <bpmn:endEvent id="Event_17hd48v" name="end">
+      <bpmn:incoming>Flow_133ycqg</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_133ycqg" sourceRef="well-readable-activity-id" targetRef="Event_17hd48v" />
+    <bpmn:serviceTask id="well-readable-activity-id" name="Business Validation Error Delegate" camunda:delegateExpression="#{userDataValidationErrorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="validationErrors">
+            <camunda:list>
+              <camunda:value>{"value": "value", "field": "taxPayerId", "message": "test message"} </camunda:value>
+              <camunda:value>{"value": "value2", "field": "taxPayerId2", "message": "test message2"} </camunda:value>
+            </camunda:list>
+          </camunda:inputParameter>
+          <camunda:outputParameter name="Output_2iihlu7" />
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0p5pqek</bpmn:incoming>
+      <bpmn:outgoing>Flow_133ycqg</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0p5pqek" sourceRef="Activity_1pov4gh" targetRef="well-readable-activity-id" />
+    <bpmn:userTask id="Activity_1pov4gh" name="User Task">
+      <bpmn:incoming>Flow_0s3iljg</bpmn:incoming>
+      <bpmn:outgoing>Flow_0p5pqek</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_0plk85h">
+      <bpmndi:BPMNEdge id="Flow_0p5pqek_di" bpmnElement="Flow_0p5pqek">
+        <di:waypoint x="320" y="117" />
+        <di:waypoint x="370" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_133ycqg_di" bpmnElement="Flow_133ycqg">
+        <di:waypoint x="470" y="117" />
+        <di:waypoint x="522" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0s3iljg_di" bpmnElement="Flow_0s3iljg">
+        <di:waypoint x="168" y="117" />
+        <di:waypoint x="220" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="132" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="139" y="142" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_17hd48v_di" bpmnElement="Event_17hd48v">
+        <dc:Bounds x="522" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="531" y="142" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0evwb9z_di" bpmnElement="well-readable-activity-id">
+        <dc:Bounds x="370" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_04lsw2b_di" bpmnElement="Activity_1pov4gh">
+        <dc:Bounds x="220" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_18gpu2t" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.12.0">
+  <bpmn:process id="test-batch-read" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_0j6d5zu</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0j6d5zu" sourceRef="StartEvent_1" targetRef="Activity_0u7zn17" />
+    <bpmn:sequenceFlow id="Flow_1br1mor" sourceRef="Activity_0u7zn17" targetRef="Activity_1d65s2h" />
+    <bpmn:endEvent id="Event_1a3fwwq">
+      <bpmn:incoming>Flow_122mlox</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_122mlox" sourceRef="Activity_1d65s2h" targetRef="Event_1a3fwwq" />
+    <bpmn:serviceTask id="Activity_0u7zn17" name="DataFactoryConnectorBatchReadDelegate" camunda:delegateExpression="${dataFactoryConnectorBatchReadDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="resourceIds">${resourceIds}</camunda:inputParameter>
+          <camunda:inputParameter name="resource">research</camunda:inputParameter>
+          <camunda:outputParameter name="researchResponse">${response}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0j6d5zu</bpmn:incoming>
+      <bpmn:outgoing>Flow_1br1mor</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Activity_1d65s2h" name="Assert" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1br1mor</bpmn:incoming>
+      <bpmn:outgoing>Flow_122mlox</bpmn:outgoing>
+      <bpmn:script>var researches = researchResponse.responseBody.elements()
+
+assert researches.size() == 2
+var chemResearch = researches.stream()
+        .filter(r -&gt;
+                r.prop("researchId").value().equals("7074945f-e088-446b-8c28-325aca4f423f"))
+        .findFirst().get()
+assert chemResearch != null
+assert chemResearch.prop("researchType").value().equals("Chemical factors")
+var physResearch = researches.stream()
+        .filter(r -&gt;
+                r.prop("researchId").value().equals("0b3c9f55-ba50-4d87-970a-bfbb8e31adeb"))
+        .findFirst().get()
+assert physResearch != null
+assert physResearch.prop("researchType").value().equals("Physical factors")</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="test-batch-read">
+      <bpmndi:BPMNEdge id="Flow_122mlox_di" bpmnElement="Flow_122mlox">
+        <di:waypoint x="550" y="117" />
+        <di:waypoint x="622" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1br1mor_di" bpmnElement="Flow_1br1mor">
+        <di:waypoint x="380" y="117" />
+        <di:waypoint x="450" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0j6d5zu_di" bpmnElement="Flow_0j6d5zu">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="280" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1a3fwwq_di" bpmnElement="Event_1a3fwwq">
+        <dc:Bounds x="622" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_11mm7y4_di" bpmnElement="Activity_0u7zn17">
+        <dc:Bounds x="280" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0pbmc6n_di" bpmnElement="Activity_1d65s2h">
+        <dc:Bounds x="450" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

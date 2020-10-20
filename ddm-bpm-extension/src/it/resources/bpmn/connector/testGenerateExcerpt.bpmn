@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_0s1qio9" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:process id="test_generate_excerpt" name="Assert" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" camunda:initiator="initiator">
+      <bpmn:outgoing>Flow_1oi0ew9</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1oi0ew9" sourceRef="StartEvent_1" targetRef="Activity_1iskvcy" />
+    <bpmn:sequenceFlow id="Flow_0swlvzi" sourceRef="generate_excerpt_activity_id" targetRef="Activity_1gmvuxx" />
+    <bpmn:endEvent id="Event_1o6o6gp">
+      <bpmn:incoming>Flow_1ysx8zv</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1ysx8zv" sourceRef="Activity_1gmvuxx" targetRef="Event_1o6o6gp" />
+    <bpmn:serviceTask id="generate_excerpt_activity_id" name="Generate Excerpt" camunda:modelerTemplate="excerptConnectorGenerateDelegate" camunda:delegateExpression="${excerptConnectorGenerateDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="requiresSystemSignature">true</camunda:inputParameter>
+          <camunda:inputParameter name="excerptType">subject-laboratories-accreditation-excerpt</camunda:inputParameter>
+          <camunda:inputParameter name="excerptInputData">${payload}</camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token">${initiator().accessToken}</camunda:inputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0yx7en0</bpmn:incoming>
+      <bpmn:outgoing>Flow_0swlvzi</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Activity_1gmvuxx" name="Assert" scriptFormat="groovy">
+      <bpmn:incoming>Flow_0swlvzi</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ysx8zv</bpmn:outgoing>
+      <bpmn:script>assert response.responseBody.prop('excerptIdentifier').value().equals('d564f2ab-eec6-11eb-9efa-0a580a820439')</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:scriptTask id="Activity_1iskvcy" name="Prepare input data" scriptFormat="groovy" camunda:resultVariable="payload">
+      <bpmn:incoming>Flow_1oi0ew9</bpmn:incoming>
+      <bpmn:outgoing>Flow_0yx7en0</bpmn:outgoing>
+      <bpmn:script>def payload = [subjectId: "1234"]</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_0yx7en0" sourceRef="Activity_1iskvcy" targetRef="generate_excerpt_activity_id" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="test_generate_excerpt">
+      <bpmndi:BPMNEdge id="Flow_1oi0ew9_di" bpmnElement="Flow_1oi0ew9">
+        <di:waypoint x="158" y="117" />
+        <di:waypoint x="200" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ysx8zv_di" bpmnElement="Flow_1ysx8zv">
+        <di:waypoint x="610" y="117" />
+        <di:waypoint x="672" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0swlvzi_di" bpmnElement="Flow_0swlvzi">
+        <di:waypoint x="450" y="117" />
+        <di:waypoint x="510" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0yx7en0_di" bpmnElement="Flow_0yx7en0">
+        <di:waypoint x="300" y="117" />
+        <di:waypoint x="350" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="122" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1o6o6gp_di" bpmnElement="Event_1o6o6gp">
+        <dc:Bounds x="672" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0vh92tp_di" bpmnElement="generate_excerpt_activity_id">
+        <dc:Bounds x="350" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0o26w5u_di" bpmnElement="Activity_1gmvuxx">
+        <dc:Bounds x="510" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1dy9qe3_di" bpmnElement="Activity_1iskvcy">
+        <dc:Bounds x="200" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

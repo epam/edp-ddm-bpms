@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<soap11env:Envelope xmlns:soap11env="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tns="http://nais.gov.ua/api/sevdeir/EDR" xmlns:xroad="http://x-road.eu/xsd/xroad.xsd" xmlns:id="http://x-road.eu/xsd/identifiers">
+  <soap11env:Header>
+    <tns:AuthorizationToken>token</tns:AuthorizationToken>
+    <xroad:client id:objectType="SUBSYSTEM">
+      <id:xRoadInstance>CLIENT-TEST</id:xRoadInstance>
+      <id:memberClass>GOV</id:memberClass>
+      <id:memberCode>666777666</id:memberCode>
+      <id:subsystemCode>GOV_TEST</id:subsystemCode>
+    </xroad:client>
+    <xroad:service id:objectType="SERVICE">
+      <id:xRoadInstance>EDR-TEST</id:xRoadInstance>
+      <id:memberClass>GOV</id:memberClass>
+      <id:memberCode>11115888</id:memberCode>
+      <id:subsystemCode>EDR_test</id:subsystemCode>
+      <id:serviceCode>SearchSubjects</id:serviceCode>
+    </xroad:service>
+    <xroad:protocolVersion>4.0</xroad:protocolVersion>
+    <xroad:id>DDM</xroad:id>
+    <xroad:requestHash algorithmId="http://www.w3.org/2001/04/xmldsig-more#gost34311">SuEiKUUEdrX5HcRCxIqPgYi01EmQai4q2POEOMJGJLc=</xroad:requestHash>
+  </soap11env:Header>
+  <soap11env:Body>
+    <tns:SearchSubjectsResponse>
+      <tns:SubjectList>
+        <tns:SubjectInfo>
+          <tns:state>1</tns:state>
+          <tns:state_text>ACTIVE</tns:state_text>
+          <tns:name>lab owner</tns:name>
+          <tns:url/>
+          <tns:code>01010101</tns:code>
+          <tns:id>213123123</tns:id>
+        </tns:SubjectInfo>
+      </tns:SubjectList>
+    </tns:SearchSubjectsResponse>
+  </soap11env:Body>
+</soap11env:Envelope>

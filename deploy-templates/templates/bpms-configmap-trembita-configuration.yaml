@@ -1,0 +1,15 @@
+{{- $configmap := (lookup "v1" "ConfigMap" .Values.namespace .Values.trembitaConfConfigmapName) -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.trembitaConfConfigmapName }}
+data:
+  trembita-configuration.yml: |-
+  {{- if $configmap }}
+    {{- index $configmap "data" "trembita-configuration.yml" | nindent 4 }}
+  {{- else }}
+    trembita-exchange-gateway:
+      registries:
+        edr-registry:
+          trembita-url: http://mock
+  {{- end -}}

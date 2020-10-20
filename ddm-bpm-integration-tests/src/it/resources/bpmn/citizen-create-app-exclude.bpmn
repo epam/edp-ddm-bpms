@@ -1,0 +1,1212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" id="Definitions_0rgkxg0" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:collaboration id="Collaboration_02ovycg">
+    <bpmn:participant id="Participant_18brs1j" name="Створення заяви на видалення Лабораторії з переліку" processRef="citizen-create-app-exclude" />
+  </bpmn:collaboration>
+  <bpmn:process id="citizen-create-app-exclude" name="Створення заяви на видалення Лабораторії з переліку" isExecutable="true">
+    <bpmn:laneSet id="LaneSet_1ofm8ky">
+      <bpmn:lane id="Lane_15ynufa" name="Citizen">
+        <bpmn:flowNodeRef>Event_11krvm7</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>citizenSignActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>prepareSignDate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>createValidationErrorActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>start_event</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1dd6d9i</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1ff6kao</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1z0fbwk</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_1c69eh6</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_1cl6udf" name="officer">
+        <bpmn:flowNodeRef>officerSignFormActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_12z37ob</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_00tf5ac</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>getNameAndEdrpouFromLabActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>addApplicationFormActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1a1f53o</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>checkComplianceFormActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>parseCheckComplienceFormActivity</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_0563vrv" name="headofficer">
+        <bpmn:flowNodeRef>Gateway_0ozhvw0</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_12zkqa5</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>headOfficerAgreeActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_0ylv6h6</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>getExcludeSolutionActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1getm1o</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>addDecisionExcludeFormActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>addDecisionDenyFormActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_0hozznl</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>getDenySolutionActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>createSignAppDenyFormDataPrepoulationActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>createSignAppExcludeFormDataPrepoulationActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>signAppDenyFormActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>signAppExcludeFormActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_0ynaerq</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_1g2worh</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>convertSignFormDataForExclusionToDataFactoryFormatActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>searchApplicationTypeIdForExclusionActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>searchApplicationTypeIdForDenyActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>convertSignFormDataForDenyToDataFactoryFormatActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>signFormDataForExclusionWithDsoActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>signFormDataForDenyWithDsoActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_1dnnwxx</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>defineBusinessProcessStatusForExclusionActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_15ha5z9</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>defineBusinessProcessStatusForDenyActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>createRegistrationForExclusionActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>createRegistrationForDenyActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>getOfficerUsersActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>dispatchTaskActivity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_0tpo6ct</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_1d3528m</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:endEvent id="Event_11krvm7" name="Бізнес-процес не почато">
+      <bpmn:incoming>Flow_1osx656</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="officerSignFormActivity" name="Підписати документи на видалення лабораторії з реєстру" camunda:modelerTemplate="officerSignTaskTemplate" camunda:formKey="citizen-create-app-exclude-bp-officer-sign" camunda:assignee="${officerAssignee}">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="eSign" value="true" />
+        </camunda:properties>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="userTaskInputFormDataPrepopulate">${submission('checkComplianceFormActivity').formData}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1umse39</bpmn:incoming>
+      <bpmn:outgoing>Flow_0or1jn4</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_12z37ob" name="headOfficerCheckFlag">
+      <bpmn:incoming>Flow_0or1jn4</bpmn:incoming>
+      <bpmn:outgoing>Flow_190xe4c</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1yw0mfq</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="Gateway_0ozhvw0" name="headOfficerAgreeCheckFlag">
+      <bpmn:incoming>Flow_052tyuv</bpmn:incoming>
+      <bpmn:outgoing>Flow_0a5izcd</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1851ttw</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="Gateway_12zkqa5">
+      <bpmn:incoming>Flow_1851ttw</bpmn:incoming>
+      <bpmn:incoming>Flow_190xe4c</bpmn:incoming>
+      <bpmn:outgoing>Flow_0fdt4hv</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="headOfficerAgreeActivity" name="Перевірка документів на відповідність" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="citizen-create-app-exclude-bp-headofficer-compliance" camunda:assignee="" camunda:candidateGroups="head-officer">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="userTaskInputFormDataPrepopulate">${submission('officerSignFormActivity').formData}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1yw0mfq</bpmn:incoming>
+      <bpmn:outgoing>Flow_052tyuv</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_0ylv6h6" name="errorChechFlag">
+      <bpmn:incoming>Flow_0fdt4hv</bpmn:incoming>
+      <bpmn:outgoing>Flow_0gb78wp</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0xrur4k</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="getExcludeSolutionActivity" name="Отримання результату з дата фабрики" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="resource">solution-type-equal-constant-code</camunda:inputParameter>
+          <camunda:inputParameter name="searchConditions">
+            <camunda:map>
+              <camunda:entry key="constantCode">EXCLUDE</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token">${completer('officerSignFormActivity').accessToken == null ? completer('headOfficerAgreeActivity').accessToken : completer('officerSignFormActivity').accessToken}</camunda:inputParameter>
+          <camunda:outputParameter name="solutionResponse">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0xrur4k</bpmn:incoming>
+      <bpmn:outgoing>Flow_0kv96nf</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Activity_1getm1o" name="Підготовка даних документа для показу" scriptFormat="groovy">
+      <bpmn:incoming>Flow_0kv96nf</bpmn:incoming>
+      <bpmn:outgoing>Flow_1uydftt</bpmn:outgoing>
+      <bpmn:script>def cephData = [:]
+
+        ['name', 'registrationNo'].each {
+        cephData[it] = submission('checkComplianceFormActivity').formData.prop(it).value()
+        }
+
+        var solutionResponseObj = solutionResponse.responseBody.elements()[0]
+        var solutionName = solutionResponseObj.prop('name').value()
+
+        cephData['solutionName'] = solutionName
+        cephData['initiated'] = initiated
+
+        execution.removeVariable('addDecisionExcludeFormData')
+        set_transient_variable('addDecisionExcludeFormData', S(cephData, 'application/json'))
+
+        execution.setVariable('solutionTypeId', solutionResponseObj.prop('solutionTypeId').value())</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:userTask id="addDecisionExcludeFormActivity" name="Прийняти рішення про виключення з інформаційного переліку" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="create-app-exclude-bp-add-decision-exclude" camunda:assignee="" camunda:candidateGroups="head-officer">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="eSign" value="" />
+        </camunda:properties>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="userTaskInputFormDataPrepopulate">${addDecisionExcludeFormData}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1uydftt</bpmn:incoming>
+      <bpmn:outgoing>Flow_15xxz75</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="addDecisionDenyFormActivity" name="Прийняти рішення про залишення без розгляду" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="shared-add-decision-deny" camunda:assignee="" camunda:candidateGroups="head-officer">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="eSign" value="" />
+        </camunda:properties>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="userTaskInputFormDataPrepopulate">${addDecisionDenyFormData}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1fkn4gr</bpmn:incoming>
+      <bpmn:outgoing>Flow_0tbiys0</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:scriptTask id="Activity_0hozznl" name="Підготовка даних документа для показу" scriptFormat="groovy">
+      <bpmn:incoming>Flow_0txtb4r</bpmn:incoming>
+      <bpmn:outgoing>Flow_1fkn4gr</bpmn:outgoing>
+      <bpmn:script>def cephData = [:]
+
+        ['name', 'registrationNo'].each {
+        cephData[it] = submission('checkComplianceFormActivity').formData.prop(it).value()
+        }
+
+        var solutionResponseObj = solutionResponse.responseBody.elements()[0]
+        var solutionName = solutionResponseObj.prop('name').value()
+
+        cephData['solutionName'] = solutionName
+
+        execution.removeVariable('addDecisionDenyFormData')
+        set_transient_variable('addDecisionDenyFormData', S(cephData, 'application/json'))
+
+        execution.setVariable('solutionTypeId', solutionResponseObj.prop('solutionTypeId').value())</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:serviceTask id="getDenySolutionActivity" name="Отримання результату з дата фабрики" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="resource">solution-type-equal-constant-code</camunda:inputParameter>
+          <camunda:inputParameter name="searchConditions">
+            <camunda:map>
+              <camunda:entry key="constantCode">WO_CONSIDER</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token">${completer('officerSignFormActivity').accessToken == null ? completer('headOfficerAgreeActivity').accessToken : completer('officerSignFormActivity').accessToken}</camunda:inputParameter>
+          <camunda:outputParameter name="solutionResponse">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0gb78wp</bpmn:incoming>
+      <bpmn:outgoing>Flow_0txtb4r</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="createSignAppDenyFormDataPrepoulationActivity" name="Підготовка даних документа для показу" scriptFormat="groovy">
+      <bpmn:incoming>Flow_0tbiys0</bpmn:incoming>
+      <bpmn:outgoing>Flow_0gj5d9q</bpmn:outgoing>
+      <bpmn:script>import groovy.json.JsonSlurper
+        var cephData = [:]
+
+        var formDataOutput = ['addDecisionDenyFormActivity','addApplicationFormActivity','checkComplianceFormActivity','headOfficerAgreeActivity']
+
+        def checkComplianceFormData = submission('checkComplianceFormActivity').formData
+
+        if(checkComplianceFormData.hasProp("regRefusalReason")){
+        cephData["regRefusalReason"] = [new JsonSlurper().parseText(checkComplianceFormData.prop("regRefusalReason").toString())]
+        }
+
+        if(checkComplianceFormData.hasProp("healthMinistryLetterComplianceReason")){
+        cephData["healthMinistryLetterComplianceReason"] = [new JsonSlurper().parseText(checkComplianceFormData.prop("healthMinistryLetterComplianceReason").toString())]
+        }
+
+        var refusalReasons = ["regRefusalReason", "healthMinistryLetterComplianceReason"]
+
+        formDataOutput.stream()
+        .map(activityId -&gt; submission(activityId).formData)
+        .filter(Objects::nonNull)
+        .forEach(data -&gt;
+        data.fieldNames().findAll(f -&gt; !refusalReasons.contains(f)).each {
+        cephData[it] = data.prop(it).value()
+        }
+        )
+
+        execution.removeVariable('signAppDenyFormData')
+        set_transient_variable('signAppDenyFormData', S(cephData, 'application/json'))</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:scriptTask id="createSignAppExcludeFormDataPrepoulationActivity" name="Підготовка даних документа для показу" scriptFormat="groovy">
+      <bpmn:incoming>Flow_15xxz75</bpmn:incoming>
+      <bpmn:outgoing>Flow_0inr64u</bpmn:outgoing>
+      <bpmn:script>def cephData = [:]
+
+def formDataOutput = ['addApplicationFormActivity','checkComplianceFormActivity','addDecisionExcludeFormActivity','headOfficerAgreeActivity']
+
+formDataOutput.stream()
+        .map(activityId -&gt; submission(activityId).formData)
+        .filter(Objects::nonNull)
+        .forEach(data -&gt; data.fieldNames().each {
+            cephData[it] = data.prop(it).value()
+        })
+
+execution.removeVariable('signAppExcludeFormData')
+set_transient_variable('signAppExcludeFormData', S(cephData, 'application/json'))</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:userTask id="signAppDenyFormActivity" name="Підписати КЕП" camunda:modelerTemplate="officerSignTaskTemplate" camunda:formKey="citizen-create-app-exclude-bp-sign-app-deny" camunda:assignee="" camunda:candidateGroups="head-officer">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="eSign" value="true" />
+        </camunda:properties>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="userTaskInputFormDataPrepopulate">${signAppDenyFormData}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0on4bmx</bpmn:incoming>
+      <bpmn:outgoing>Flow_0j4dlgx</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="signAppExcludeFormActivity" name="Підписати КЕП" camunda:modelerTemplate="officerSignTaskTemplate" camunda:formKey="citizen-create-app-exclude-bp-sign-app-exclude" camunda:assignee="" camunda:candidateGroups="head-officer">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="eSign" value="true" />
+        </camunda:properties>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="userTaskInputFormDataPrepopulate">${signAppExcludeFormData}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1b6jn9b</bpmn:incoming>
+      <bpmn:outgoing>Flow_09lehq0</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_0ynaerq">
+      <bpmn:incoming>Flow_0324uei</bpmn:incoming>
+      <bpmn:incoming>Flow_0inr64u</bpmn:incoming>
+      <bpmn:outgoing>Flow_1b6jn9b</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="Gateway_1g2worh">
+      <bpmn:incoming>Flow_19mzg2a</bpmn:incoming>
+      <bpmn:incoming>Flow_0gj5d9q</bpmn:incoming>
+      <bpmn:outgoing>Flow_0on4bmx</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:scriptTask id="convertSignFormDataForExclusionToDataFactoryFormatActivity" name="Підготовка даних для запису (transient var)" scriptFormat="groovy">
+      <bpmn:incoming>Flow_0039a9g</bpmn:incoming>
+      <bpmn:outgoing>Flow_1frzegu</bpmn:outgoing>
+      <bpmn:script>def requestMap = [:]
+def signAppExcludeFormData = submission('signAppExcludeFormActivity').formData
+
+signAppExcludeFormData.fieldNames().each {
+    requestMap[it] = signAppExcludeFormData.prop(it).value()
+}
+
+def appType = applicationTypeResponse.responseBody.elements()[0]
+requestMap['applicationTypeId']=appType.prop('applicationTypeId').value()
+
+requestMap['laboratoryId']= submission('start_event').formData.prop('laboratory').prop('laboratoryId').stringValue()
+requestMap['solutionTypeId'] = solutionTypeId
+
+def dataPayload = S(requestMap, 'application/json')
+execution.removeVariable('dataPayload')
+set_transient_variable('dataPayload', dataPayload)</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:serviceTask id="searchApplicationTypeIdForExclusionActivity" name="Отримання унікального ідентификатору типу заяви з дата фабрики" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="resource">application-type-equal-constant-code</camunda:inputParameter>
+          <camunda:inputParameter name="searchConditions">
+            <camunda:map>
+              <camunda:entry key="constantCode">EXCLUDE</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token">${completer('signAppExcludeFormActivity').accessToken}</camunda:inputParameter>
+          <camunda:outputParameter name="applicationTypeResponse">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_09lehq0</bpmn:incoming>
+      <bpmn:outgoing>Flow_0039a9g</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="searchApplicationTypeIdForDenyActivity" name="Отримання унікального ідентификатору типу заяви з дата фабрики" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="resource">application-type-equal-constant-code</camunda:inputParameter>
+          <camunda:inputParameter name="searchConditions">
+            <camunda:map>
+              <camunda:entry key="constantCode">EXCLUDE</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token">${completer('signAppDenyFormActivity').accessToken}</camunda:inputParameter>
+          <camunda:outputParameter name="applicationTypeResponse">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0j4dlgx</bpmn:incoming>
+      <bpmn:outgoing>Flow_1bxrr8b</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="convertSignFormDataForDenyToDataFactoryFormatActivity" name="Підготовка даних для запису (transient var)" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1bxrr8b</bpmn:incoming>
+      <bpmn:outgoing>Flow_1578idm</bpmn:outgoing>
+      <bpmn:script>def signAppDenyFormData = submission('signAppDenyFormActivity').formData
+
+        def refusalReasons = []
+        ['regRefusalReason','healthMinistryLetterComplianceReason'].each {
+        if (signAppDenyFormData.hasProp it) {
+        signAppDenyFormData.prop(it).elements().each { reason -&gt;
+        refusalReasons &lt;&lt; reason.prop('refusalReasonId').value()
+        }
+        signAppDenyFormData.deleteProp it
+        }
+        }
+
+        var requestMap = [:]
+
+        signAppDenyFormData.fieldNames().each {
+        requestMap[it] = signAppDenyFormData.prop(it).value()
+        }
+
+        def appType = applicationTypeResponse.responseBody.elements()[0]
+        requestMap['applicationTypeId']=appType.prop('applicationTypeId').value()
+
+        requestMap['laboratoryId'] = submission('start_event').formData.prop('laboratory').prop('laboratoryId').stringValue()
+        requestMap['solutionTypeId'] = solutionTypeId
+        requestMap['refusalReasons'] = refusalReasons
+
+        var dataPayload = S(requestMap, 'application/json')
+        execution.removeVariable('dataPayload')
+        set_transient_variable('dataPayload', dataPayload)</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:callActivity id="signFormDataForExclusionWithDsoActivity" name="Підписати дані системним ключем" calledElement="system-signature-bp">
+      <bpmn:extensionElements>
+        <camunda:in source="dataPayload" target="dataToSign" />
+        <camunda:out source="system_signature_ceph_key" target="system_signature_ceph_key" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1frzegu</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ewnmuo</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:callActivity id="signFormDataForDenyWithDsoActivity" name="Підписати дані системним ключем" calledElement="system-signature-bp">
+      <bpmn:extensionElements>
+        <camunda:in source="dataPayload" target="dataToSign" />
+        <camunda:out source="system_signature_ceph_key" target="system_signature_ceph_key" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1578idm</bpmn:incoming>
+      <bpmn:outgoing>Flow_1dgxdk8</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:endEvent id="Event_1dnnwxx" name="Прийнято рішення про видалення лабораторії з реєстру">
+      <bpmn:incoming>Flow_1k1xaa5</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="defineBusinessProcessStatusForExclusionActivity" name="Формування результату розгляду" camunda:modelerTemplate="defineBusinessProcessStatusDelegate" camunda:delegateExpression="${defineBusinessProcessStatusDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="status">Лабораторію видалено з реєстру</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1s2oez3</bpmn:incoming>
+      <bpmn:outgoing>Flow_1k1xaa5</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_15ha5z9" name="Прийнято рішення про залишення без розгляду">
+      <bpmn:incoming>Flow_0yrwhm9</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="defineBusinessProcessStatusForDenyActivity" name="Формування результату розгляду" camunda:modelerTemplate="defineBusinessProcessStatusDelegate" camunda:delegateExpression="${defineBusinessProcessStatusDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="status">Залишено без розгляду</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0tei7z3</bpmn:incoming>
+      <bpmn:outgoing>Flow_0yrwhm9</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="createRegistrationForExclusionActivity" name="Зберегти дані в Дата фабрику" camunda:modelerTemplate="dataFactoryConnectorCreateDelegate" camunda:delegateExpression="${dataFactoryConnectorCreateDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="resource">registration</camunda:inputParameter>
+          <camunda:inputParameter name="payload">${dataPayload}</camunda:inputParameter>
+          <camunda:inputParameter name="x_digital_signature_derived_ceph_key">${system_signature_ceph_key}</camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token">${completer('signAppExcludeFormActivity').accessToken}</camunda:inputParameter>
+          <camunda:inputParameter name="x_digital_signature_ceph_key">${sign_submission('signAppExcludeFormActivity').signatureDocumentId}</camunda:inputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0ewnmuo</bpmn:incoming>
+      <bpmn:outgoing>Flow_1s2oez3</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="createRegistrationForDenyActivity" name="Зберегти дані в Дата фабрику" camunda:modelerTemplate="dataFactoryConnectorCreateDelegate" camunda:delegateExpression="${dataFactoryConnectorCreateDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="resource">registration</camunda:inputParameter>
+          <camunda:inputParameter name="payload">${dataPayload}</camunda:inputParameter>
+          <camunda:inputParameter name="x_digital_signature_derived_ceph_key">${system_signature_ceph_key}</camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token">${completer('signAppDenyFormActivity').accessToken}</camunda:inputParameter>
+          <camunda:inputParameter name="x_digital_signature_ceph_key">${sign_submission('signAppDenyFormActivity').signatureDocumentId}</camunda:inputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1dgxdk8</bpmn:incoming>
+      <bpmn:outgoing>Flow_0tei7z3</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="citizenSignActivity" name="Підписати дані" camunda:modelerTemplate="citizenSignTaskTemplate" camunda:formKey="citizen-create-app-exclude-sign-app" camunda:assignee="${initiator}">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="eSign" value="true" />
+          <camunda:property name="CITIZEN" value="" />
+          <camunda:property name="ENTREPRENEUR" value="true" />
+          <camunda:property name="LEGAL" value="true" />
+          <camunda:property name="formVariables" value="" />
+        </camunda:properties>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="userTaskInputFormDataPrepopulate">${submission('start_event').formData}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_022v17m</bpmn:incoming>
+      <bpmn:outgoing>Flow_0369kux</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="getOfficerUsersActivity" name="Отримання користувачів з ролью &#39;officer&#39;" camunda:modelerTemplate="getUsersByRoleFromKeycloak" camunda:delegateExpression="${keycloakGetUsersConnectorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="role_name" />
+          <camunda:outputParameter name="officerUsers">${ usersByRole }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0nkhj0b</bpmn:incoming>
+      <bpmn:outgoing>Flow_0vpzv3j</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="prepareSignDate" name="Підготовка дати підписання" scriptFormat="groovy">
+      <bpmn:incoming>Flow_0369kux</bpmn:incoming>
+      <bpmn:outgoing>Flow_0nkhj0b</bpmn:outgoing>
+      <bpmn:script>import java.text.SimpleDateFormat
+
+def date = new Date()
+def sdf = new SimpleDateFormat("yyyy-MM-dd")
+
+execution.setVariable('createdDate', sdf.format(date))</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:serviceTask id="createValidationErrorActivity" name="Формування валідаційної помилки" camunda:modelerTemplate="userDataValidationErrorDelegate" camunda:delegateExpression="${userDataValidationErrorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="validationErrors">
+            <camunda:list>
+              <camunda:value>{"field": "laboratory", "value": "${submission('start_event').formData.prop('laboratory').prop('laboratoryId').value()}", "message": "Немає заяви на первинне внесення або заява на видалення вже створена"}</camunda:value>
+            </camunda:list>
+          </camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1uh4o3y</bpmn:incoming>
+      <bpmn:outgoing>Flow_1osx656</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:startEvent id="start_event" name="Початок процессу" camunda:formKey="citizen-shared-search-lab" camunda:initiator="initiator">
+      <bpmn:outgoing>Flow_0c4kjdl</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_1dd6d9i" name="Запит даних про актуальну заяву" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="resource">last-laboratory-solution</camunda:inputParameter>
+          <camunda:inputParameter name="searchConditions">
+            <camunda:map>
+              <camunda:entry key="laboratoryId">${submission('start_event').formData.prop('laboratory').prop('laboratoryId').value()}</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token">${initiator().accessToken}</camunda:inputParameter>
+          <camunda:outputParameter name="lastSolutionResponse">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0c4kjdl</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ls0w3k</bpmn:outgoing>
+      <bpmn:property id="Property_0avhn7f" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DataInputAssociation_1oq9sqv">
+        <bpmn:sourceRef>DataStoreReference_048cae9</bpmn:sourceRef>
+        <bpmn:targetRef>Property_0avhn7f</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:dataStoreReference id="DataStoreReference_048cae9" name="Дата Фабрика" />
+    <bpmn:serviceTask id="Activity_1ff6kao" name="Запит до довідника applicationType (ADD)" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="resource">application-type-equal-constant-code</camunda:inputParameter>
+          <camunda:inputParameter name="searchConditions">
+            <camunda:map>
+              <camunda:entry key="constantCode">ADD</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token">${initiator().accessToken}</camunda:inputParameter>
+          <camunda:outputParameter name="appTypeResponse">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0ls0w3k</bpmn:incoming>
+      <bpmn:outgoing>Flow_1dm2pq7</bpmn:outgoing>
+      <bpmn:property id="Property_1dncaet" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DataInputAssociation_0g8wgdq">
+        <bpmn:sourceRef>DataStoreReference_1ltt0e3</bpmn:sourceRef>
+        <bpmn:targetRef>Property_1dncaet</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:dataStoreReference id="DataStoreReference_1ltt0e3" name="Дата Фабрика" />
+    <bpmn:serviceTask id="Activity_1z0fbwk" name="Запит до довідника solutionType (ADD)" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="resource">solution-type-equal-constant-code</camunda:inputParameter>
+          <camunda:inputParameter name="searchConditions">
+            <camunda:map>
+              <camunda:entry key="constantCode">ADD</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token">${initiator().accessToken}</camunda:inputParameter>
+          <camunda:outputParameter name="solTypeResponse">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1dm2pq7</bpmn:incoming>
+      <bpmn:outgoing>Flow_0uev93k</bpmn:outgoing>
+      <bpmn:property id="Property_199dxzs" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DataInputAssociation_0i4zriu">
+        <bpmn:sourceRef>DataStoreReference_103sahg</bpmn:sourceRef>
+        <bpmn:targetRef>Property_199dxzs</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:dataStoreReference id="DataStoreReference_103sahg" name="Дата Фабрика" />
+    <bpmn:exclusiveGateway id="Gateway_1c69eh6" name="Оcтання заява на включення та прийнята?">
+      <bpmn:incoming>Flow_0uev93k</bpmn:incoming>
+      <bpmn:outgoing>Flow_1uh4o3y</bpmn:outgoing>
+      <bpmn:outgoing>Flow_022v17m</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="Gateway_00tf5ac">
+      <bpmn:incoming>Flow_16awf42</bpmn:incoming>
+      <bpmn:incoming>Flow_0a5izcd</bpmn:incoming>
+      <bpmn:outgoing>Flow_03ynu3l</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:scriptTask id="getNameAndEdrpouFromLabActivity" name="Підготовка даних документа для показу (transient)" scriptFormat="groovy">
+      <bpmn:incoming>Flow_11an4cf</bpmn:incoming>
+      <bpmn:outgoing>Flow_0wo44qp</bpmn:outgoing>
+      <bpmn:script>def cephData = [:]
+def userAssignee = submission('dispatchTaskActivity').formData.prop('userTaskAssignee')
+
+execution.setVariable('fullName',userAssignee.prop('fullName').value())
+
+cephData['registrationSource'] = 'електроннаПодача'
+cephData['createdDate'] = createdDate
+cephData['acceptedBy'] = fullName
+
+def subjectType = submission('citizenSignActivity').formData.prop('subjectType').value()
+if (subjectType.equals('ENTREPRENEUR')) {
+  cephData['subjectCode'] = submission('citizenSignActivity').formData.prop('rnokppCode').value()
+} else if (subjectType.equals('LEGAL')) {
+  cephData['subjectCode'] = submission('citizenSignActivity').formData.prop('edrpou').value()
+}
+
+cephData['name'] = submission('citizenSignActivity').formData.prop('laboratory').prop('name').value()
+
+execution.removeVariable('officerAssignee')
+execution.setVariable('officerAssignee', userAssignee.prop('userName').value())
+
+execution.removeVariable('addApplicationFormPayload')
+set_transient_variable('addApplicationFormPayload', S(cephData, 'application/json'))</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:userTask id="dispatchTaskActivity" name="Призначення виконавця задачі &#34;Створити заяву&#34;" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="shared-dispatch-task" camunda:assignee="" camunda:candidateGroups="head-officer">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="formVariables" value="officerUsers" />
+        </camunda:properties>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="userTaskInputFormDataPrepopulate" />
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0vpzv3j</bpmn:incoming>
+      <bpmn:outgoing>Flow_11an4cf</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:boundaryEvent id="Event_0tpo6ct" attachedToRef="createRegistrationForDenyActivity">
+      <bpmn:outgoing>Flow_19mzg2a</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_0z3e6d2" />
+    </bpmn:boundaryEvent>
+    <bpmn:boundaryEvent id="Event_1d3528m" attachedToRef="createRegistrationForExclusionActivity">
+      <bpmn:outgoing>Flow_0324uei</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_061seyk" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_1umse39" sourceRef="parseCheckComplienceFormActivity" targetRef="officerSignFormActivity" />
+    <bpmn:sequenceFlow id="Flow_1osx656" sourceRef="createValidationErrorActivity" targetRef="Event_11krvm7" />
+    <bpmn:sequenceFlow id="Flow_16awf42" sourceRef="addApplicationFormActivity" targetRef="Gateway_00tf5ac" />
+    <bpmn:sequenceFlow id="Flow_0ebqe8e" sourceRef="checkComplianceFormActivity" targetRef="parseCheckComplienceFormActivity" />
+    <bpmn:sequenceFlow id="Flow_0or1jn4" sourceRef="officerSignFormActivity" targetRef="Gateway_12z37ob" />
+    <bpmn:sequenceFlow id="Flow_03ynu3l" sourceRef="Gateway_00tf5ac" targetRef="Activity_1a1f53o" />
+    <bpmn:sequenceFlow id="Flow_190xe4c" name="false" sourceRef="Gateway_12z37ob" targetRef="Gateway_12zkqa5">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!submission('checkComplianceFormActivity').formData.hasProp('headOfficerCheckFlag') || submission('checkComplianceFormActivity').formData.prop('headOfficerCheckFlag').value() == false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1yw0mfq" name="true" sourceRef="Gateway_12z37ob" targetRef="headOfficerAgreeActivity">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${submission('checkComplianceFormActivity').formData.hasProp('headOfficerCheckFlag') &amp;&amp; submission('checkComplianceFormActivity').formData.prop('headOfficerCheckFlag').value() == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0a5izcd" name="false" sourceRef="Gateway_0ozhvw0" targetRef="Gateway_00tf5ac">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!submission('headOfficerAgreeActivity').formData.hasProp('headOfficerAgreeCheckFlag') || submission('headOfficerAgreeActivity').formData.prop('headOfficerAgreeCheckFlag').value() == false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0xrur4k" name="false" sourceRef="Gateway_0ylv6h6" targetRef="getExcludeSolutionActivity">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!errorCheckFlag}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0gb78wp" name="true" sourceRef="Gateway_0ylv6h6" targetRef="getDenySolutionActivity">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${errorCheckFlag}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0txtb4r" sourceRef="getDenySolutionActivity" targetRef="Activity_0hozznl" />
+    <bpmn:sequenceFlow id="Flow_0kv96nf" sourceRef="getExcludeSolutionActivity" targetRef="Activity_1getm1o" />
+    <bpmn:sequenceFlow id="Flow_1uydftt" sourceRef="Activity_1getm1o" targetRef="addDecisionExcludeFormActivity" />
+    <bpmn:sequenceFlow id="Flow_1fkn4gr" sourceRef="Activity_0hozznl" targetRef="addDecisionDenyFormActivity" />
+    <bpmn:sequenceFlow id="Flow_0gj5d9q" sourceRef="createSignAppDenyFormDataPrepoulationActivity" targetRef="Gateway_1g2worh" />
+    <bpmn:sequenceFlow id="Flow_0inr64u" sourceRef="createSignAppExcludeFormDataPrepoulationActivity" targetRef="Gateway_0ynaerq" />
+    <bpmn:sequenceFlow id="Flow_0on4bmx" sourceRef="Gateway_1g2worh" targetRef="signAppDenyFormActivity" />
+    <bpmn:sequenceFlow id="Flow_0j4dlgx" sourceRef="signAppDenyFormActivity" targetRef="searchApplicationTypeIdForDenyActivity" />
+    <bpmn:sequenceFlow id="Flow_1b6jn9b" sourceRef="Gateway_0ynaerq" targetRef="signAppExcludeFormActivity" />
+    <bpmn:sequenceFlow id="Flow_09lehq0" sourceRef="signAppExcludeFormActivity" targetRef="searchApplicationTypeIdForExclusionActivity" />
+    <bpmn:sequenceFlow id="Flow_0324uei" sourceRef="Event_1d3528m" targetRef="Gateway_0ynaerq" />
+    <bpmn:sequenceFlow id="Flow_19mzg2a" sourceRef="Event_0tpo6ct" targetRef="Gateway_1g2worh" />
+    <bpmn:sequenceFlow id="Flow_0039a9g" sourceRef="searchApplicationTypeIdForExclusionActivity" targetRef="convertSignFormDataForExclusionToDataFactoryFormatActivity" />
+    <bpmn:sequenceFlow id="Flow_1frzegu" sourceRef="convertSignFormDataForExclusionToDataFactoryFormatActivity" targetRef="signFormDataForExclusionWithDsoActivity" />
+    <bpmn:sequenceFlow id="Flow_1bxrr8b" sourceRef="searchApplicationTypeIdForDenyActivity" targetRef="convertSignFormDataForDenyToDataFactoryFormatActivity" />
+    <bpmn:sequenceFlow id="Flow_1578idm" sourceRef="convertSignFormDataForDenyToDataFactoryFormatActivity" targetRef="signFormDataForDenyWithDsoActivity" />
+    <bpmn:sequenceFlow id="Flow_0ewnmuo" sourceRef="signFormDataForExclusionWithDsoActivity" targetRef="createRegistrationForExclusionActivity" />
+    <bpmn:sequenceFlow id="Flow_1dgxdk8" sourceRef="signFormDataForDenyWithDsoActivity" targetRef="createRegistrationForDenyActivity" />
+    <bpmn:sequenceFlow id="Flow_1k1xaa5" sourceRef="defineBusinessProcessStatusForExclusionActivity" targetRef="Event_1dnnwxx" />
+    <bpmn:sequenceFlow id="Flow_1s2oez3" sourceRef="createRegistrationForExclusionActivity" targetRef="defineBusinessProcessStatusForExclusionActivity" />
+    <bpmn:sequenceFlow id="Flow_0yrwhm9" sourceRef="defineBusinessProcessStatusForDenyActivity" targetRef="Event_15ha5z9" />
+    <bpmn:sequenceFlow id="Flow_0tei7z3" sourceRef="createRegistrationForDenyActivity" targetRef="defineBusinessProcessStatusForDenyActivity" />
+    <bpmn:sequenceFlow id="Flow_052tyuv" sourceRef="headOfficerAgreeActivity" targetRef="Gateway_0ozhvw0" />
+    <bpmn:sequenceFlow id="Flow_1851ttw" name="true" sourceRef="Gateway_0ozhvw0" targetRef="Gateway_12zkqa5">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${submission('headOfficerAgreeActivity').formData.hasProp('headOfficerAgreeCheckFlag') &amp;&amp; submission('headOfficerAgreeActivity').formData.prop('headOfficerAgreeCheckFlag').value() == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0fdt4hv" sourceRef="Gateway_12zkqa5" targetRef="Gateway_0ylv6h6" />
+    <bpmn:sequenceFlow id="Flow_15xxz75" sourceRef="addDecisionExcludeFormActivity" targetRef="createSignAppExcludeFormDataPrepoulationActivity" />
+    <bpmn:sequenceFlow id="Flow_0tbiys0" sourceRef="addDecisionDenyFormActivity" targetRef="createSignAppDenyFormDataPrepoulationActivity" />
+    <bpmn:sequenceFlow id="Flow_0wo44qp" sourceRef="getNameAndEdrpouFromLabActivity" targetRef="addApplicationFormActivity" />
+    <bpmn:sequenceFlow id="Flow_022v17m" name="так" sourceRef="Gateway_1c69eh6" targetRef="citizenSignActivity">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!lastSolutionResponse.value.responseBody.elements().isEmpty() &amp;&amp; lastSolutionResponse.value.responseBody.elements()[0].prop('applicationTypeId').value().equals(appTypeResponse.value.responseBody.elements()[0].prop('applicationTypeId').value()) &amp;&amp; lastSolutionResponse.value.responseBody.elements()[0].prop('solutionTypeId').value().equals(solTypeResponse.value.responseBody.elements()[0].prop('solutionTypeId').value())}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0369kux" sourceRef="citizenSignActivity" targetRef="prepareSignDate" />
+    <bpmn:sequenceFlow id="Flow_0nkhj0b" sourceRef="prepareSignDate" targetRef="getOfficerUsersActivity" />
+    <bpmn:sequenceFlow id="Flow_0vpzv3j" sourceRef="getOfficerUsersActivity" targetRef="dispatchTaskActivity" />
+    <bpmn:sequenceFlow id="Flow_11an4cf" sourceRef="dispatchTaskActivity" targetRef="getNameAndEdrpouFromLabActivity" />
+    <bpmn:sequenceFlow id="Flow_1uh4o3y" name="ні" sourceRef="Gateway_1c69eh6" targetRef="createValidationErrorActivity">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${lastSolutionResponse.value.responseBody.elements().isEmpty() || !lastSolutionResponse.value.responseBody.elements()[0].prop('applicationTypeId').value().equals(appTypeResponse.value.responseBody.elements()[0].prop('applicationTypeId').value()) || !lastSolutionResponse.value.responseBody.elements()[0].prop('solutionTypeId').value().equals(solTypeResponse.value.responseBody.elements()[0].prop('solutionTypeId').value())}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0c4kjdl" sourceRef="start_event" targetRef="Activity_1dd6d9i" />
+    <bpmn:sequenceFlow id="Flow_0ls0w3k" sourceRef="Activity_1dd6d9i" targetRef="Activity_1ff6kao" />
+    <bpmn:sequenceFlow id="Flow_1dm2pq7" sourceRef="Activity_1ff6kao" targetRef="Activity_1z0fbwk" />
+    <bpmn:sequenceFlow id="Flow_0uev93k" sourceRef="Activity_1z0fbwk" targetRef="Gateway_1c69eh6" />
+    <bpmn:sequenceFlow id="Flow_0h9tvi4" sourceRef="Activity_1a1f53o" targetRef="checkComplianceFormActivity" />
+    <bpmn:userTask id="addApplicationFormActivity" name="Створити заяву" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="citizen-shared-add-application" camunda:assignee="${officerAssignee}">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="formVariables" value="fullName" />
+        </camunda:properties>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="userTaskInputFormDataPrepopulate">${addApplicationFormPayload}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0wo44qp</bpmn:incoming>
+      <bpmn:outgoing>Flow_16awf42</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:scriptTask id="Activity_1a1f53o" name="Підготовка даних документа для показу (transient)" scriptFormat="groovy">
+      <bpmn:incoming>Flow_03ynu3l</bpmn:incoming>
+      <bpmn:outgoing>Flow_0h9tvi4</bpmn:outgoing>
+      <bpmn:script>def data= submission('headOfficerAgreeActivity').formData == null ? submission('addApplicationFormActivity').formData : submission('headOfficerAgreeActivity').formData
+
+execution.removeVariable('checkCompliancePayload')
+set_transient_variable('checkCompliancePayload', data)</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:userTask id="checkComplianceFormActivity" name="Перевірити документи на відповідність" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="citizen-create-app-exclude-bp-check-compliance" camunda:assignee="${officerAssignee}">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="eSign" value="" />
+        </camunda:properties>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="userTaskInputFormDataPrepopulate">${checkCompliancePayload}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0h9tvi4</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ebqe8e</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:scriptTask id="parseCheckComplienceFormActivity" name="Перевірити наявність помилок" scriptFormat="groovy">
+      <bpmn:incoming>Flow_0ebqe8e</bpmn:incoming>
+      <bpmn:outgoing>Flow_1umse39</bpmn:outgoing>
+      <bpmn:script>['errorCheckFlag', 'initiated'].each {
+        execution.setVariable(it, submission('checkComplianceFormActivity').formData.prop(it).value())
+        }</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:textAnnotation id="TextAnnotation_1sc7vnj">
+      <bpmn:text>СК возвращает последюю заявку
+если если вернулся NULL или последняя заявка была на удаление - то формируется валидационная ошибка
+ 
+если вернулась последняя заявка на первичное внесение двигаемся дальше по процессу процессу</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="TextAnnotation_1ugv5hf">
+      <bpmn:text>на этой форме Руководитель может, нажав чекбокс, согласовать заявку или отравить на доработку 
+
+Чекбокс headOfficerAgreeCheckFlag - true -  переходим к проверке чекбокса по ошибкам - errorCheckFlag
+
+Чекбокс headOfficerAgreeCheckFlag- false- будет отправлено к чиновнику на доработку</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1vky6yo" sourceRef="Activity_1dd6d9i" targetRef="TextAnnotation_1sc7vnj" />
+    <bpmn:association id="Association_0feepz9" sourceRef="Gateway_1c69eh6" targetRef="TextAnnotation_1sc7vnj" />
+    <bpmn:textAnnotation id="TextAnnotation_1v4846w">
+      <bpmn:text>на этой форме Чиновник может, нажав чекбокс, отправить на рассмотрение руководителю,
+
+Чекбокс headOfficerAgreeCheckFlag - true - будет отправлено к руководителю,
+
+Чекбокс headOfficerAgreeCheckFlag- false- переходим к проверке чекбокса по ошибкам - errorCheckFlag</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_0phsffc" sourceRef="checkComplianceFormActivity" targetRef="TextAnnotation_1v4846w" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_02ovycg">
+      <bpmndi:BPMNShape id="Participant_18brs1j_di" bpmnElement="Participant_18brs1j" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="4210" height="1300" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_0563vrv_di" bpmnElement="Lane_0563vrv" isHorizontal="true">
+        <dc:Bounds x="190" y="860" width="4180" height="520" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_1cl6udf_di" bpmnElement="Lane_1cl6udf" isHorizontal="true">
+        <dc:Bounds x="190" y="650" width="4180" height="210" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_15ynufa_di" bpmnElement="Lane_15ynufa" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="4180" height="570" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0h9tvi4_di" bpmnElement="Flow_0h9tvi4">
+        <di:waypoint x="1700" y="770" />
+        <di:waypoint x="1760" y="770" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0uev93k_di" bpmnElement="Flow_0uev93k">
+        <di:waypoint x="710" y="410" />
+        <di:waypoint x="745" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1dm2pq7_di" bpmnElement="Flow_1dm2pq7">
+        <di:waypoint x="580" y="410" />
+        <di:waypoint x="610" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ls0w3k_di" bpmnElement="Flow_0ls0w3k">
+        <di:waypoint x="450" y="410" />
+        <di:waypoint x="480" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0c4kjdl_di" bpmnElement="Flow_0c4kjdl">
+        <di:waypoint x="318" y="410" />
+        <di:waypoint x="350" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1uh4o3y_di" bpmnElement="Flow_1uh4o3y">
+        <di:waypoint x="770" y="385" />
+        <di:waypoint x="770" y="260" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="752" y="313" width="9" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11an4cf_di" bpmnElement="Flow_11an4cf" bioc:stroke="black" bioc:fill="white">
+        <di:waypoint x="1230" y="991" />
+        <di:waypoint x="1230" y="810" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0vpzv3j_di" bpmnElement="Flow_0vpzv3j">
+        <di:waypoint x="1090" y="1031" />
+        <di:waypoint x="1180" y="1031" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0nkhj0b_di" bpmnElement="Flow_0nkhj0b">
+        <di:waypoint x="1040" y="580" />
+        <di:waypoint x="1040" y="991" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0369kux_di" bpmnElement="Flow_0369kux">
+        <di:waypoint x="1040" y="450" />
+        <di:waypoint x="1040" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_022v17m_di" bpmnElement="Flow_022v17m">
+        <di:waypoint x="795" y="410" />
+        <di:waypoint x="990" y="410" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="892" y="392" width="16" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0wo44qp_di" bpmnElement="Flow_0wo44qp">
+        <di:waypoint x="1280" y="770" />
+        <di:waypoint x="1330" y="770" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0tbiys0_di" bpmnElement="Flow_0tbiys0">
+        <di:waypoint x="2990" y="1280" />
+        <di:waypoint x="3020" y="1280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15xxz75_di" bpmnElement="Flow_15xxz75">
+        <di:waypoint x="3000" y="1021" />
+        <di:waypoint x="3020" y="1021" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0fdt4hv_di" bpmnElement="Flow_0fdt4hv">
+        <di:waypoint x="2515" y="1021" />
+        <di:waypoint x="2555" y="1021" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1851ttw_di" bpmnElement="Flow_1851ttw">
+        <di:waypoint x="2395" y="1021" />
+        <di:waypoint x="2465" y="1021" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2422" y="1003" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_052tyuv_di" bpmnElement="Flow_052tyuv">
+        <di:waypoint x="2290" y="1021" />
+        <di:waypoint x="2345" y="1021" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0tei7z3_di" bpmnElement="Flow_0tei7z3">
+        <di:waypoint x="3970" y="1280" />
+        <di:waypoint x="4020" y="1280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0yrwhm9_di" bpmnElement="Flow_0yrwhm9">
+        <di:waypoint x="4120" y="1280" />
+        <di:waypoint x="4152" y="1280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1s2oez3_di" bpmnElement="Flow_1s2oez3">
+        <di:waypoint x="3970" y="1021" />
+        <di:waypoint x="4020" y="1021" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1k1xaa5_di" bpmnElement="Flow_1k1xaa5">
+        <di:waypoint x="4120" y="1021" />
+        <di:waypoint x="4152" y="1021" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1dgxdk8_di" bpmnElement="Flow_1dgxdk8">
+        <di:waypoint x="3820" y="1280" />
+        <di:waypoint x="3870" y="1280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ewnmuo_di" bpmnElement="Flow_0ewnmuo">
+        <di:waypoint x="3820" y="1021" />
+        <di:waypoint x="3870" y="1021" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1578idm_di" bpmnElement="Flow_1578idm">
+        <di:waypoint x="3660" y="1280" />
+        <di:waypoint x="3720" y="1280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1bxrr8b_di" bpmnElement="Flow_1bxrr8b">
+        <di:waypoint x="3490" y="1280" />
+        <di:waypoint x="3560" y="1280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1frzegu_di" bpmnElement="Flow_1frzegu">
+        <di:waypoint x="3660" y="1021" />
+        <di:waypoint x="3720" y="1021" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0039a9g_di" bpmnElement="Flow_0039a9g">
+        <di:waypoint x="3490" y="1021" />
+        <di:waypoint x="3560" y="1021" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19mzg2a_di" bpmnElement="Flow_19mzg2a">
+        <di:waypoint x="3920" y="1222" />
+        <di:waypoint x="3920" y="1202" />
+        <di:waypoint x="3180" y="1202" />
+        <di:waypoint x="3180" y="1255" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0324uei_di" bpmnElement="Flow_0324uei">
+        <di:waypoint x="3920" y="963" />
+        <di:waypoint x="3920" y="943" />
+        <di:waypoint x="3180" y="943" />
+        <di:waypoint x="3180" y="996" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_09lehq0_di" bpmnElement="Flow_09lehq0">
+        <di:waypoint x="3340" y="1021" />
+        <di:waypoint x="3390" y="1021" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1b6jn9b_di" bpmnElement="Flow_1b6jn9b">
+        <di:waypoint x="3205" y="1021" />
+        <di:waypoint x="3240" y="1021" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0j4dlgx_di" bpmnElement="Flow_0j4dlgx">
+        <di:waypoint x="3340" y="1280" />
+        <di:waypoint x="3390" y="1280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0on4bmx_di" bpmnElement="Flow_0on4bmx">
+        <di:waypoint x="3205" y="1280" />
+        <di:waypoint x="3240" y="1280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0inr64u_di" bpmnElement="Flow_0inr64u">
+        <di:waypoint x="3120" y="1021" />
+        <di:waypoint x="3155" y="1021" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0gj5d9q_di" bpmnElement="Flow_0gj5d9q">
+        <di:waypoint x="3120" y="1280" />
+        <di:waypoint x="3155" y="1280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1fkn4gr_di" bpmnElement="Flow_1fkn4gr">
+        <di:waypoint x="2860" y="1280" />
+        <di:waypoint x="2890" y="1280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1uydftt_di" bpmnElement="Flow_1uydftt">
+        <di:waypoint x="2880" y="1021" />
+        <di:waypoint x="2900" y="1021" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kv96nf_di" bpmnElement="Flow_0kv96nf">
+        <di:waypoint x="2750" y="1021" />
+        <di:waypoint x="2780" y="1021" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0txtb4r_di" bpmnElement="Flow_0txtb4r">
+        <di:waypoint x="2740" y="1280" />
+        <di:waypoint x="2760" y="1280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0gb78wp_di" bpmnElement="Flow_0gb78wp">
+        <di:waypoint x="2580" y="1046" />
+        <di:waypoint x="2580" y="1280" />
+        <di:waypoint x="2640" y="1280" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2587" y="1153" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xrur4k_di" bpmnElement="Flow_0xrur4k">
+        <di:waypoint x="2605" y="1021" />
+        <di:waypoint x="2650" y="1021" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2616" y="1003" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0a5izcd_di" bpmnElement="Flow_0a5izcd">
+        <di:waypoint x="2370" y="1046" />
+        <di:waypoint x="2370" y="1140" />
+        <di:waypoint x="1520" y="1140" />
+        <di:waypoint x="1520" y="795" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1933" y="1163" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1yw0mfq_di" bpmnElement="Flow_1yw0mfq">
+        <di:waypoint x="2240" y="795" />
+        <di:waypoint x="2240" y="981" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2247" y="890" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_190xe4c_di" bpmnElement="Flow_190xe4c">
+        <di:waypoint x="2265" y="770" />
+        <di:waypoint x="2490" y="770" />
+        <di:waypoint x="2490" y="996" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2366" y="752" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03ynu3l_di" bpmnElement="Flow_03ynu3l">
+        <di:waypoint x="1545" y="770" />
+        <di:waypoint x="1600" y="770" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0or1jn4_di" bpmnElement="Flow_0or1jn4">
+        <di:waypoint x="2170" y="770" />
+        <di:waypoint x="2215" y="770" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ebqe8e_di" bpmnElement="Flow_0ebqe8e">
+        <di:waypoint x="1860" y="770" />
+        <di:waypoint x="1910" y="770" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16awf42_di" bpmnElement="Flow_16awf42">
+        <di:waypoint x="1430" y="770" />
+        <di:waypoint x="1495" y="770" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1osx656_di" bpmnElement="Flow_1osx656">
+        <di:waypoint x="820" y="220" />
+        <di:waypoint x="4062" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1umse39_di" bpmnElement="Flow_1umse39">
+        <di:waypoint x="2010" y="770" />
+        <di:waypoint x="2070" y="770" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_11krvm7_di" bpmnElement="Event_11krvm7">
+        <dc:Bounds x="4062" y="202" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4036" y="245" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1o5bkah_di" bpmnElement="officerSignFormActivity">
+        <dc:Bounds x="2070" y="730" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_12z37ob_di" bpmnElement="Gateway_12z37ob" isMarkerVisible="true">
+        <dc:Bounds x="2215" y="745" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2200" y="686" width="84" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0ozhvw0_di" bpmnElement="Gateway_0ozhvw0" isMarkerVisible="true">
+        <dc:Bounds x="2345" y="996" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2321" y="967" width="81" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_12zkqa5_di" bpmnElement="Gateway_12zkqa5" isMarkerVisible="true">
+        <dc:Bounds x="2465" y="996" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1sshzxe_di" bpmnElement="headOfficerAgreeActivity">
+        <dc:Bounds x="2190" y="981" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0ylv6h6_di" bpmnElement="Gateway_0ylv6h6" isMarkerVisible="true">
+        <dc:Bounds x="2555" y="996" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2542" y="964" width="77" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0dm7ckv_di" bpmnElement="getExcludeSolutionActivity">
+        <dc:Bounds x="2650" y="981" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1getm1o_di" bpmnElement="Activity_1getm1o" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="2780" y="981" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0drkr1c_di" bpmnElement="addDecisionExcludeFormActivity">
+        <dc:Bounds x="2900" y="981" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0o3kjq9_di" bpmnElement="addDecisionDenyFormActivity">
+        <dc:Bounds x="2890" y="1240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0hozznl_di" bpmnElement="Activity_0hozznl" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="2760" y="1240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1dwq2h6_di" bpmnElement="getDenySolutionActivity">
+        <dc:Bounds x="2640" y="1240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_02s302e_di" bpmnElement="createSignAppDenyFormDataPrepoulationActivity">
+        <dc:Bounds x="3020" y="1240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0af4wlu_di" bpmnElement="createSignAppExcludeFormDataPrepoulationActivity">
+        <dc:Bounds x="3020" y="981" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ztad0w_di" bpmnElement="signAppDenyFormActivity">
+        <dc:Bounds x="3240" y="1240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_144r15x_di" bpmnElement="signAppExcludeFormActivity">
+        <dc:Bounds x="3240" y="981" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0ynaerq_di" bpmnElement="Gateway_0ynaerq" isMarkerVisible="true">
+        <dc:Bounds x="3155" y="996" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1g2worh_di" bpmnElement="Gateway_1g2worh" isMarkerVisible="true">
+        <dc:Bounds x="3155" y="1255" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1tfugmi_di" bpmnElement="convertSignFormDataForExclusionToDataFactoryFormatActivity" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="3560" y="981" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0tjyr2v_di" bpmnElement="searchApplicationTypeIdForExclusionActivity">
+        <dc:Bounds x="3390" y="981" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1mxei1g_di" bpmnElement="searchApplicationTypeIdForDenyActivity">
+        <dc:Bounds x="3390" y="1240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1sts3jx_di" bpmnElement="convertSignFormDataForDenyToDataFactoryFormatActivity" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="3560" y="1240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ej79ug_di" bpmnElement="signFormDataForExclusionWithDsoActivity">
+        <dc:Bounds x="3720" y="981" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0obro02_di" bpmnElement="signFormDataForDenyWithDsoActivity">
+        <dc:Bounds x="3720" y="1240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1dnnwxx_di" bpmnElement="Event_1dnnwxx">
+        <dc:Bounds x="4152" y="1003" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4137" y="1046" width="68" height="66" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0wlj8yf_di" bpmnElement="defineBusinessProcessStatusForExclusionActivity">
+        <dc:Bounds x="4020" y="981" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_15ha5z9_di" bpmnElement="Event_15ha5z9">
+        <dc:Bounds x="4152" y="1262" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4132" y="1305" width="78" height="53" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0zqg748_di" bpmnElement="defineBusinessProcessStatusForDenyActivity">
+        <dc:Bounds x="4020" y="1240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0514dw7_di" bpmnElement="createRegistrationForExclusionActivity">
+        <dc:Bounds x="3870" y="981" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_038k4vv_di" bpmnElement="createRegistrationForDenyActivity">
+        <dc:Bounds x="3870" y="1240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0stvfsd_di" bpmnElement="citizenSignActivity" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="990" y="370" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_13i7zt2_di" bpmnElement="getOfficerUsersActivity">
+        <dc:Bounds x="990" y="991" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_13u1rq7_di" bpmnElement="prepareSignDate">
+        <dc:Bounds x="990" y="500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ubd3bq_di" bpmnElement="createValidationErrorActivity" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="720" y="180" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_12fdxpj_di" bpmnElement="start_event" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="282" y="392" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="278" y="435" width="48" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1dd6d9i_di" bpmnElement="Activity_1dd6d9i" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="350" y="370" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataStoreReference_048cae9_di" bpmnElement="DataStoreReference_048cae9">
+        <dc:Bounds x="375" y="515" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="368" y="572" width="72" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ff6kao_di" bpmnElement="Activity_1ff6kao" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="480" y="370" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataStoreReference_1ltt0e3_di" bpmnElement="DataStoreReference_1ltt0e3">
+        <dc:Bounds x="505" y="515" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="498" y="572" width="72" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1z0fbwk_di" bpmnElement="Activity_1z0fbwk" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="610" y="370" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataStoreReference_103sahg_di" bpmnElement="DataStoreReference_103sahg">
+        <dc:Bounds x="635" y="515" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="628" y="572" width="72" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1c69eh6_di" bpmnElement="Gateway_1c69eh6" isMarkerVisible="true" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="745" y="385" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="733" y="445" width="85" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_00tf5ac_di" bpmnElement="Gateway_00tf5ac" isMarkerVisible="true">
+        <dc:Bounds x="1495" y="745" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1l3m8cr_di" bpmnElement="getNameAndEdrpouFromLabActivity">
+        <dc:Bounds x="1180" y="730" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1iit9pj_di" bpmnElement="dispatchTaskActivity" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="1180" y="991" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1la80w8_di" bpmnElement="addApplicationFormActivity">
+        <dc:Bounds x="1330" y="730" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0gva352_di" bpmnElement="Activity_1a1f53o">
+        <dc:Bounds x="1600" y="730" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_03pigl7_di" bpmnElement="checkComplianceFormActivity">
+        <dc:Bounds x="1760" y="730" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0k49def_di" bpmnElement="parseCheckComplienceFormActivity">
+        <dc:Bounds x="1910" y="730" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1sc7vnj_di" bpmnElement="TextAnnotation_1sc7vnj">
+        <dc:Bounds x="400" y="660" width="302" height="109" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1ugv5hf_di" bpmnElement="TextAnnotation_1ugv5hf">
+        <dc:Bounds x="1760" y="920" width="380" height="140" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1v4846w_di" bpmnElement="TextAnnotation_1v4846w">
+        <dc:Bounds x="1670" y="457" width="420" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0m9oxlz_di" bpmnElement="Event_1d3528m">
+        <dc:Bounds x="3902" y="963" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_00nk0jw_di" bpmnElement="Event_0tpo6ct">
+        <dc:Bounds x="3902" y="1222" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1vky6yo_di" bpmnElement="Association_1vky6yo">
+        <di:waypoint x="412" y="450" />
+        <di:waypoint x="474" y="660" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_0feepz9_di" bpmnElement="Association_0feepz9">
+        <di:waypoint x="762" y="427" />
+        <di:waypoint x="662" y="660" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_0phsffc_di" bpmnElement="Association_0phsffc">
+        <di:waypoint x="1810" y="730" />
+        <di:waypoint x="1810" y="577" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataInputAssociation_1oq9sqv_di" bpmnElement="DataInputAssociation_1oq9sqv">
+        <di:waypoint x="400" y="515" />
+        <di:waypoint x="400" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataInputAssociation_0g8wgdq_di" bpmnElement="DataInputAssociation_0g8wgdq">
+        <di:waypoint x="530" y="515" />
+        <di:waypoint x="530" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataInputAssociation_0i4zriu_di" bpmnElement="DataInputAssociation_0i4zriu">
+        <di:waypoint x="660" y="515" />
+        <di:waypoint x="660" y="450" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -1,0 +1,115 @@
+spring:
+  application:
+    name: ddm-bpm-integration-tests
+  jersey:
+    application-path: api
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
+    username: bpms
+    password: password
+  sleuth:
+    opentracing:
+      enabled: true
+    baggage:
+      correlation-enabled: true
+      correlation-fields: x-request-id, X-Primary-Request-URL
+      remote-fields: x-request-id, x-access-token, X-Primary-Request-URL
+
+camunda:
+  admin-user-id: camunda
+  admin-group-id: camunda-admin
+  bpm:
+    generic-properties:
+      properties:
+        enableHistoricInstancePermissions: true
+    authorization:
+      enabled: true
+    admin-user:
+      id: ${camunda.admin-user-id}
+      password: camunda
+    job-execution:
+      enabled: false
+data-platform:
+  kafka:
+    enabled: false
+    topic-properties:
+      creation:
+        enabled: false
+    ssl:
+      enabled: false
+dso:
+  url: http://localhost:8081
+
+registry-rest-api:
+  url: http://localhost:8877/mock-server
+
+platform-gateway:
+  url: http://localhost:9779
+
+ceph:
+  http-endpoint: http://localhost:8100
+  access-key: access-key
+  secret-key: secret-key
+  bucket: bucket
+  file-storage-access-key: file-access-key
+  file-storage-secret-key: file-secret-key
+  file-storage-bucket: file-bucket
+
+user-settings-service-api:
+  url: http://localhost:8878/user-settings-mock-server
+excerpt-service-api:
+  url: http://localhost:9999/excerpt-mock-service
+digital-document-service:
+  url: http://localhost:1111/digital-doc-service-mock
+keycloak:
+  url: http://localhost:8200
+  citizen:
+    realm: citizen-realm
+    client-id: citizen-client-id
+    client-secret: citizen-client-secret
+  officer:
+    realm: officer-realm
+    client-id: officer-client-id
+    client-secret: officer-client-secret
+  system-user:
+    realm: system-user-realm
+    client-id: system-user-client-id
+    client-secret: system-user-client-secret
+
+trembita-exchange-gateway:
+  registries:
+    edr-registry:
+      trembita-url: http://localhost:7788/trembita-mock-server
+      userId: DDM
+      protocol-version: 4.0
+      authorization-token: token
+      client:
+        x-road-instance: CLIENT-TEST
+        member-class: GOV
+        member-code: 666777666
+        subsystem-code: GOV_TEST
+      service:
+        x-road-instance: EDR-TEST
+        member-class: GOV
+        member-code: 11115888
+        subsystem-code: EDR_test
+
+registry-regulation:
+  officer:
+    roles:
+      - name: task-dispatcher
+      - name: head-officer
+
+management:
+  health:
+    kafka:
+      enabled: false
+
+decorator:
+  datasource:
+    enabled: false
+
+kubernetes:
+  namespace:
+    current: current-namespace

@@ -1,0 +1,21 @@
+{
+  "labUniqueCheckFlag": true,
+  "laboratoryId": "laboratoryToUpdate",
+  "name": "updatedLabName",
+  "edrpou": "01010101",
+  "oblast": "8000000000",
+  "address": "вул. Ливарська, 1-А",
+  "phoneNumber": "123456789",
+  "headName": "Оніщенко К.Б.",
+  "accreditationFlag": true,
+  "notes": "",
+  "accreditationEndDate": "1993-11-01",
+  "koatuuId": "labToUpdateKoatuu",
+  "ownershipId": "labToUpdateOwnership",
+  "kopfgId": "labToUpdateKopfg",
+  "premisesFile": {
+    "id": "fileId",
+    "checksum": "checksum"
+  },
+  "accreditationFile": null
+}

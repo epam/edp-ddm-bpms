@@ -1,0 +1,125 @@
+server:
+  port: 8080
+  max-http-header-size: 16KB
+
+camunda:
+  admin-user-id: camunda
+  admin-group-id: camunda-admin
+  bpm:
+    database-history-level: AUDIT
+    generic-properties:
+      properties:
+        enable-historic-instance-permissions: true
+        user-resource-whitelist-pattern: '[a-zA-Z0-9_@.]+|camunda-admin'
+        history-cleanup-enabled: true
+        history-cleanup-strategy: removalTimeBased
+        history-removal-time-strategy: end
+        history-time-to-live: P10D
+        history-cleanup-batch-window-start-time: 03:00
+        history-cleanup-batch-window-end-time: 04:00
+        history-cleanup-degree-of-parallelism: 1
+        history-cleanup-batch-size: 200
+    authorization:
+      enabled: true
+    history-level: FULL
+
+data-platform:
+  kafka:
+    producer:
+      enabled: true
+    topic-properties:
+      creation:
+        enabled: true
+        num-partitions: 1
+        replication-factor: 1
+    topics:
+      history-process-instance-topic: bpm-history-process
+      history-task-topic: bpm-history-task
+      user-notifications: user-notifications
+
+registry-rest-api:
+  url: http://registry-rest-api:8080
+
+platform-gateway:
+  url: http://platform-gateway:8080
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  jersey:
+    application-path: api
+  application:
+    name: ddm-bpm
+  sleuth:
+    opentracing:
+      enabled: true
+    baggage:
+      correlation-enabled: true
+      correlation-fields: x-request-id, X-Primary-Request-URL
+      remote-fields: x-request-id, X-Primary-Request-URL
+  datasource:
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      max-lifetime: 600000
+
+# Configuration => prometheus.yml:
+#   scrape_configs:
+#     metrics_path: '/actuator/prometheus'
+management:
+  endpoints:
+    web:
+      exposure:
+        include: 'health'
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState, db
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+    kafka:
+      enabled: false
+
+ceph:
+  bucket: ${CEPH_BUCKET_NAME:bucket}
+
+user-settings-service-api:
+  url: http://user-settings-service-api:8080
+
+platform:
+  logging:
+    aspect:
+      enabled: false
+    primary-url:
+      enabled: true
+
+logbook:
+  feign:
+    enabled: true
+  info-logging:
+    enabled: true
+  strategy: without-body
+  exclude:
+    - /actuator/**
+  obfuscate:
+    headers:
+      - x-access-token
+
+decorator:
+  datasource:
+    enabled: false
+    sleuth:
+      enabled: false
+    p6spy:
+      enable-logging: false
+
+# Reducing logging level of TraceListenerStrategy because of "TODO" logs
+logging.level.org.springframework.cloud.sleuth.instrument.jdbc.TraceListenerStrategy: WARN

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1xd2ral" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.11.1">
+  <bpmn:process id="initiator_access_token" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="start">
+      <bpmn:outgoing>Flow_1t72gt4</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1t72gt4" sourceRef="StartEvent_1" targetRef="Activity_0dpzs8w" />
+    <bpmn:endEvent id="Event_10ledza" name="end">
+      <bpmn:incoming>Flow_1joy6n9</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1joy6n9" sourceRef="Activity_0dpzs8w" targetRef="Event_10ledza" />
+    <bpmn:scriptTask id="Activity_0dpzs8w" name="script" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1t72gt4</bpmn:incoming>
+      <bpmn:outgoing>Flow_1joy6n9</bpmn:outgoing>
+      <bpmn:script>assert initiator_access_token.equals('eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJlc2tZeXhudE1LelNOTTdPZ3RGdV9VOUFZMWl0Z3FsNjBzWU9tUkZTckRVIn0.eyJleHAiOjE2MjgyNTU4ODksImlhdCI6MTYyODI1NTU4OSwianRpIjoiNjNjOGM1NTYtY2FkZS00NDM4LTg1NTYtYTQ3N2YzOWJmZTU1IiwiaXNzIjoiaHR0cHM6Ly9wbGF0Zm9ybS1rZXljbG9hay5hcHBzLmNpY2QyLm1kdHUtZGRtLnByb2plY3RzLmVwYW0uY29tL2F1dGgvcmVhbG1zL21kdHUtZGRtLWVkcC1jaWNkLWxvd2NvZGUtZGV2LWRldi1jaXRpemVuLXBvcnRhbCIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiI0NmYzNmIyMi1hNGJkLTQ1YjAtOGU0OC05OGRjMzhiYTBlMzMiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJjaXRpemVuLXBvcnRhbCIsInNlc3Npb25fc3RhdGUiOiI0MDk4MDQxMS0zNWYwLTQzOTMtYjJmOC03ZGMzNTcyMThiZDkiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHBzOi8vY2l0aXplbi1wb3J0YWwtbG93Y29kZS1kZXYtZGV2LmFwcHMuY2ljZDIubWR0dS1kZG0ucHJvamVjdHMuZXBhbS5jb20iXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImNpdGl6ZW4iLCJvZmZsaW5lX2FjY2VzcyIsImxlZ2FsIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJjaXRpemVuLXBvcnRhbCI6eyJyb2xlcyI6WyJjaXRpemVuIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImVkcnBvdSI6IjAxMDEwMTAxIiwicm9sZXMiOlsiY2l0aXplbiIsIm9mZmxpbmVfYWNjZXNzIiwibGVnYWwiLCJ1bWFfYXV0aG9yaXphdGlvbiJdLCJuYW1lIjoidGVzdHVzZXIgdGVzdHVzZXIiLCJkcmZvIjoiMDEwMTAxMDEwMSIsImZ1bGxOYW1lIjoidGVzdHVzZXIgdGVzdHVzZXIgdGVzdHVzZXIiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJ0ZXN0dXNlciIsImdpdmVuX25hbWUiOiJ0ZXN0dXNlciIsImZhbWlseV9uYW1lIjoidGVzdHVzZXIiLCJzdWJqZWN0VHlwZSI6IkxFR0FMIn0.123')</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="initiator_access_token">
+      <bpmndi:BPMNEdge id="Flow_1joy6n9_di" bpmnElement="Flow_1joy6n9">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="432" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1t72gt4_di" bpmnElement="Flow_1t72gt4">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="142" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_10ledza_di" bpmnElement="Event_10ledza">
+        <dc:Bounds x="432" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="441" y="142" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0vk6qyf_di" bpmnElement="Activity_0dpzs8w">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

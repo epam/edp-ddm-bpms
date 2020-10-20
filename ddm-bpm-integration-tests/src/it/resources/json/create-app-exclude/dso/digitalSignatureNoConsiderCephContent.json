@@ -1,0 +1,30 @@
+{
+  "data": {
+    "name": "labName",
+    "registrationNo": "123123123",
+    "solutionName": "Залишити без розгляду",
+    "receivedBy": "gggggg",
+    "certifiedBy": "fffffff",
+    "notes": "",
+    "submit": true,
+    "solutionDate": "1999-10-02",
+    "letterNo": "666",
+    "letterDate": "1995-07-04",
+    "initiated": "держпраці",
+    "errorCheckFlag": true,
+    "edrpou": "23510933",
+    "registrationSource": "держпраці",
+    "createdDate": "1999-11-12",
+    "acceptedBy": "jogn doe",
+    "regComplianceFlag": true,
+    "healthMinistryLetterComplianceFlag": true,
+    "applicationTypeId": "da987ee9-bee2-4b5e-8831-e21207e0dcfc",
+    "laboratoryId": "d2943186-0f1f-4a77-9de9-a5a59c07db02",
+    "solutionTypeId": "4403e2dd-523f-4969-8942-4f3b086bc473",
+    "refusalReasons": [
+      "testRegRefusalReasonId",
+      "testHealthMinistryLetterComplianceReasonId"
+    ]
+  },
+  "signature": "test"
+}

@@ -1,0 +1,10 @@
+{
+  "data": {
+    "subjectType": "LEGAL",
+    "edrpou": "01010101",
+    "laboratory": {
+      "laboratoryId": "laboratoryToUpdate",
+      "subjectId": "activeSubject"
+    }
+  }
+}

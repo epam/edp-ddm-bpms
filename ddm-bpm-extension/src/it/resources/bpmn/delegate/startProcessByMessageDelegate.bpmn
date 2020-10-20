@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0bdi3zy" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:message id="Message_03lyfii" name="Message_1" />
+  <bpmn:collaboration id="Collaboration_1j4x0dh">
+    <bpmn:participant id="Participant_135tmd3" name="Send message" processRef="sendMessage" />
+    <bpmn:participant id="Participant_1pbvb45" name="Receive Message" processRef="receiveMessage" />
+  </bpmn:collaboration>
+  <bpmn:process id="sendMessage" isExecutable="true">
+    <bpmn:sequenceFlow id="Flow_0jdmtmk" sourceRef="StartEvent_1" targetRef="Event_0nw5sd2" />
+    <bpmn:startEvent id="StartEvent_1" name="start">
+      <bpmn:outgoing>Flow_0jdmtmk</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_0nw5sd2" name="end">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="messagePayload">
+            <camunda:map>
+              <camunda:entry key="payloadPart">payloadPartValue</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0jdmtmk</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1tk54wt" messageRef="Message_03lyfii" camunda:delegateExpression="${startProcessByMessageDelegate}" />
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmn:process id="receiveMessage" name="" isExecutable="true">
+    <bpmn:endEvent id="Event_19g2qys" name="end">
+      <bpmn:incoming>Flow_0i5aupu</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0i5aupu" sourceRef="Event_1n17aro" targetRef="Event_19g2qys" />
+    <bpmn:startEvent id="Event_1n17aro" name="start">
+      <bpmn:outgoing>Flow_0i5aupu</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0qm94wj" messageRef="Message_03lyfii" />
+    </bpmn:startEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1j4x0dh">
+      <bpmndi:BPMNShape id="Participant_135tmd3_di" bpmnElement="Participant_135tmd3" isHorizontal="true">
+        <dc:Bounds x="160" y="50" width="300" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0jdmtmk_di" bpmnElement="Flow_0jdmtmk">
+        <di:waypoint x="248" y="97" />
+        <di:waypoint x="302" y="97" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="212" y="79" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="219" y="122" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0h1bwz1_di" bpmnElement="Event_0nw5sd2">
+        <dc:Bounds x="302" y="79" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="310" y="122" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_1pbvb45_di" bpmnElement="Participant_1pbvb45" isHorizontal="true">
+        <dc:Bounds x="160" y="160" width="300" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0i5aupu_di" bpmnElement="Flow_0i5aupu">
+        <di:waypoint x="248" y="200" />
+        <di:waypoint x="302" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_19g2qys_di" bpmnElement="Event_19g2qys">
+        <dc:Bounds x="302" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="311" y="225" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1bwowbt_di" bpmnElement="Event_1n17aro">
+        <dc:Bounds x="212" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="219" y="225" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

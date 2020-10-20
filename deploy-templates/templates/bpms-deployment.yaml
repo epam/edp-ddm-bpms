@@ -1,0 +1,216 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  replicas: {{ .Values.replicas }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        traffic.sidecar.istio.io/excludeOutboundPorts: '5432,6379'
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      initContainers:
+      - command:
+          - sh
+          - '-c'
+          - >-
+            while ! nc -w 1 {{ .Values.db.url }} {{ .Values.db.port }} </dev/null; do echo waiting for
+            database; sleep 10; done;
+        image: {{ template "imageRegistry" . -}} busybox
+        imagePullPolicy: IfNotPresent
+        name: {{ .Chart.Name }}-init
+      - name: create-db
+        image: {{ template "imageRegistry" . -}} bitnami/postgresql:latest
+        env:
+          - name: PSQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.db.secret }}
+                key: username
+          - name: PGPASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.db.secret }}
+                key: password
+        imagePullPolicy: IfNotPresent
+        command:
+          - sh
+          - '-c'
+          - >-
+            echo "SELECT 'CREATE DATABASE {{ .Values.db.defaultDatabase }}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '{{ .Values.db.defaultDatabase }}')\gexec" | psql -U $PSQL_USER --host={{ .Values.db.url }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
+        ports:
+          - containerPort: {{ .Values.port }}
+            name: {{ .Chart.Name }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.livenessPath }}
+            port: {{ .Values.port }}
+          failureThreshold: 10
+          initialDelaySeconds: 65
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.readinessPath }}
+            port: {{ .Values.port }}
+          failureThreshold: 10
+          initialDelaySeconds: 65
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        {{- if not .Values.global.disableRequestsLimits }}
+        resources:
+          limits:
+            cpu: '1'
+            memory: 2Gi
+          requests:
+            cpu: '1'
+            memory: 2Gi
+        {{- end }}
+        env:
+          - name: CEPH_BUCKET_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Values.ceph.bucketName }}
+                key: BUCKET_HOST
+          - name: CEPH_BUCKET_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Values.ceph.bucketName }}
+                key: BUCKET_PORT
+          - name: CEPH_BUCKET_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Values.ceph.bucketName }}
+                key: BUCKET_NAME
+          - name: ceph.file-storage-bucket
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Values.fileStorage.bucketName }}
+                key: BUCKET_NAME
+          - name: JAVA_OPTS
+            value: {{ .Values.javaOpts }}
+          - name: KAFKA_USER_KEYSTORE_CERTIFICATE
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.kafka.user }}
+                key: user.crt
+          - name: KAFKA_USER_KEYSTORE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.kafka.user }}
+                key: user.key
+          - name: KAFKA_CLUSTER_TRUSTSTORE
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.kafka.clusterName }}-cluster-ca-cert
+                key: ca.crt
+          - name: kubernetes.namespace.current
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+        volumeMounts:
+          - name: {{ .Chart.Name }}
+            mountPath: {{ .Values.appConfigMountPath }}
+          - name: {{ .Values.db.secret }}
+            mountPath: {{ .Values.appSecretsMountPath }}
+          - name: {{ .Chart.Name }}-camunda-global-system-vars
+            mountPath: {{ .Values.camundaVarsMountPath }}
+          - name: {{ .Chart.Name }}-ceph-bucket-credentials
+            mountPath: {{ .Values.cephSecretMountPath }}
+          - name: {{ .Values.fileStorage.bucketName }}-credentials
+            mountPath: {{ .Values.fileStorageSecretMountPath }}
+          - name: {{ .Values.keycloak.citizenClient.secretName }}
+            mountPath: {{ .Values.citizenKeycloakClientSecretsMountPath }}
+          - name: {{ .Values.keycloak.officerClient.secretName }}
+            mountPath: {{ .Values.officerKeycloakClientSecretsMountPath }}
+          - name: {{ .Values.keycloak.systemUserClient.secretName }}
+            mountPath: {{ .Values.systemUserKeycloakClientSecretsMountPath }}
+          - name: {{ .Values.officerConfigMapName }}
+            mountPath: {{ .Values.officerConfigMountPath }}
+          - name: {{ .Values.citizenConfigMapName }}
+            mountPath: {{ .Values.citizenConfigMountPath }}
+          - name: {{ .Values.trembitaConfConfigmapName }}
+            mountPath: {{ .Values.trembitaConfigMountPath }}
+      serviceAccountName: {{ .Chart.Name }}
+      {{- if .Values.nodeSelector }}
+      nodeSelector: {{ toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.podSecurityContext }}
+      securityContext: {{ toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: {{ .Chart.Name }}
+          configMap:
+            name: {{ .Chart.Name }}
+        - name: {{ .Values.db.secret }}
+          secret:
+            secretName: {{ .Values.db.secret }}
+            items:
+            - key: username
+              path: spring.datasource.username
+            - key: password
+              path: spring.datasource.password
+        - name: {{ .Chart.Name }}-ceph-bucket-credentials
+          secret:
+            secretName: {{ .Values.ceph.bucketName }}
+            items:
+            - key: AWS_ACCESS_KEY_ID
+              path: ceph.access-key
+            - key: AWS_SECRET_ACCESS_KEY
+              path: ceph.secret-key
+        - name: {{ .Values.fileStorage.bucketName }}-credentials
+          secret:
+            secretName: {{ .Values.fileStorage.bucketName }}
+            items:
+            - key: AWS_ACCESS_KEY_ID
+              path: ceph.file-storage-access-key
+            - key: AWS_SECRET_ACCESS_KEY
+              path: ceph.file-storage-secret-key
+        - name: {{ .Chart.Name }}-camunda-global-system-vars
+          configMap:
+            name: {{ .Chart.Name }}-camunda-global-system-vars
+        - name: {{ .Values.keycloak.citizenClient.secretName }}
+          secret:
+            secretName: {{ .Values.keycloak.citizenClient.secretName }}
+            items:
+            - key: clientSecret
+              path: keycloak.citizen.client-secret
+        - name: {{ .Values.keycloak.officerClient.secretName }}
+          secret:
+            secretName: {{ .Values.keycloak.officerClient.secretName }}
+            items:
+            - key: clientSecret
+              path: keycloak.officer.client-secret
+        - name: {{ .Values.keycloak.systemUserClient.secretName }}
+          secret:
+            secretName: {{ .Values.keycloak.systemUserClient.secretName }}
+            items:
+            - key: clientSecret
+              path: keycloak.system-user.client-secret
+        - name: {{ .Values.officerConfigMapName }}
+          configMap:
+            name: {{ .Values.officerConfigMapName }}
+        - name: {{ .Values.citizenConfigMapName }}
+          configMap:
+            name: {{ .Values.citizenConfigMapName }}
+        - name: {{ .Values.trembitaConfConfigmapName }}
+          configMap:
+            name: {{ .Values.trembitaConfConfigmapName }}

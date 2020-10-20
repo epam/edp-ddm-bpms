@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1fce3hl" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.12.0">
+  <bpmn:process id="testCephJavaDelegates_key" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_19k9hr4</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_19k9hr4" sourceRef="StartEvent_1" targetRef="Activity_18d6fqh" />
+    <bpmn:endEvent id="Event_0xpprxe">
+      <bpmn:incoming>Flow_0ceuntk</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Activity_18d6fqh" name="Store To ceph" camunda:delegateExpression="#{putContentToCephDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="content">#{content}</camunda:inputParameter>
+          <camunda:inputParameter name="key">#{key}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_19k9hr4</bpmn:incoming>
+      <bpmn:outgoing>Flow_0xz5912</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0xz5912" sourceRef="Activity_18d6fqh" targetRef="Activity_0z8r9fk" />
+    <bpmn:sequenceFlow id="Flow_0shduc5" sourceRef="Activity_0z8r9fk" targetRef="Activity_1m33q6y" />
+    <bpmn:serviceTask id="Activity_0z8r9fk" name="Download from Ceph" camunda:delegateExpression="#{getContentFromCephDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="key">#{key}</camunda:inputParameter>
+          <camunda:outputParameter name="content">#{content}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0xz5912</bpmn:incoming>
+      <bpmn:outgoing>Flow_0shduc5</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0ceuntk" sourceRef="Activity_1m33q6y" targetRef="Event_0xpprxe" />
+    <bpmn:scriptTask id="Activity_1m33q6y" name="Assert" scriptFormat="groovy">
+      <bpmn:incoming>Flow_0shduc5</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ceuntk</bpmn:outgoing>
+      <bpmn:script>var content = execution.getVariable("content")
+
+assert content.equals('{"data":{"var1":"value1","var2":"value2"}}')</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testCephJavaDelegates_key">
+      <bpmndi:BPMNEdge id="Flow_0ceuntk_di" bpmnElement="Flow_0ceuntk">
+        <di:waypoint x="670" y="120" />
+        <di:waypoint x="722" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0shduc5_di" bpmnElement="Flow_0shduc5">
+        <di:waypoint x="520" y="120" />
+        <di:waypoint x="570" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xz5912_di" bpmnElement="Flow_0xz5912">
+        <di:waypoint x="370" y="120" />
+        <di:waypoint x="420" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19k9hr4_di" bpmnElement="Flow_19k9hr4">
+        <di:waypoint x="188" y="120" />
+        <di:waypoint x="270" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0xpprxe_di" bpmnElement="Event_0xpprxe">
+        <dc:Bounds x="722" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0r3wgyq_di" bpmnElement="Activity_18d6fqh">
+        <dc:Bounds x="270" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0yju9ic_di" bpmnElement="Activity_0z8r9fk">
+        <dc:Bounds x="420" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ag0lo1_di" bpmnElement="Activity_1m33q6y">
+        <dc:Bounds x="570" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

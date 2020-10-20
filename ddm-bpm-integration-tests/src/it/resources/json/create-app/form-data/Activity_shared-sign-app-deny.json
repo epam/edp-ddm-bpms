@@ -1,0 +1,109 @@
+{
+  "data": {
+    "name": "labName",
+    "edrpou": "11111111",
+    "registrationSource": "держпраці",
+    "registrationNo": "1234567890-primary-add",
+    "createdDate": "2021-03-25",
+    "acceptedBy": "Full Name",
+    "chemfactgost": [
+      {
+        "factorId": "chemfactgost1",
+        "name": "string"
+      }
+    ],
+    "chemfacthyge": [
+      {
+        "factorId": "chemfacthyge1",
+        "name": "string"
+      }
+    ],
+    "chemfactobrv": [
+      {
+        "factorId": "chemfactobrv1",
+        "name": "string"
+      }
+    ],
+    "chemfactodovilni": [
+      {
+        "factorId": "chemfactodovilni1",
+        "name": "string"
+      }
+    ],
+    "FactorsPhys": [
+      {
+        "factorId": "FactorsPhys1",
+        "name": "string"
+      }
+    ],
+    "laborfact": [
+      {
+        "factorId": "laborfact1",
+        "name": "string"
+      }
+    ],
+    "biofactors": [
+      {
+        "factorId": "biofactors",
+        "name": "string"
+      }
+    ],
+    "factorPesticide": [
+      {
+        "factorId": "factorPesticide",
+        "name": "string"
+      }
+    ],
+    "errorCheckFlag": true,
+    "regComplianceFlag": true,
+    "regRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "regRefusalReasonId1"
+      }
+    ],
+    "factorComplianceFlag": true,
+    "factorRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "factorRefusalReasonId1"
+      }
+    ],
+    "zvtComplianceFlag": true,
+    "zvtRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "zvtRefusalReasonId1"
+      }
+    ],
+    "staffComplianceFlag": true,
+    "staffRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "staffRefusalReasonId1"
+      }
+    ],
+    "reagentComplianceFlag": true,
+    "reagentRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "reagentRefusalReasonId1"
+      }
+    ],
+    "facilityComplianceFlag": true,
+    "facilityRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "facilityRefusalReasonId1"
+      }
+    ],
+    "solutionName": "Залишити без розгляду",
+    "solutionDate": "2021-03-24",
+    "letterNo": "1234567890-letterNo",
+    "letterDate": "2021-03-23",
+    "receivedBy": "receiver",
+    "certifiedBy": "multipass",
+    "notes": "smth noted"
+  },
+  "signature": "signature"
+}

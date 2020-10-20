@@ -1,0 +1,13 @@
+{{- $configmap := (lookup "v1" "ConfigMap" .Values.namespace .Values.officerConfigMapName) -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.officerConfigMapName }}
+data:
+  officer-roles.yml: |-
+  {{- if $configmap }}
+    {{- index $configmap "data" "officer-roles.yml" | nindent 4 }}
+  {{- else }}
+    roles:
+      officer
+  {{- end -}}

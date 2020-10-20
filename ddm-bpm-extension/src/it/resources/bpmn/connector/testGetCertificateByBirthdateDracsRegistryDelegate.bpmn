@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1d03mps" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.11.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:process id="test_get_certificate_by_birthdate" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_10o6jz5</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_10o6jz5" sourceRef="StartEvent_1" targetRef="Activity_19xb970" />
+    <bpmn:sequenceFlow id="Flow_1507g2a" sourceRef="Activity_19xb970" targetRef="Activity_1bszrby" />
+    <bpmn:endEvent id="Event_05sgnzi">
+      <bpmn:incoming>Flow_0jehr4b</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0jehr4b" sourceRef="Activity_1bszrby" targetRef="Event_05sgnzi" />
+    <bpmn:serviceTask id="Activity_19xb970" name="Get Certificate By Birthdate" camunda:modelerTemplate="getCertificateByBirthdateDracsRegistryDelegate" camunda:delegateExpression="${getCertificateByBirthdateDracsRegistryDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="role">4</camunda:inputParameter>
+          <camunda:inputParameter name="birthMonth">3</camunda:inputParameter>
+          <camunda:inputParameter name="birthDay">12</camunda:inputParameter>
+          <camunda:inputParameter name="certSerial">AA</camunda:inputParameter>
+          <camunda:inputParameter name="certNumber">333444</camunda:inputParameter>
+          <camunda:inputParameter name="birthYear">1998</camunda:inputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_10o6jz5</bpmn:incoming>
+      <bpmn:outgoing>Flow_1507g2a</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Activity_1bszrby" name="Assert" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1507g2a</bpmn:incoming>
+      <bpmn:outgoing>Flow_0jehr4b</bpmn:outgoing>
+      <bpmn:script>assert response.statusCode == 200
+assert response.responseBody.prop('certificate').elements().get(0).prop("certNumber").value().equals('333444')
+assert response.responseBody.prop('certificate').elements().get(0).prop("certSerial").value().equals('AA')
+assert response.responseBody.prop('certificate').elements().get(0).prop("dateOfBirth").value().equals('2010-01-01')</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="test_get_certificate_by_birthdate">
+      <bpmndi:BPMNEdge id="Flow_0jehr4b_di" bpmnElement="Flow_0jehr4b">
+        <di:waypoint x="530" y="117" />
+        <di:waypoint x="592" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1507g2a_di" bpmnElement="Flow_1507g2a">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="430" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10o6jz5_di" bpmnElement="Flow_10o6jz5">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_05sgnzi_di" bpmnElement="Event_05sgnzi">
+        <dc:Bounds x="592" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ttkwco_di" bpmnElement="Activity_19xb970">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1d6b14j_di" bpmnElement="Activity_1bszrby">
+        <dc:Bounds x="430" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

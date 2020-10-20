@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}
+data:
+  application.yml: |-
+    spring.datasource.driver-class-name: org.postgresql.Driver
+    spring.datasource.url: jdbc:postgresql://{{ .Values.db.url }}:{{ .Values.db.port }}/{{ .Values.db.defaultDatabase }}
+    spring.zipkin.baseUrl: http://zipkin.istio-system:9411
+    camunda.bpm.job-execution.deployment-aware: false
+    camunda.bpm.database.schema-update: true
+    dso.url: http://digital-signature-ops:8080
+    ceph.http-endpoint: {{ .Values.ceph.host }}
+    keycloak.url: {{ template "keycloak.url" . }}
+    keycloak.citizen.realm: {{ template "keycloak.citizenTargetRealm" . }}
+    keycloak.citizen.client-id: {{ .Values.keycloak.citizenClient.clientName }}
+    keycloak.officer.realm: {{ template "keycloak.officerTargetRealm" . }}
+    keycloak.officer.client-id: {{ .Values.keycloak.officerClient.clientName }}
+    excerpt-service-api.url: http://excerpt-service-api:8080
+    keycloak.system-user.realm: {{ template "keycloak.citizenTargetRealm" . }}
+    keycloak.system-user.client-id: {{ .Values.keycloak.systemUserClient.clientName }}
+    {{- if eq .Values.deployProfile "dev" }}
+    management.endpoints.web.exposure.include: '*'
+    {{- end }}
+    storage: {{ toYaml .Values.storage | nindent 6 }}
+    s3: {{ .Values.s3 | toYaml | nindent 6 }}
+    data-platform.kafka.enabled: true
+    data-platform.kafka.bootstrap: {{ .Values.kafka.service }}
+    data-platform.kafka.topic-properties.num-partitions: {{ .Values.kafka.numPartitions }}
+    data-platform.kafka.topic-properties.replication-factor: {{ .Values.global.kafkaOperator.replicationFactor }}
+    data-platform.kafka.ssl.enabled: {{ .Values.kafka.sslEnabled }}
+    data-platform.kafka.ssl.keystore-certificate: {{ .Values.kafka.sslUserCertificate }}
+    data-platform.kafka.ssl.keystore-key: {{ .Values.kafka.sslUserKey }}
+    data-platform.kafka.ssl.truststore-certificate: {{ .Values.kafka.sslClusterCertificate }}
+    data-platform.kafka.ssl.keystore-type: {{ .Values.kafka.sslCertType }}
+    data-platform.kafka.ssl.truststore-type: {{ .Values.kafka.sslCertType }}
+    data-platform.kafka.error-handler.initial-interval: {{ .Values.kafka.errorHandlerInitialInterval }}
+    data-platform.kafka.error-handler.max-elapsed-time: {{ .Values.kafka.errorHandlerMaxElapsedTime }}
+    data-platform.kafka.error-handler.multiplier: {{ .Values.kafka.errorHandlerMultiplier }}
+    spring.rest-template.ssl-checking-enabled: {{ .Values.restTemplate.sslCheckingEnabled }}
+    digital-document-service.url: http://digital-document-service:8080

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1n0xxdb" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:process id="testStartFormKey" name="Test Start Form Key" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="start" camunda:formKey="test-form-key">
+      <bpmn:outgoing>Flow_176pfn9</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_1kyihra" name="end">
+      <bpmn:incoming>Flow_15re4f2</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_176pfn9" sourceRef="StartEvent_1" targetRef="Activity_06whq82" />
+    <bpmn:sequenceFlow id="Flow_0o5sn3h" sourceRef="Activity_06whq82" targetRef="Activity_19aviqp" />
+    <bpmn:serviceTask id="Activity_06whq82" name="Read start form data" camunda:modelerTemplate="getStartFormDataFromCephDelegate" camunda:delegateExpression="${getStartFormDataFromCephDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="startFormData">${ formData }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_176pfn9</bpmn:incoming>
+      <bpmn:outgoing>Flow_0o5sn3h</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_15re4f2" sourceRef="Activity_19aviqp" targetRef="Event_1kyihra" />
+    <bpmn:scriptTask id="Activity_19aviqp" name="Assert" scriptFormat="groovy">
+      <bpmn:incoming>Flow_0o5sn3h</bpmn:incoming>
+      <bpmn:outgoing>Flow_15re4f2</bpmn:outgoing>
+      <bpmn:script>assert startFormData.prop('prop1').value().equals('value1')</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testStartFormKey">
+      <bpmndi:BPMNEdge id="Flow_15re4f2_di" bpmnElement="Flow_15re4f2">
+        <di:waypoint x="480" y="97" />
+        <di:waypoint x="512" y="97" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0o5sn3h_di" bpmnElement="Flow_0o5sn3h">
+        <di:waypoint x="320" y="97" />
+        <di:waypoint x="380" y="97" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_176pfn9_di" bpmnElement="Flow_176pfn9">
+        <di:waypoint x="188" y="97" />
+        <di:waypoint x="220" y="97" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="79" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="159" y="122" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1kyihra_di" bpmnElement="Event_1kyihra">
+        <dc:Bounds x="512" y="79" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="521" y="122" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_17h29hl_di" bpmnElement="Activity_06whq82">
+        <dc:Bounds x="220" y="57" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1xqjigo_di" bpmnElement="Activity_19aviqp">
+        <dc:Bounds x="380" y="57" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

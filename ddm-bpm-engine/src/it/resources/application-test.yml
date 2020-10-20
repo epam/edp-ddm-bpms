@@ -1,0 +1,3 @@
+registry-rest-api:
+  url: http://localhost:8877/mock-server
+

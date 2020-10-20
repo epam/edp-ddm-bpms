@@ -1,0 +1,120 @@
+global:
+  disableRequestsLimits: false
+  kafkaOperator:
+    replicationFactor: 3
+
+image:
+  name: business-process-management
+  version: latest
+port: 8080
+service:
+  type: ClusterIP
+  port: 8080
+replicas: 1
+appConfigMountPath: "/app/config/main"
+camundaVarsMountPath: "/app/config/camunda"
+appSecretsMountPath: "/app/secrets/main"
+cephSecretMountPath: "/app/secrets/ceph"
+fileStorageSecretMountPath: "/app/secrets/fileStorage"
+systemUserKeycloakClientSecretsMountPath: "/app/secrets/system-user-client"
+citizenKeycloakClientSecretsMountPath: "/app/secrets/citizen-realm-admin-client"
+officerKeycloakClientSecretsMountPath: "/app/secrets/officer-realm-admin-client"
+prometheusScrapePath: "/actuator/prometheus"
+readinessPath: "/actuator/health/readiness"
+livenessPath: "/actuator/health/liveness"
+officerConfigMountPath: "/app/config/registry-regulation/officer-roles"
+citizenConfigMountPath: "/app/config/registry-regulation/citizen-roles"
+trembitaConfigMountPath: "/app/config/registry-regulation/trembita-configuration"
+officerConfigMapName: officer-roles
+citizenConfigMapName: citizen-roles
+trembitaConfConfigmapName: trembita-configuration
+
+javaOpts: "-Xms1536m -Xmx1536m -Duser.timezone=UTC"
+
+db:
+  url: citus-master
+  port: 5432
+  defaultDatabase: camunda
+  secret: citus-secrets
+
+ingress: # expose the service with a route or an ingress depending on platform type
+  platform: openshift # openshift or kubernetes
+
+ceph:
+  bucketName: lowcode-form-data-storage
+  host: ${CEPH_BUCKET_HOST}
+
+fileStorage:
+  bucketName: lowcode-file-storage
+
+monitoring:
+  namespace: openshift-monitoring
+
+keycloak:
+  citizenClient:
+    clientName: realm-admin
+    realm: citizen-portal
+    public: false
+    secretName: keycloak-realm-admin-citizen-client-secret
+  officerClient:
+    clientName: realm-admin
+    realm: officer-portal
+    public: false
+    secretName: keycloak-realm-admin-officer-client-secret
+  systemUserClient:
+    clientName: system-user
+    realm: citizen-portal
+    public: false
+    secretName: keycloak-system-user-citizen-client-secret
+  realms:
+    admin: admin
+    external: external-system
+  certificatesEndpoint: /protocol/openid-connect/certs
+
+deployProfile: prod
+
+storage:
+  form-data:
+    type: ceph
+  message-payload:
+    type: ceph
+  backend:
+    ceph:
+      http-endpoint: ${ceph.http-endpoint}
+      access-key: ${ceph.access-key}
+      secret-key: ${ceph.secret-key}
+      bucket: ${ceph.bucket}
+  file-data:
+    type: ceph
+    backend:
+      ceph:
+        http-endpoint: ${ceph.http-endpoint}
+        access-key: ${ceph.file-storage-access-key}
+        secret-key: ${ceph.file-storage-secret-key}
+        bucket: ${ceph.file-storage-bucket}
+
+s3:
+  config:
+    client:
+      protocol: http
+    options:
+      pathStyleAccess: true
+
+kafka:
+  service: kafka-cluster-kafka-bootstrap:9093
+  user: bpms-user
+  clusterName: kafka-cluster
+  sslEnabled: true
+  sslCertType: PEM
+  sslUserKey: ${KAFKA_USER_KEYSTORE_KEY}
+  sslUserCertificate: ${KAFKA_USER_KEYSTORE_CERTIFICATE}
+  sslClusterCertificate: ${KAFKA_CLUSTER_TRUSTSTORE}
+  numPartitions: 15
+  errorHandlerInitialInterval: 1500
+  errorHandlerMaxElapsedTime: 6000
+  errorHandlerMultiplier: 2
+
+restTemplate:
+  sslCheckingEnabled: false
+
+readSecretsRoleName: read-secrets-role

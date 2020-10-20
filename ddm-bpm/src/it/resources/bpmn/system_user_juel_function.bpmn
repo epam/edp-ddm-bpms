@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_13xanxl" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:process id="test_system_user" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_18zxk80</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_18zxk80" sourceRef="StartEvent_1" targetRef="Activity_123otqa" />
+    <bpmn:endEvent id="Event_06kagsz">
+      <bpmn:incoming>Flow_0dlrbi6</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0dlrbi6" sourceRef="Activity_123otqa" targetRef="Event_06kagsz" />
+    <bpmn:scriptTask id="Activity_123otqa" name="Assert" scriptFormat="groovy">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="systemUser">${system_user()}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_18zxk80</bpmn:incoming>
+      <bpmn:outgoing>Flow_0dlrbi6</bpmn:outgoing>
+      <bpmn:script>assert systemUser.userName.equals('testuser2')
+assert !systemUser.accessToken.isEmpty()</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="test_system_user">
+      <bpmndi:BPMNEdge id="Flow_18zxk80_di" bpmnElement="Flow_18zxk80">
+        <di:waypoint x="188" y="117" />
+        <di:waypoint x="250" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0dlrbi6_di" bpmnElement="Flow_0dlrbi6">
+        <di:waypoint x="350" y="117" />
+        <di:waypoint x="412" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_06kagsz_di" bpmnElement="Event_06kagsz">
+        <dc:Bounds x="412" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0gvr7lq_di" bpmnElement="Activity_123otqa">
+        <dc:Bounds x="250" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

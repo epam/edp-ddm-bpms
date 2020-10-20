@@ -1,0 +1,48 @@
+{
+  "data": {
+    "laboratoryId": "laboratoryToUpdate",
+    "name": "updatedLabName",
+    "edrpou": "01010101",
+    "oblast": {
+      "level2": "8000000000",
+      "category": null,
+      "koatuuId": "labToUpdateKoatuu",
+      "code": "8000000000",
+      "level1": "8000000000",
+      "name": "М.КИЇВ",
+      "type": "НП"
+    },
+    "koatuu": {
+      "level2": "8000000000",
+      "category": null,
+      "koatuuId": "labToUpdateKoatuu",
+      "code": "8000000000",
+      "level1": "8000000000",
+      "name": "М.КИЇВ",
+      "type": "НП"
+    },
+    "address": "вул. Ливарська, 1-А",
+    "phoneNumber": "123456789",
+    "headName": "Оніщенко К.Б.",
+    "ownership": {
+      "ownershipId": "labToUpdateOwnership",
+      "code": "code",
+      "name": "ownership"
+    },
+    "kopfg": {
+      "kopfgId": "labToUpdateKopfg",
+      "code": "code1",
+      "name": "kopfg"
+    },
+    "accreditationFlag": true,
+    "notes": "",
+    "accreditationEndDate": "1993-11-01",
+    "premisesFile": [
+      {
+        "id": "fileId",
+        "checksum": "checksum"
+      }
+    ]
+  },
+  "signature": "citizenSignature"
+}

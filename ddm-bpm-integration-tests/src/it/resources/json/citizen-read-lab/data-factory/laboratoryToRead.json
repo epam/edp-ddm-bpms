@@ -1,0 +1,18 @@
+{
+  "laboratoryId": "laboratoryToRead",
+  "headName": "Оніщенко К.Б.",
+  "edrpou": "01010101",
+  "phoneNumber": "123456789",
+  "notes": "",
+  "address": "вул. Ливарська, 1-А",
+  "kopfgId": "labToReadKopfg",
+  "koatuuId": "labToReadKoatuu",
+  "ownershipId": "labToReadOwnership",
+  "accreditationEndDate": "1993-11-01",
+  "name": "labName",
+  "accreditationFlag": true,
+  "premisesFile": {
+    "id": "fileId",
+    "checksum": "checksum"
+  }
+}

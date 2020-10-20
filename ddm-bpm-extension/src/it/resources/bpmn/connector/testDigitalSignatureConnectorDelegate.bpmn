@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1td2znt" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.12.0">
+  <bpmn:process id="testDigitalSignatureConnectorDelegate_key" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="start">
+      <bpmn:outgoing>Flow_0icgft6</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0icgft6" sourceRef="StartEvent_1" targetRef="waitConditionTaskForDso" />
+    <bpmn:endEvent id="Event_0s1xd96" name="fin">
+      <bpmn:incoming>Flow_1lp38py</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1lp38py" sourceRef="Activity_0gsj5pa" targetRef="Event_0s1xd96" />
+    <bpmn:scriptTask id="Activity_0gsj5pa" name="Assert" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1doos4f</bpmn:incoming>
+      <bpmn:outgoing>Flow_1lp38py</bpmn:outgoing>
+      <bpmn:script>def rootProcessInstanceId = execution.getRootProcessInstanceId()
+def processInstanceId = execution.getProcessInstanceId()
+assert system_signature_ceph_key.equals("lowcode_${rootProcessInstanceId}_${processInstanceId}_system_signature_ceph_key".toString())</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:userTask id="waitConditionTaskForDso" name="Wait to get process instance id" camunda:formKey="testForm">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="eSign" value="" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0icgft6</bpmn:incoming>
+      <bpmn:outgoing>Flow_1plwfpy</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1plwfpy" sourceRef="waitConditionTaskForDso" targetRef="Activity_0rwzrmw" />
+    <bpmn:sequenceFlow id="Flow_1doos4f" sourceRef="Activity_0rwzrmw" targetRef="Activity_0gsj5pa" />
+    <bpmn:serviceTask id="Activity_0rwzrmw" name="Test sign" camunda:delegateExpression="${digitalSystemSignatureDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="x_access_token">${completer('testActivity').accessToken}</camunda:inputParameter>
+          <camunda:inputParameter name="payload">${S('{"name":"John"}')}</camunda:inputParameter>
+          <camunda:outputParameter name="system_signature_ceph_key">${ system_signature_storage_key }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1plwfpy</bpmn:incoming>
+      <bpmn:outgoing>Flow_1doos4f</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testDigitalSignatureConnectorDelegate_key">
+      <bpmndi:BPMNEdge id="Flow_1doos4f_di" bpmnElement="Flow_1doos4f">
+        <di:waypoint x="510" y="120" />
+        <di:waypoint x="570" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1plwfpy_di" bpmnElement="Flow_1plwfpy">
+        <di:waypoint x="350" y="120" />
+        <di:waypoint x="410" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1lp38py_di" bpmnElement="Flow_1lp38py">
+        <di:waypoint x="670" y="120" />
+        <di:waypoint x="732" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0icgft6_di" bpmnElement="Flow_0icgft6">
+        <di:waypoint x="188" y="120" />
+        <di:waypoint x="250" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="159" y="145" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0s1xd96_di" bpmnElement="Event_0s1xd96">
+        <dc:Bounds x="732" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="744" y="145" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0cj0mkc_di" bpmnElement="Activity_0gsj5pa">
+        <dc:Bounds x="570" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_18k8sbd_di" bpmnElement="waitConditionTaskForDso">
+        <dc:Bounds x="250" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1vose81_di" bpmnElement="Activity_0rwzrmw">
+        <dc:Bounds x="410" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

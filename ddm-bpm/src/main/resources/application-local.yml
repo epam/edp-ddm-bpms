@@ -1,0 +1,80 @@
+camunda:
+  bpm:
+    authorization:
+      enabled: false
+    job-execution:
+      deployment-aware: true
+    database:
+      schema-update: true
+    admin-user:
+      id: ${camunda.admin-user-id}
+      password: camunda
+
+data-platform:
+  kafka:
+    enabled: false
+
+registry-rest-api:
+  url: http://localhost:8877/mock-server
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/camunda
+    username: bpms
+    password: password
+
+lowcode:
+  security:
+    enabled: false
+
+dso:
+  url: http://localhost:8100
+excerpt-service-api:
+  url: http://localhost:9999
+
+ceph:
+  http-endpoint: http://localhost:8100
+  access-key: access-key
+  secret-key: secret-key
+  bucket: bucket
+
+s3:
+  config:
+    client:
+      protocol: http
+    options:
+      pathStyleAccess: true
+
+storage:
+  form-data:
+    type: ceph
+    backend:
+      ceph:
+        http-endpoint: ${ceph.http-endpoint}
+        access-key: access-key
+        secret-key: secret-key
+        bucket: bucket
+  file-data:
+    type: ceph
+    backend:
+      ceph:
+        http-endpoint: ${ceph.http-endpoint}
+        access-key: access-key
+        secret-key: secret-key
+        bucket: bucket
+
+keycloak:
+  url: http://localhost:8200
+  citizen:
+    realm: citizenRealm
+    client-id: citizenClientId
+    client-secret: citizenClientSecret
+  officer:
+    realm: officerRealm
+    client-id: officerClientId
+    client-secret: officerClientSecret
+  system-user:
+    realm: systemUserRealm
+    client-id: systemUserClientId
+    client-secret: systemUserClientSecret

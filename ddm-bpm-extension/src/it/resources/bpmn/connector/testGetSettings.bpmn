@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1yedlas" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:process id="get_settings_key" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="start">
+      <bpmn:outgoing>Flow_07qzr0a</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_07qzr0a" sourceRef="StartEvent_1" targetRef="Activity_164t8p9" />
+    <bpmn:endEvent id="Event_0ni6wjs" name="end">
+      <bpmn:incoming>Flow_1dy8psi</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1dy8psi" sourceRef="Activity_1odm3qh" targetRef="Event_0ni6wjs" />
+    <bpmn:scriptTask id="Activity_1odm3qh" name="Assert" scriptFormat="groovy">
+      <bpmn:incoming>Flow_0gl2ex9</bpmn:incoming>
+      <bpmn:outgoing>Flow_1dy8psi</bpmn:outgoing>
+      <bpmn:script>
+        assert response.responseBody.toString().equals('{"phone":"+380441111111","settings_id":"c2c19401-f1b7-4954-a230-ab15566e7318","e-mail":"test@test.com","communicationIsAllowed":true}')</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_0gl2ex9" sourceRef="Activity_164t8p9" targetRef="Activity_1odm3qh" />
+    <bpmn:serviceTask id="Activity_164t8p9" name="Get Settings" camunda:modelerTemplate="userSettingsConnectorReadDelegate" camunda:delegateExpression="${userSettingsConnectorReadDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="x_access_token">token</camunda:inputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_07qzr0a</bpmn:incoming>
+      <bpmn:outgoing>Flow_0gl2ex9</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="get_settings_key">
+      <bpmndi:BPMNEdge id="Flow_1dy8psi_di" bpmnElement="Flow_1dy8psi">
+        <di:waypoint x="510" y="117" />
+        <di:waypoint x="572" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07qzr0a_di" bpmnElement="Flow_07qzr0a">
+        <di:waypoint x="188" y="117" />
+        <di:waypoint x="240" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0gl2ex9_di" bpmnElement="Flow_0gl2ex9">
+        <di:waypoint x="340" y="117" />
+        <di:waypoint x="410" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="159" y="142" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0ni6wjs_di" bpmnElement="Event_0ni6wjs">
+        <dc:Bounds x="572" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="581" y="142" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ra5ahx_di" bpmnElement="Activity_1odm3qh">
+        <dc:Bounds x="410" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1fqw39j_di" bpmnElement="Activity_164t8p9">
+        <dc:Bounds x="240" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
