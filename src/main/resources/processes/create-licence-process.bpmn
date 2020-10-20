@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1re5akf" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.2.0">
+  <bpmn:process id="Process_00rzvvo" name="Заява про реєстрацію медичної ліцензії" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="Початок бізнес процесу" camunda:formKey="medicallicencecreateform">
+      <bpmn:outgoing>Flow_19rhv4u</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_19rhv4u" sourceRef="StartEvent_1" targetRef="Activity_1ifv4qp" />
+    <bpmn:userTask id="Activity_1ifv4qp" name="Заява завершена" camunda:assignee="demo" camunda:candidateUsers="demo">
+      <bpmn:incoming>Flow_19rhv4u</bpmn:incoming>
+      <bpmn:outgoing>Flow_1k0odht</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="Event_0jxn3fv" name="Завершення бізнес процесу">
+      <bpmn:incoming>Flow_1k0odht</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1k0odht" sourceRef="Activity_1ifv4qp" targetRef="Event_0jxn3fv" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_00rzvvo">
+      <bpmndi:BPMNEdge id="Flow_19rhv4u_di" bpmnElement="Flow_19rhv4u">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1k0odht_di" bpmnElement="Flow_1k0odht">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="432" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="160" y="142" width="77" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0s6wa7q_di" bpmnElement="Activity_1ifv4qp">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0jxn3fv_di" bpmnElement="Event_0jxn3fv">
+        <dc:Bounds x="432" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="413" y="142" width="77" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -1,0 +1,17 @@
+server:
+  port: 8080
+
+spring:
+  jersey:
+    application-path: api
+
+  datasource:
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.postgresql.Driver}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/camunda}
+    username: ${SPRING_DATASOURCE_USERNAME:bpms}
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
+
+camunda:
+  bpm:
+    job-execution:
+      deployment-aware: true
