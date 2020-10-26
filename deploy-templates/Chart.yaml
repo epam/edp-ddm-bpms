@@ -1,6 +1,6 @@
 apiVersion: v1
 description: Helm chart for Java application/service deploying
-name: business-process-management
+name: bpms
 version: 1.0
 keywords:
     - Java
