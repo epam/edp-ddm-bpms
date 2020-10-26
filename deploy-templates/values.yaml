@@ -1,16 +1,27 @@
-name: bpms
-namespace: ""
-cdPipelineName: ""
-cdPipelineStageName: ""
-dnsWildcard: demo.edp-epam.com
-
-database:
-  required: false
-
-
-ingress:
-  required: false
-
 image:
-  name: bpms
+  name: business-process-management
   version: latest
+port: 8080
+service:
+  type: ClusterIP
+  port: 8080
+replicas: 1
+
+db:
+  image: postgres:9.6
+  port: 5432
+  service:
+    type: ClusterIP
+    port: 5432
+    clusterIP: None
+  replicas: 1
+  defaultDatabase: camunda
+  credentials:
+    username: admin
+    password: admin
+  storage:
+    size: 2Gi
+    class: gp2-c
+  podSecurityContext:
+    runAsUser: 999
+    fsGroup: 999

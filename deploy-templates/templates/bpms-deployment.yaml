@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  replicas: {{ .Values.replicas }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      initContainers:
+      - command:
+          - sh
+          - '-c'
+          - >-
+            while ! nc -w 1 {{ .Chart.Name }}-db-headless {{ .Values.db.service.port }} </dev/null; do echo waiting for
+            database; sleep 10; done;
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        name: {{ .Chart.Name }}-init
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
+        ports:
+          - containerPort: {{ .Values.port }}
+            name: {{ .Chart.Name }}
+        env:
+          - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+            value: "org.postgresql.Driver"
+          - name: SPRING_DATASOURCE_URL
+            value: "jdbc:postgresql://{{ .Chart.Name }}-db-headless:{{ .Values.db.service.port }}/{{ .Values.db.defaultDatabase }}"
+          - name: SPRING_DATASOURCE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: "username"
+                name: "{{ .Chart.Name }}-db-credentials"
+          - name: SPRING_DATASOURCE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: "{{ .Chart.Name }}-db-credentials"
+        livenessProbe:
+          httpGet:
+            path: /actuator
+            port: {{ .Values.port }}
+          failureThreshold: 10
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /actuator
+            port: {{ .Values.port }}
+          failureThreshold: 10
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+      serviceAccountName: {{ .Chart.Name }}
+      {{- if .Values.nodeSelector }}
+      nodeSelector: {{ toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.podSecurityContext }}
+      securityContext: {{ toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- end }}
