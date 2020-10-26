@@ -1,0 +1,16 @@
+name: business-process-management
+namespace: ""
+cdPipelineName: ""
+cdPipelineStageName: ""
+dnsWildcard: demo.edp-epam.com
+
+database:
+  required: false
+
+
+ingress:
+  required: false
+
+image:
+  name: business-process-management
+  version: latest
