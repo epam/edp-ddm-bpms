@@ -25,3 +25,6 @@ db:
   podSecurityContext:
     runAsUser: 999
     fsGroup: 999
+
+ingress: # expose the service with a route or an ingress depending on platform type
+  platform: openshift # openshift or kubernetes
