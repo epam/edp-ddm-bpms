@@ -6,7 +6,7 @@ metadata:
     app: {{ .Chart.Name }}
   name: {{ .Chart.Name }}
 spec:
-  host: officer-portal-{{ .Values.cdPipelineName }}-{{ .Values.cdPipelineStageName }}.{{ .Values.dnsWildcard }}
+  host: bpms-{{ .Values.cdPipelineName }}-{{ .Values.cdPipelineStageName }}.{{ .Values.dnsWildcard }}
   tls:
     insecureEdgeTerminationPolicy: Redirect
     termination: edge

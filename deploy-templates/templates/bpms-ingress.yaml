@@ -7,7 +7,7 @@ metadata:
     app: {{ .Chart.Name }}
 spec:
   rules:
-    - host: officer-portal-{{ .Values.cdPipelineName }}-{{ .Values.cdPipelineStageName }}.{{ .Values.dnsWildcard }}
+    - host: bpms-{{ .Values.cdPipelineName }}-{{ .Values.cdPipelineStageName }}.{{ .Values.dnsWildcard }}
       http:
         paths:
           - path: /
