@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_12bs772" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.2.0">
+  <bpmn:process id="Process_1malzzr" name="Заява на оновлення медичної ліцензії" isExecutable="true">
+    <bpmn:startEvent id="Event_1vpjgvz" name="Початок бізнес процесу" camunda:formKey="startForm">
+      <bpmn:outgoing>Flow_17w2b0m</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Activity_106566h" name="Очікування вводу даних" camunda:formKey="inputTaxPayerId">
+      <bpmn:incoming>Flow_17w2b0m</bpmn:incoming>
+      <bpmn:outgoing>Flow_0aam69g</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_17w2b0m" sourceRef="Event_1vpjgvz" targetRef="Activity_106566h" />
+    <bpmn:serviceTask id="Activity_0nvs4qh" name="Запит ліцензії за вказаним ІНН">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:inputParameter name="url">http://localhost:8877/mock-server/api/licenses/search/findByTaxpayerIdentificationNumber?taxpayerIdentificationNumber=${taxpayerIdentificationNumber}</camunda:inputParameter>
+            <camunda:outputParameter name="recordExists">${statusCode == 200}</camunda:outputParameter>
+            <camunda:outputParameter name="company">${recordExists ? S(response).prop('company').value() : null}</camunda:outputParameter>
+            <camunda:outputParameter name="location">${recordExists ? S(response).prop('location').value() : null}</camunda:outputParameter>
+            <camunda:outputParameter name="ownerFirstName">${recordExists ? S(response).prop('ownerFirstName').value() : null}</camunda:outputParameter>
+            <camunda:outputParameter name="ownerLastName">${recordExists ? S(response).prop('ownerLastName').value() : null}</camunda:outputParameter>
+            <camunda:outputParameter name="id">${recordExists ? S(response).prop('id').value() : null}</camunda:outputParameter>
+            <camunda:outputParameter name="certificateDate">${recordExists ? S(response).prop('certificateDate').value() : null}</camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0aam69g</bpmn:incoming>
+      <bpmn:outgoing>Flow_02yx3qs</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0aam69g" sourceRef="Activity_106566h" targetRef="Activity_0nvs4qh" />
+    <bpmn:exclusiveGateway id="Gateway_1bcm3zx" name="Медична ліцензія знайдена?">
+      <bpmn:incoming>Flow_02yx3qs</bpmn:incoming>
+      <bpmn:outgoing>Flow_0jd66g6</bpmn:outgoing>
+      <bpmn:outgoing>Flow_008ailp</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_02yx3qs" sourceRef="Activity_0nvs4qh" targetRef="Gateway_1bcm3zx" />
+    <bpmn:userTask id="Activity_0dep9on" name="Медична ліцензія не знайдена" camunda:formKey="showLicenceNotFoundErrorForm">
+      <bpmn:incoming>Flow_0jd66g6</bpmn:incoming>
+      <bpmn:outgoing>Flow_19b2dw6</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0jd66g6" name="Ні" sourceRef="Gateway_1bcm3zx" targetRef="Activity_0dep9on">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!recordExists}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="Gateway_1mng7y9">
+      <bpmn:incoming>Flow_19b2dw6</bpmn:incoming>
+      <bpmn:incoming>Flow_1pg7ffz</bpmn:incoming>
+      <bpmn:outgoing>Flow_0nnwlme</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_19b2dw6" sourceRef="Activity_0dep9on" targetRef="Gateway_1mng7y9" />
+    <bpmn:userTask id="Activity_0dbrlpq" name="Заява завершена" camunda:assignee="demo" camunda:candidateUsers="demo">
+      <bpmn:incoming>Flow_0nnwlme</bpmn:incoming>
+      <bpmn:outgoing>Flow_014yq5m</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0nnwlme" sourceRef="Gateway_1mng7y9" targetRef="Activity_0dbrlpq" />
+    <bpmn:userTask id="Activity_0sj2sdi" name="Очікування вводу даних" camunda:formKey="updateMedicalLicenceForm">
+      <bpmn:incoming>Flow_008ailp</bpmn:incoming>
+      <bpmn:outgoing>Flow_0z0ngz5</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_008ailp" name="Так" sourceRef="Gateway_1bcm3zx" targetRef="Activity_0sj2sdi" />
+    <bpmn:serviceTask id="Activity_0wygnky" name="Запит на оновлення у фабрику даних">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="Input_0idlrb3" />
+        </camunda:inputOutput>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="method">PATCH</camunda:inputParameter>
+            <camunda:inputParameter name="url">http://localhost:8877/mock-server/api/licenses/${id}</camunda:inputParameter>
+            <camunda:inputParameter name="payload">{
+    "company": "${company}",
+    "location": "${location}",
+    "ownerFirstName": "${ownerFirstName}",
+    "ownerLastName": "${ownerLastName}",
+    "certificateDate": "${certificateDate}"
+}</camunda:inputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0ocgwlq</bpmn:incoming>
+      <bpmn:outgoing>Flow_1na1umx</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0z0ngz5" sourceRef="Activity_0sj2sdi" targetRef="Activity_1psdqct" />
+    <bpmn:sequenceFlow id="Flow_1na1umx" sourceRef="Activity_0wygnky" targetRef="Gateway_0l40q26" />
+    <bpmn:businessRuleTask id="Activity_1psdqct" name="Перевірка дати сертифікату" camunda:resultVariable="certificateDateValidationPass" camunda:decisionRef="certificateDateValidationRule" camunda:mapDecisionResult="singleEntry">
+      <bpmn:incoming>Flow_0z0ngz5</bpmn:incoming>
+      <bpmn:outgoing>Flow_13yghg5</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:sequenceFlow id="Flow_13yghg5" sourceRef="Activity_1psdqct" targetRef="Gateway_1b5ohl6" />
+    <bpmn:exclusiveGateway id="Gateway_1b5ohl6" name="Дата сертифікату валідна?">
+      <bpmn:incoming>Flow_13yghg5</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ocgwlq</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0s1sgqm</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0ocgwlq" name="Так" sourceRef="Gateway_1b5ohl6" targetRef="Activity_0wygnky">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${certificateDateValidationPass}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:userTask id="Activity_1u47xua" name="Помилка валідації сертифікату" camunda:formKey="showCertificateValidationErrorForm">
+      <bpmn:incoming>Flow_0s1sgqm</bpmn:incoming>
+      <bpmn:outgoing>Flow_0llb4yz</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0s1sgqm" name="Ні" sourceRef="Gateway_1b5ohl6" targetRef="Activity_1u47xua">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!certificateDateValidationPass}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="Gateway_0l40q26">
+      <bpmn:incoming>Flow_1na1umx</bpmn:incoming>
+      <bpmn:incoming>Flow_0llb4yz</bpmn:incoming>
+      <bpmn:outgoing>Flow_1pg7ffz</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1pg7ffz" sourceRef="Gateway_0l40q26" targetRef="Gateway_1mng7y9" />
+    <bpmn:sequenceFlow id="Flow_0llb4yz" sourceRef="Activity_1u47xua" targetRef="Gateway_0l40q26" />
+    <bpmn:endEvent id="Event_191nex2" name="Завершення бізнес процесу">
+      <bpmn:incoming>Flow_014yq5m</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_014yq5m" sourceRef="Activity_0dbrlpq" targetRef="Event_191nex2" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1malzzr">
+      <bpmndi:BPMNEdge id="Flow_17w2b0m_di" bpmnElement="Flow_17w2b0m">
+        <di:waypoint x="208" y="147" />
+        <di:waypoint x="270" y="147" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0aam69g_di" bpmnElement="Flow_0aam69g">
+        <di:waypoint x="370" y="147" />
+        <di:waypoint x="430" y="147" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02yx3qs_di" bpmnElement="Flow_02yx3qs">
+        <di:waypoint x="530" y="147" />
+        <di:waypoint x="585" y="147" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0jd66g6_di" bpmnElement="Flow_0jd66g6">
+        <di:waypoint x="610" y="172" />
+        <di:waypoint x="610" y="320" />
+        <di:waypoint x="690" y="320" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="620" y="243" width="11" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19b2dw6_di" bpmnElement="Flow_19b2dw6">
+        <di:waypoint x="790" y="320" />
+        <di:waypoint x="1400" y="320" />
+        <di:waypoint x="1400" y="172" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_008ailp_di" bpmnElement="Flow_008ailp">
+        <di:waypoint x="635" y="147" />
+        <di:waypoint x="690" y="147" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="654" y="129" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0z0ngz5_di" bpmnElement="Flow_0z0ngz5">
+        <di:waypoint x="790" y="147" />
+        <di:waypoint x="850" y="147" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13yghg5_di" bpmnElement="Flow_13yghg5">
+        <di:waypoint x="950" y="147" />
+        <di:waypoint x="1015" y="147" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1na1umx_di" bpmnElement="Flow_1na1umx">
+        <di:waypoint x="1220" y="147" />
+        <di:waypoint x="1275" y="147" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0nnwlme_di" bpmnElement="Flow_0nnwlme">
+        <di:waypoint x="1425" y="147" />
+        <di:waypoint x="1470" y="147" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ocgwlq_di" bpmnElement="Flow_0ocgwlq">
+        <di:waypoint x="1065" y="147" />
+        <di:waypoint x="1120" y="147" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1084" y="129" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0s1sgqm_di" bpmnElement="Flow_0s1sgqm">
+        <di:waypoint x="1040" y="172" />
+        <di:waypoint x="1040" y="250" />
+        <di:waypoint x="1120" y="250" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1050" y="208" width="11" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1pg7ffz_di" bpmnElement="Flow_1pg7ffz">
+        <di:waypoint x="1325" y="147" />
+        <di:waypoint x="1375" y="147" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0llb4yz_di" bpmnElement="Flow_0llb4yz">
+        <di:waypoint x="1220" y="250" />
+        <di:waypoint x="1300" y="250" />
+        <di:waypoint x="1300" y="172" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_014yq5m_di" bpmnElement="Flow_014yq5m">
+        <di:waypoint x="1570" y="147" />
+        <di:waypoint x="1622" y="147" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1vpjgvz_di" bpmnElement="Event_1vpjgvz">
+        <dc:Bounds x="172" y="129" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="153" y="172" width="77" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_106566h_di" bpmnElement="Activity_106566h">
+        <dc:Bounds x="270" y="107" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0nvs4qh_di" bpmnElement="Activity_0nvs4qh">
+        <dc:Bounds x="430" y="107" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1bcm3zx_di" bpmnElement="Gateway_1bcm3zx" isMarkerVisible="true">
+        <dc:Bounds x="585" y="122" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="582" y="70" width="55" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0sj2sdi_di" bpmnElement="Activity_0sj2sdi">
+        <dc:Bounds x="690" y="107" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1psdqct_di" bpmnElement="Activity_1psdqct">
+        <dc:Bounds x="850" y="107" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1b5ohl6_di" bpmnElement="Gateway_1b5ohl6" isMarkerVisible="true">
+        <dc:Bounds x="1015" y="122" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="995" y="85" width="89" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0wygnky_di" bpmnElement="Activity_0wygnky">
+        <dc:Bounds x="1120" y="107" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0l40q26_di" bpmnElement="Gateway_0l40q26" isMarkerVisible="true">
+        <dc:Bounds x="1275" y="122" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1mng7y9_di" bpmnElement="Gateway_1mng7y9" isMarkerVisible="true">
+        <dc:Bounds x="1375" y="122" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0dbrlpq_di" bpmnElement="Activity_0dbrlpq">
+        <dc:Bounds x="1470" y="107" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_191nex2_di" bpmnElement="Event_191nex2">
+        <dc:Bounds x="1622" y="129" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1603" y="172" width="77" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1u47xua_di" bpmnElement="Activity_1u47xua">
+        <dc:Bounds x="1120" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0dep9on_di" bpmnElement="Activity_0dep9on">
+        <dc:Bounds x="690" y="280" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

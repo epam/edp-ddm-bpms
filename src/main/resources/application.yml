@@ -15,3 +15,8 @@ camunda:
   bpm:
     job-execution:
       deployment-aware: true
+    admin-user:
+      id: camunda
+      password: camunda
+    database:
+      schema-update: true

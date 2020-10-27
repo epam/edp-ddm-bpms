@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/2.0" id="Definitions_1fubd3r" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.2.0">
+  <decision id="certificateDateValidationRule" name="Перевірка дати сертифікату">
+    <decisionTable id="DecisionTable_00ywzgs">
+      <input id="Input_1" label="Дата сертифікату">
+        <inputExpression id="InputExpression_1" typeRef="date">
+          <text>certificateDate</text>
+        </inputExpression>
+      </input>
+      <output id="OutputClause_071hp49" label="Валідний сертифікат" name="certificateDateValidationPass" typeRef="boolean" biodi:width="192" />
+      <rule id="DecisionRule_1w4iw1r">
+        <inputEntry id="UnaryTests_1i5p4gg">
+          <text>&lt; date and time("2020-01-01T00:00:00")</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0rirwzg">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1yzg0zt">
+        <inputEntry id="UnaryTests_1g4y4ty">
+          <text>&gt; date and time("2020-01-01T00:00:00")</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1voy01i">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="certificateDateValidationRule">
+        <dc:Bounds height="80" width="180" x="160" y="80" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>
