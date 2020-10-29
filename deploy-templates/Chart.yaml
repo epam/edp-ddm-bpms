@@ -1,7 +1,6 @@
 apiVersion: v1
-description: Helm chart for Java application/service deploying
-name: business-process-management
-version: 1.0
-keywords:
-    - Java
-home: https://www.epam.com
+description: Chart for deployng bpms with postgres database
+maintainers:
+- email: dmytro_zinchenko1@epam.com
+name: bpms
+version: 0.0.1
