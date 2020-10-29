@@ -1,4 +1,4 @@
-name: bpms
+name: business-process-management
 namespace: ""
 cdPipelineName: ""
 cdPipelineStageName: ""
@@ -12,5 +12,5 @@ ingress:
   required: false
 
 image:
-  name: bpms
+  name: business-process-management
   version: latest
