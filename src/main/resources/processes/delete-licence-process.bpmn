@@ -34,7 +34,7 @@
         <camunda:connector>
           <camunda:inputOutput>
             <camunda:inputParameter name="method">DELETE</camunda:inputParameter>
-            <camunda:inputParameter name="url">http://localhost:8877/mock-server/api/licenses/${id}</camunda:inputParameter>
+            <camunda:inputParameter name="url">http://data-factory-mock-server:8877/mock-server/api/licenses/${id}</camunda:inputParameter>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>
         </camunda:connector>
@@ -52,7 +52,7 @@
         <camunda:connector>
           <camunda:inputOutput>
             <camunda:inputParameter name="method">GET</camunda:inputParameter>
-            <camunda:inputParameter name="url">http://localhost:8877/mock-server/api/licenses/search/findByTaxpayerIdentificationNumber?taxpayerIdentificationNumber=${taxpayerIdentificationNumber}</camunda:inputParameter>
+            <camunda:inputParameter name="url">http://data-factory-mock-server:8877/mock-server/api/licenses/search/findByTaxpayerIdentificationNumber?taxpayerIdentificationNumber=${taxpayerIdentificationNumber}</camunda:inputParameter>
             <camunda:outputParameter name="recordExists">${statusCode == 200}</camunda:outputParameter>
             <camunda:outputParameter name="id">${recordExists ? S(response).prop('id').value() : null}</camunda:outputParameter>
             <camunda:outputParameter name="company">${recordExists ? S(response).prop('company').value() : null}</camunda:outputParameter>
