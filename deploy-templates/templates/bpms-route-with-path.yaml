@@ -4,7 +4,7 @@ kind: Route
 metadata:
   labels:
     app: {{ .Chart.Name }}
-  name: {{ .Chart.Name }}
+  name: {{ .Chart.Name }}-path
 spec:
   host: {{ .Values.cdPipelineName }}-{{ .Values.cdPipelineStageName }}.{{ .Values.dnsWildcard }}
   path: /api
