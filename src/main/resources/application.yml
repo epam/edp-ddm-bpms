@@ -17,6 +17,6 @@ camunda:
       deployment-aware: true
     admin-user:
       id: camunda
-      password: camunda
+      password: camunda-112
     database:
       schema-update: true
