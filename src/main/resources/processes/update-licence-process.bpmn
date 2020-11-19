@@ -14,7 +14,7 @@
         <camunda:connector>
           <camunda:inputOutput>
             <camunda:inputParameter name="method">GET</camunda:inputParameter>
-            <camunda:inputParameter name="url">http://data-factory-mock-server:8877/mock-server/api/licenses/search/findByTaxpayerIdentificationNumber?taxpayerIdentificationNumber=${taxpayerIdentificationNumber}</camunda:inputParameter>
+            <camunda:inputParameter name="url">${dataFactoryBaseUrl}/api/licenses/search/findByTaxpayerIdentificationNumber?taxpayerIdentificationNumber=${taxpayerIdentificationNumber}</camunda:inputParameter>
             <camunda:outputParameter name="recordExists">${statusCode == 200}</camunda:outputParameter>
             <camunda:outputParameter name="company">${recordExists ? S(response).prop('company').value() : null}</camunda:outputParameter>
             <camunda:outputParameter name="location">${recordExists ? S(response).prop('location').value() : null}</camunda:outputParameter>
@@ -67,7 +67,7 @@
         <camunda:connector>
           <camunda:inputOutput>
             <camunda:inputParameter name="method">PATCH</camunda:inputParameter>
-            <camunda:inputParameter name="url">http://data-factory-mock-server:8877/mock-server/api/licenses/${id}</camunda:inputParameter>
+            <camunda:inputParameter name="url">${dataFactoryBaseUrl}/api/licenses/${id}</camunda:inputParameter>
             <camunda:inputParameter name="payload">{
     "company": "${company}",
     "location": "${location}",

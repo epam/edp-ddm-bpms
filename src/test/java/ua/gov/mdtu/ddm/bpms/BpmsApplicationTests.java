@@ -1,4 +1,4 @@
-package mdtu.ddm.bpms;
+package ua.gov.mdtu.ddm.bpms;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

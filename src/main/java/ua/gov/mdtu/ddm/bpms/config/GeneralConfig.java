@@ -1,4 +1,4 @@
-package mdtu.ddm.bpms.config;
+package ua.gov.mdtu.ddm.bpms.config;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
