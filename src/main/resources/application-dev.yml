@@ -1,3 +1,3 @@
 camunda:
   system-variables:
-    dataFactoryBaseUrl: http://localhost:8877/mock-server
+    data-factory-base-url: http://localhost:8877/mock-server

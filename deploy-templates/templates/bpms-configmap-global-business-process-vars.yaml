@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-camunda-global-system-vars
+data:
+  camunda-global-system-vars.yml: |-
+    camunda:
+      system-variables:
+        data-factory-base-url: http://data-factory-mock-server:8877/mock-server

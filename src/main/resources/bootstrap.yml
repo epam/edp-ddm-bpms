@@ -1,0 +1,24 @@
+spring:
+  profiles: dev
+  cloud:
+    kubernetes:
+      config:
+        enabled: false
+
+---
+spring:
+  application:
+    name: business-process-management
+  cloud:
+    kubernetes:
+      config:
+        enabled: true
+        enable-api: false
+        paths:
+          - /app/config/application.yml
+          - /app/config/camunda-global-system-vars.yml
+      secrets:
+        enabled: true
+        enable-api: false
+        paths:
+          - /app/secrets
