@@ -6,4 +6,4 @@ data:
   camunda-global-system-vars.yml: |-
     camunda:
       system-variables:
-        data-factory-base-url: http://data-factory-mock-server:8877/mock-server
+        dataFactoryBaseUrl: http://data-factory-mock-server:8877/mock-server
