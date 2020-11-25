@@ -6,6 +6,8 @@ service:
   type: ClusterIP
   port: 8080
 replicas: 1
+appConfigMountPath: "/app/config"
+appSecretsMountPath: "/app/secrets"
 
 db:
   image: postgres:9.6

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}
+data:
+  application.yml: |-
+    db.url: jdbc:postgresql://{{ .Chart.Name }}-db-headless:{{ .Values.db.service.port }}/{{ .Values.db.defaultDatabase }}

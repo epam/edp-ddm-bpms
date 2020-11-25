@@ -68,6 +68,11 @@ spec:
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 5
+        volumeMounts:
+          - name: {{ .Chart.Name }}
+            mountPath: {{ .Values.appConfigMountPath }}
+          - name: {{ .Chart.Name }}-db-credentials
+            mountPath: {{ .Values.appSecretsMountPath }}
       serviceAccountName: {{ .Chart.Name }}
       {{- if .Values.nodeSelector }}
       nodeSelector: {{ toYaml .Values.nodeSelector | nindent 8 }}
@@ -75,3 +80,10 @@ spec:
       {{- if .Values.podSecurityContext }}
       securityContext: {{ toYaml .Values.podSecurityContext | nindent 8 }}
       {{- end }}
+      volumes:
+        - name: {{ .Chart.Name }}
+          configMap:
+            name: {{ .Chart.Name }}
+        - name: {{ .Chart.Name }}-db-credentials
+          secret:
+            secretName: {{ .Chart.Name }}-db-credentials
