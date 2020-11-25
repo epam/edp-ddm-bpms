@@ -6,7 +6,8 @@ service:
   type: ClusterIP
   port: 8080
 replicas: 1
-appConfigMountPath: "/app/config"
+appConfigMountPath: "/app/config/main"
+camundaVarsMountPath: "/app/config/camunda"
 appSecretsMountPath: "/app/secrets"
 
 db:

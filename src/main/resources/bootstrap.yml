@@ -15,8 +15,8 @@ spring:
         enabled: true
         enable-api: false
         paths:
-          - /app/config/application.yml
-          - /app/config/camunda-global-system-vars.yml
+          - /app/config/main/application.yml
+          - /app/config/camunda/camunda-global-system-vars.yml
       secrets:
         enabled: true
         enable-api: false

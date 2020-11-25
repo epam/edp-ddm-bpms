@@ -74,7 +74,7 @@ spec:
           - name: {{ .Chart.Name }}-db-credentials
             mountPath: {{ .Values.appSecretsMountPath }}
           - name: {{ .Chart.Name }}-camunda-global-system-vars
-            mountPath: {{ .Values.appConfigMountPath }}
+            mountPath: {{ .Values.camundaVarsMountPath }}
       serviceAccountName: {{ .Chart.Name }}
       {{- if .Values.nodeSelector }}
       nodeSelector: {{ toYaml .Values.nodeSelector | nindent 8 }}
