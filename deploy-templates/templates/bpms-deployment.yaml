@@ -35,21 +35,6 @@ spec:
         ports:
           - containerPort: {{ .Values.port }}
             name: {{ .Chart.Name }}
-        env:
-          - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
-            value: "org.postgresql.Driver"
-          - name: SPRING_DATASOURCE_URL
-            value: "jdbc:postgresql://{{ .Chart.Name }}-db-headless:{{ .Values.db.service.port }}/{{ .Values.db.defaultDatabase }}"
-          - name: SPRING_DATASOURCE_USERNAME
-            valueFrom:
-              secretKeyRef:
-                key: "username"
-                name: "{{ .Chart.Name }}-db-credentials"
-          - name: SPRING_DATASOURCE_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                key: password
-                name: "{{ .Chart.Name }}-db-credentials"
         livenessProbe:
           httpGet:
             path: /actuator
@@ -89,6 +74,11 @@ spec:
         - name: {{ .Chart.Name }}-db-credentials
           secret:
             secretName: {{ .Chart.Name }}-db-credentials
+            items:
+            - key: username
+              path: spring.datasource.username
+            - key: password
+              path: spring.datasource.password
         - name: {{ .Chart.Name }}-camunda-global-system-vars
           configMap:
             name: {{ .Chart.Name }}-camunda-global-system-vars
