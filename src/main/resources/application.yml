@@ -4,9 +4,3 @@ server:
 spring:
   jersey:
     application-path: api
-
-camunda:
-  bpm:
-    admin-user:
-      id: camunda
-      password: camunda
