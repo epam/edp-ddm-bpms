@@ -6,11 +6,11 @@
   <parent>
     <groupId>mdtu.ddm.lowcode</groupId>
     <artifactId>business-process-management-parent</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>${project.version}</version>
   </parent>
 
   <artifactId>business-process-management</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>${project.version}</version>
 
   <dependencies>
     <!--Spring Boot dependencies-->

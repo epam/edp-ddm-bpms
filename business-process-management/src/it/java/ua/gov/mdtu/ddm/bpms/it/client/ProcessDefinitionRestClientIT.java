@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
+import mdtu.ddm.lowcode.api.dto.ProcessDefinitionQueryDto;
 import org.assertj.core.util.Lists;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
@@ -42,7 +43,8 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(200)
-                .withBody(objectMapper.writeValueAsString(Lists.newArrayList(processDefinitionDto))))
+                .withBody(
+                    objectMapper.writeValueAsString(Lists.newArrayList(processDefinitionDto))))
         )
     );
   }
@@ -60,7 +62,7 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
   public void shouldReturnListOfProcessDefinitions() {
     //when
     List<ProcessDefinitionDto> processDefinitions = processDefinitionRestClient
-        .getProcessDefinitions("name", "desc");
+        .getProcessDefinitionsByParams(ProcessDefinitionQueryDto.builder().name("name").build());
     //then
     assertThat(processDefinitions.size()).isOne();
     assertThat(processDefinitions.get(0).getId()).isEqualTo("testId");

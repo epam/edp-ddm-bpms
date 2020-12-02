@@ -7,17 +7,28 @@
   <parent>
     <groupId>mdtu.ddm.lowcode</groupId>
     <artifactId>business-process-management-parent</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>${project.version}</version>
   </parent>
 
   <artifactId>business-process-management-client</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>${project.version}</version>
   <name>business-process-management-client</name>
 
   <dependencies>
     <dependency>
-      <groupId>org.camunda.bpm.springboot</groupId>
-      <artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
+      <groupId>mdtu.ddm.lowcode</groupId>
+      <artifactId>business-process-management-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine-rest-core</artifactId>
+      <version>${camunda.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
+      <version>${camunda.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.cloud</groupId>
