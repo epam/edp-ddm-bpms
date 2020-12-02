@@ -13,7 +13,7 @@
 
   <groupId>mdtu.ddm.lowcode</groupId>
   <artifactId>business-process-management-parent</artifactId>
-  <version>${project.version}</version>
+  <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -23,7 +23,6 @@
   </modules>
 
   <properties>
-    <project.version>0.0.1-SNAPSHOT</project.version>
     <java.version>11</java.version>
     <camunda.version>7.13.0</camunda.version>
     <deployable.module>business-process-management</deployable.module>

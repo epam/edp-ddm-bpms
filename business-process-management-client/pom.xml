@@ -7,11 +7,10 @@
   <parent>
     <groupId>mdtu.ddm.lowcode</groupId>
     <artifactId>business-process-management-parent</artifactId>
-    <version>${project.version}</version>
+    <version>0.0.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>business-process-management-client</artifactId>
-  <version>${project.version}</version>
   <name>business-process-management-client</name>
 
   <dependencies>
