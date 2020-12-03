@@ -10,6 +10,10 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
+  <properties>
+    <sonar.coverage.exclusions>**/mdtu/ddm/lowcode/api/dto/**/*</sonar.coverage.exclusions>
+  </properties>
+
   <artifactId>business-process-management-api</artifactId>
   <name>business-process-management-api</name>
 

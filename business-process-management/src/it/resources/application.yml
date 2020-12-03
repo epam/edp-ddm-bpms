@@ -8,6 +8,3 @@ spring:
 camunda:
   system-variables:
     dataFactoryBaseUrl: http://localhost:8877/mock-server
-
-bpms:
-  url: http://localhost:8090

@@ -1,4 +1,4 @@
-package ua.gov.mdtu.ddm.bpms.it.client;
+package ua.gov.mdtu.ddm.client;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -15,8 +15,6 @@ import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import ua.gov.mdtu.ddm.bpms.it.BaseIT;
-import ua.gov.mdtu.ddm.client.CamundaTaskRestClient;
 
 public class CamundaTaskRestClientIT extends BaseIT {
 
