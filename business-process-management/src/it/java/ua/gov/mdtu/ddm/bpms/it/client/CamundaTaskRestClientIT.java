@@ -43,6 +43,16 @@ public class CamundaTaskRestClientIT extends BaseIT {
                 .withBody(objectMapper.writeValueAsString(Lists.newArrayList(taskDto))))
         )
     );
+    TaskDto taskDtoById = new TaskDto();
+    taskDtoById.setId("tid");
+    restClientWireMock.addStubMapping(
+        stubFor(get(urlPathEqualTo("/api/task/tid"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withStatus(200)
+                .withBody(objectMapper.writeValueAsString(taskDtoById)))
+        )
+    );
   }
 
   @Test
@@ -62,5 +72,13 @@ public class CamundaTaskRestClientIT extends BaseIT {
     //then
     assertThat(tasksByParams.size()).isOne();
     assertThat(tasksByParams.get(0).getAssignee()).isEqualTo("testAssignee");
+  }
+
+  @Test
+  public void shouldReturnTaskById() {
+    //when
+    TaskDto taskById = camundaTaskRestClient.getTaskById("tid");
+    //then
+    assertThat(taskById.getId()).isEqualTo("tid");
   }
 }
