@@ -2,15 +2,21 @@ package ua.gov.mdtu.ddm.client;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import mdtu.ddm.lowcode.api.dto.TaskQueryDto;
 import org.assertj.core.util.Lists;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
+import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,6 +57,15 @@ public class CamundaTaskRestClientIT extends BaseIT {
                 .withBody(objectMapper.writeValueAsString(taskDtoById)))
         )
     );
+    Map<String, VariableValueDto> completeVariables = new HashMap<>();
+    completeVariables.put("var1", new VariableValueDto());
+    restClientWireMock.addStubMapping(
+        stubFor(post(urlEqualTo("/api/task/testId/complete"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody(objectMapper.writeValueAsString(completeVariables))))
+    );
   }
 
   @Test
@@ -78,5 +93,14 @@ public class CamundaTaskRestClientIT extends BaseIT {
     TaskDto taskById = camundaTaskRestClient.getTaskById("tid");
     //then
     assertThat(taskById.getId()).isEqualTo("tid");
+  }
+
+  @Test
+  public void shouldCompleteTaskById() {
+    //when
+    Map<String, VariableValueDto> variables = camundaTaskRestClient
+        .completeTaskById("testId", new CompleteTaskDto());
+    //then
+    assertThat(variables).isNotEmpty();
   }
 }
