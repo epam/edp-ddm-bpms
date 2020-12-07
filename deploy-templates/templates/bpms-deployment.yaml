@@ -16,6 +16,8 @@ spec:
     type: RollingUpdate
   template:
     metadata:
+      annotations:
+        prometheus.io/path: '/actuator/prometheus'
       labels:
         app: {{ .Chart.Name }}
     spec:
