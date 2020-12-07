@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn">
+  <Appenders>
+    <Console name="CONSOLE" target="SYSTEM_OUT" follow="true">
+      <JsonTemplateLayout
+        charset="utf-8"
+        eventTemplateUri="classpath:log4j2-layout.json"
+        locationInfoEnabled="true"
+        stackTraceEnabled="true"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Root level="debug">
+      <AppenderRef ref="CONSOLE"/>
+    </Root>
+  </Loggers>
+</Configuration>

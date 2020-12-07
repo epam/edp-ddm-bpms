@@ -25,6 +25,12 @@
   <properties>
     <java.version>11</java.version>
     <camunda.version>7.13.0</camunda.version>
+    <spring-cloud.version>Hoxton.SR9</spring-cloud.version>
+    <springdoc-openapi-ui.version>1.5.0</springdoc-openapi-ui.version>
+    <mapstruct.version>1.4.1.Final</mapstruct.version>
+    <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
+    <log4j-layout-template-json.version>2.14.0</log4j-layout-template-json.version>
+
     <deployable.module>business-process-management</deployable.module>
   </properties>
 
@@ -38,11 +44,11 @@
         <type>pom</type>
       </dependency>
       <dependency>
-        <artifactId>spring-cloud-dependencies</artifactId>
         <groupId>org.springframework.cloud</groupId>
-        <scope>import</scope>
+        <artifactId>spring-cloud-dependencies</artifactId>
+        <version>${spring-cloud.version}</version>
         <type>pom</type>
-        <version>Hoxton.SR9</version>
+        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>

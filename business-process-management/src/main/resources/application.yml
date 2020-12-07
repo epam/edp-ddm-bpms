@@ -4,3 +4,21 @@ server:
 spring:
   jersey:
     application-path: api
+  application:
+    name: business-process-management
+    sleuth:
+      opentracing:
+        enabled: true
+      baggage:
+        correlation-enabled: true
+        correlation-fields: x-request-id
+        remote-fields: x-request-id
+
+# Configuration => prometheus.yml:
+#   scrape_configs:
+#     metrics_path: '/actuator/prometheus'
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
