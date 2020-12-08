@@ -5,13 +5,13 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>mdtu.ddm.lowcode</groupId>
+    <groupId>ua.gov.mdtu.ddm.lowcode</groupId>
     <artifactId>business-process-management-parent</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
   </parent>
 
   <properties>
-    <sonar.coverage.exclusions>**/mdtu/ddm/lowcode/api/dto/**/*</sonar.coverage.exclusions>
+    <sonar.coverage.exclusions>**/mdtu/ddm/lowcode/bpms/api/dto/**/*</sonar.coverage.exclusions>
   </properties>
 
   <artifactId>business-process-management-api</artifactId>
