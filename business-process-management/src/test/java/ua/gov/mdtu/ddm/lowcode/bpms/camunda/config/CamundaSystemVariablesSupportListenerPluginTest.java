@@ -31,11 +31,10 @@ public class CamundaSystemVariablesSupportListenerPluginTest {
 
   @Test
   public void testPreInit() {
-    //given
     when(processEngineConfiguration.getCustomPreBPMNParseListeners()).thenReturn(null);
-    //when
+
     camundaSystemVariablesSupportListenerPlugin.preInit(processEngineConfiguration);
-    //then
+
     List<BpmnParseListener> listeners = Lists.newArrayList();
     listeners.add(camundaSystemVariablesSupportListener);
     verify(processEngineConfiguration).setCustomPreBPMNParseListeners(listeners);

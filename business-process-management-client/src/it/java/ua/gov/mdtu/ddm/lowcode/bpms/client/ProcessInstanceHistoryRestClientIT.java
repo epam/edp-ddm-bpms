@@ -1,22 +1,19 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.client;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Date;
-
 import org.assertj.core.util.Lists;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.HistoryProcessInstanceQueryDto;
 import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.enums.SortOrder;
 
@@ -48,13 +45,12 @@ public class ProcessInstanceHistoryRestClientIT extends BaseIT {
 
   @Test
   public void shouldReturnListOfHistoryProcessInstances() {
-    //when
     var processInstances = processInstanceHistoryRestClient.getProcessInstances(
         HistoryProcessInstanceQueryDto.builder().unfinished(true)
             .sortBy(HistoryProcessInstanceQueryDto.SortByConstants.SORT_BY_START_TIME)
             .sortOrder(SortOrder.ASC.stringValue()).build()
     );
-    //then
+
     assertThat(processInstances.size()).isOne();
     assertThat(processInstances.get(0).getId()).isEqualTo("id");
     assertThat(processInstances.get(0).getProcessDefinitionId()).isEqualTo("processDefinitionId");

@@ -5,7 +5,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @FeignClient(name = "camunda-process-instance-client", url = "${bpms.url}/api/process-instance")
-public interface ProcessInstanceRestClient {
+public interface ProcessInstanceRestClient extends BaseFeignClient {
 
   @GetMapping("/count")
   CountResultDto getProcessInstancesCount();

@@ -36,11 +36,10 @@ public class CamundaSystemVariablesSupportListenerTest {
 
   @Test
   public void shouldAddListenerThatAddsCamundaSystemPropertiesToBpmn() throws Exception {
-    //given
     when(camundaProperties.getSystemVariables()).thenReturn(Maps.newHashMap("var1", "value1"));
-    //when
+
     camundaSystemVariablesSupportListener.parseStartEvent(null, null, startEventActivity);
-    //then
+
     ArgumentCaptor<ExecutionListener> captor = ArgumentCaptor.forClass(ExecutionListener.class);
     verify(startEventActivity).addListener(eq(ExecutionListener.EVENTNAME_START), captor.capture());
     ExecutionListener listener = captor.getValue();
