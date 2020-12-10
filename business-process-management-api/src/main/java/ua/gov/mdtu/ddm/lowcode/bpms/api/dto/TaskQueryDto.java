@@ -1,5 +1,6 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.api.dto;
 
+import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 
@@ -9,4 +10,5 @@ public class TaskQueryDto {
 
   private String taskId;
   private String assignee;
+  private List<String> processInstanceIdIn;
 }
