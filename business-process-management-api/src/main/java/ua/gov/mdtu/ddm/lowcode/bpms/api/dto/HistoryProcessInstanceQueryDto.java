@@ -8,6 +8,7 @@ import lombok.Data;
 public class HistoryProcessInstanceQueryDto {
 
   private boolean unfinished;
+  private boolean finished;
   private String sortBy;
   private String sortOrder;
 

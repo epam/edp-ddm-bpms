@@ -1,9 +1,10 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.client;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,12 +34,29 @@ public class ProcessInstanceHistoryRestClientIT extends BaseIT {
     var historicProcessInstanceDto = HistoricProcessInstanceDto
         .fromHistoricProcessInstance(historicProcessInstanceEntity);
     restClientWireMock.addStubMapping(
-        stubFor(get(urlEqualTo("/api/history/process-instance?sortOrder=asc&unfinished=true&sortBy=startTime"))
+        stubFor(get(urlPathEqualTo("/api/history/process-instance"))
+            .withQueryParam("sortOrder", equalTo("asc"))
+            .withQueryParam("unfinished", equalTo("true"))
+            .withQueryParam("sortBy", equalTo("startTime"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(200)
                 .withBody(
-                    objectMapper.writeValueAsString(Lists.newArrayList(historicProcessInstanceDto))))
+                    objectMapper
+                        .writeValueAsString(Lists.newArrayList(historicProcessInstanceDto))))
+        )
+    );
+
+    // init list of finished process instance response
+    restClientWireMock.addStubMapping(
+        stubFor(get(urlPathEqualTo("/api/history/process-instance"))
+            .withQueryParam("finished", equalTo("true"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withStatus(200)
+                .withBody(
+                    objectMapper
+                        .writeValueAsString(Lists.newArrayList(historicProcessInstanceDto))))
         )
     );
   }
@@ -54,7 +72,22 @@ public class ProcessInstanceHistoryRestClientIT extends BaseIT {
     assertThat(processInstances.size()).isOne();
     assertThat(processInstances.get(0).getId()).isEqualTo("id");
     assertThat(processInstances.get(0).getProcessDefinitionId()).isEqualTo("processDefinitionId");
-    assertThat(processInstances.get(0).getProcessDefinitionName()).isEqualTo("processDefinitionName");
+    assertThat(processInstances.get(0).getProcessDefinitionName())
+        .isEqualTo("processDefinitionName");
+    assertThat(processInstances.get(0).getStartTime()).isEqualTo(new Date(10000L));
+  }
+
+  @Test
+  public void shouldReturnListOfFinishedHistoryProcessInstances() {
+    var processInstances = processInstanceHistoryRestClient.getProcessInstances(
+        HistoryProcessInstanceQueryDto.builder().finished(true).build()
+    );
+
+    assertThat(processInstances.size()).isOne();
+    assertThat(processInstances.get(0).getId()).isEqualTo("id");
+    assertThat(processInstances.get(0).getProcessDefinitionId()).isEqualTo("processDefinitionId");
+    assertThat(processInstances.get(0).getProcessDefinitionName())
+        .isEqualTo("processDefinitionName");
     assertThat(processInstances.get(0).getStartTime()).isEqualTo(new Date(10000L));
   }
 }
