@@ -1,7 +1,7 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.client;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
@@ -93,14 +93,18 @@ public class CamundaTaskRestClientIT extends BaseIT {
     //get tasks by processInstanceIdIn
     TaskEntity task = new TaskEntity();
     task.setProcessInstanceId("testProcessInstanceId");
+    TaskEntity task2 = new TaskEntity();
+    task2.setProcessInstanceId("testProcessInstanceId2");
     restClientWireMock.addStubMapping(
         stubFor(get(urlPathEqualTo("/api/task"))
-            .withQueryParam("processInstanceIdIn", equalTo("testProcessInstanceId"))
+            .withQueryParam("processInstanceIdIn", containing("testProcessInstanceId"))
+            .withQueryParam("processInstanceIdIn", containing("testProcessInstanceId2"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(200)
                 .withBody(
-                    objectMapper.writeValueAsString(Lists.newArrayList(TaskDto.fromEntity(task)))))
+                    objectMapper.writeValueAsString(
+                        Lists.newArrayList(TaskDto.fromEntity(task), TaskDto.fromEntity(task2)))))
         )
     );
   }
@@ -159,9 +163,15 @@ public class CamundaTaskRestClientIT extends BaseIT {
   public void shouldReturnTasksByProcessInstanceIdIn() {
     List<TaskDto> tasksByParams = camundaTaskRestClient
         .getTasksByParams(TaskQueryDto.builder()
-            .processInstanceIdIn(Lists.newArrayList("testProcessInstanceId")).build());
+            .processInstanceIdIn(
+                Lists.newArrayList("testProcessInstanceId", "testProcessInstanceId2")).build());
 
-    assertThat(tasksByParams.size()).isOne();
-    assertThat(tasksByParams.get(0).getProcessInstanceId()).isEqualTo("testProcessInstanceId");
+    assertThat(tasksByParams.size()).isEqualTo(2);
+    assertThat(
+        tasksByParams.stream()
+            .anyMatch(t -> "testProcessInstanceId".equals(t.getProcessInstanceId()))).isTrue();
+    assertThat(
+        tasksByParams.stream()
+            .anyMatch(t -> "testProcessInstanceId2".equals(t.getProcessInstanceId()))).isTrue();
   }
 }

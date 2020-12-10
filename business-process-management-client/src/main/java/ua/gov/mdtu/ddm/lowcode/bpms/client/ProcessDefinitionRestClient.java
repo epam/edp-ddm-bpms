@@ -7,6 +7,7 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
+import org.springframework.cloud.openfeign.CollectionFormat;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,10 +21,12 @@ import ua.gov.mdtu.ddm.lowcode.bpms.client.exception.ProcessDefinitionNotFoundEx
 public interface ProcessDefinitionRestClient extends BaseFeignClient {
 
   @GetMapping("/count")
+  @CollectionFormat(feign.CollectionFormat.CSV)
   CountResultDto getProcessDefinitionsCount(
       @SpringQueryMap ProcessDefinitionQueryDto requestDto);
 
   @GetMapping
+  @CollectionFormat(feign.CollectionFormat.CSV)
   List<ProcessDefinitionDto> getProcessDefinitionsByParams(
       @SpringQueryMap ProcessDefinitionQueryDto requestDto);
 

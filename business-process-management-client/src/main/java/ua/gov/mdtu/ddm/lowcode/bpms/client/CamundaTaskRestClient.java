@@ -8,6 +8,7 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
+import org.springframework.cloud.openfeign.CollectionFormat;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,9 +22,11 @@ import ua.gov.mdtu.ddm.lowcode.bpms.client.exception.TaskNotFoundException;
 public interface CamundaTaskRestClient extends BaseFeignClient {
 
   @GetMapping("/count")
+  @CollectionFormat(feign.CollectionFormat.CSV)
   CountResultDto getTaskCountByParams(@SpringQueryMap TaskQueryDto taskQueryDto);
 
   @GetMapping
+  @CollectionFormat(feign.CollectionFormat.CSV)
   List<TaskDto> getTasksByParams(@SpringQueryMap TaskQueryDto taskQueryDto);
 
   @GetMapping("/{id}")
