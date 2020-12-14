@@ -21,7 +21,7 @@ db:
   defaultDatabase: camunda
   credentials:
     username: admin
-    password: admin
+    # password: '' # randomly generated
   storage:
     size: 2Gi
     class: gp2-c
