@@ -160,6 +160,20 @@ public class CamundaTaskRestClientIT extends BaseIT {
   }
 
   @Test
+  public void shouldCompleteTaskByIdSuccessfulWhenHttpStatus204() {
+    restClientWireMock.addStubMapping(
+        stubFor(post(urlEqualTo("/api/task/testId204/complete"))
+            .willReturn(aResponse()
+                .withStatus(204)
+                .withHeader("Content-Type", "application/json")))
+    );
+    Map<String, VariableValueDto> variables = camundaTaskRestClient
+        .completeTaskById("testId204", new CompleteTaskDto());
+
+    assertThat(variables).isNull();
+  }
+
+  @Test
   public void shouldReturnTasksByProcessInstanceIdIn() {
     List<TaskDto> tasksByParams = camundaTaskRestClient
         .getTasksByParams(TaskQueryDto.builder()

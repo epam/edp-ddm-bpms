@@ -7,6 +7,7 @@ import feign.codec.Decoder;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -17,7 +18,7 @@ public class BpmsResponseDecoder implements Decoder {
 
   @Override
   public Object decode(Response response, Type type) throws IOException {
-    if (response.body() == null) {
+    if (response.body() == null || HttpStatus.NO_CONTENT.value() == response.status()) {
       return null;
     }
     return objectMapper.readValue(
