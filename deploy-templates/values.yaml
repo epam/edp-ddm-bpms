@@ -10,6 +10,7 @@ appConfigMountPath: "/app/config/main"
 camundaVarsMountPath: "/app/config/camunda"
 appSecretsMountPath: "/app/secrets/main"
 cephSecretMountPath: "/app/secrets/ceph"
+prometheusScrapePath: "/actuator/prometheus"
 
 db:
   image: postgres:9.6
@@ -35,3 +36,6 @@ ingress: # expose the service with a route or an ingress depending on platform t
 
 ceph:
   bucketName: ceph-bucket
+
+monitoring:
+  namespace: openshift-monitoring
