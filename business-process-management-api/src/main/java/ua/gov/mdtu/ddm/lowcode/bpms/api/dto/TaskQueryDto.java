@@ -10,5 +10,6 @@ public class TaskQueryDto {
 
   private String taskId;
   private String assignee;
+  private String processInstanceId;
   private List<String> processInstanceIdIn;
 }

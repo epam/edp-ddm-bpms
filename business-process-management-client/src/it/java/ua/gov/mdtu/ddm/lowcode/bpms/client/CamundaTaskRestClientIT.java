@@ -2,6 +2,7 @@ package ua.gov.mdtu.ddm.lowcode.bpms.client;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
@@ -187,5 +188,29 @@ public class CamundaTaskRestClientIT extends BaseIT {
     assertThat(
         tasksByParams.stream()
             .anyMatch(t -> "testProcessInstanceId2".equals(t.getProcessInstanceId()))).isTrue();
+  }
+
+  @Test
+  public void shouldReturnTasksByProcessInstanceId() throws JsonProcessingException {
+    TaskEntity task = new TaskEntity();
+    task.setProcessInstanceId("testProcessInstanceId");
+    restClientWireMock.addStubMapping(
+        stubFor(get(urlPathEqualTo("/api/task"))
+            .withQueryParam("processInstanceId", equalTo("testProcessInstanceId"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withStatus(200)
+                .withBody(
+                    objectMapper.writeValueAsString(
+                        Lists.newArrayList(TaskDto.fromEntity(task)))))
+        )
+    );
+
+    List<TaskDto> tasksByParams = camundaTaskRestClient
+        .getTasksByParams(TaskQueryDto.builder()
+            .processInstanceId("testProcessInstanceId").build());
+
+    assertThat(tasksByParams.size()).isOne();
+    assertThat(tasksByParams.get(0).getProcessInstanceId()).isEqualTo("testProcessInstanceId");
   }
 }
