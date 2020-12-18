@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import org.assertj.core.util.Lists;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.junit.Test;
@@ -35,7 +36,7 @@ public class HistoryTaskRestClientIT extends BaseIT {
         )
     );
 
-    List<TaskDto> tasksByParams = historyTaskRestClient
+    List<HistoricTaskInstanceEntity> tasksByParams = historyTaskRestClient
         .getHistoryTasksByParams(HistoryTaskQueryDto.builder().build());
 
     assertThat(tasksByParams.size()).isOne();
