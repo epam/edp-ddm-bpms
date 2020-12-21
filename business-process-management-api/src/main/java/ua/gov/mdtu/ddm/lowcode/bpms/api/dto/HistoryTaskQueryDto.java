@@ -8,4 +8,5 @@ import lombok.Data;
 public class HistoryTaskQueryDto {
 
   private String assignee;
+  private boolean finished;
 }

@@ -1,6 +1,7 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.client;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
@@ -27,6 +28,7 @@ public class HistoryTaskRestClientIT extends BaseIT {
     task.setId("testId");
     restClientWireMock.addStubMapping(
         stubFor(get(urlPathEqualTo("/api/history/task"))
+            .withQueryParam("finished", equalTo("true"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(200)
@@ -37,7 +39,7 @@ public class HistoryTaskRestClientIT extends BaseIT {
     );
 
     List<HistoricTaskInstanceEntity> tasksByParams = historyTaskRestClient
-        .getHistoryTasksByParams(HistoryTaskQueryDto.builder().build());
+        .getHistoryTasksByParams(HistoryTaskQueryDto.builder().finished(true).build());
 
     assertThat(tasksByParams.size()).isOne();
     assertThat(tasksByParams.get(0).getId()).isEqualTo("testId");
