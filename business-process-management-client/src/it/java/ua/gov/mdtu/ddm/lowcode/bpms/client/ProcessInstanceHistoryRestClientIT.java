@@ -90,4 +90,25 @@ public class ProcessInstanceHistoryRestClientIT extends BaseIT {
         .isEqualTo("processDefinitionName");
     assertThat(processInstances.get(0).getStartTime()).isEqualTo(new Date(10000L));
   }
+
+  @Test
+  public void shouldReturnProcessInstanceById() throws JsonProcessingException {
+    var historicProcessInstanceEntity = new HistoricProcessInstanceEntity();
+    historicProcessInstanceEntity.setId("testId");
+    var historicProcessInstanceDto = HistoricProcessInstanceDto
+        .fromHistoricProcessInstance(historicProcessInstanceEntity);
+    restClientWireMock.addStubMapping(
+        stubFor(get(urlPathEqualTo("/api/history/process-instance/testId"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withStatus(200)
+                .withBody(objectMapper.writeValueAsString(historicProcessInstanceDto))
+            )
+        )
+    );
+
+    var processInstances = processInstanceHistoryRestClient.getProcessInstanceById("testId");
+
+    assertThat(processInstances.getId()).isEqualTo("testId");
+  }
 }
