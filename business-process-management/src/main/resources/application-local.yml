@@ -6,6 +6,9 @@ camunda:
       deployment-aware: true
     database:
       schema-update: true
+    admin-user:
+      id: camunda
+      password: camunda
 
 spring:
   datasource:
@@ -25,3 +28,9 @@ logging:
     #    Logging patterns inherited from Spring Boot default logging system configuration
     console: '%d{${LOG_DATEFORMAT_PATTERN}} [trace:%X{traceId}/%X{spanId}/%X{x-request-id}] ${LOG_LEVEL_PATTERN} %pid --- [%15.15t] %-40.40c{1.} : %m%n${LOG_EXCEPTION_CONVERSION_WORD}'
     file: '%d{${LOG_DATEFORMAT_PATTERN}} ${LOG_LEVEL_PATTERN} %pid --- [%t] %-40.40c{1.} : %m%n${LOG_EXCEPTION_CONVERSION_WORD}'
+
+ceph:
+  http-endpoint: https://s3-openshift-storage.apps.cicd.mdtu-ddm.projects.epam.com
+  access-key: uPrTAanl8S9lvFNELCdQ
+  secret-key: T/j5lj5qxRZGvD03fw5HO29BvYPgJlCN9CgQV05Q
+  bucket: lowcode-dev-0c2c233f-7d88-4f5c-953e-6aa0e380028b

@@ -42,13 +42,6 @@
       <artifactId>feign-annotation-error-decoder</artifactId>
       <version>${feign-annotation-error-decoder.version}</version>
     </dependency>
-
-    <dependency>
-      <groupId>com.github.tomakehurst</groupId>
-      <artifactId>wiremock</artifactId>
-      <version>${wiremock-jre8.version}</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>

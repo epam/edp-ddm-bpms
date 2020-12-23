@@ -31,6 +31,7 @@
     <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
     <log4j-layout-template-json.version>2.14.0</log4j-layout-template-json.version>
     <groovy.version>3.0.6</groovy.version>
+    <aws-java-sdk.version>1.11.918</aws-java-sdk.version>
 
     <deployable.module>business-process-management</deployable.module>
   </properties>
@@ -59,6 +60,12 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <artifactId>wiremock</artifactId>
+      <groupId>com.github.tomakehurst</groupId>
+      <scope>test</scope>
+      <version>${wiremock-jre8.version}</version>
     </dependency>
   </dependencies>
 

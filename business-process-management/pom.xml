@@ -102,6 +102,11 @@
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
     </dependency>
+    <dependency>
+      <artifactId>aws-java-sdk</artifactId>
+      <groupId>com.amazonaws</groupId>
+      <version>${aws-java-sdk.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
@@ -202,6 +207,15 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <id>local</id>
+      <dependencies>
+        <dependency>
+          <artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
+          <groupId>org.camunda.bpm.springboot</groupId>
+        </dependency>
+      </dependencies>
     </profile>
   </profiles>
 

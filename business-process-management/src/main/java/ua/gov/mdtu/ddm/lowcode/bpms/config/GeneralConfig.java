@@ -4,12 +4,15 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Import;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import ua.gov.mdtu.ddm.lowcode.bpms.integration.ceph.config.CephConfig;
 
 @Configuration
 @EnableAspectJAutoProxy
+@Import(CephConfig.class)
 public class GeneralConfig {
 
     @Bean
