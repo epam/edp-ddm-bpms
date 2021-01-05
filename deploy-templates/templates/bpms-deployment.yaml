@@ -103,7 +103,7 @@ spec:
           secret:
             secretName: {{ .Values.ceph.bucketName }}
             items:
-            - key: AWS_SECRET_ACCESS_KEY
+            - key: AWS_ACCESS_KEY_ID
               path: ceph.access-key
             - key: AWS_SECRET_ACCESS_KEY
               path: ceph.secret-key
