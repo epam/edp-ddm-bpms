@@ -96,8 +96,8 @@ spec:
               path: spring.datasource.password
         - name: {{ .Chart.Name }}-ceph-bucket-credentials
           secret:
-          secretName: {{ .Values.ceph.bucketName }}
-          items:
+            secretName: {{ .Values.ceph.bucketName }}
+            items:
             - key: AWS_SECRET_ACCESS_KEY
               path: ceph.access-key
             - key: AWS_SECRET_ACCESS_KEY
