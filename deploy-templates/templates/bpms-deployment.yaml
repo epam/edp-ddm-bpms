@@ -66,6 +66,11 @@ spec:
               configMapKeyRef:
                 name: {{ .Values.ceph.bucketName }}
                 key: BUCKET_PORT
+          - name: CEPH_BUCKET_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Values.ceph.bucketName }}
+                key: BUCKET_NAME
         volumeMounts:
           - name: {{ .Chart.Name }}
             mountPath: {{ .Values.appConfigMountPath }}

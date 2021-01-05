@@ -22,3 +22,7 @@ management:
     web:
       exposure:
         include: '*'
+
+ceph:
+  http-endpoint: ${CEPH_BUCKET_HOST:localhost}:${CEPH_BUCKET_PORT:8100}
+  bucket: ${CEPH_BUCKET_NAME:bucket}
