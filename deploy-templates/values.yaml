@@ -8,7 +8,8 @@ service:
 replicas: 1
 appConfigMountPath: "/app/config/main"
 camundaVarsMountPath: "/app/config/camunda"
-appSecretsMountPath: "/app/secrets"
+appSecretsMountPath: "/app/secrets/main"
+cephSecretMountPath: "/app/secrets/ceph"
 
 db:
   image: postgres:9.6
@@ -31,3 +32,6 @@ db:
 
 ingress: # expose the service with a route or an ingress depending on platform type
   platform: openshift # openshift or kubernetes
+
+ceph:
+  bucketName: ceph-bucket

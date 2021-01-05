@@ -9,3 +9,6 @@ data:
 
     camunda.bpm.job-execution.deployment-aware: true
     camunda.bpm.database.schema-update: true
+
+    ceph.http-endpoint=${CEPH_BUCKET_HOST:localhost}:${CEPH_BUCKET_PORT:8100}
+    ceph.bucket={{ .Values.ceph.bucketName }}

@@ -55,6 +55,17 @@ spec:
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 5
+        env:
+          - name: CEPH_BUCKET_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Values.ceph.bucketName }}
+                key: BUCKET_HOST
+          - name: CEPH_BUCKET_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Values.ceph.bucketName }}
+                key: BUCKET_PORT
         volumeMounts:
           - name: {{ .Chart.Name }}
             mountPath: {{ .Values.appConfigMountPath }}
@@ -62,6 +73,8 @@ spec:
             mountPath: {{ .Values.appSecretsMountPath }}
           - name: {{ .Chart.Name }}-camunda-global-system-vars
             mountPath: {{ .Values.camundaVarsMountPath }}
+          - name: {{ .Chart.Name }}-ceph-bucket-credentials
+            mountPath: {{ .Values.cephSecretMountPath }}
       serviceAccountName: {{ .Chart.Name }}
       {{- if .Values.nodeSelector }}
       nodeSelector: {{ toYaml .Values.nodeSelector | nindent 8 }}
@@ -81,6 +94,14 @@ spec:
               path: spring.datasource.username
             - key: password
               path: spring.datasource.password
+        - name: {{ .Chart.Name }}-ceph-bucket-credentials
+          secret:
+          secretName: {{ .Values.ceph.bucketName }}
+          items:
+            - key: AWS_SECRET_ACCESS_KEY
+              path: ceph.access-key
+            - key: AWS_SECRET_ACCESS_KEY
+              path: ceph.secret-key
         - name: {{ .Chart.Name }}-camunda-global-system-vars
           configMap:
             name: {{ .Chart.Name }}-camunda-global-system-vars

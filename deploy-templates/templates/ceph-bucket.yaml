@@ -1,0 +1,11 @@
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: {{ .Values.ceph.bucketName }}
+  namespace: mdtu-ddm-edp-cicd-lowcode-dev-dev
+spec:
+  additionalConfig:
+    bucketclass: ceph-bucket-class
+  bucketName: {{ .Values.ceph.bucketName }}
+  storageClassName: openshift-storage.noobaa.io
+  ssl: false
