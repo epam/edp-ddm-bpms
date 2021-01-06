@@ -24,4 +24,4 @@ management:
         include: '*'
 
 ceph:
-  bucket: ${BUCKET_NAME:bucket}
+  bucket: ${CEPH_BUCKET_NAME:bucket}
