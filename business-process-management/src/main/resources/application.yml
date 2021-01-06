@@ -22,3 +22,6 @@ management:
     web:
       exposure:
         include: '*'
+
+ceph:
+  bucket: ${BUCKET_NAME:bucket}

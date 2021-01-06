@@ -11,4 +11,3 @@ data:
     camunda.bpm.database.schema-update: true
 
     ceph.http-endpoint: https://s3-openshift-storage.apps.cicd.mdtu-ddm.projects.epam.com
-    ceph.bucket: {{ .Values.ceph.bucketName }}
