@@ -1,20 +1,26 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.api.dto;
 
 import java.util.List;
-
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 
 @Data
 @Builder
 public class ProcessDefinitionQueryDto {
+
   private boolean latestVersion;
   private String sortBy;
   private String sortOrder;
   private String processDefinitionId;
   private List<String> processDefinitionIdIn;
+  @Default
+  private boolean suspended = false;
+  @Default
+  private boolean active = false;
 
   public static final class SortByConstants {
+
     public static final String SORT_BY_CATEGORY = "category";
     public static final String SORT_BY_KEY = "key";
     public static final String SORT_BY_ID = "id";

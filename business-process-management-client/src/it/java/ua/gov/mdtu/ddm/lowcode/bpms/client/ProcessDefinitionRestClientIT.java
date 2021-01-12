@@ -1,6 +1,7 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.client;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
@@ -42,21 +43,11 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
                 .withBody(objectMapper.writeValueAsString(new CountResultDto(1L))))
         )
     );
-    // init list response
+    // init findOne response
     ProcessDefinitionEntity processDefinitionEntity = new ProcessDefinitionEntity();
     processDefinitionEntity.setId("testId");
     ProcessDefinitionDto processDefinitionDto = ProcessDefinitionDto
         .fromProcessDefinition(processDefinitionEntity);
-    restClientWireMock.addStubMapping(
-        stubFor(get(urlEqualTo("/api/process-definition?latestVersion=true&sortOrder=asc&sortBy=name"))
-            .willReturn(aResponse()
-                .withHeader("Content-Type", "application/json")
-                .withStatus(200)
-                .withBody(
-                    objectMapper.writeValueAsString(Lists.newArrayList(processDefinitionDto))))
-        )
-    );
-    // init findOne response
     restClientWireMock.addStubMapping(
         stubFor(get(urlEqualTo("/api/process-definition/testId"))
             .willReturn(aResponse()
@@ -98,7 +89,25 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturnListOfProcessDefinitions() {
+  public void shouldReturnListOfProcessDefinitions() throws JsonProcessingException {
+    ProcessDefinitionEntity processDefinitionEntity = new ProcessDefinitionEntity();
+    processDefinitionEntity.setId("testId");
+    ProcessDefinitionDto processDefinitionDto = ProcessDefinitionDto
+        .fromProcessDefinition(processDefinitionEntity);
+    restClientWireMock.addStubMapping(
+        stubFor(get(urlPathEqualTo("/api/process-definition"))
+            .withQueryParam("latestVersion", equalTo("true"))
+            .withQueryParam("sortOrder", equalTo("asc"))
+            .withQueryParam("active", equalTo("false"))
+            .withQueryParam("sortBy", equalTo("name"))
+            .withQueryParam("suspended", equalTo("false"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withStatus(200)
+                .withBody(
+                    objectMapper.writeValueAsString(Lists.newArrayList(processDefinitionDto))))
+        )
+    );
     List<ProcessDefinitionDto> processDefinitions = processDefinitionRestClient
         .getProcessDefinitionsByParams(ProcessDefinitionQueryDto.builder().latestVersion(true)
             .sortBy(ProcessDefinitionQueryDto.SortByConstants.SORT_BY_NAME)
@@ -133,5 +142,31 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
 
     assertThat(processInstanceDto.getId()).isEqualTo("testInstanceId");
     assertThat(processInstanceDto.getDefinitionId()).isEqualTo("testId");
+  }
+
+  @Test
+  public void shouldReturnActiveProcessDefinitions() throws JsonProcessingException {
+    ProcessDefinitionEntity processDefinitionEntity = new ProcessDefinitionEntity();
+    processDefinitionEntity.setId("testId");
+    ProcessDefinitionDto processDefinitionDto = ProcessDefinitionDto
+        .fromProcessDefinition(processDefinitionEntity);
+    restClientWireMock.addStubMapping(
+        stubFor(get(urlPathEqualTo("/api/process-definition"))
+            .withQueryParam("latestVersion", equalTo("false"))
+            .withQueryParam("active", equalTo("true"))
+            .withQueryParam("suspended", equalTo("false"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withStatus(200)
+                .withBody(
+                    objectMapper.writeValueAsString(Lists.newArrayList(processDefinitionDto))))
+        )
+    );
+
+    List<ProcessDefinitionDto> processDefinitions = processDefinitionRestClient
+        .getProcessDefinitionsByParams(ProcessDefinitionQueryDto.builder().active(true).build());
+
+    assertThat(processDefinitions.size()).isOne();
+    assertThat(processDefinitions.get(0).getId()).isEqualTo("testId");
   }
 }
