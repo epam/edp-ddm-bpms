@@ -31,7 +31,7 @@
     <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
     <log4j-layout-template-json.version>2.14.0</log4j-layout-template-json.version>
     <groovy.version>3.0.6</groovy.version>
-    <aws-java-sdk.version>1.11.918</aws-java-sdk.version>
+    <platform-ceph-client.version>0.0.1-SNAPSHOT</platform-ceph-client.version>
 
     <deployable.module>business-process-management</deployable.module>
   </properties>

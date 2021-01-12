@@ -111,9 +111,9 @@
       <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
     </dependency>
     <dependency>
-      <artifactId>aws-java-sdk</artifactId>
-      <groupId>com.amazonaws</groupId>
-      <version>${aws-java-sdk.version}</version>
+      <groupId>ua.gov.mdtu.ddm.general</groupId>
+      <artifactId>platform-ceph-client</artifactId>
+      <version>${platform-ceph-client.version}</version>
     </dependency>
 
     <dependency>

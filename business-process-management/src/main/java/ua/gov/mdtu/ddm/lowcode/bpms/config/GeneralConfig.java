@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-import ua.gov.mdtu.ddm.lowcode.bpms.integration.ceph.config.CephConfig;
+import ua.gov.mdtu.ddm.general.integration.ceph.config.CephConfig;
 
 @Configuration
 @EnableAspectJAutoProxy

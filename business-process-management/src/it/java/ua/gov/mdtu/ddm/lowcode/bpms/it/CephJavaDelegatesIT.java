@@ -25,7 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import ua.gov.mdtu.ddm.lowcode.bpms.integration.ceph.exception.MisconfigurationException;
+import ua.gov.mdtu.ddm.general.integration.ceph.exception.MisconfigurationException;
 
 public class CephJavaDelegatesIT extends BaseIT {
 
