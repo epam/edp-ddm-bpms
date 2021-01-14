@@ -6,5 +6,5 @@ spec:
   additionalConfig:
     bucketclass: ceph-bucket-class
   generateBucketName: {{ .Values.ceph.bucketName }}
-  storageClassName: openshift-storage.noobaa.io
+  storageClassName: registry-bucket-class
   ssl: false
