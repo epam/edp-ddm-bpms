@@ -4,10 +4,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.matching.RequestPatternBuilder.newRequestPattern;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
@@ -15,11 +16,13 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.http.RequestMethod;
 import com.github.tomakehurst.wiremock.matching.EqualToPattern;
 import com.github.tomakehurst.wiremock.matching.UrlPattern;
+import com.google.common.collect.ImmutableMap;
 import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.Variables;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,24 +73,17 @@ public class CephJavaDelegatesIT extends BaseIT {
     var ex = assertThrows(MisconfigurationException.class, () -> runtimeService
         .startProcessInstanceByKey("testCephJavaDelegates_key", "1", vars));
 
-    assertThat(ex.getMessage(), is("Bucket bucket hasn't found"));
+    assertThat(ex.getMessage()).isEqualTo("Bucket bucket hasn't found");
   }
 
   @Test
   @Deployment(resources = {"bpmn/testCephJavaDelegates.bpmn"})
   public void shouldUseCephJavaDelegatesInServiceTasks() {
+    initGetCephBucket();
 
-    cephWireMockServer.addStubMapping(
-        stubFor(get(urlPathEqualTo("/")).willReturn(
-            aResponse()
-                .withStatus(200)
-                .withBody("<?xml version=\"1.0\" encoding=\"UTF-8\"?><ListAllMyBucketsResult>"
-                    + "<Buckets><Bucket><Name>" + cephBucketName + "</Name></Bucket></Buckets>"
-                    + "</ListAllMyBucketsResult>"))));
-
-    Map<String, Object> vars = new HashMap<>();
-    vars.put("key", "testKey");
-    vars.put("content", "testContent");
+    Map<String, Object> vars = ImmutableMap.of(
+        "key", "testKey",
+        "content", "testContent");
     ProcessInstance process = runtimeService
         .startProcessInstanceByKey("testCephJavaDelegates_key", "1", vars);
 
@@ -96,13 +92,50 @@ public class CephJavaDelegatesIT extends BaseIT {
         .processInstanceId(process.getId()).list().stream()
         .filter(historicVariableInstance -> "content".equals(historicVariableInstance.getName()))
         .findFirst().orElseThrow();
-    assertThat(variables.getValue(), is("{ \"var1\":\"value1\", \"var2\":\"value2\" }"));
+    assertThat(variables.getValue()).isEqualTo("{ \"var1\":\"value1\", \"var2\":\"value2\" }");
 
     var rootUrlPattern = new UrlPattern(new EqualToPattern("/"), false);
     cephWireMockServer.verify(2, newRequestPattern(RequestMethod.GET, rootUrlPattern));
 
-    UrlPattern lowcodeKeyUrlPattern = new UrlPattern(new EqualToPattern("/" + cephBucketName + "/testKey"), false);
+    UrlPattern lowcodeKeyUrlPattern = new UrlPattern(
+        new EqualToPattern("/" + cephBucketName + "/testKey"), false);
     cephWireMockServer.verify(1, newRequestPattern(RequestMethod.GET, lowcodeKeyUrlPattern));
     cephWireMockServer.verify(1, newRequestPattern(RequestMethod.PUT, lowcodeKeyUrlPattern));
+  }
+
+  @Test
+  public void shouldPutTaskFormDataToCeph() {
+    initGetCephBucket();
+    cephWireMockServer.addStubMapping(
+        stubFor(put(urlMatching("/" + cephBucketName
+            + "/lowcode-.+-secure-sys-var-ref-task-form-data-Activity_1ez0zc9"))
+            .willReturn(aResponse().withStatus(200))));
+
+    var content = "{\"name\":{\"value\":\"value ek\"}}";
+    Map<String, Object> vars = ImmutableMap.of("formData", Variables.stringValue(content, true));
+    var processInstance = runtimeService
+        .startProcessInstanceByKey("testPutFormDataToCephDelegate_key", "key", vars);
+
+    assertFalse(processInstance.isEnded());
+
+    var resultVariables = runtimeService.getVariables(processInstance.getId());
+    var expectedCephKey = "lowcode-" + processInstance.getProcessInstanceId()
+        + "-secure-sys-var-ref-task-form-data-Activity_1ez0zc9";
+    assertThat(resultVariables)
+        .containsEntry("secure-sys-var-ref-task-form-data-Activity_1ez0zc9", expectedCephKey);
+
+    UrlPattern lowcodeKeyUrlPattern = new UrlPattern(
+        new EqualToPattern("/" + cephBucketName + "/" + expectedCephKey), false);
+    cephWireMockServer.verify(1, newRequestPattern(RequestMethod.PUT, lowcodeKeyUrlPattern));
+  }
+
+  private void initGetCephBucket() {
+    cephWireMockServer.addStubMapping(
+        stubFor(get(urlPathEqualTo("/")).willReturn(
+            aResponse()
+                .withStatus(200)
+                .withBody("<?xml version=\"1.0\" encoding=\"UTF-8\"?><ListAllMyBucketsResult>"
+                    + "<Buckets><Bucket><Name>" + cephBucketName + "</Name></Bucket></Buckets>"
+                    + "</ListAllMyBucketsResult>"))));
   }
 }
