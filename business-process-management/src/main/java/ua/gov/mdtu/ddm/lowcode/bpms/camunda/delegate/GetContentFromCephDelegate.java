@@ -7,9 +7,11 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ua.gov.mdtu.ddm.general.integration.ceph.service.CephService;
+import ua.gov.mdtu.ddm.general.starter.logger.annotation.Logging;
 
 @Component
 @RequiredArgsConstructor
+@Logging
 public class GetContentFromCephDelegate implements JavaDelegate {
 
   @Value("${ceph.bucket}")
