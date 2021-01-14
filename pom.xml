@@ -29,7 +29,6 @@
     <springdoc-openapi-ui.version>1.5.0</springdoc-openapi-ui.version>
     <mapstruct.version>1.4.1.Final</mapstruct.version>
     <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
-    <log4j-layout-template-json.version>2.14.0</log4j-layout-template-json.version>
     <groovy.version>3.0.6</groovy.version>
     <platform-ceph-client.version>0.0.1-SNAPSHOT</platform-ceph-client.version>
 

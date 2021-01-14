@@ -1,4 +1,6 @@
-##### Log4j2 configured for exporting log events to stdout in JSON format following predefined layout (*"default"* spring profile):
+##### Install platform-logger-spring-boot-starter library
+##### For local development set active profile 'local'
+##### Logger provide stdout in JSON format following predefined layout:
 
 ```javascript
 {
