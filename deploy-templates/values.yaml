@@ -35,7 +35,7 @@ ingress: # expose the service with a route or an ingress depending on platform t
   platform: openshift # openshift or kubernetes
 
 ceph:
-  bucketName: ceph-bucket
+  bucketName: backend-ceph-bucket
 
 monitoring:
   namespace: openshift-monitoring

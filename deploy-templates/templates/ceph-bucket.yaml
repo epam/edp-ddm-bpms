@@ -6,5 +6,5 @@ spec:
   additionalConfig:
     bucketclass: ceph-bucket-class
   generateBucketName: {{ .Values.ceph.bucketName }}
-  storageClassName: registry-bucket-class
+  storageClassName: registry-bucket
   ssl: false
