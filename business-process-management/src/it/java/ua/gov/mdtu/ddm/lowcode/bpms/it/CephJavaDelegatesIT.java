@@ -7,8 +7,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.matching.RequestPatternBuilder.newRequestPattern;
+import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
@@ -105,24 +106,35 @@ public class CephJavaDelegatesIT extends BaseIT {
 
   @Test
   public void shouldPutTaskFormDataToCeph() {
+    var content = "{\"name\":{\"value\":\"value ek\"}}";
+
     initGetCephBucket();
     cephWireMockServer.addStubMapping(
         stubFor(put(urlMatching("/" + cephBucketName
-            + "/lowcode-.+-secure-sys-var-ref-task-form-data-Activity_1ez0zc9"))
+            + "/lowcode-.+-secure-sys-var-ref-task-form-data-userTask"))
             .willReturn(aResponse().withStatus(200))));
+    cephWireMockServer.addStubMapping(
+        stubFor(get(urlMatching("/" + cephBucketName
+            + "/lowcode-.+-secure-sys-var-ref-task-form-data-userTask"))
+            .willReturn(aResponse().withStatus(200)
+                .withHeader("Content-Length", "29").withBody(content))));
 
-    var content = "{\"name\":{\"value\":\"value ek\"}}";
     Map<String, Object> vars = ImmutableMap.of("formData", Variables.stringValue(content, true));
     var processInstance = runtimeService
-        .startProcessInstanceByKey("testPutFormDataToCephDelegate_key", "key", vars);
+        .startProcessInstanceByKey("testCephFormDataDelegates_key", "key", vars);
 
-    assertFalse(processInstance.isEnded());
+    assertTrue(processInstance.isEnded());
 
-    var resultVariables = runtimeService.getVariables(processInstance.getId());
+    var resultVariables = historyService.createHistoricVariableInstanceQuery()
+        .processInstanceId(processInstance.getId()).list().stream()
+        .collect(toMap(HistoricVariableInstance::getName, HistoricVariableInstance::getValue,
+            (o1, o2) -> o1));
+
     var expectedCephKey = "lowcode-" + processInstance.getProcessInstanceId()
-        + "-secure-sys-var-ref-task-form-data-Activity_1ez0zc9";
+        + "-secure-sys-var-ref-task-form-data-userTask";
     assertThat(resultVariables)
-        .containsEntry("secure-sys-var-ref-task-form-data-Activity_1ez0zc9", expectedCephKey);
+        .containsEntry("secure-sys-var-ref-task-form-data-userTask", expectedCephKey)
+        .containsEntry("formDataOutput", content);
 
     UrlPattern lowcodeKeyUrlPattern = new UrlPattern(
         new EqualToPattern("/" + cephBucketName + "/" + expectedCephKey), false);
