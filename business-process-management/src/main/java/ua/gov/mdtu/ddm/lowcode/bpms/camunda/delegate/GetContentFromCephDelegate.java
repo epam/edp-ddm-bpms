@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import ua.gov.mdtu.ddm.general.integration.ceph.service.CephService;
 import ua.gov.mdtu.ddm.general.starter.logger.annotation.Logging;
 
-@Component
+@Component("getContentFromCephDelegate")
 @RequiredArgsConstructor
 @Logging
 public class GetContentFromCephDelegate implements JavaDelegate {

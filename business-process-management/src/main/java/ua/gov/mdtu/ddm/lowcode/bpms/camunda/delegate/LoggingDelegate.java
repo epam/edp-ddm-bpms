@@ -6,7 +6,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
+@Component("loggingDelegate")
 public class LoggingDelegate implements JavaDelegate {
 
   @Override

@@ -9,7 +9,7 @@
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_0kibm5r" sourceRef="StartEvent_1" targetRef="Activity_0z3d404" />
     <bpmn:sequenceFlow id="Flow_1y7yep8" sourceRef="Activity_0z3d404" targetRef="Activity_0me4tx4" />
-    <bpmn:serviceTask id="Activity_0z3d404" name="Put formData to ceph" camunda:class="ua.gov.mdtu.ddm.lowcode.bpms.camunda.delegate.PutFormDataToCephDelegate">
+    <bpmn:serviceTask id="Activity_0z3d404" name="Put formData to ceph" camunda:delegateExpression="${putFormDataToCephDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="formData">${formData}</camunda:inputParameter>

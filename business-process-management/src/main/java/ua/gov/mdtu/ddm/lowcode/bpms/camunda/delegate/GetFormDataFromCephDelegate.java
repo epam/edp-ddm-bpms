@@ -9,7 +9,7 @@ import ua.gov.mdtu.ddm.general.integration.ceph.service.CephService;
 import ua.gov.mdtu.ddm.general.starter.logger.annotation.Logging;
 import ua.gov.mdtu.ddm.lowcode.bpms.camunda.delegate.constants.CamundaDelegateConstants;
 
-@Component
+@Component("getFormDataFromCephDelegate")
 @RequiredArgsConstructor
 @Logging
 public class GetFormDataFromCephDelegate implements JavaDelegate {
