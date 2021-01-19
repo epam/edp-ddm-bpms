@@ -3,8 +3,7 @@ package ua.gov.mdtu.ddm.lowcode.bpms.delegate;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,7 +24,7 @@ public class GetContentFromCephDelegateTest {
   @Mock
   private CephService cephService;
   @Mock
-  private DelegateExecution delegateExecution;
+  private ExecutionEntity delegateExecution;
 
   @Before
   public void setUp() {
@@ -39,7 +38,6 @@ public class GetContentFromCephDelegateTest {
 
     getContentFromCephDelegate.execute(delegateExecution);
 
-    verify(delegateExecution).setVariableLocal("content",
-        Variables.stringValue("someContent", true));
+    verify(delegateExecution).setVariableLocalTransient("content", "someContent");
   }
 }

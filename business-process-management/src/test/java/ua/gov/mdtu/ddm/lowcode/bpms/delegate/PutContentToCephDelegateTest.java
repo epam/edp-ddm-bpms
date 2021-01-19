@@ -3,7 +3,7 @@ package ua.gov.mdtu.ddm.lowcode.bpms.delegate;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +24,7 @@ public class PutContentToCephDelegateTest {
   @Mock
   private CephService cephService;
   @Mock
-  private DelegateExecution delegateExecution;
+  private ExecutionEntity delegateExecution;
 
   @Before
   public void setUp() {
