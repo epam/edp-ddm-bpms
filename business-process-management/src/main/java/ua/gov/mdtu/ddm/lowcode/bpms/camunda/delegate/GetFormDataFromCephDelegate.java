@@ -3,6 +3,7 @@ package ua.gov.mdtu.ddm.lowcode.bpms.camunda.delegate;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ua.gov.mdtu.ddm.general.integration.ceph.service.CephService;
@@ -27,6 +28,6 @@ public class GetFormDataFromCephDelegate implements JavaDelegate {
     var cephKey = (String) execution.getVariable(taskFormDataVariableName);
     var formData = cephService.getContent(cephBucketName, cephKey);
 
-    execution.setVariableLocal("formData", formData);
+    ((AbstractVariableScope) execution).setVariableLocalTransient("formData", formData);
   }
 }

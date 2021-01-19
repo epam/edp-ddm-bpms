@@ -5,7 +5,7 @@
       <bpmn:outgoing>Flow_0kibm5r</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:endEvent id="Event_07oaldn">
-      <bpmn:incoming>Flow_0on3fs3</bpmn:incoming>
+      <bpmn:incoming>Flow_0avqqip</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_0kibm5r" sourceRef="StartEvent_1" targetRef="Activity_0z3d404" />
     <bpmn:sequenceFlow id="Flow_1y7yep8" sourceRef="Activity_0z3d404" targetRef="Activity_0me4tx4" />
@@ -22,7 +22,7 @@
       <bpmn:incoming>Flow_0kibm5r</bpmn:incoming>
       <bpmn:outgoing>Flow_1y7yep8</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_0on3fs3" sourceRef="Activity_0me4tx4" targetRef="Event_07oaldn" />
+    <bpmn:sequenceFlow id="Flow_0on3fs3" sourceRef="Activity_0me4tx4" targetRef="Activity_0qci6bv" />
     <bpmn:serviceTask id="Activity_0me4tx4" name="Get formData from ceph" camunda:class="ua.gov.mdtu.ddm.lowcode.bpms.camunda.delegate.GetFormDataFromCephDelegate">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -33,20 +33,32 @@
       <bpmn:incoming>Flow_1y7yep8</bpmn:incoming>
       <bpmn:outgoing>Flow_0on3fs3</bpmn:outgoing>
     </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0avqqip" sourceRef="Activity_0qci6bv" targetRef="Event_07oaldn" />
+    <bpmn:scriptTask id="Activity_0qci6bv" name="Assert" scriptFormat="groovy">
+      <bpmn:incoming>Flow_0on3fs3</bpmn:incoming>
+      <bpmn:outgoing>Flow_0avqqip</bpmn:outgoing>
+      <bpmn:script>
+var formData = execution.getVariable('formDataOutput')
+assert formData.equals('{"name":{"value":"value ek"}}')</bpmn:script>
+    </bpmn:scriptTask>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testCephFormDataDelegates_key">
+      <bpmndi:BPMNEdge id="Flow_0on3fs3_di" bpmnElement="Flow_0on3fs3">
+        <di:waypoint x="480" y="117" />
+        <di:waypoint x="530" y="117" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1y7yep8_di" bpmnElement="Flow_1y7yep8">
         <di:waypoint x="350" y="117" />
-        <di:waypoint x="400" y="117" />
+        <di:waypoint x="380" y="117" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0kibm5r_di" bpmnElement="Flow_0kibm5r">
         <di:waypoint x="188" y="117" />
         <di:waypoint x="250" y="117" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0on3fs3_di" bpmnElement="Flow_0on3fs3">
-        <di:waypoint x="500" y="117" />
-        <di:waypoint x="552" y="117" />
+      <bpmndi:BPMNEdge id="Flow_0avqqip_di" bpmnElement="Flow_0avqqip">
+        <di:waypoint x="630" y="117" />
+        <di:waypoint x="662" y="117" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
         <dc:Bounds x="152" y="99" width="36" height="36" />
@@ -55,10 +67,13 @@
         <dc:Bounds x="250" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_07oaldn_di" bpmnElement="Event_07oaldn">
-        <dc:Bounds x="552" y="99" width="36" height="36" />
+        <dc:Bounds x="662" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ju58kf_di" bpmnElement="Activity_0qci6bv">
+        <dc:Bounds x="530" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_00rhpol_di" bpmnElement="Activity_0me4tx4">
-        <dc:Bounds x="400" y="77" width="100" height="80" />
+        <dc:Bounds x="380" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

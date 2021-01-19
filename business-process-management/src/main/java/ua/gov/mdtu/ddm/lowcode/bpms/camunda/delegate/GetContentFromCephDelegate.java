@@ -3,7 +3,7 @@ package ua.gov.mdtu.ddm.lowcode.bpms.camunda.delegate;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ua.gov.mdtu.ddm.general.integration.ceph.service.CephService;
@@ -19,9 +19,10 @@ public class GetContentFromCephDelegate implements JavaDelegate {
   private final CephService cephService;
 
   @Override
-  public void execute(DelegateExecution delegateExecution) {
-    var key = (String) delegateExecution.getVariable("key");
-    var content = Variables.stringValue(cephService.getContent(cephBucketName, key), true);
-    delegateExecution.setVariableLocal("content", content);
+  public void execute(DelegateExecution execution) {
+    var key = (String) execution.getVariable("key");
+    var content = cephService.getContent(cephBucketName, key);
+
+    ((AbstractVariableScope) execution).setVariableLocalTransient("content", content);
   }
 }

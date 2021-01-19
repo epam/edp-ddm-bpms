@@ -84,16 +84,11 @@ public class CephJavaDelegatesIT extends BaseIT {
 
     Map<String, Object> vars = ImmutableMap.of(
         "key", "testKey",
-        "content", "testContent");
+        "content", Variables.stringValue("testContent", true));
     ProcessInstance process = runtimeService
         .startProcessInstanceByKey("testCephJavaDelegates_key", "1", vars);
 
     assertTrue(process.isEnded());
-    var variables = historyService.createHistoricVariableInstanceQuery()
-        .processInstanceId(process.getId()).list().stream()
-        .filter(historicVariableInstance -> "content".equals(historicVariableInstance.getName()))
-        .findFirst().orElseThrow();
-    assertThat(variables.getValue()).isEqualTo("{ \"var1\":\"value1\", \"var2\":\"value2\" }");
 
     var rootUrlPattern = new UrlPattern(new EqualToPattern("/"), false);
     cephWireMockServer.verify(2, newRequestPattern(RequestMethod.GET, rootUrlPattern));
@@ -134,7 +129,7 @@ public class CephJavaDelegatesIT extends BaseIT {
         + "-secure-sys-var-ref-task-form-data-userTask";
     assertThat(resultVariables)
         .containsEntry("secure-sys-var-ref-task-form-data-userTask", expectedCephKey)
-        .containsEntry("formDataOutput", content);
+        .doesNotContainKey("formDataOutput");
 
     UrlPattern lowcodeKeyUrlPattern = new UrlPattern(
         new EqualToPattern("/" + cephBucketName + "/" + expectedCephKey), false);
