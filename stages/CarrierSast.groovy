@@ -1,7 +1,7 @@
 import com.epam.edp.stages.impl.ci.ProjectType
 import com.epam.edp.stages.impl.ci.Stage
 
-@Stage(name = "carrier-sast", buildTool = "npm", type = [ProjectType.APPLICATION, ProjectType.LIBRARY])
+@Stage(name = "carrier-sast", buildTool = "any", type = [ProjectType.APPLICATION, ProjectType.LIBRARY])
 class CarrierSast {
     Script script
     void run(context) {
