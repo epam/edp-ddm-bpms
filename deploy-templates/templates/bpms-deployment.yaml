@@ -16,6 +16,9 @@ spec:
     type: RollingUpdate
   template:
     metadata:
+      annotations:
+        traffic.sidecar.istio.io/excludeOutboundPorts: '5432'
+        sidecar.istio.io/inject: "true"
       labels:
         app: {{ .Chart.Name }}
     spec:
