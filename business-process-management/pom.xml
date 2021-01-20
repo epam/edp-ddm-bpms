@@ -12,6 +12,12 @@
   <artifactId>business-process-management</artifactId>
 
   <dependencies>
+    <dependency>
+      <groupId>ua.gov.mdtu.ddm.lowcode</groupId>
+      <artifactId>business-process-management-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!--Spring Boot dependencies-->
     <dependency>
       <groupId>org.springframework.boot</groupId>

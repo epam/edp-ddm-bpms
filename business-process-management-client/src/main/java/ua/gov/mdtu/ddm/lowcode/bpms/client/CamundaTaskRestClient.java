@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.TaskQueryDto;
 import ua.gov.mdtu.ddm.lowcode.bpms.client.exception.TaskNotFoundException;
+import ua.gov.mdtu.ddm.lowcode.bpms.client.exception.UserDataValidationException;
 
 @FeignClient(name = "camunda-task-client", url = "${bpms.url}/api/task")
 public interface CamundaTaskRestClient extends BaseFeignClient {
@@ -36,6 +37,9 @@ public interface CamundaTaskRestClient extends BaseFeignClient {
   TaskDto getTaskById(@PathVariable("id") String taskId);
 
   @PostMapping("/{id}/complete")
+  @ErrorHandling(codeSpecific = {
+      @ErrorCodes(codes = {422}, generate = UserDataValidationException.class)
+  })
   Map<String, VariableValueDto> completeTaskById(@PathVariable("id") String taskId,
       @RequestBody CompleteTaskDto completeTaskDto);
 }

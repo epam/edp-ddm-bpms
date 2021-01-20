@@ -3,6 +3,7 @@ package ua.gov.mdtu.ddm.lowcode.bpms.it;
 
 import javax.inject.Inject;
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.junit.runner.RunWith;
@@ -21,5 +22,7 @@ public abstract class BaseIT {
   protected HistoryService historyService;
   @Inject
   protected TaskService taskService;
+  @Inject
+  protected ProcessEngine engine;
 
 }

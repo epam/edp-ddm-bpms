@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.util.Lists;
+import org.assertj.core.util.Maps;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
@@ -24,10 +25,14 @@ import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.ErrorDetailsDto;
 import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.ErrorDto;
 import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.TaskQueryDto;
+import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.UserDataValidationErrorDto;
+import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.ValidationErrorDto;
 import ua.gov.mdtu.ddm.lowcode.bpms.client.exception.AuthorizationException;
 import ua.gov.mdtu.ddm.lowcode.bpms.client.exception.TaskNotFoundException;
+import ua.gov.mdtu.ddm.lowcode.bpms.client.exception.UserDataValidationException;
 
 public class CamundaTaskRestClientIT extends BaseIT {
 
@@ -212,5 +217,27 @@ public class CamundaTaskRestClientIT extends BaseIT {
 
     assertThat(tasksByParams.size()).isOne();
     assertThat(tasksByParams.get(0).getProcessInstanceId()).isEqualTo("testProcessInstanceId");
+  }
+
+  @Test
+  public void shouldReturn422DuringTaskCompletion() throws JsonProcessingException {
+    ErrorDetailsDto details = new ErrorDetailsDto();
+    details.setValidationErrors(Lists.newArrayList(new ValidationErrorDto("test msg",
+        Maps.newHashMap("key1", "val1"))));
+    UserDataValidationErrorDto errorDto422 = UserDataValidationErrorDto.builder().details(details).build();
+    restClientWireMock.addStubMapping(
+        stubFor(post(urlPathEqualTo("/api/task/taskId/complete"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withStatus(422)
+                .withBody(objectMapper.writeValueAsString(errorDto422)))
+        )
+    );
+
+    UserDataValidationException exception = assertThrows(UserDataValidationException.class,
+        () -> camundaTaskRestClient.completeTaskById("taskId", new CompleteTaskDto()));
+
+    assertThat(exception.getError().getDetails().getValidationErrors().get(0).getMessage()).isEqualTo("test msg");
+    assertThat(exception.getError().getDetails().getValidationErrors().get(0).getContext().get("key1")).isEqualTo("val1");
   }
 }
