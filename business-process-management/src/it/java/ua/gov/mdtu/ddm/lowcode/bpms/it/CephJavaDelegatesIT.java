@@ -136,6 +136,22 @@ public class CephJavaDelegatesIT extends BaseIT {
     cephWireMockServer.verify(1, newRequestPattern(RequestMethod.PUT, lowcodeKeyUrlPattern));
   }
 
+  @Test
+  public void shouldSaveProcessStatusAsSysVariable() {
+    var status = "awesome";
+    Map<String, Object> vars = ImmutableMap.of("status", status);
+    var processInstance = runtimeService
+        .startProcessInstanceByKey("testDefineProcessStatus_key", "key", vars);
+
+    assertTrue(processInstance.isEnded());
+
+    var resultVariables = historyService.createHistoricVariableInstanceQuery()
+        .processInstanceId(processInstance.getId()).list().stream()
+        .collect(toMap(HistoricVariableInstance::getName, HistoricVariableInstance::getValue,
+            (o1, o2) -> o1));
+    assertThat(resultVariables).containsEntry("sys-var-process-completion-result", status);
+  }
+
   private void initGetCephBucket() {
     cephWireMockServer.addStubMapping(
         stubFor(get(urlPathEqualTo("/")).willReturn(
