@@ -17,7 +17,7 @@ import ua.gov.mdtu.ddm.lowcode.bpms.exception.UserDataValidationException;
 /**
  * Throws user data validation exception with details based on user input.
  */
-@Component
+@Component("userDataValidationErrorDelegate")
 @RequiredArgsConstructor
 public class UserDataValidationErrorDelegate implements JavaDelegate {
 
