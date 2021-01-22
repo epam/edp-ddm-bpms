@@ -20,10 +20,15 @@ public class TransientVariableScopeElResolver extends VariableScopeElResolver {
 
     var scope = (AbstractVariableScope) scopeContext;
     var variableName = (String) property;
-    if (scope.hasVariable(variableName)) {
-      context.setPropertyResolved(true);
-      return scope.getVariableTyped(variableName);
+    if (!scope.hasVariable(variableName)) {
+      return null;
     }
-    return null;
+
+    context.setPropertyResolved(true);
+    var typedValue = scope.getVariableTyped(variableName);
+    if (!typedValue.isTransient()) {
+      return scope.getVariable(variableName);
+    }
+    return typedValue;
   }
 }

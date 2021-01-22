@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0zsecmu" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.4.0">
+  <bpmn:process id="testNonTransientBooleanExpressionLanguage_key" name="" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="Початок БП">
+      <bpmn:outgoing>Flow_15pckz5</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_06djw9x" name="Успішний кінець БП">
+      <bpmn:incoming>Flow_1bfo0q6</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="Gateway_0wai3bg" name="Задача виконана у 2021 році?">
+      <bpmn:incoming>Flow_1cw61d6</bpmn:incoming>
+      <bpmn:outgoing>Flow_1kapitq</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1p0lz68</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_15pckz5" sourceRef="StartEvent_1" targetRef="Activity_10pept1" />
+    <bpmn:sequenceFlow id="Flow_1kapitq" name="Так" sourceRef="Gateway_0wai3bg" targetRef="Activity_0hdcjra">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${resultDateValidation}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1p0lz68" name="Ні" sourceRef="Gateway_0wai3bg" targetRef="Activity_02789u8">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="groovy">!resultDateValidation</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1bfo0q6" sourceRef="Activity_0hdcjra" targetRef="Event_06djw9x" />
+    <bpmn:userTask id="Activity_0hdcjra" name="Задача виконана у 2021 році" camunda:formKey="formwithcomponents">
+      <bpmn:incoming>Flow_1kapitq</bpmn:incoming>
+      <bpmn:outgoing>Flow_1bfo0q6</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Activity_02789u8" name="Помилка" camunda:delegateExpression="${userDataValidationErrorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="validationErrors">
+            <camunda:list>
+              <camunda:value>{"message": "Задача виконана не у 2020р. Введіть корректну дату!": {"datetime": ${datetime}}}</camunda:value>
+              <camunda:value>{"message": "Такий email вже є у базі": {"email": ${email}}}</camunda:value>
+            </camunda:list>
+          </camunda:inputParameter>
+          <camunda:outputParameter name="Output_3ol9jtg" />
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1p0lz68</bpmn:incoming>
+      <bpmn:outgoing>Flow_0dax6js</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_1sgqs62" name="Неуспішний кінець БП">
+      <bpmn:incoming>Flow_0dax6js</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0dax6js" sourceRef="Activity_02789u8" targetRef="Event_1sgqs62" />
+    <bpmn:sequenceFlow id="Flow_1cw61d6" sourceRef="Activity_10pept1" targetRef="Gateway_0wai3bg" />
+    <bpmn:scriptTask id="Activity_10pept1" scriptFormat="groovy">
+      <bpmn:incoming>Flow_15pckz5</bpmn:incoming>
+      <bpmn:outgoing>Flow_1cw61d6</bpmn:outgoing>
+      <bpmn:script>execution.setVariable("resultDateValidation", true)</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1f0pdqs">
+      <bpmndi:BPMNEdge id="Flow_1cw61d6_di" bpmnElement="Flow_1cw61d6">
+        <di:waypoint x="350" y="220" />
+        <di:waypoint x="375" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0dax6js_di" bpmnElement="Flow_0dax6js">
+        <di:waypoint x="590" y="320" />
+        <di:waypoint x="702" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1bfo0q6_di" bpmnElement="Flow_1bfo0q6">
+        <di:waypoint x="590" y="120" />
+        <di:waypoint x="692" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1p0lz68_di" bpmnElement="Flow_1p0lz68">
+        <di:waypoint x="400" y="245" />
+        <di:waypoint x="400" y="320" />
+        <di:waypoint x="490" y="320" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="410" y="280" width="11" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1kapitq_di" bpmnElement="Flow_1kapitq">
+        <di:waypoint x="400" y="195" />
+        <di:waypoint x="400" y="120" />
+        <di:waypoint x="490" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="406" y="155" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15pckz5_di" bpmnElement="Flow_15pckz5">
+        <di:waypoint x="208" y="220" />
+        <di:waypoint x="250" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_06djw9x_di" bpmnElement="Event_06djw9x">
+        <dc:Bounds x="692" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="670" y="145" width="82" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0wai3bg_di" bpmnElement="Gateway_0wai3bg" isMarkerVisible="true">
+        <dc:Bounds x="375" y="195" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="306" y="166" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_11goyks_di" bpmnElement="Activity_0hdcjra">
+        <dc:Bounds x="490" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0dl9x0b_di" bpmnElement="Activity_02789u8">
+        <dc:Bounds x="490" y="280" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1sgqs62_di" bpmnElement="Event_1sgqs62">
+        <dc:Bounds x="702" y="302" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="690" y="345" width="61" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_14m2d8j_di" bpmnElement="Activity_10pept1">
+        <dc:Bounds x="250" y="180" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="172" y="202" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="161" y="245" width="60" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
