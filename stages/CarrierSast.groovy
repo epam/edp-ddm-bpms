@@ -9,7 +9,7 @@ class CarrierSast {
             script.withCredentials([script.usernamePassword(credentialsId: "carrier-credentials",
                     passwordVariable: 'TOKEN', usernameVariable: 'USERNAME')]) {
                 script.sh "sed 's/PROJECT-NAME/${context.codebase.name}/' /tmp/carrier-config/config.yaml > ./config.yaml"
-                script.sh "dusty run -s sastJavaScript -c ./config.yaml"
+                script.sh "dusty run -s sastJava -c ./config.yaml"
                 script.archiveArtifacts artifacts: 'report.html, report.xml'
             }
         }
