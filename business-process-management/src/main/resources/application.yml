@@ -12,7 +12,7 @@ spring:
       baggage:
         correlation-enabled: true
         correlation-fields: x-request-id
-        remote-fields: x-request-id
+        remote-fields: x-request-id, x-access-token
 
 # Configuration => prometheus.yml:
 #   scrape_configs:
