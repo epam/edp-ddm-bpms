@@ -86,6 +86,12 @@
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
 
+    <dependency>
+      <groupId>ua.gov.mdtu.ddm.general</groupId>
+      <artifactId>platform-security-spring-boot-starter</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+
     <!--Camunda dependencies-->
     <dependency>
       <groupId>org.camunda.bpm.springboot</groupId>
