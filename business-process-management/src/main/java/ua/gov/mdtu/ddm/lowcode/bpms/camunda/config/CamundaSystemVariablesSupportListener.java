@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 public class CamundaSystemVariablesSupportListener extends AbstractBpmnParseListener {
 
   private final CamundaProperties systemProperties;
-  private final AuthorizationStartEventListener authorizationStartEventListener;
 
   @Override
   public void parseStartEvent(Element startEventElement, ScopeImpl scope,
@@ -24,7 +23,5 @@ public class CamundaSystemVariablesSupportListener extends AbstractBpmnParseList
     startEventActivity.addListener(ExecutionListener.EVENTNAME_START,
         (ExecutionListener) execution ->
             systemProperties.getSystemVariables().forEach(execution::setVariable));
-    startEventActivity.addListener(ExecutionListener.EVENTNAME_START,
-        authorizationStartEventListener);
   }
 }

@@ -1,16 +1,6 @@
 server:
   port: 8080
 
-camunda:
-  admin-user-id: camunda
-  admin-group-id: camunda-admin
-  bpm:
-    generic-properties:
-      properties:
-        enableHistoricInstancePermissions: true
-    authorization:
-      enabled: true
-
 spring:
   jersey:
     application-path: api

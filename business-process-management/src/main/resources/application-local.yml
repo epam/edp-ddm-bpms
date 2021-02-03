@@ -2,14 +2,12 @@ camunda:
   system-variables:
     dataFactoryBaseUrl: http://localhost:8877/mock-server
   bpm:
-    authorization:
-      enabled: false
     job-execution:
       deployment-aware: true
     database:
       schema-update: true
     admin-user:
-      id: ${camunda.admin-user-id}
+      id: camunda
       password: camunda
 
 spring:

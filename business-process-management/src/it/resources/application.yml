@@ -1,6 +1,4 @@
 spring:
-  jersey:
-    application-path: api
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
@@ -8,17 +6,6 @@ spring:
     password: password
 
 camunda:
-  admin-user-id: camunda
-  admin-group-id: camunda-admin
-  bpm:
-    generic-properties:
-      properties:
-        enableHistoricInstancePermissions: true
-    authorization:
-      enabled: true
-    admin-user:
-      id: ${camunda.admin-user-id}
-      password: camunda
   system-variables:
     dataFactoryBaseUrl: http://localhost:8877/mock-server
 
