@@ -8,6 +8,7 @@ camunda:
     generic-properties:
       properties:
         enableHistoricInstancePermissions: true
+        userResourceWhitelistPattern: [a-zA-Z0-9_@.]+|camunda-admin
     authorization:
       enabled: true
 
