@@ -50,18 +50,19 @@ public class AuthorizationStartEventListener implements ExecutionListener {
     //only admin user has rights for creation authorizations
     processEngine.getIdentityService().setAuthentication(
         new Authentication(administratorUserId, Collections.singletonList(administratorGroupName)));
-    addPermissionReadProcessInstances(processEngine, execution, currentAuthentication.getUserId());
+    addPermissionForProcessInstances(processEngine, execution, currentAuthentication.getUserId());
     addPermissionReadHistory(processEngine, execution, currentAuthentication.getUserId());
 
     processEngine.getIdentityService().setAuthentication(currentAuthentication);
     log.info("AuthorizationStartEventListener finished...");
   }
 
-  private void addPermissionReadProcessInstances(ProcessEngine processEngine,
+  private void addPermissionForProcessInstances(ProcessEngine processEngine,
       DelegateExecution execution, String userId) {
     Authorization authorization = createAuthorization(processEngine,
         execution.getProcessInstanceId(),
-        Resources.PROCESS_INSTANCE, new Permission[]{ProcessInstancePermissions.READ}, userId);
+        Resources.PROCESS_INSTANCE, new Permission[]{ProcessInstancePermissions.READ,
+            ProcessInstancePermissions.UPDATE_VARIABLE}, userId);
     processEngine.getAuthorizationService().saveAuthorization(authorization);
   }
 
