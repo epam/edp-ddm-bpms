@@ -2,13 +2,12 @@ package ua.gov.mdtu.ddm.lowcode.bpms.client;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import java.util.List;
 import org.assertj.core.util.Lists;
 import org.camunda.bpm.engine.rest.dto.history.HistoricVariableInstanceDto;
 import org.junit.Test;
@@ -21,14 +20,17 @@ public class HistoryVariableInstanceClientIT extends BaseIT {
   private HistoryVariableInstanceClient historyVariableInstanceClient;
 
   @Test
-  public void shouldReturnVariablesInstanceList() throws JsonProcessingException {
-    HistoricVariableInstanceDto dto = new HistoricVariableInstanceDto();
+  public void shouldReturnVariablesInstanceListPost() throws JsonProcessingException {
+    var dto = new HistoricVariableInstanceDto();
     dto.setValue("value");
+
+    var requestDto = HistoryVariableInstanceQueryDto.builder().variableName("myVariable")
+        .processInstanceId("processInstance")
+        .processInstanceIdIn(Lists.newArrayList("processInstance1", "processInstance2"))
+        .build();
     restClientWireMock.addStubMapping(
-        stubFor(get(urlPathEqualTo("/api/history/variable-instance"))
-            .withQueryParam("variableName", equalTo("myVariable"))
-            .withQueryParam("processInstanceId", equalTo("processInstance"))
-            .withQueryParam("processInstanceIdIn", equalTo("processInstance1,processInstance2"))
+        stubFor(post(urlPathEqualTo("/api/history/variable-instance"))
+            .withRequestBody(equalTo(objectMapper.writeValueAsString(requestDto)))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(200)
@@ -36,11 +38,7 @@ public class HistoryVariableInstanceClientIT extends BaseIT {
         )
     );
 
-    List<HistoricVariableInstanceDto> tasksByParams = historyVariableInstanceClient
-        .getList(HistoryVariableInstanceQueryDto.builder().variableName("myVariable")
-            .processInstanceId("processInstance")
-            .processInstanceIdIn(Lists.newArrayList("processInstance1", "processInstance2"))
-            .build());
+    var tasksByParams = historyVariableInstanceClient.getList(requestDto);
 
     assertThat(tasksByParams.size()).isOne();
     assertThat(tasksByParams.get(0).getValue()).isEqualTo("value");

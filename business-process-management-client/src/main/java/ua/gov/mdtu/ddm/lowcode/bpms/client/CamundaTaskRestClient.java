@@ -8,9 +8,7 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
-import org.springframework.cloud.openfeign.CollectionFormat;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,13 +20,11 @@ import ua.gov.mdtu.ddm.lowcode.bpms.client.exception.UserDataValidationException
 @FeignClient(name = "camunda-task-client", url = "${bpms.url}/api/task")
 public interface CamundaTaskRestClient extends BaseFeignClient {
 
-  @GetMapping("/count")
-  @CollectionFormat(feign.CollectionFormat.CSV)
-  CountResultDto getTaskCountByParams(@SpringQueryMap TaskQueryDto taskQueryDto);
+  @PostMapping("/count")
+  CountResultDto getTaskCountByParams(@RequestBody TaskQueryDto taskQueryDto);
 
-  @GetMapping
-  @CollectionFormat(feign.CollectionFormat.CSV)
-  List<TaskDto> getTasksByParams(@SpringQueryMap TaskQueryDto taskQueryDto);
+  @PostMapping
+  List<TaskDto> getTasksByParams(@RequestBody TaskQueryDto taskQueryDto);
 
   @GetMapping("/{id}")
   @ErrorHandling(codeSpecific = {
