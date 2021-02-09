@@ -10,8 +10,4 @@ data:
     camunda.bpm.job-execution.deployment-aware: true
     camunda.bpm.database.schema-update: true
 
-    lowcode.security.enabled: false
-
-    camunda.bpm.authorization.enabled: false
-
     ceph.http-endpoint: https://s3-openshift-storage.apps.cicd.mdtu-ddm.projects.epam.com
