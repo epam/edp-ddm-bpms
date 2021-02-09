@@ -19,9 +19,11 @@ import ua.gov.mdtu.ddm.lowcode.bpms.client.exception.ProcessDefinitionNotFoundEx
 public interface ProcessDefinitionRestClient extends BaseFeignClient {
 
   @PostMapping("/count")
+  @ErrorHandling
   CountResultDto getProcessDefinitionsCount(@RequestBody ProcessDefinitionQueryDto requestDto);
 
   @PostMapping
+  @ErrorHandling
   List<ProcessDefinitionDto> getProcessDefinitionsByParams(
       @RequestBody ProcessDefinitionQueryDto requestDto);
 
@@ -32,6 +34,7 @@ public interface ProcessDefinitionRestClient extends BaseFeignClient {
   ProcessDefinitionDto getProcessDefinition(@PathVariable("id") String id);
 
   @PostMapping("/{id}/start")
+  @ErrorHandling
   ProcessInstanceDto startProcessInstance(@PathVariable("id") String id,
       @RequestBody StartProcessInstanceDto startProcessInstanceDto);
 }

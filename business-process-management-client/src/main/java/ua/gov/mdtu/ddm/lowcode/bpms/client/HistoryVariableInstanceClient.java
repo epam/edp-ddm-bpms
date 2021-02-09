@@ -1,5 +1,6 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.client;
 
+import feign.error.ErrorHandling;
 import java.util.List;
 import org.camunda.bpm.engine.rest.dto.history.HistoricVariableInstanceDto;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -12,5 +13,6 @@ import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.HistoryVariableInstanceQueryDto;
 public interface HistoryVariableInstanceClient extends BaseFeignClient {
 
   @PostMapping
+  @ErrorHandling
   List<HistoricVariableInstanceDto> getList(@RequestBody HistoryVariableInstanceQueryDto dto);
 }

@@ -1,5 +1,6 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.client;
 
+import feign.error.ErrorHandling;
 import java.util.Map;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,5 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface TaskPropertyRestClient extends BaseFeignClient {
 
   @GetMapping("/{id}/extension-element/property")
+  @ErrorHandling
   Map<String, String> getTaskProperty(@PathVariable("id") String taskId);
 }

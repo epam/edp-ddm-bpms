@@ -21,9 +21,11 @@ import ua.gov.mdtu.ddm.lowcode.bpms.client.exception.UserDataValidationException
 public interface CamundaTaskRestClient extends BaseFeignClient {
 
   @PostMapping("/count")
+  @ErrorHandling
   CountResultDto getTaskCountByParams(@RequestBody TaskQueryDto taskQueryDto);
 
   @PostMapping
+  @ErrorHandling
   List<TaskDto> getTasksByParams(@RequestBody TaskQueryDto taskQueryDto);
 
   @GetMapping("/{id}")

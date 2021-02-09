@@ -1,5 +1,6 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.client;
 
+import feign.error.ErrorHandling;
 import java.util.List;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -11,5 +12,6 @@ import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.HistoryTaskQueryDto;
 public interface HistoryTaskRestClient extends BaseFeignClient {
 
   @GetMapping
+  @ErrorHandling
   List<HistoricTaskInstanceEntity> getHistoryTasksByParams(@SpringQueryMap HistoryTaskQueryDto historyTaskQueryDto);
 }

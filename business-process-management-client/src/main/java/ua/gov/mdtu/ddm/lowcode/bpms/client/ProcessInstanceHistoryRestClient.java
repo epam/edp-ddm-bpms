@@ -15,6 +15,7 @@ import ua.gov.mdtu.ddm.lowcode.bpms.client.exception.ProcessInstanceNotFoundExce
 public interface ProcessInstanceHistoryRestClient extends BaseFeignClient {
 
   @GetMapping
+  @ErrorHandling
   List<HistoricProcessInstanceDto> getProcessInstances(
       @SpringQueryMap HistoryProcessInstanceQueryDto dto);
 

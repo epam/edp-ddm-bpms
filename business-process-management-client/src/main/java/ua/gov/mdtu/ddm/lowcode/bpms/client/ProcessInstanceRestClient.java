@@ -15,6 +15,7 @@ import ua.gov.mdtu.ddm.lowcode.bpms.client.exception.ProcessInstanceVariableNotF
 public interface ProcessInstanceRestClient extends BaseFeignClient {
 
   @GetMapping("/count")
+  @ErrorHandling
   CountResultDto getProcessInstancesCount();
 
   @GetMapping("/{processInstanceId}/variables/{variableName}")
@@ -26,6 +27,7 @@ public interface ProcessInstanceRestClient extends BaseFeignClient {
       @PathVariable("variableName") String variableName);
 
   @PutMapping("/{processInstanceId}/variables/{variableName}")
+  @ErrorHandling
   void putProcessInstanceVariable(
       @PathVariable("processInstanceId") String processInstanceId,
       @PathVariable("variableName") String variableName,
