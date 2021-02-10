@@ -33,7 +33,7 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
   @Test
   public void shouldReturnProcessDefinitionCount() throws JsonProcessingException {
     restClientWireMock.addStubMapping(
-        stubFor(post(urlPathEqualTo("/api/process-definition/count"))
+        stubFor(get(urlPathEqualTo("/api/process-definition/count"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(200)
@@ -58,8 +58,10 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
     processDefinitionEntity.setId("testId");
     var processDefinitionDto = ProcessDefinitionDto.fromProcessDefinition(processDefinitionEntity);
     restClientWireMock.addStubMapping(
-        stubFor(post(urlPathEqualTo("/api/process-definition"))
-            .withRequestBody(equalTo(objectMapper.writeValueAsString(requestDto)))
+        stubFor(get(urlPathEqualTo("/api/process-definition"))
+            .withQueryParam("latestVersion", equalTo("true"))
+            .withQueryParam("sortBy", equalTo("name"))
+            .withQueryParam("sortOrder", equalTo("asc"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(200)
@@ -140,8 +142,10 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
     processDefinitionEntity.setId("testId");
     var processDefinitionDto = ProcessDefinitionDto.fromProcessDefinition(processDefinitionEntity);
     restClientWireMock.addStubMapping(
-        stubFor(post(urlPathEqualTo("/api/process-definition"))
-            .withRequestBody(equalTo(objectMapper.writeValueAsString(requestDto)))
+        stubFor(get(urlPathEqualTo("/api/process-definition"))
+            .withQueryParam("active", equalTo("true"))
+            .withQueryParam("latestVersion", equalTo("false"))
+            .withQueryParam("suspended", equalTo("false"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(200)

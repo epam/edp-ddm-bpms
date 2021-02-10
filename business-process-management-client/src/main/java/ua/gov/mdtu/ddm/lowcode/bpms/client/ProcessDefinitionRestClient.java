@@ -7,7 +7,9 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
+import org.springframework.cloud.openfeign.CollectionFormat;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,14 +20,17 @@ import ua.gov.mdtu.ddm.lowcode.bpms.client.exception.ProcessDefinitionNotFoundEx
 @FeignClient(name = "camunda-process-definition-client", url = "${bpms.url}/api/process-definition")
 public interface ProcessDefinitionRestClient extends BaseFeignClient {
 
-  @PostMapping("/count")
+  @GetMapping("/count")
   @ErrorHandling
-  CountResultDto getProcessDefinitionsCount(@RequestBody ProcessDefinitionQueryDto requestDto);
+  @CollectionFormat(feign.CollectionFormat.CSV)
+  CountResultDto getProcessDefinitionsCount(
+      @SpringQueryMap ProcessDefinitionQueryDto requestDto);
 
-  @PostMapping
+  @GetMapping
   @ErrorHandling
+  @CollectionFormat(feign.CollectionFormat.CSV)
   List<ProcessDefinitionDto> getProcessDefinitionsByParams(
-      @RequestBody ProcessDefinitionQueryDto requestDto);
+      @SpringQueryMap ProcessDefinitionQueryDto requestDto);
 
   @GetMapping("/{id}")
   @ErrorHandling(codeSpecific = {
