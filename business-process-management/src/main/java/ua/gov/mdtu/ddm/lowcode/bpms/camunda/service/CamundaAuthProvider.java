@@ -35,12 +35,12 @@ public class CamundaAuthProvider {
 
   public void clearAuthentication() {
     identityService.clearAuthentication();
-    log.info("Clear Camunda authentication");
+    log.debug("Clear Camunda authentication");
   }
 
   public void createAuthentication(Authentication authentication) {
     if (Objects.isNull(authentication)) {
-      log.warn("User is not authenticated in application");
+      log.debug("User is not authenticated in application");
       return;
     }
     if (hasAuthorities(ALLOWED_AUTHORITIES, authentication.getAuthorities())) {
@@ -53,7 +53,7 @@ public class CamundaAuthProvider {
       //authenticate user but without any permissions
       identityService.setAuthenticatedUserId(authentication.getName());
     }
-    log.info("Camunda authentication is created for {}", authentication.getName());
+    log.debug("Camunda authentication is created for {}", authentication.getName());
   }
 
   private boolean hasAuthorities(Set<String> allowedAuthorities,
