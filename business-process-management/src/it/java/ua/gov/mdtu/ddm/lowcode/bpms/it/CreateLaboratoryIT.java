@@ -74,8 +74,8 @@ public class CreateLaboratoryIT extends BaseIT {
     dataFactoryMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo("/mock-server/laboratory"))
             .withHeader("Content-Type", equalTo("application/json"))
-            .withHeader("source-system", equalTo("Low-code Platform"))
-            .withHeader("source-application", equalTo("business-process-management"))
+            .withHeader("X-Source-System", equalTo("Low-code Platform"))
+            .withHeader("X-Source-Application", equalTo("business-process-management"))
             .withRequestBody(equalTo(DATA_FACTORY_REQUEST))
             .willReturn(aResponse().withStatus(500))));
 
@@ -109,8 +109,8 @@ public class CreateLaboratoryIT extends BaseIT {
     dataFactoryMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo("/mock-server/laboratory"))
             .withHeader("Content-Type", equalTo("application/json"))
-            .withHeader("source-system", equalTo("Low-code Platform"))
-            .withHeader("source-application", equalTo("business-process-management"))
+            .withHeader("X-Source-System", equalTo("Low-code Platform"))
+            .withHeader("X-Source-Application", equalTo("business-process-management"))
             .withRequestBody(equalTo(DATA_FACTORY_REQUEST))
             .willReturn(aResponse().withStatus(201))));
 

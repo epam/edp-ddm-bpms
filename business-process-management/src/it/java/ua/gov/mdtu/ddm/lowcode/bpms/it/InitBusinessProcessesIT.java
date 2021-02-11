@@ -17,15 +17,14 @@ public class InitBusinessProcessesIT extends BaseIT {
   @Test
   @Deployment(resources = {"bpmn/testInitSystemVariablesProcess.bpmn"})
   public void shouldInitDataFactoryBaseUrlDuringDeploy() {
-    String varDataFactoryBaseUrl = "dataFactoryBaseUrl";
+    String varDataFactoryBaseUrl = "const.dataFactoryBaseUrl";
 
     ProcessInstance process = runtimeService
         .startProcessInstanceByKey("testInitSystemVariablesProcess_key", "1");
 
     Map<String, Object> variables = runtimeService.getVariables(process.getId());
     String dataFactoryBaseUrl = (String) variables.get(varDataFactoryBaseUrl);
-    assertThat(dataFactoryBaseUrl).isNotNull();
-    assertThat(dataFactoryBaseUrl)
+    assertThat(dataFactoryBaseUrl).isNotNull()
         .isEqualTo(camundaProperties.getSystemVariables().get(varDataFactoryBaseUrl));
   }
 }

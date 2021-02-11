@@ -82,26 +82,16 @@
         <bpmn:targetRef>Property_1qqtsul</bpmn:targetRef>
       </bpmn:dataInputAssociation>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="Activity_1w3vw9u" name="Зберегти дані в Дата фабрику">
+    <bpmn:serviceTask id="Activity_1w3vw9u" name="Зберегти дані в Дата фабрику" camunda:delegateExpression="${dataFactoryConnectorCreateDelegate}">
       <bpmn:extensionElements>
-        <camunda:connector>
-          <camunda:inputOutput>
-            <camunda:inputParameter name="method">POST</camunda:inputParameter>
-            <camunda:inputParameter name="url">${execution.getVariable("const.dataFactoryBaseUrl")}/laboratory</camunda:inputParameter>
-            <camunda:inputParameter name="headers">
-              <camunda:map>
-                <camunda:entry key="Content-Type">application/json</camunda:entry>
-                <camunda:entry key="source-system">Low-code Platform</camunda:entry>
-                <camunda:entry key="source-application">business-process-management</camunda:entry>
-              </camunda:map>
-            </camunda:inputParameter>
-            <camunda:inputParameter name="payload">${payload.value}</camunda:inputParameter>
-            <camunda:outputParameter name="statusCode">${statusCode}</camunda:outputParameter>
-            <camunda:outputParameter name="headers">${headers}</camunda:outputParameter>
-            <camunda:outputParameter name="response">${response}</camunda:outputParameter>
-          </camunda:inputOutput>
-          <camunda:connectorId>http-connector</camunda:connectorId>
-        </camunda:connector>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="resource">laboratory</camunda:inputParameter>
+          <camunda:inputParameter name="payload">${payload}</camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token_var">secure-sys-var-ref-task-form-data-Activity_0s05qmu</camunda:inputParameter>
+          <camunda:inputParameter name="x_digital_signature_var">secure-sys-var-ref-task-form-data-Activity_0s05qmu</camunda:inputParameter>
+          <camunda:inputParameter name="x_digital_signature_derived_var">secure-sys-var-ref-task-form-data-Activity_0s05qmu</camunda:inputParameter>
+          <camunda:outputParameter name="response">${response}</camunda:outputParameter>
+        </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0u9qq1c</bpmn:incoming>
       <bpmn:outgoing>Flow_05l3haz</bpmn:outgoing>
@@ -109,20 +99,26 @@
         <bpmn:targetRef>DataStoreReference_0suitd4</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
     </bpmn:serviceTask>
-    <bpmn:dataStoreReference id="DataStoreReference_0suitd4" name="Дата фабрика" />
     <bpmn:scriptTask id="Activity_1ap9x8j" name="Підготовка даних для запису (transient var)" scriptFormat="groovy" camunda:resultVariable="payload">
       <bpmn:incoming>Flow_06zm02c</bpmn:incoming>
       <bpmn:outgoing>Flow_0u9qq1c</bpmn:outgoing>
-      <bpmn:script>import static org.camunda.spin.Spin.JSON;
+      <bpmn:script>import static org.camunda.spin.Spin.JSON
 
-import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.Variables
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 var formData = JSON(signedFormDataOutput).prop("data")
 var requestMap = [:]
 
 for (var name : formData.fieldNames()) {
-  var value = formData.prop(name).prop("value").stringValue()
-  requestMap.put(name, value)
+  requestMap[name] = formData.prop(name).prop("value").value()
+}
+
+if (requestMap.accreditationEndDate?.trim()) {
+  def parsedDate = LocalDateTime.parse(requestMap.accreditationEndDate, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+
+  requestMap.accreditationEndDate = parsedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 }
 
 var payload = Variables.stringValue(JSON(requestMap).toString(), true)</bpmn:script>
@@ -143,26 +139,28 @@ var payload = Variables.stringValue(JSON(requestMap).toString(), true)</bpmn:scr
       <bpmn:incoming>Flow_05l3haz</bpmn:incoming>
       <bpmn:outgoing>Flow_1g53dix</bpmn:outgoing>
       <bpmn:outgoing>Flow_15687pb</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0itngfy</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:exclusiveGateway id="Gateway_1px1n9s">
       <bpmn:incoming>Flow_1so9oif</bpmn:incoming>
       <bpmn:incoming>Flow_0ngtdnd</bpmn:incoming>
+      <bpmn:incoming>Flow_1uoeuv0</bpmn:incoming>
       <bpmn:outgoing>Flow_0mpmv5k</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:serviceTask id="Activity_0iogsm2" name="Помилка взаємодії за Дата Фабрикою" camunda:modelerTemplate="camundaSystemErrorDelegate" camunda:delegateExpression="${camundaSystemErrorDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="systemError" />
+          <camunda:inputParameter name="systemError">${response.value.responseBody}</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_15687pb</bpmn:incoming>
       <bpmn:outgoing>Flow_0ngtdnd</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_15687pb" name="ні" sourceRef="Gateway_1nwarsr" targetRef="Activity_0iogsm2">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${statusCode == 500}</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_15687pb" name="Системна помилка" sourceRef="Gateway_1nwarsr" targetRef="Activity_0iogsm2">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${response.value.statusCode != 201 &amp;&amp; response.value.statusCode != 422}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_1g53dix" name="так" sourceRef="Gateway_1nwarsr" targetRef="Activity_1c1se7a">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${statusCode == 201}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${response.value.statusCode == 201}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_157otpm" sourceRef="Activity_15o5gqa" targetRef="Activity_0570xco" />
     <bpmn:sequenceFlow id="Flow_16mq6s1" sourceRef="Event_1dh8s72" targetRef="Activity_1ne2ryq" />
@@ -175,72 +173,102 @@ var payload = Variables.stringValue(JSON(requestMap).toString(), true)</bpmn:scr
     <bpmn:sequenceFlow id="Flow_0i7crn5" sourceRef="Activity_1c1se7a" targetRef="Event_0llb5w6" />
     <bpmn:sequenceFlow id="Flow_0mpmv5k" sourceRef="Gateway_1px1n9s" targetRef="Activity_0s05qmu" />
     <bpmn:sequenceFlow id="Flow_0ngtdnd" sourceRef="Activity_0iogsm2" targetRef="Gateway_1px1n9s" />
+    <bpmn:dataStoreReference id="DataStoreReference_0suitd4" name="Дата фабрика" />
+    <bpmn:sequenceFlow id="Flow_0itngfy" name="Валідаційна помилка" sourceRef="Gateway_1nwarsr" targetRef="Activity_0e11jzf">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${response.value.statusCode == 422}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1uoeuv0" sourceRef="Activity_0e11jzf" targetRef="Gateway_1px1n9s" />
+    <bpmn:serviceTask id="Activity_0e11jzf" name="Валідаційна помилка" camunda:modelerTemplate="userDataValidationErrorDelegate" camunda:delegateExpression="${userDataValidationErrorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="validationErrors" />
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0itngfy</bpmn:incoming>
+      <bpmn:outgoing>Flow_1uoeuv0</bpmn:outgoing>
+    </bpmn:serviceTask>
   </bpmn:process>
   <bpmn:error id="Error_11ddrup" name="Error_09c29ei" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0pn1cv8">
       <bpmndi:BPMNShape id="Participant_02zjlbh_di" bpmnElement="Participant_02zjlbh" isHorizontal="true">
-        <dc:Bounds x="160" y="80" width="1500" height="420" />
+        <dc:Bounds x="160" y="80" width="1500" height="490" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_15687pb_di" bpmnElement="Flow_15687pb">
-        <di:waypoint x="1370" y="275" />
-        <di:waypoint x="1370" y="180" />
-        <di:waypoint x="1300" y="180" />
+      <bpmndi:BPMNEdge id="Flow_1uoeuv0_di" bpmnElement="Flow_1uoeuv0">
+        <di:waypoint x="1200" y="490" />
+        <di:waypoint x="710" y="490" />
+        <di:waypoint x="710" y="325" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1350" y="193" width="9" height="14" />
+          <dc:Bounds x="954" y="493" width="31" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1g53dix_di" bpmnElement="Flow_1g53dix">
-        <di:waypoint x="1395" y="300" />
-        <di:waypoint x="1460" y="300" />
+      <bpmndi:BPMNEdge id="Flow_0itngfy_di" bpmnElement="Flow_0itngfy">
+        <di:waypoint x="1370" y="325" />
+        <di:waypoint x="1370" y="490" />
+        <di:waypoint x="1300" y="490" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1420" y="282" width="16" height="14" />
+          <dc:Bounds x="1378" y="396" width="63" height="27" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_157otpm_di" bpmnElement="Flow_157otpm">
-        <di:waypoint x="500" y="300" />
-        <di:waypoint x="540" y="300" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_16mq6s1_di" bpmnElement="Flow_16mq6s1">
-        <di:waypoint x="248" y="300" />
-        <di:waypoint x="273" y="300" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0n9venr_di" bpmnElement="Flow_0n9venr">
-        <di:waypoint x="373" y="300" />
-        <di:waypoint x="400" y="300" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1so9oif_di" bpmnElement="Flow_1so9oif">
-        <di:waypoint x="640" y="300" />
-        <di:waypoint x="685" y="300" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_18e8iv6_di" bpmnElement="Flow_18e8iv6">
-        <di:waypoint x="890" y="300" />
-        <di:waypoint x="920" y="300" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_06zm02c_di" bpmnElement="Flow_06zm02c">
-        <di:waypoint x="1020" y="300" />
-        <di:waypoint x="1060" y="300" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0u9qq1c_di" bpmnElement="Flow_0u9qq1c">
-        <di:waypoint x="1160" y="300" />
-        <di:waypoint x="1200" y="300" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_05l3haz_di" bpmnElement="Flow_05l3haz">
-        <di:waypoint x="1300" y="300" />
-        <di:waypoint x="1345" y="300" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0i7crn5_di" bpmnElement="Flow_0i7crn5">
-        <di:waypoint x="1560" y="300" />
-        <di:waypoint x="1592" y="300" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0mpmv5k_di" bpmnElement="Flow_0mpmv5k">
-        <di:waypoint x="735" y="300" />
-        <di:waypoint x="790" y="300" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0ngtdnd_di" bpmnElement="Flow_0ngtdnd">
         <di:waypoint x="1200" y="180" />
         <di:waypoint x="710" y="180" />
         <di:waypoint x="710" y="275" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0mpmv5k_di" bpmnElement="Flow_0mpmv5k">
+        <di:waypoint x="735" y="300" />
+        <di:waypoint x="790" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0i7crn5_di" bpmnElement="Flow_0i7crn5">
+        <di:waypoint x="1560" y="300" />
+        <di:waypoint x="1592" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_05l3haz_di" bpmnElement="Flow_05l3haz">
+        <di:waypoint x="1300" y="300" />
+        <di:waypoint x="1345" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0u9qq1c_di" bpmnElement="Flow_0u9qq1c">
+        <di:waypoint x="1160" y="300" />
+        <di:waypoint x="1200" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06zm02c_di" bpmnElement="Flow_06zm02c">
+        <di:waypoint x="1020" y="300" />
+        <di:waypoint x="1060" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18e8iv6_di" bpmnElement="Flow_18e8iv6">
+        <di:waypoint x="890" y="300" />
+        <di:waypoint x="920" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1so9oif_di" bpmnElement="Flow_1so9oif">
+        <di:waypoint x="640" y="300" />
+        <di:waypoint x="685" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0n9venr_di" bpmnElement="Flow_0n9venr">
+        <di:waypoint x="373" y="300" />
+        <di:waypoint x="400" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16mq6s1_di" bpmnElement="Flow_16mq6s1">
+        <di:waypoint x="248" y="300" />
+        <di:waypoint x="273" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_157otpm_di" bpmnElement="Flow_157otpm">
+        <di:waypoint x="500" y="300" />
+        <di:waypoint x="540" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1g53dix_di" bpmnElement="Flow_1g53dix">
+        <di:waypoint x="1395" y="300" />
+        <di:waypoint x="1460" y="300" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1432" y="282" width="16" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15687pb_di" bpmnElement="Flow_15687pb">
+        <di:waypoint x="1370" y="275" />
+        <di:waypoint x="1370" y="180" />
+        <di:waypoint x="1300" y="180" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1374" y="206" width="51" height="27" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_1dh8s72_di" bpmnElement="Event_1dh8s72">
         <dc:Bounds x="212" y="282" width="36" height="36" />
@@ -284,12 +312,6 @@ var payload = Variables.stringValue(JSON(requestMap).toString(), true)</bpmn:scr
       <bpmndi:BPMNShape id="Activity_1w3vw9u_di" bpmnElement="Activity_1w3vw9u">
         <dc:Bounds x="1200" y="260" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="DataStoreReference_0suitd4_di" bpmnElement="DataStoreReference_0suitd4">
-        <dc:Bounds x="1225" y="405" width="50" height="50" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1214" y="462" width="72" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1ap9x8j_di" bpmnElement="Activity_1ap9x8j">
         <dc:Bounds x="1060" y="260" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -305,7 +327,7 @@ var payload = Variables.stringValue(JSON(requestMap).toString(), true)</bpmn:scr
       <bpmndi:BPMNShape id="Gateway_1nwarsr_di" bpmnElement="Gateway_1nwarsr" isMarkerVisible="true">
         <dc:Bounds x="1345" y="275" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1337" y="335" width="65" height="27" />
+          <dc:Bounds x="1377" y="318" width="65" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_1px1n9s_di" bpmnElement="Gateway_1px1n9s" isMarkerVisible="true">
@@ -313,6 +335,15 @@ var payload = Variables.stringValue(JSON(requestMap).toString(), true)</bpmn:scr
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0iogsm2_di" bpmnElement="Activity_0iogsm2">
         <dc:Bounds x="1200" y="140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataStoreReference_0suitd4_di" bpmnElement="DataStoreReference_0suitd4">
+        <dc:Bounds x="1225" y="365" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1214" y="422" width="72" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ocvt7w_di" bpmnElement="Activity_0e11jzf">
+        <dc:Bounds x="1200" y="450" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="DataOutputAssociation_0vh50wy_di" bpmnElement="DataOutputAssociation_0vh50wy">
         <di:waypoint x="323" y="340" />
@@ -329,8 +360,8 @@ var payload = Variables.stringValue(JSON(requestMap).toString(), true)</bpmn:scr
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="DataInputAssociation_06heeq8_di" bpmnElement="DataInputAssociation_06heeq8">
         <di:waypoint x="635" y="430" />
-        <di:waypoint x="720" y="430" />
-        <di:waypoint x="792" y="336" />
+        <di:waypoint x="820" y="430" />
+        <di:waypoint x="820" y="340" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="DataOutputAssociation_1ui1ubx_di" bpmnElement="DataOutputAssociation_1ui1ubx">
         <di:waypoint x="840" y="340" />
@@ -344,7 +375,7 @@ var payload = Variables.stringValue(JSON(requestMap).toString(), true)</bpmn:scr
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="DataOutputAssociation_1n5l5l4_di" bpmnElement="DataOutputAssociation_1n5l5l4">
         <di:waypoint x="1250" y="340" />
-        <di:waypoint x="1250" y="405" />
+        <di:waypoint x="1250" y="365" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
