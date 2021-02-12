@@ -17,7 +17,7 @@ public class InitBusinessProcessesIT extends BaseIT {
   @Test
   @Deployment(resources = {"bpmn/testInitSystemVariablesProcess.bpmn"})
   public void shouldInitDataFactoryBaseUrlDuringDeploy() {
-    String varDataFactoryBaseUrl = "const.dataFactoryBaseUrl";
+    String varDataFactoryBaseUrl = "const_dataFactoryBaseUrl";
 
     ProcessInstance process = runtimeService
         .startProcessInstanceByKey("testInitSystemVariablesProcess_key", "1");

@@ -27,7 +27,7 @@ public class DataFactoryConnectorSearchDelegate extends BaseDataFactoryConnector
       JacksonJsonParser jacksonJsonParser, MessageResolver messageResolver,
       @Value("${spring.application.name}") String springAppName,
       @Value("${ceph.bucket}") String cephBucketName,
-      @Value("${camunda.system-variables.const.dataFactoryBaseUrl}") String dataFactoryBaseUrl) {
+      @Value("${camunda.system-variables.const_dataFactoryBaseUrl}") String dataFactoryBaseUrl) {
     super(restTemplate, cephService, jacksonJsonParser, messageResolver, springAppName,
         cephBucketName);
     this.dataFactoryBaseUrl = dataFactoryBaseUrl;

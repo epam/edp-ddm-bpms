@@ -20,7 +20,7 @@ public class WireMockConfig {
 
   @Bean(destroyMethod = "stop")
   @Qualifier("dataFactoryMockServer")
-  public WireMockServer dataFactoryWireMock(@Value("${camunda.system-variables.const.dataFactoryBaseUrl}") String urlStr)
+  public WireMockServer dataFactoryWireMock(@Value("${camunda.system-variables.const_dataFactoryBaseUrl}") String urlStr)
       throws MalformedURLException {
     return WireMockUtil.createAndStartMockServerForUrl(urlStr);
   }

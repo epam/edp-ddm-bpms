@@ -20,8 +20,7 @@ camunda:
       id: ${camunda.admin-user-id}
       password: camunda
   system-variables:
-    const:
-      dataFactoryBaseUrl: http://localhost:8877/mock-server
+    const_dataFactoryBaseUrl: http://localhost:8877/mock-server
 
 ceph:
   http-endpoint: http://localhost:8100
