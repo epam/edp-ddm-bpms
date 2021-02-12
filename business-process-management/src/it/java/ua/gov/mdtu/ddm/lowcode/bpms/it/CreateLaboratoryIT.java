@@ -77,7 +77,8 @@ public class CreateLaboratoryIT extends BaseIT {
             .withHeader("X-Source-System", equalTo("Low-code Platform"))
             .withHeader("X-Source-Application", equalTo("business-process-management"))
             .withRequestBody(equalTo(DATA_FACTORY_REQUEST))
-            .willReturn(aResponse().withStatus(500))));
+            .willReturn(aResponse().withStatus(500)
+                .withBody("{\"traceId\":\"traceId2\",\"code\":\"RUNTIME_ERROR\"}"))));
 
     var processInstance = runtimeService.startProcessInstanceByKey("add-lab");
     var processInstanceId = processInstance.getId();
@@ -99,8 +100,13 @@ public class CreateLaboratoryIT extends BaseIT {
         "secure-sys-var-ref-task-form-data-Activity_0s05qmu",
         String.format("lowcode-%s-secure-sys-var-ref-task-form-data-Activity_0s05qmu",
             processInstanceId));
-    assertThrows(CamundaSystemException.class,
+    var ex = assertThrows(CamundaSystemException.class,
         () -> taskService.complete(signLabTaskId, signLabVariables));
+
+    assertThat(ex.getTraceId()).isEqualTo("traceId2");
+    assertThat(ex.getType()).isEqualTo("RUNTIME_ERROR");
+    assertThat(ex.getMessage()).isEqualTo("System Error");
+    assertThat(ex.getLocalizedMessage()).isEqualTo("Щось пішло не так");
   }
 
   @Test

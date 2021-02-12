@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -41,5 +42,14 @@ public class GeneralConfig {
     @Bean
     public JacksonJsonParser jacksonJsonParser(ObjectMapper objectMapper) {
         return new JacksonJsonParser(objectMapper);
+    }
+
+    @Bean
+    public ResourceBundleMessageSource messageSource() {
+        ResourceBundleMessageSource rs = new ResourceBundleMessageSource();
+        rs.setUseCodeAsDefaultMessage(true);
+        rs.setDefaultEncoding("UTF-8");
+        rs.setBasename("lang/messages");
+        return rs;
     }
 }

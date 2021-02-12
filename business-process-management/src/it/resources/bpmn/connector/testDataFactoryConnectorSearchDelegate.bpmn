@@ -6,7 +6,7 @@
     </bpmn:startEvent>
     <bpmn:sequenceFlow id="Flow_0c2sso8" sourceRef="StartEvent_1" targetRef="Activity_1uev980" />
     <bpmn:sequenceFlow id="Flow_0a4no4l" sourceRef="Activity_1uev980" targetRef="Activity_0uzvndv" />
-    <bpmn:serviceTask id="Activity_1uev980" name="Test Search" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
+    <bpmn:serviceTask id="Activity_1uev980" name="Test Search" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="headers">
@@ -20,7 +20,8 @@
               <camunda:entry key="id">id1</camunda:entry>
             </camunda:map>
           </camunda:inputParameter>
-          <camunda:outputParameter name="response">${response}</camunda:outputParameter>
+          <camunda:inputParameter name="x_access_token_ceph_key" />
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0c2sso8</bpmn:incoming>
@@ -42,11 +43,13 @@
       <bpmn:outgoing>Flow_0nwl2gm</bpmn:outgoing>
       <bpmn:script>assert response.statusCode == 400</bpmn:script>
     </bpmn:scriptTask>
-    <bpmn:serviceTask id="Activity_0xg8akg" name="Test Search2" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
+    <bpmn:serviceTask id="Activity_0xg8akg" name="Test Search2" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="resource">laboratory</camunda:inputParameter>
-          <camunda:outputParameter name="response">${response}</camunda:outputParameter>
+          <camunda:inputParameter name="searchConditions" />
+          <camunda:inputParameter name="x_access_token_ceph_key" />
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0oi8e0f</bpmn:incoming>

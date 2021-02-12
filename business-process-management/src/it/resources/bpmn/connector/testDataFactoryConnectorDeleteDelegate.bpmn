@@ -6,12 +6,15 @@
     </bpmn:startEvent>
     <bpmn:sequenceFlow id="Flow_0c2sso8" sourceRef="StartEvent_1" targetRef="Activity_1uev980" />
     <bpmn:sequenceFlow id="Flow_0a4no4l" sourceRef="Activity_1uev980" targetRef="Activity_0uzvndv" />
-    <bpmn:serviceTask id="Activity_1uev980" name="Test DELETE" camunda:delegateExpression="${dataFactoryConnectorDeleteDelegate}">
+    <bpmn:serviceTask id="Activity_1uev980" name="Test DELETE" camunda:modelerTemplate="dataFactoryConnectorDeleteDelegate" camunda:delegateExpression="${dataFactoryConnectorDeleteDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
+          <camunda:inputParameter name="x_access_token_ceph_key" />
+          <camunda:inputParameter name="x_digital_signature_ceph_key" />
+          <camunda:inputParameter name="x_digital_signature_derived_ceph_key" />
           <camunda:inputParameter name="resource">laboratory</camunda:inputParameter>
           <camunda:inputParameter name="id">id</camunda:inputParameter>
-          <camunda:outputParameter name="response">${response}</camunda:outputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0c2sso8</bpmn:incoming>
@@ -29,17 +32,17 @@
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testDataFactoryConnectorDeleteDelegate_key">
-      <bpmndi:BPMNEdge id="Flow_0c2sso8_di" bpmnElement="Flow_0c2sso8">
-        <di:waypoint x="215" y="117" />
-        <di:waypoint x="270" y="117" />
+      <bpmndi:BPMNEdge id="Flow_1kmjsjz_di" bpmnElement="Flow_1kmjsjz">
+        <di:waypoint x="530" y="117" />
+        <di:waypoint x="592" y="117" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0a4no4l_di" bpmnElement="Flow_0a4no4l">
         <di:waypoint x="370" y="117" />
         <di:waypoint x="430" y="117" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1kmjsjz_di" bpmnElement="Flow_1kmjsjz">
-        <di:waypoint x="530" y="117" />
-        <di:waypoint x="592" y="117" />
+      <bpmndi:BPMNEdge id="Flow_0c2sso8_di" bpmnElement="Flow_0c2sso8">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
         <dc:Bounds x="179" y="99" width="36" height="36" />

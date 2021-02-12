@@ -7,11 +7,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ua.gov.mdtu.ddm.general.integration.ceph.service.CephService;
 import ua.gov.mdtu.ddm.general.starter.logger.annotation.Logging;
 import ua.gov.mdtu.ddm.lowcode.bpms.camunda.delegate.dto.DataFactoryConnectorResponse;
+import ua.gov.mdtu.ddm.lowcode.bpms.camunda.service.MessageResolver;
 
 @Component("dataFactoryConnectorUpdateDelegate")
 @Logging
@@ -21,11 +23,12 @@ public class DataFactoryConnectorUpdateDelegate extends BaseDataFactoryConnector
 
   @Autowired
   public DataFactoryConnectorUpdateDelegate(RestTemplate restTemplate, CephService cephService,
-      JacksonJsonParser jacksonJsonParser,
+      JacksonJsonParser jacksonJsonParser, MessageResolver messageResolver,
       @Value("${spring.application.name}") String springAppName,
       @Value("${ceph.bucket}") String cephBucketName,
       @Value("${camunda.system-variables.const.dataFactoryBaseUrl}") String dataFactoryBaseUrl) {
-    super(restTemplate, cephService, jacksonJsonParser, springAppName, cephBucketName);
+    super(restTemplate, cephService, jacksonJsonParser, messageResolver, springAppName,
+        cephBucketName);
     this.dataFactoryBaseUrl = dataFactoryBaseUrl;
   }
 
@@ -46,6 +49,10 @@ public class DataFactoryConnectorUpdateDelegate extends BaseDataFactoryConnector
         .pathSegment(resourceId).build().toUri();
 
     var requestEntity = RequestEntity.put(uri).headers(getHeaders(delegateExecution)).body(body);
-    return perform(requestEntity);
+    try {
+      return perform(requestEntity);
+    } catch (RestClientResponseException ex) {
+      throw buildUpdatableException(ex);
+    }
   }
 }
