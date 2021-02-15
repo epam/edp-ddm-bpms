@@ -17,7 +17,7 @@ import ua.gov.mdtu.ddm.lowcode.bpms.camunda.service.MessageResolver;
 
 @Component("dataFactoryConnectorCreateDelegate")
 @Logging
-public class DataFactoryConnectorCreateDelegate extends BaseDataFactoryConnectorDelegate {
+public class DataFactoryConnectorCreateDelegate extends BaseConnectorDelegate {
 
   private final String dataFactoryBaseUrl;
 

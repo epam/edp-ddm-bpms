@@ -5,6 +5,8 @@ import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.json.JacksonJsonParser;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientResponseException;
@@ -15,44 +17,44 @@ import ua.gov.mdtu.ddm.general.starter.logger.annotation.Logging;
 import ua.gov.mdtu.ddm.lowcode.bpms.camunda.delegate.dto.DataFactoryConnectorResponse;
 import ua.gov.mdtu.ddm.lowcode.bpms.camunda.service.MessageResolver;
 
-@Component("dataFactoryConnectorUpdateDelegate")
+@Component("digitalSignatureConnectorDelegate")
 @Logging
-public class DataFactoryConnectorUpdateDelegate extends BaseConnectorDelegate {
+public class DigitalSignatureConnectorDelegate extends BaseConnectorDelegate {
 
-  private final String dataFactoryBaseUrl;
+  private final String dsoBaseUrl;
 
   @Autowired
-  public DataFactoryConnectorUpdateDelegate(RestTemplate restTemplate, CephService cephService,
+  public DigitalSignatureConnectorDelegate(RestTemplate restTemplate, CephService cephService,
       JacksonJsonParser jacksonJsonParser, MessageResolver messageResolver,
       @Value("${spring.application.name}") String springAppName,
       @Value("${ceph.bucket}") String cephBucketName,
-      @Value("${camunda.system-variables.const_dataFactoryBaseUrl}") String dataFactoryBaseUrl) {
-    super(restTemplate, cephService, jacksonJsonParser, messageResolver, springAppName,
-        cephBucketName);
-    this.dataFactoryBaseUrl = dataFactoryBaseUrl;
+      @Value("${dso.url}") String dsoBaseUrl) {
+    super(restTemplate, cephService, jacksonJsonParser, messageResolver, springAppName, cephBucketName);
+    this.dsoBaseUrl = dsoBaseUrl;
   }
 
   @Override
-  public void execute(DelegateExecution execution) {
-    var resource = (String) execution.getVariable("resource");
-    var id = (String) execution.getVariable("id");
+  public void execute(DelegateExecution execution) throws Exception {
     var payload = (String) execution.getVariable("payload");
+    var response = performPost(execution, payload);
 
-    var response = performPut(execution, resource, id, payload);
-
-    ((AbstractVariableScope) execution).setVariableLocalTransient("response", response);
+    ((AbstractVariableScope) execution).setVariableLocalTransient("response", response.getResponseBody());
   }
 
-  private DataFactoryConnectorResponse performPut(DelegateExecution delegateExecution,
-      String resourceName, String resourceId, String body) {
-    var uri = UriComponentsBuilder.fromHttpUrl(dataFactoryBaseUrl).pathSegment(resourceName)
-        .pathSegment(resourceId).build().toUri();
-
-    var requestEntity = RequestEntity.put(uri).headers(getHeaders(delegateExecution)).body(body);
+  private DataFactoryConnectorResponse performPost(DelegateExecution execution, String body) {
+    var uri = UriComponentsBuilder.fromHttpUrl(dsoBaseUrl).pathSegment("api", "eseal", "sign").build().toUri();
+    var requestEntity = RequestEntity.post(uri).headers(getHeadersForSign(execution)).body(body);
     try {
       return perform(requestEntity);
     } catch (RestClientResponseException ex) {
       throw buildUpdatableException(ex);
     }
+  }
+
+  private HttpHeaders getHeadersForSign(DelegateExecution execution) {
+    var headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    getAccessToken(execution).ifPresent(xAccessToken -> headers.add("X-Access-Token", xAccessToken));
+    return headers;
   }
 }

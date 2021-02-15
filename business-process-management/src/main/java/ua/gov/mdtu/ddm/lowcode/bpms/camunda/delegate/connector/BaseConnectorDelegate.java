@@ -29,7 +29,7 @@ import ua.gov.mdtu.ddm.lowcode.bpms.exception.UserDataValidationException;
 
 @RequiredArgsConstructor
 @Slf4j
-public abstract class BaseDataFactoryConnectorDelegate implements JavaDelegate {
+public abstract class BaseConnectorDelegate implements JavaDelegate {
 
   private final RestTemplate restTemplate;
   private final CephService cephService;
@@ -82,7 +82,7 @@ public abstract class BaseDataFactoryConnectorDelegate implements JavaDelegate {
 
     return headers;
   }
-  private Optional<String> getAccessToken(DelegateExecution delegateExecution) {
+  protected Optional<String> getAccessToken(DelegateExecution delegateExecution) {
     var xAccessTokenCephKey = (String) delegateExecution.getVariable("x_access_token_ceph_key");
     if (StringUtils.isBlank(xAccessTokenCephKey)) {
       return Optional.empty();

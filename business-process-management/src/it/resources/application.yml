@@ -21,7 +21,8 @@ camunda:
       password: camunda
   system-variables:
     const_dataFactoryBaseUrl: http://localhost:8877/mock-server
-
+dso:
+  url: http://localhost:8081
 ceph:
   http-endpoint: http://localhost:8100
   access-key: access-key
