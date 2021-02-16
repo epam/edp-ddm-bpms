@@ -46,7 +46,8 @@ public class DataFactoryConnectorSearchDelegate extends BaseConnectorDelegate {
 
   private DataFactoryConnectorResponse performSearch(DelegateExecution delegateExecution,
       String resourceName, Map<String, String> searchCriteria) {
-    var uriBuilder = UriComponentsBuilder.fromHttpUrl(dataFactoryBaseUrl).pathSegment(resourceName);
+    var uriBuilder = UriComponentsBuilder.fromHttpUrl(dataFactoryBaseUrl).pathSegment(resourceName)
+        .encode();
     if (searchCriteria != null) {
       searchCriteria.forEach(uriBuilder::queryParam);
     }
