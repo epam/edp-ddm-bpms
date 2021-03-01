@@ -76,7 +76,6 @@ spec:
         name: {{ .Chart.Name }}-db-data
       spec:
         accessModes: [ "ReadWriteOnce" ]
-        storageClassName: {{ .Values.db.storage.class }}
         resources:
           requests:
             storage: {{ .Values.db.storage.size }}

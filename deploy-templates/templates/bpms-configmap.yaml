@@ -10,4 +10,4 @@ data:
     camunda.bpm.job-execution.deployment-aware: true
     camunda.bpm.database.schema-update: true
     dso.url: http://digital-signature-ops:8080
-    ceph.http-endpoint: https://s3-openshift-storage.apps.cicd.mdtu-ddm.projects.epam.com
+    ceph.http-endpoint: https://s3-openshift-storage.apps.cicd2.mdtu-ddm.projects.epam.com

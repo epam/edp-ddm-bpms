@@ -1,5 +1,5 @@
 image:
-  name: business-process-management
+  name: nexus-docker-registry.apps.cicd2.mdtu-ddm.projects.epam.com/mdtu-ddm-edp-cicd/business-process-management
   version: latest
 port: 8080
 service:
@@ -13,7 +13,7 @@ cephSecretMountPath: "/app/secrets/ceph"
 prometheusScrapePath: "/actuator/prometheus"
 
 db:
-  image: postgres:9.6
+  image: nexus-docker-registry.apps.cicd2.mdtu-ddm.projects.epam.com/postgres:9.6
   port: 5432
   service:
     type: ClusterIP
@@ -26,7 +26,6 @@ db:
     # password: '' # randomly generated
   storage:
     size: 2Gi
-    class: gp2-c
   podSecurityContext:
     runAsUser: 999
     fsGroup: 999
