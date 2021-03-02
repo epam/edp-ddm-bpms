@@ -29,7 +29,7 @@ spec:
           - >-
             while ! nc -w 1 {{ .Chart.Name }}-db-headless {{ .Values.db.service.port }} </dev/null; do echo waiting for
             database; sleep 10; done;
-        image: nexus-docker-registry.apps.cicd2.mdtu-ddm.projects.epam.com/busybox
+        image: busybox
         imagePullPolicy: IfNotPresent
         name: {{ .Chart.Name }}-init
       containers:
