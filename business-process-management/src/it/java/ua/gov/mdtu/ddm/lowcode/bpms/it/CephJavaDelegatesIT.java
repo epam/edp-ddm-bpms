@@ -4,18 +4,13 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-import static com.github.tomakehurst.wiremock.matching.RequestPatternBuilder.newRequestPattern;
 import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.http.RequestMethod;
-import com.github.tomakehurst.wiremock.matching.EqualToPattern;
-import com.github.tomakehurst.wiremock.matching.UrlPattern;
 import com.google.common.collect.ImmutableMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,21 +51,18 @@ public class CephJavaDelegatesIT extends BaseIT {
   @After
   public void tearDown() {
     cephWireMockServer.resetRequests();
+    cephService.setCephBucketName(cephBucketName);
   }
 
   @Test
   @Deployment(resources = {"bpmn/testCephJavaDelegates.bpmn"})
   public void shouldThrowAnExceptionIfBucketNotExists() {
-    cephWireMockServer.addStubMapping(
-        stubFor(get(urlPathEqualTo("/")).willReturn(
-            aResponse()
-                .withStatus(200)
-                .withBody("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                    + "<ListAllMyBucketsResult></ListAllMyBucketsResult>"))));
-
+    String contentToPut = "{ \"var1\":\"value1\", \"var2\":\"value2\" }";
     Map<String, Object> vars = new HashMap<>();
     vars.put("key", "testKey");
-    vars.put("content", "testContent");
+    vars.put("content", Variables.stringValue(contentToPut, true));
+
+    this.cephService.setCephBucketName("newName");
     var ex = assertThrows(MisconfigurationException.class, () -> runtimeService
         .startProcessInstanceByKey("testCephJavaDelegates_key", "1", vars));
 
@@ -80,39 +72,24 @@ public class CephJavaDelegatesIT extends BaseIT {
   @Test
   @Deployment(resources = {"bpmn/testCephJavaDelegates.bpmn"})
   public void shouldUseCephJavaDelegatesInServiceTasks() {
-    initGetCephBucket();
+    String contentToPut = "{ \"var1\":\"value1\", \"var2\":\"value2\" }";
 
     Map<String, Object> vars = ImmutableMap.of(
         "key", "testKey",
-        "content", Variables.stringValue("testContent", true));
+        "content", Variables.stringValue(contentToPut, true));
     ProcessInstance process = runtimeService
         .startProcessInstanceByKey("testCephJavaDelegates_key", "1", vars);
 
     assertTrue(process.isEnded());
 
-    var rootUrlPattern = new UrlPattern(new EqualToPattern("/"), false);
-    cephWireMockServer.verify(2, newRequestPattern(RequestMethod.GET, rootUrlPattern));
-
-    UrlPattern lowcodeKeyUrlPattern = new UrlPattern(
-        new EqualToPattern("/" + cephBucketName + "/testKey"), false);
-    cephWireMockServer.verify(1, newRequestPattern(RequestMethod.GET, lowcodeKeyUrlPattern));
-    cephWireMockServer.verify(1, newRequestPattern(RequestMethod.PUT, lowcodeKeyUrlPattern));
+    String content = cephService.getContent(cephBucketName, "testKey");
+    assertThat(content).isNotNull();
+    assertThat(content).isEqualTo(contentToPut);
   }
 
   @Test
   public void shouldPutTaskFormDataToCeph() {
     var content = "{\"name\":{\"value\":\"value ek\"}}";
-
-    initGetCephBucket();
-    cephWireMockServer.addStubMapping(
-        stubFor(put(urlMatching("/" + cephBucketName
-            + "/lowcode-.+-secure-sys-var-ref-task-form-data-userTask"))
-            .willReturn(aResponse().withStatus(200))));
-    cephWireMockServer.addStubMapping(
-        stubFor(get(urlMatching("/" + cephBucketName
-            + "/lowcode-.+-secure-sys-var-ref-task-form-data-userTask"))
-            .willReturn(aResponse().withStatus(200)
-                .withHeader("Content-Length", "29").withBody(content))));
 
     Map<String, Object> vars = ImmutableMap.of("formData", Variables.stringValue(content, true));
     var processInstance = runtimeService
@@ -131,9 +108,9 @@ public class CephJavaDelegatesIT extends BaseIT {
         .containsEntry("secure-sys-var-ref-task-form-data-userTask", expectedCephKey)
         .doesNotContainKey("formDataOutput");
 
-    UrlPattern lowcodeKeyUrlPattern = new UrlPattern(
-        new EqualToPattern("/" + cephBucketName + "/" + expectedCephKey), false);
-    cephWireMockServer.verify(1, newRequestPattern(RequestMethod.PUT, lowcodeKeyUrlPattern));
+    String data = cephService.getContent(cephBucketName, expectedCephKey);
+    assertThat(data).isNotNull();
+    assertThat(data).isEqualTo(content);
   }
 
   @Test
@@ -150,15 +127,5 @@ public class CephJavaDelegatesIT extends BaseIT {
         .collect(toMap(HistoricVariableInstance::getName, HistoricVariableInstance::getValue,
             (o1, o2) -> o1));
     assertThat(resultVariables).containsEntry("sys-var-process-completion-result", status);
-  }
-
-  private void initGetCephBucket() {
-    cephWireMockServer.addStubMapping(
-        stubFor(get(urlPathEqualTo("/")).willReturn(
-            aResponse()
-                .withStatus(200)
-                .withBody("<?xml version=\"1.0\" encoding=\"UTF-8\"?><ListAllMyBucketsResult>"
-                    + "<Buckets><Bucket><Name>" + cephBucketName + "</Name></Bucket></Buckets>"
-                    + "</ListAllMyBucketsResult>"))));
   }
 }

@@ -11,6 +11,10 @@
 
   <artifactId>business-process-management</artifactId>
 
+  <properties>
+    <camunda.bpm.assert.version>7.0.0</camunda.bpm.assert.version>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>ua.gov.mdtu.ddm.lowcode</groupId>
@@ -131,6 +135,12 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.camunda.bpm.assert</groupId>
+      <artifactId>camunda-bpm-assert</artifactId>
+      <version>${camunda.bpm.assert.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

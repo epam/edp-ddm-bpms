@@ -2,10 +2,8 @@ package ua.gov.mdtu.ddm.lowcode.bpms.it;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,18 +32,7 @@ public class DigitalSignatureConnectorDelegateIT extends BaseIT {
   @Test
   @Deployment(resources = {"bpmn/connector/testDigitalSignatureConnectorDelegate.bpmn"})
   public void testDigitalSignatureConnectorDelegate() {
-    cephWireMockServer.addStubMapping(
-        stubFor(get(urlPathEqualTo("/"))
-            .willReturn(aResponse().withStatus(200)
-                .withBody("<?xml version=\"1.0\" encoding=\"UTF-8\"?><ListAllMyBucketsResult>"
-                    + "<Buckets><Bucket><Name>" + cephBucketName + "</Name></Bucket></Buckets>"
-                    + "</ListAllMyBucketsResult>"))));
-
-    cephWireMockServer.addStubMapping(
-        stubFor(get(urlMatching("/" + cephBucketName + "/cephKey"))
-            .willReturn(aResponse().withStatus(200)
-                .withHeader("Content-Length", String.valueOf(CONTENT.length()))
-                .withBody(CONTENT))));
+    cephService.putContent(cephBucketName, "cephKey", CONTENT);
 
     digitalSignatureMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo("/api/eseal/sign"))

@@ -1,0 +1,70 @@
+{
+  "data": {
+    "name": {
+      "type": null,
+      "value": "labName",
+      "valueInfo": null
+    },
+    "edrpou": {
+      "type": null,
+      "value": "11111111",
+      "valueInfo": null
+    },
+    "oblast": {
+      "type": null,
+      "value": "0100000000",
+      "valueInfo": null
+    },
+    "koatuuId": {
+      "type": null,
+      "value": "bb652d3f-a36f-465a-b7ba-232a5a1680c4",
+      "valueInfo": null
+    },
+    "address": {
+      "type": null,
+      "value": "asdfs",
+      "valueInfo": null
+    },
+    "headName": {
+      "type": null,
+      "value": "ff",
+      "valueInfo": null
+    },
+    "ownershipId": {
+      "type": null,
+      "value": "60c99b70-3644-4938-b785-027c25c13c87",
+      "valueInfo": null
+    },
+    "kopfgId": {
+      "type": null,
+      "value": "c54af316-4280-43fd-b49a-1e1f44ac374b",
+      "valueInfo": null
+    },
+    "accreditationFlag": {
+      "type": null,
+      "value": true,
+      "valueInfo": null
+    },
+    "notes": {
+      "type": null,
+      "value": "sdfsd",
+      "valueInfo": null
+    },
+    "submit": {
+      "type": null,
+      "value": true,
+      "valueInfo": null
+    },
+    "phoneNumber": {
+      "type": null,
+      "value": 446666666,
+      "valueInfo": null
+    },
+    "accreditationEndDate": {
+      "type": null,
+      "value": "2021-02-25T12:00:00+02:00",
+      "valueInfo": null
+    }
+  },
+  "x-access-token": "token"
+}

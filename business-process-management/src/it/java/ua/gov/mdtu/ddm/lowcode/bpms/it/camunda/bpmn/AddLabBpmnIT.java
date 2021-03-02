@@ -1,0 +1,48 @@
+package ua.gov.mdtu.ddm.lowcode.bpms.it.camunda.bpmn;
+
+import java.io.IOException;
+import java.util.HashMap;
+import org.apache.groovy.util.Maps;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
+import org.junit.Test;
+import ua.gov.mdtu.ddm.lowcode.bpms.it.builder.StubData;
+
+public class AddLabBpmnIT extends BaseBpmnIT {
+
+  @Test
+  @Deployment(resources = {"bpmn/add-lab.bpmn"})
+  public void test() throws IOException {
+    stubDataFactorySearch(StubData.builder()
+        .resource("laboratory-equal-edrpou-name-count")
+        .queryParams(Maps.of("name", "labName", "edrpou", "11111111"))
+        .response("[]")
+        .build());
+
+    stubDataFactoryCreate(StubData.builder()
+        .resource("laboratory")
+        .requestBody("/json/add-lab/addLabRequestBody.json")
+        .response("{}")
+        .build());
+
+    stubDigitalSignature(StubData.builder()
+        .requestBody("/json/add-lab/digitalSignatureRequestBody.json")
+        .response("{\"signature\": \"test\"}")
+        .build());
+
+    //start process
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("add-lab-key", new HashMap<>());
+    String processInstanceId = processInstance.getId();
+
+    BpmnAwareTests.assertThat(processInstance).isWaitingAt("Activity_1ne2ryq");
+    completeTask("Activity_1ne2ryq", processInstanceId, "/json/add-lab/Activity_1ne2ryq.json");
+
+    BpmnAwareTests.assertThat(processInstance).isWaitingAt("Activity_0s05qmu");
+    completeTask("Activity_0s05qmu", processInstanceId, "/json/add-lab/Activity_0s05qmu.json");
+
+    //then
+    BpmnAwareTests.assertThat(processInstance).hasPassed("Activity_1ne2ryq", "Activity_0s05qmu").isEnded();
+  }
+
+}

@@ -8,7 +8,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -155,11 +154,7 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
                     + "<Buckets><Bucket><Name>" + cephBucketName + "</Name></Bucket></Buckets>"
                     + "</ListAllMyBucketsResult>"))));
 
-    cephWireMockServer.addStubMapping(
-        stubFor(get(urlMatching("/" + cephBucketName + "/cephKey"))
-            .willReturn(aResponse().withStatus(200)
-                .withHeader("Content-Length", String.valueOf(CONTENT.length()))
-                .withBody(CONTENT))));
+    cephService.putContent(cephBucketName, "cephKey", CONTENT);
 
     dataFactoryMockServer.addStubMapping(
         stubFor(put(urlPathEqualTo("/mock-server/laboratory/id"))
@@ -226,19 +221,7 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
   @Test
   @Deployment(resources = {"bpmn/connector/testDataFactoryConnectorBatchCreateDelegate.bpmn"})
   public void testDataFactoryConnectorBatchCreateDelegate() {
-    cephWireMockServer.addStubMapping(
-        stubFor(get(urlPathEqualTo("/")).willReturn(
-            aResponse()
-                .withStatus(200)
-                .withBody("<?xml version=\"1.0\" encoding=\"UTF-8\"?><ListAllMyBucketsResult>"
-                    + "<Buckets><Bucket><Name>" + cephBucketName + "</Name></Bucket></Buckets>"
-                    + "</ListAllMyBucketsResult>"))));
-
-    cephWireMockServer.addStubMapping(
-        stubFor(get(urlMatching("/" + cephBucketName + "/tokenKey"))
-            .willReturn(aResponse().withStatus(200)
-                .withHeader("Content-Length", String.valueOf(CONTENT.length()))
-                .withBody(CONTENT))));
+    cephService.putContent(cephBucketName, "tokenKey", CONTENT);
 
     dataFactoryMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo("/mock-server/test"))

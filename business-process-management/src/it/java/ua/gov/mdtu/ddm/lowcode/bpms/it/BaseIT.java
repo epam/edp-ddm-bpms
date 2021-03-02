@@ -14,7 +14,6 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.glassfish.jersey.client.JerseyClientBuilder;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import ua.gov.mdtu.ddm.lowcode.bpms.it.config.TestCephServiceImpl;
 
 @ActiveProfiles("test")
 @RunWith(SpringRunner.class)
@@ -40,6 +40,8 @@ public abstract class BaseIT {
   protected ProcessEngine engine;
   @Inject
   protected ObjectMapper objectMapper;
+  @Inject
+  protected TestCephServiceImpl cephService;
 
   @LocalServerPort
   protected int port;
