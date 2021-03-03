@@ -5,6 +5,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static ua.gov.mdtu.ddm.lowcode.bpms.it.util.TestUtils.VARIABLE_NAME;
@@ -14,6 +15,7 @@ import static ua.gov.mdtu.ddm.lowcode.bpms.it.util.TestUtils.getContent;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Map;
 import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
@@ -26,7 +28,7 @@ import ua.gov.mdtu.ddm.lowcode.bpms.it.BaseIT;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.builder.StubData;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.config.TestCephServiceImpl;
 
-public abstract class BaseBpmnIT extends BaseIT  {
+public abstract class BaseBpmnIT extends BaseIT {
 
   private final String MOCK_SERVER = "/mock-server";
 
@@ -41,6 +43,7 @@ public abstract class BaseBpmnIT extends BaseIT  {
 
   @Inject
   protected TestCephServiceImpl cephService;
+
   @Inject
   protected JacksonJsonParser jacksonJsonParser;
 
@@ -68,6 +71,27 @@ public abstract class BaseBpmnIT extends BaseIT  {
     var uri = UriComponentsBuilder.fromPath(MOCK_SERVER).pathSegment(data.getResource()).build()
         .toUri();
     MappingBuilder mappingBuilder = post(urlPathEqualTo(uri.getPath()))
+        .withRequestBody(equalToJson(getContent(data.getRequestBody())))
+        .willReturn(aResponse().withStatus(200).withBody(getContent(data.getResponse())));
+
+    data.getHeaders().forEach((key, value) -> mappingBuilder.withHeader(key, equalTo(value)));
+    dataFactoryMockServer.addStubMapping(stubFor(mappingBuilder));
+  }
+
+  protected void stubDataFactoryRead(StubData data) throws IOException {
+    var uri = UriComponentsBuilder.fromPath(MOCK_SERVER).pathSegment(data.getResource())
+        .pathSegment(data.getResourceId()).build().toUri();
+    MappingBuilder mappingBuilder = get(urlPathEqualTo(uri.getPath()))
+        .willReturn(aResponse().withStatus(200).withBody(getContent(data.getResponse())));
+
+    data.getHeaders().forEach((key, value) -> mappingBuilder.withHeader(key, equalTo(value)));
+    dataFactoryMockServer.addStubMapping(stubFor(mappingBuilder));
+  }
+
+  protected void stubDataFactoryUpdate(StubData data) throws IOException {
+    var uri = UriComponentsBuilder.fromUri(URI.create(MOCK_SERVER)).pathSegment(data.getResource())
+        .pathSegment(data.getResourceId()).build().toUri();
+    MappingBuilder mappingBuilder = put(urlPathEqualTo(uri.getPath()))
         .withRequestBody(equalToJson(getContent(data.getRequestBody())))
         .willReturn(aResponse().withStatus(200).withBody(getContent(data.getResponse())));
 

@@ -1,0 +1,20 @@
+{
+  "data": {
+    "edrpou": {
+      "type": null,
+      "value": "13171992",
+      "valueInfo": null
+    },
+    "name": {
+      "type": null,
+      "value": "labName",
+      "valueInfo": null
+    },
+    "staffId": {
+      "type": null,
+      "value": "02e68684-1335-47f0-9bd6-17d937267527",
+      "valueInfo": null
+    }
+  },
+  "x-access-token": "token"
+}
