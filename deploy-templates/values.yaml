@@ -13,23 +13,10 @@ cephSecretMountPath: "/app/secrets/ceph"
 prometheusScrapePath: "/actuator/prometheus"
 
 db:
-  image: postgres:9.6
+  url: citus-master
   port: 5432
-  service:
-    type: ClusterIP
-    port: 5432
-    clusterIP: None
-  replicas: 1
   defaultDatabase: camunda
-  credentials:
-    username: admin
-    # password: '' # randomly generated
-  storage:
-    size: 2Gi
-    class: gp2-c
-  podSecurityContext:
-    runAsUser: 999
-    fsGroup: 999
+  secret: citus-secrets
 
 ingress: # expose the service with a route or an ingress depending on platform type
   platform: openshift # openshift or kubernetes

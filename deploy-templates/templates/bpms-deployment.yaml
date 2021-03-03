@@ -27,11 +27,27 @@ spec:
           - sh
           - '-c'
           - >-
-            while ! nc -w 1 {{ .Chart.Name }}-db-headless {{ .Values.db.service.port }} </dev/null; do echo waiting for
+            while ! nc -w 1 {{ .Values.db.url }} {{ .Values.db.port }} </dev/null; do echo waiting for
             database; sleep 10; done;
-        image: busybox
+      - name: create-db
+        image: bitnami/postgresql:latest
+        env:
+          - name: PSQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.db.secret }}
+                key: username
+          - name: PGPASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.db.secret }}
+                key: password
         imagePullPolicy: IfNotPresent
-        name: {{ .Chart.Name }}-init
+        command:
+          - sh
+          - '-c'
+          - >-
+            echo "SELECT 'CREATE DATABASE {{ .Values.db.defaultDatabase }}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '{{ .Values.db.defaultDatabase }}')\gexec" | psql -U $PSQL_USER --host={{ .Values.db.url }}
       containers:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
@@ -75,7 +91,7 @@ spec:
         volumeMounts:
           - name: {{ .Chart.Name }}
             mountPath: {{ .Values.appConfigMountPath }}
-          - name: {{ .Chart.Name }}-db-credentials
+          - name: {{ .Values.db.secret }}
             mountPath: {{ .Values.appSecretsMountPath }}
           - name: {{ .Chart.Name }}-camunda-global-system-vars
             mountPath: {{ .Values.camundaVarsMountPath }}
@@ -92,9 +108,9 @@ spec:
         - name: {{ .Chart.Name }}
           configMap:
             name: {{ .Chart.Name }}
-        - name: {{ .Chart.Name }}-db-credentials
+        - name: {{ .Values.db.secret }}
           secret:
-            secretName: {{ .Chart.Name }}-db-credentials
+            secretName: {{ .Values.db.secret }}
             items:
             - key: username
               path: spring.datasource.username
