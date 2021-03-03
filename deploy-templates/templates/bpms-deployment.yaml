@@ -29,6 +29,9 @@ spec:
           - >-
             while ! nc -w 1 {{ .Values.db.url }} {{ .Values.db.port }} </dev/null; do echo waiting for
             database; sleep 10; done;
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        name: {{ .Chart.Name }}-init
       - name: create-db
         image: bitnami/postgresql:latest
         env:
