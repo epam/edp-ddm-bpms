@@ -1,0 +1,31 @@
+{
+  "data": {
+    "name": {
+      "value": "labName"
+    },
+    "edrpou": {
+      "value": "11111111"
+    },
+    "personnelGrid": {
+      "value": [
+        {
+          "fullName": "s",
+          "hygienistFlag": true,
+          "fullTimeFlag": "основнеМісцеРоботи",
+          "fixedTermContractFlag": true,
+          "researches": ["research1", "research2"],
+          "staffStatusId": "12",
+          "specializationDate": "2021-03-02T00:00:00+02:00",
+          "specializationEndDate": "2021-03-09T00:00:00+02:00",
+          "salary": 0.99,
+          "contractEndDate": "2021-03-22T00:00:00+02:00"
+        }
+      ]
+    },
+    "submit": {
+      "value": true
+    }
+  },
+  "x-access-token": "token",
+  "signature": "signature"
+}

@@ -14,14 +14,17 @@ import static ua.gov.mdtu.ddm.lowcode.bpms.it.util.TestUtils.getContent;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
 import java.io.IOException;
+import java.util.Map;
 import javax.inject.Inject;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Maps;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.web.util.UriComponentsBuilder;
-import ua.gov.mdtu.ddm.general.integration.ceph.service.CephService;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.BaseIT;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.builder.StubData;
+import ua.gov.mdtu.ddm.lowcode.bpms.it.config.TestCephServiceImpl;
 
 public abstract class BaseBpmnIT extends BaseIT  {
 
@@ -37,7 +40,9 @@ public abstract class BaseBpmnIT extends BaseIT  {
   protected String cephBucketName;
 
   @Inject
-  protected CephService cephService;
+  protected TestCephServiceImpl cephService;
+  @Inject
+  protected JacksonJsonParser jacksonJsonParser;
 
   protected void completeTask(String taskId, String processInstanceId, String formData)
       throws IOException {
@@ -60,12 +65,21 @@ public abstract class BaseBpmnIT extends BaseIT  {
   }
 
   protected void stubDataFactoryCreate(StubData data) throws IOException {
-    var uri = UriComponentsBuilder.fromPath(MOCK_SERVER).pathSegment(data.getResource()).build().toUri();
+    var uri = UriComponentsBuilder.fromPath(MOCK_SERVER).pathSegment(data.getResource()).build()
+        .toUri();
     MappingBuilder mappingBuilder = post(urlPathEqualTo(uri.getPath()))
         .withRequestBody(equalToJson(getContent(data.getRequestBody())))
         .willReturn(aResponse().withStatus(200).withBody(getContent(data.getResponse())));
 
     data.getHeaders().forEach((key, value) -> mappingBuilder.withHeader(key, equalTo(value)));
+    dataFactoryMockServer.addStubMapping(stubFor(mappingBuilder));
+  }
+
+  protected void stubDataFactoryGet(StubData stubData) throws IOException {
+    var uri = UriComponentsBuilder.fromPath(MOCK_SERVER)
+        .pathSegment(stubData.getResource(), stubData.getResourceId()).encode().build().toUri();
+    var mappingBuilder = get(urlPathEqualTo(uri.getPath()))
+        .willReturn(aResponse().withStatus(200).withBody(getContent(stubData.getResponse())));
     dataFactoryMockServer.addStubMapping(stubFor(mappingBuilder));
   }
 
@@ -77,5 +91,15 @@ public abstract class BaseBpmnIT extends BaseIT  {
     data.getHeaders().forEach((key, value) -> mappingBuilder.withHeader(key, equalTo(value)));
 
     digitalSignatureMockServer.addStubMapping(stubFor(mappingBuilder));
+  }
+
+  protected void assertCephContent(Map<String, String> expectedContent) {
+    Assertions.assertThat(cephService.getStorage()).hasSize(expectedContent.size());
+    expectedContent.forEach((key, value) -> {
+      var expectedMap = jacksonJsonParser.parseMap(value);
+      var actualMap = jacksonJsonParser.parseMap(cephService.getContent(cephBucketName, key));
+
+      Assertions.assertThat(actualMap).isEqualTo(expectedMap);
+    });
   }
 }

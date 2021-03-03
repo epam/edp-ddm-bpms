@@ -9,12 +9,13 @@ import lombok.Getter;
 @Builder
 public class StubData {
 
-  private String resource;
-  private String requestBody;
+  private final String resource;
+  private final String resourceId;
+  private final String requestBody;
   @Builder.Default
-  private Map<String, String> queryParams = new HashMap<>();
+  private final Map<String, String> queryParams = new HashMap<>();
   @Builder.Default
-  private Map<String, String> headers = new HashMap<>();
-  private String response;
+  private final Map<String, String> headers = new HashMap<>();
+  private final String response;
 
 }

@@ -3,11 +3,13 @@ package ua.gov.mdtu.ddm.lowcode.bpms.it.config;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.Setter;
 import ua.gov.mdtu.ddm.general.integration.ceph.exception.MisconfigurationException;
 import ua.gov.mdtu.ddm.general.integration.ceph.service.CephService;
 
 @Setter
+@Getter
 @AllArgsConstructor
 public class TestCephServiceImpl implements CephService {
 

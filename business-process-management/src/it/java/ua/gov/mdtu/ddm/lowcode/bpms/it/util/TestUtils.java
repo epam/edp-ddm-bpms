@@ -14,4 +14,12 @@ public final class TestUtils {
     }
     return content;
   }
+
+  public static String formDataVariableName(String taskDefinitionKey) {
+    return String.format(VARIABLE_NAME, taskDefinitionKey);
+  }
+
+  public static String formDataVariableValue(String processInstanceId, String varName) {
+    return String.format(VARIABLE_VALUE, processInstanceId, varName);
+  }
 }
