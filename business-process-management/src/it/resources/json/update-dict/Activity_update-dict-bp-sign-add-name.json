@@ -1,0 +1,15 @@
+{
+  "data": {
+    "name": {
+      "type": null,
+      "value": "testName",
+      "valueInfo": null
+    },
+    "notes": {
+      "type": null,
+      "value": "testNote",
+      "valueInfo": null
+    }
+  },
+  "x-access-token": "token"
+}

@@ -20,6 +20,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Maps;
+import org.junit.Before;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.json.JacksonJsonParser;
@@ -46,6 +47,11 @@ public abstract class BaseBpmnIT extends BaseIT {
 
   @Inject
   protected JacksonJsonParser jacksonJsonParser;
+
+  @Before
+  public void init() {
+    cephService.clearStorage();
+  }
 
   protected void completeTask(String taskId, String processInstanceId, String formData)
       throws IOException {

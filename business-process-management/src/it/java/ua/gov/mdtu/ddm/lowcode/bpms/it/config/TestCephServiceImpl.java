@@ -29,6 +29,10 @@ public class TestCephServiceImpl implements CephService {
     storage.put(key, content);
   }
 
+  public void clearStorage() {
+    storage.clear();
+  }
+
   private void verifyBucketName(String bucketName) {
     if (!cephBucketName.equals(bucketName)) {
       throw new MisconfigurationException("Bucket " + bucketName + " hasn't found");
