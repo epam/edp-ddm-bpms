@@ -21,6 +21,12 @@ public class UpdateStaffBpmnIT extends BaseBpmnIT {
         .response("/json/update-staff/getStaffById.json")
         .build());
 
+    stubDataFactoryRead(StubData.builder()
+        .resource("laboratory")
+        .resourceId("3758f3e6-937a-4ef9-a8b6-c95671241abd")
+        .response("/json/update-staff/laboratoryByIdResponse.json")
+        .build());
+
     stubDigitalSignature(StubData.builder()
         .requestBody("/json/update-staff/digitalSignatureRequestBody.json")
         .response("{\"signature\": \"test\"}")
