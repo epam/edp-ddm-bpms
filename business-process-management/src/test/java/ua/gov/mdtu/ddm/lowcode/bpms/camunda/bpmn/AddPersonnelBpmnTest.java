@@ -156,7 +156,7 @@ public class AddPersonnelBpmnTest extends BaseBpmnTest {
         getContent("/json/add-personnel/dso/systemSignatureCephContent.json"));
 
     assertThat(processInstance).isEnded();
-    assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
+    assertThat(processInstance).variables().hasSize(17).containsAllEntriesOf(expectedVariablesMap);
     assertCephContent(expectedCephStorage);
 
     mockServer.verify();

@@ -155,9 +155,7 @@ public class AddPersonnelBpmnIT extends BaseBpmnIT {
         getContent("/json/add-personnel/dso/systemSignatureCephContent.json"));
 
     assertThat(processInstance).isEnded();
-    assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
+    assertThat(processInstance).variables().hasSize(18).containsAllEntriesOf(expectedVariablesMap);
     assertCephContent(expectedCephStorage);
-
-
   }
 }

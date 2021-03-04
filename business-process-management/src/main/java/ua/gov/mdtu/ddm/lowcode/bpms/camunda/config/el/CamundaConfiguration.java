@@ -15,11 +15,12 @@ import org.springframework.context.annotation.Configuration;
 public class CamundaConfiguration {
 
   private final ApplicationContext appContext;
+  private final LowcodeSpringProcessEngineConfiguration configuration;
 
   @Bean
   public ProcessEngineConfigurationImpl processEngineConfigurationImpl(
       List<ProcessEnginePlugin> processEnginePlugins) {
-    var configuration = CamundaSpringBootUtil.springProcessEngineConfiguration();
+    CamundaSpringBootUtil.initCustomFields(this.configuration);
     configuration.getProcessEnginePlugins()
         .add(new CompositeProcessEnginePlugin(processEnginePlugins));
 
