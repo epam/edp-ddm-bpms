@@ -2,6 +2,8 @@ server:
   port: 8080
 
 camunda:
+  system-variables:
+    const_dataFactoryBaseUrl: http://registry-rest-api:8080
   admin-user-id: camunda
   admin-group-id: camunda-admin
   bpm:
