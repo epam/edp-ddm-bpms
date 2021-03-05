@@ -34,12 +34,12 @@ public class DataFactoryConnectorCreateDelegate extends BaseConnectorDelegate {
 
   @Override
   public void execute(DelegateExecution execution) {
-    var resource = (String) execution.getVariable("resource");
-    var payload = (String) execution.getVariable("payload");
+    var resource = (String) execution.getVariable(RESOURCE_VARIABLE);
+    var payload = (String) execution.getVariable(PAYLOAD_VARIABLE);
 
     var response = performPost(execution, resource, payload);
 
-    ((AbstractVariableScope) execution).setVariableLocalTransient("response", response);
+    ((AbstractVariableScope) execution).setVariableLocalTransient(RESPONSE_VARIABLE, response);
   }
 
   private DataFactoryConnectorResponse performPost(DelegateExecution delegateExecution,
@@ -51,7 +51,7 @@ public class DataFactoryConnectorCreateDelegate extends BaseConnectorDelegate {
     try {
       return perform(requestEntity);
     } catch (RestClientResponseException ex) {
-      throw buildUpdatableException(ex);
+      throw buildUpdatableException(requestEntity, ex);
     }
   }
 }

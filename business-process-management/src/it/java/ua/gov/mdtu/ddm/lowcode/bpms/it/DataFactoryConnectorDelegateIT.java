@@ -4,6 +4,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.matching;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
@@ -33,6 +34,9 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
   @Inject
   @Qualifier("dataFactoryMockServer")
   private WireMockServer dataFactoryMockServer;
+  @Inject
+  @Qualifier("digitalSignatureMockServer")
+  private WireMockServer digitalSignatureMockServer;
   @Value("${ceph.bucket}")
   private String cephBucketName;
 
@@ -223,28 +227,41 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
   public void testDataFactoryConnectorBatchCreateDelegate() {
     cephService.putContent(cephBucketName, "tokenKey", CONTENT);
 
+    digitalSignatureMockServer.addStubMapping(stubFor(
+        post(urlPathEqualTo("/api/eseal/sign"))
+            .withHeader("X-Access-Token", equalTo("token"))
+            .withRequestBody(equalTo(
+                "{\"data\":\"{\\\"data\\\":\\\"test data\\\",\\\"description\\\":\\\"some description\\\"}\"}"))
+            .willReturn(aResponse().withStatus(200).withBody("{\"signature\":\"signature\"}"))));
     dataFactoryMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo("/mock-server/test"))
             .withHeader("X-Access-Token", equalTo("token"))
             .withHeader("X-Digital-Signature", equalTo("testSignature"))
-            .withHeader("X-Digital-Signature-Derived", equalTo("testSignatureDerived"))
+            .withHeader("X-Digital-Signature-Derived",
+                matching("lowcode_.*_system_signature_ceph_key_0"))
             .withRequestBody(
                 equalTo("{\"data\":\"test data\",\"description\":\"some description\"}"))
             .willReturn(aResponse().withStatus(201))));
 
+    digitalSignatureMockServer.addStubMapping(stubFor(
+        post(urlPathEqualTo("/api/eseal/sign"))
+            .withHeader("X-Access-Token", equalTo("token"))
+            .withRequestBody(equalTo(
+                "{\"data\":\"{\\\"data2\\\":\\\"test data2\\\",\\\"description2\\\":\\\"some description2\\\"}\"}"))
+            .willReturn(aResponse().withStatus(200).withBody("{\"signature\":\"signature2\"}"))));
     dataFactoryMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo("/mock-server/test"))
             .withHeader("X-Access-Token", equalTo("token"))
             .withHeader("X-Digital-Signature", equalTo("testSignature"))
-            .withHeader("X-Digital-Signature-Derived", equalTo("testSignatureDerived"))
+            .withHeader("X-Digital-Signature-Derived",
+                matching("lowcode_.*_system_signature_ceph_key_1"))
             .withRequestBody(
                 equalTo("{\"data2\":\"test data2\",\"description2\":\"some description2\"}"))
             .willReturn(aResponse().withStatus(201))));
 
     Map<String, Object> variables = ImmutableMap
         .of("secure-sys-var-ref-task-form-data-test_token", "tokenKey",
-            "secure-sys-var-ref-task-form-data-test_signature", "testSignature",
-            "secure-sys-var-ref-task-form-data-test_derived", "testSignatureDerived");
+            "secure-sys-var-ref-task-form-data-test_signature", "testSignature");
 
     var processInstance = runtimeService
         .startProcessInstanceByKey("testDataFactoryConnectorBatchCreateDelegate_key", variables);

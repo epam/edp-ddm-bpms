@@ -34,13 +34,13 @@ public class DataFactoryConnectorUpdateDelegate extends BaseConnectorDelegate {
 
   @Override
   public void execute(DelegateExecution execution) {
-    var resource = (String) execution.getVariable("resource");
-    var id = (String) execution.getVariable("id");
-    var payload = (String) execution.getVariable("payload");
+    var resource = (String) execution.getVariable(RESOURCE_VARIABLE);
+    var id = (String) execution.getVariable(RESOURCE_ID_VARIABLE);
+    var payload = (String) execution.getVariable(PAYLOAD_VARIABLE);
 
     var response = performPut(execution, resource, id, payload);
 
-    ((AbstractVariableScope) execution).setVariableLocalTransient("response", response);
+    ((AbstractVariableScope) execution).setVariableLocalTransient(RESPONSE_VARIABLE, response);
   }
 
   private DataFactoryConnectorResponse performPut(DelegateExecution delegateExecution,
@@ -52,7 +52,7 @@ public class DataFactoryConnectorUpdateDelegate extends BaseConnectorDelegate {
     try {
       return perform(requestEntity);
     } catch (RestClientResponseException ex) {
-      throw buildUpdatableException(ex);
+      throw buildUpdatableException(requestEntity, ex);
     }
   }
 }

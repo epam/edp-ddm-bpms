@@ -76,13 +76,14 @@ public abstract class BaseBpmnTest {
     var dataFactoryConnectorReadDelegate = new DataFactoryConnectorReadDelegate(restTemplate,
         cephService, jacksonJsonParser, messageResolver, springAppName, cephBucketName,
         dataFactoryUrl);
-    var dataFactoryConnectorBatchCreateDelegate = new DataFactoryConnectorBatchCreateDelegate(
-        restTemplate, cephService, jacksonJsonParser, messageResolver, springAppName,
-        cephBucketName, dataFactoryUrl);
 
     var digitalSignatureConnectorDelegate = new DigitalSignatureConnectorDelegate(restTemplate,
         cephService, jacksonJsonParser, messageResolver, springAppName, cephBucketName,
         digitalSignatureUrl);
+
+    var dataFactoryConnectorBatchCreateDelegate = new DataFactoryConnectorBatchCreateDelegate(
+        restTemplate, cephService, jacksonJsonParser, messageResolver,
+        digitalSignatureConnectorDelegate, springAppName, cephBucketName, dataFactoryUrl);
 
     Mocks.register("getFormDataFromCephDelegate", getFormDataFromCephDelegate);
     Mocks.register("putFormDataToCephDelegate", putFormDataToCephDelegate);

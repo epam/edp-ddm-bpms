@@ -76,7 +76,7 @@ public class AddPersonnelBpmnTest extends BaseBpmnTest {
 
     var systemSignatureCephKeyRefVarName = "system_signature_ceph_key";
     var systemSignatureCephKey = "lowcode_" + processInstanceId + "_" +
-        systemSignatureCephKeyRefVarName;
+        systemSignatureCephKeyRefVarName + "_0";
 
     var expectedVariablesMap = new HashMap<String, Object>();
     var expectedCephStorage = new HashMap<String, String>();
@@ -146,7 +146,7 @@ public class AddPersonnelBpmnTest extends BaseBpmnTest {
     completeTask(signPersonnelFormActivityDefinitionKey,
         "/json/add-personnel/form-data/signPersonnelFormActivity.json", processInstanceId);
 
-    expectedVariablesMap.put(systemSignatureCephKeyRefVarName, systemSignatureCephKey);
+    expectedVariablesMap.put("x_digital_signature_derived_ceph_key", systemSignatureCephKey);
     expectedVariablesMap
         .put("sys-var-process-completion-result", "Дані про кадровий склад внесені");
 
@@ -156,7 +156,7 @@ public class AddPersonnelBpmnTest extends BaseBpmnTest {
         getContent("/json/add-personnel/dso/systemSignatureCephContent.json"));
 
     assertThat(processInstance).isEnded();
-    assertThat(processInstance).variables().hasSize(17).containsAllEntriesOf(expectedVariablesMap);
+    assertThat(processInstance).variables().hasSize(15).containsAllEntriesOf(expectedVariablesMap);
     assertCephContent(expectedCephStorage);
 
     mockServer.verify();

@@ -31,6 +31,11 @@ import ua.gov.mdtu.ddm.lowcode.bpms.exception.UserDataValidationException;
 @Slf4j
 public abstract class BaseConnectorDelegate implements JavaDelegate {
 
+  protected static final String RESOURCE_VARIABLE = "resource";
+  protected static final String RESOURCE_ID_VARIABLE = "id";
+  protected static final String PAYLOAD_VARIABLE = "payload";
+  protected static final String RESPONSE_VARIABLE = "response";
+
   private final RestTemplate restTemplate;
   private final CephService cephService;
   private final JacksonJsonParser jacksonJsonParser;
@@ -77,7 +82,8 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
 
     var customHeaders = (Map<String, String>) delegateExecution.getVariable("headers");
     if (customHeaders != null) {
-      customHeaders.forEach(headers::add);
+      customHeaders.entrySet().stream().filter(entry -> !headers.containsKey(entry.getKey()))
+          .forEach(entry -> headers.add(entry.getKey(), entry.getValue()));
     }
 
     return headers;
@@ -93,32 +99,34 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
     return Optional.ofNullable(map.get("x-access-token")).map(Object::toString);
   }
 
-  protected RuntimeException buildReadableException(RestClientResponseException ex) {
+  protected RuntimeException buildReadableException(RequestEntity<?> requestEntity,
+      RestClientResponseException ex) {
     var httpStatus = HttpStatus.valueOf(ex.getRawStatusCode());
-    if (Objects.equals(HttpStatus.UNPROCESSABLE_ENTITY, httpStatus) ||
-        Objects.equals(HttpStatus.NOT_FOUND, httpStatus)) {
-      log.info("Request to dataFactory returned result status {}, message - {}",
-          ex.getRawStatusCode(), ex.getMessage(), ex);
-
-      return validationException(ex.getResponseBodyAsString());
-    }
-
-    log.error("Request to dataFactory failed with status {}, message - {}",
-        ex.getRawStatusCode(), ex.getMessage(), ex);
-    return camundaSystemException(ex.getResponseBodyAsString());
+    var isValidationException = Objects.equals(HttpStatus.UNPROCESSABLE_ENTITY, httpStatus) ||
+        Objects.equals(HttpStatus.NOT_FOUND, httpStatus);
+    return buildException(requestEntity, ex, isValidationException);
   }
 
-  protected RuntimeException buildUpdatableException(RestClientResponseException ex) {
+  protected RuntimeException buildUpdatableException(RequestEntity<?> requestEntity,
+      RestClientResponseException ex) {
     var httpStatus = HttpStatus.valueOf(ex.getRawStatusCode());
-    if (Objects.equals(HttpStatus.UNPROCESSABLE_ENTITY, httpStatus)) {
-      log.info("Request to dataFactory returned result status {}, message - {}",
-          ex.getRawStatusCode(), ex.getMessage(), ex);
+    var isValidationException = Objects.equals(HttpStatus.UNPROCESSABLE_ENTITY, httpStatus);
+    return buildException(requestEntity, ex, isValidationException);
+  }
 
+  private RuntimeException buildException(RequestEntity<?> requestEntity,
+      RestClientResponseException ex, boolean isValidationException) {
+    log.debug("Request headers : {}", requestEntity.getHeaders());
+    log.debug("Request payload : {}", requestEntity.getBody());
+    log.debug("Response body : {}", ex.getResponseBodyAsString());
+    if (isValidationException) {
+      log.info("{} request to {} returned result status {}, message - {}",
+          requestEntity.getMethod(), requestEntity.getUrl(),
+          ex.getRawStatusCode(), ex.getMessage(), ex);
       return validationException(ex.getResponseBodyAsString());
     }
-
-    log.error("Request to dataFactory failed with status {}, message - {}",
-        ex.getRawStatusCode(), ex.getMessage(), ex);
+    log.error("{} request to {} failed with status {}, message - {}", requestEntity.getMethod(),
+        requestEntity.getUrl(), ex.getRawStatusCode(), ex.getMessage(), ex);
     return camundaSystemException(ex.getResponseBodyAsString());
   }
 

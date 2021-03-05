@@ -1,8 +1,10 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.camunda.delegate.connector;
 
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.spin.Spin;
 import org.camunda.spin.json.SpinJsonNode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.json.JacksonJsonParser;
@@ -23,33 +25,47 @@ import ua.gov.mdtu.ddm.lowcode.bpms.camunda.service.MessageResolver;
 public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelegate {
 
   private final String dataFactoryBaseUrl;
+  private final DigitalSignatureConnectorDelegate digitalSignatureConnectorDelegate;
+  private final CephService cephService;
+
+  private final String cephBucketName;
 
   public DataFactoryConnectorBatchCreateDelegate(RestTemplate restTemplate, CephService cephService,
       JacksonJsonParser jacksonJsonParser, MessageResolver messageResolver,
+      DigitalSignatureConnectorDelegate digitalSignatureConnectorDelegate,
       @Value("${spring.application.name}") String springAppName,
       @Value("${ceph.bucket}") String cephBucketName,
       @Value("${camunda.system-variables.const_dataFactoryBaseUrl}") String dataFactoryBaseUrl) {
     super(restTemplate, cephService, jacksonJsonParser, messageResolver, springAppName,
         cephBucketName);
     this.dataFactoryBaseUrl = dataFactoryBaseUrl;
+    this.digitalSignatureConnectorDelegate = digitalSignatureConnectorDelegate;
+    this.cephService = cephService;
+    this.cephBucketName = cephBucketName;
   }
 
   @Override
-  public void execute(DelegateExecution execution) throws Exception {
-    var resource = (String) execution.getVariable("resource");
-    var payload = (SpinJsonNode) execution.getVariable("payload");
+  public void execute(DelegateExecution execution) {
+    var resource = (String) execution.getVariable(RESOURCE_VARIABLE);
+    var payload = (SpinJsonNode) execution.getVariable(PAYLOAD_VARIABLE);
 
     var response = executeBatchCreateOperation(execution, payload, resource);
 
-    ((AbstractVariableScope) execution).setVariableLocalTransient("response", response);
+    ((AbstractVariableScope) execution).setVariableLocalTransient(RESPONSE_VARIABLE, response);
   }
 
-  private DataFactoryConnectorResponse executeBatchCreateOperation(
-      DelegateExecution execution,
+  private DataFactoryConnectorResponse executeBatchCreateOperation(DelegateExecution execution,
       SpinJsonNode payload, String resource) {
 
-    for (SpinJsonNode spinJsonNode : payload.elements()) {
+    var spinJsonNodes = payload.elements();
+    for (int nodeIndex = 0; nodeIndex < spinJsonNodes.size(); nodeIndex++) {
+      var spinJsonNode = spinJsonNodes.get(nodeIndex);
       var stringJsonNode = spinJsonNode.toString();
+
+      var systemSignature = signNode(execution, stringJsonNode);
+
+      putSignatureToCeph(execution, stringJsonNode, systemSignature, nodeIndex);
+
       log.debug("Post request to data factory, resource: {}, body: {}", resource, stringJsonNode);
       var response = performPost(execution, resource, stringJsonNode);
       log.debug("Response from data factory, code: {}, body: {}, headers: {}",
@@ -58,6 +74,31 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelega
     return DataFactoryConnectorResponse.builder()
         .statusCode(HttpStatus.CREATED.value())
         .build();
+  }
+
+  private void putSignatureToCeph(DelegateExecution execution, String stringJsonNode,
+      Object systemSignature, int nodeIndex) {
+    var cephSignatureMap = Map.of("data", stringJsonNode, "signature", systemSignature);
+    var cephContent = Spin.JSON(cephSignatureMap).toString();
+
+    var processInstanceId = execution.getProcessInstanceId();
+    var systemSignatureCephKey =
+        "lowcode_" + processInstanceId + "_system_signature_ceph_key_" + nodeIndex;
+    cephService.putContent(cephBucketName, systemSignatureCephKey, cephContent);
+    execution.setVariable("x_digital_signature_derived_ceph_key", systemSignatureCephKey);
+  }
+
+  private Object signNode(DelegateExecution execution, String stringJsonNode) {
+    var signRequestMap = Map.of("data", stringJsonNode);
+    var signRequestPayload = Spin.JSON(signRequestMap).toString();
+
+    execution.removeVariable(PAYLOAD_VARIABLE);
+    ((AbstractVariableScope) execution)
+        .setVariableLocalTransient(PAYLOAD_VARIABLE, signRequestPayload);
+    digitalSignatureConnectorDelegate.execute(execution);
+    var stringSystemSignature = execution.getVariable(RESPONSE_VARIABLE);
+    execution.removeVariable(RESPONSE_VARIABLE);
+    return Spin.JSON(stringSystemSignature).prop("signature").value();
   }
 
   private DataFactoryConnectorResponse performPost(DelegateExecution delegateExecution,
@@ -69,7 +110,7 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelega
     try {
       return perform(requestEntity);
     } catch (RestClientResponseException ex) {
-      throw buildUpdatableException(ex);
+      throw buildUpdatableException(requestEntity, ex);
     }
   }
 }

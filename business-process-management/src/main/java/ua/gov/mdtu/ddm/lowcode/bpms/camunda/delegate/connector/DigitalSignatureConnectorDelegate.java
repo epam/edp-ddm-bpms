@@ -34,11 +34,12 @@ public class DigitalSignatureConnectorDelegate extends BaseConnectorDelegate {
   }
 
   @Override
-  public void execute(DelegateExecution execution) throws Exception {
-    var payload = (String) execution.getVariable("payload");
+  public void execute(DelegateExecution execution) {
+    var payload = (String) execution.getVariable(PAYLOAD_VARIABLE);
     var response = performPost(execution, payload);
 
-    ((AbstractVariableScope) execution).setVariableLocalTransient("response", response.getResponseBody());
+    ((AbstractVariableScope) execution)
+        .setVariableLocalTransient(RESPONSE_VARIABLE, response.getResponseBody());
   }
 
   private DataFactoryConnectorResponse performPost(DelegateExecution execution, String body) {
@@ -47,7 +48,7 @@ public class DigitalSignatureConnectorDelegate extends BaseConnectorDelegate {
     try {
       return perform(requestEntity);
     } catch (RestClientResponseException ex) {
-      throw buildUpdatableException(ex);
+      throw buildUpdatableException(requestEntity, ex);
     }
   }
 

@@ -34,12 +34,12 @@ public class DataFactoryConnectorReadDelegate extends BaseConnectorDelegate {
 
   @Override
   public void execute(DelegateExecution execution) {
-    var resource = (String) execution.getVariable("resource");
-    var id = (String) execution.getVariable("id");
+    var resource = (String) execution.getVariable(RESOURCE_VARIABLE);
+    var id = (String) execution.getVariable(RESOURCE_ID_VARIABLE);
 
     var response = performGet(execution, resource, id);
 
-    ((AbstractVariableScope) execution).setVariableLocalTransient("response", response);
+    ((AbstractVariableScope) execution).setVariableLocalTransient(RESPONSE_VARIABLE, response);
   }
 
   private DataFactoryConnectorResponse performGet(DelegateExecution delegateExecution,
@@ -51,7 +51,7 @@ public class DataFactoryConnectorReadDelegate extends BaseConnectorDelegate {
     try {
       return perform(requestEntity);
     } catch (RestClientResponseException ex) {
-      throw buildReadableException(ex);
+      throw buildReadableException(requestEntity, ex);
     }
   }
 }

@@ -34,12 +34,12 @@ public class DataFactoryConnectorDeleteDelegate extends BaseConnectorDelegate {
 
   @Override
   public void execute(DelegateExecution execution) {
-    var resource = (String) execution.getVariable("resource");
-    var id = (String) execution.getVariable("id");
+    var resource = (String) execution.getVariable(RESOURCE_VARIABLE);
+    var id = (String) execution.getVariable(RESOURCE_ID_VARIABLE);
 
     var response = performDelete(execution, resource, id);
 
-    ((AbstractVariableScope) execution).setVariableLocalTransient("response", response);
+    ((AbstractVariableScope) execution).setVariableLocalTransient(RESPONSE_VARIABLE, response);
   }
 
   private DataFactoryConnectorResponse performDelete(DelegateExecution delegateExecution,
@@ -51,7 +51,7 @@ public class DataFactoryConnectorDeleteDelegate extends BaseConnectorDelegate {
     try {
       return perform(requestEntity);
     } catch (RestClientResponseException ex) {
-      throw buildUpdatableException(ex);
+      throw buildUpdatableException(requestEntity, ex);
     }
   }
 }

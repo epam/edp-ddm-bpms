@@ -20,6 +20,7 @@ import ua.gov.mdtu.ddm.lowcode.bpms.camunda.service.MessageResolver;
 @Logging
 public class DataFactoryConnectorSearchDelegate extends BaseConnectorDelegate {
 
+  protected static final String SEARCH_CONDITIONS_VARIABLE = "searchConditions";
   private final String dataFactoryBaseUrl;
 
   @Autowired
@@ -36,12 +37,12 @@ public class DataFactoryConnectorSearchDelegate extends BaseConnectorDelegate {
   @Override
   @SuppressWarnings("unchecked")
   public void execute(DelegateExecution execution) {
-    var resource = (String) execution.getVariable("resource");
-    var searchConditions = (Map<String, String>) execution.getVariable("searchConditions");
+    var resource = (String) execution.getVariable(RESOURCE_VARIABLE);
+    var searchConditions = (Map<String, String>) execution.getVariable(SEARCH_CONDITIONS_VARIABLE);
 
     var response = performSearch(execution, resource, searchConditions);
 
-    ((AbstractVariableScope) execution).setVariableLocalTransient("response", response);
+    ((AbstractVariableScope) execution).setVariableLocalTransient(RESPONSE_VARIABLE, response);
   }
 
   private DataFactoryConnectorResponse performSearch(DelegateExecution delegateExecution,
@@ -57,7 +58,7 @@ public class DataFactoryConnectorSearchDelegate extends BaseConnectorDelegate {
     try {
       return perform(requestEntity);
     } catch (RestClientResponseException ex) {
-      throw buildUpdatableException(ex);
+      throw buildUpdatableException(requestEntity, ex);
     }
   }
 }
