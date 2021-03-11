@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ErrorDetailsDto {
 
-  private List<ValidationErrorDto> validationErrors;
+  private List<ValidationErrorDto> errors;
 }

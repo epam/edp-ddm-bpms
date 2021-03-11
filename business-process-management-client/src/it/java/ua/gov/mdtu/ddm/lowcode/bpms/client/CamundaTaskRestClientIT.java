@@ -219,8 +219,8 @@ public class CamundaTaskRestClientIT extends BaseIT {
   @Test
   public void shouldReturn422DuringTaskCompletion() throws JsonProcessingException {
     var details = new ErrorDetailsDto();
-    details.setValidationErrors(Lists.newArrayList(new ValidationErrorDto("test msg",
-        Maps.newHashMap("key1", "val1"))));
+    details.setErrors(Lists.newArrayList(new ValidationErrorDto("test msg",
+        "key1", "val1")));
     var errorDto422 = UserDataValidationErrorDto.builder().details(details).build();
     restClientWireMock.addStubMapping(
         stubFor(post(urlPathEqualTo("/api/task/taskId/complete"))
@@ -235,9 +235,11 @@ public class CamundaTaskRestClientIT extends BaseIT {
     var exception = assertThrows(UserDataValidationException.class,
         () -> camundaTaskRestClient.completeTaskById("taskId", completeTaskDto));
 
-    assertThat(exception.getError().getDetails().getValidationErrors().get(0).getMessage())
+    assertThat(exception.getDetails().getErrors().get(0).getMessage())
         .isEqualTo("test msg");
-    assertThat(exception.getError().getDetails().getValidationErrors().get(0).getContext())
-        .containsEntry("key1", "val1");
+    assertThat(exception.getDetails().getErrors().get(0).getField())
+        .isEqualTo("key1");
+    assertThat(exception.getDetails().getErrors().get(0).getValue())
+        .isEqualTo("val1");
   }
 }

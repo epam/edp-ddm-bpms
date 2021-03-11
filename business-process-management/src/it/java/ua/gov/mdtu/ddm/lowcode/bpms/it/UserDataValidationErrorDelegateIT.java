@@ -28,15 +28,18 @@ public class UserDataValidationErrorDelegateIT extends BaseIT {
     assertThat(ex.getErrorDto()).isNotNull();
     UserDataValidationErrorDto errorDto = ex.getErrorDto();
     assertThat(errorDto.getDetails()).isNotNull();
-    assertThat(errorDto.getDetails().getValidationErrors()).isNotEmpty();
-    List<ValidationErrorDto> validationErrors = errorDto.getDetails().getValidationErrors();
+    assertThat(errorDto.getDetails().getErrors()).isNotEmpty();
+    List<ValidationErrorDto> validationErrors = errorDto.getDetails().getErrors();
     assertThat(validationErrors).hasSize(2);
 
     ValidationErrorDto validationErrorDto1 = validationErrors.get(0);
     assertThat(validationErrorDto1.getMessage()).isEqualTo("test message");
-    assertThat(validationErrorDto1.getContext().get("variable1")).isEqualTo("value1");
+    assertThat(validationErrorDto1.getField()).isEqualTo("taxPayerId");
+    assertThat(validationErrorDto1.getValue()).isEqualTo("value");
+
     ValidationErrorDto validationErrorDto2 = validationErrors.get(1);
     assertThat(validationErrorDto2.getMessage()).isEqualTo("test message2");
-    assertThat(validationErrorDto2.getContext().get("variable2")).isEqualTo("value2");
+    assertThat(validationErrorDto2.getField()).isEqualTo("taxPayerId2");
+    assertThat(validationErrorDto2.getValue()).isEqualTo("value2");
   }
 }

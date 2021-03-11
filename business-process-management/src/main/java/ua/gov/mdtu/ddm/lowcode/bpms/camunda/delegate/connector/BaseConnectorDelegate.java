@@ -151,12 +151,8 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
 
     var userDataValidationErrorDto = new UserDataValidationErrorDto();
     userDataValidationErrorDto.setTraceId(traceId);
-    userDataValidationErrorDto.setType(code);
+    userDataValidationErrorDto.setCode(code);
     userDataValidationErrorDto.setMessage("Validation error");
-
-    var dataFactoryError = DataFactoryError.fromNameOrDefaultRuntimeError(code);
-    var localizedMessage = messageResolver.getMessage(dataFactoryError.getTitleKey());
-    userDataValidationErrorDto.setLocalizedMessage(localizedMessage);
 
     var details = (Map<String, Object>) responseMap.get("details");
     if (details == null) {
@@ -178,10 +174,11 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
 
       var validationErrorDto = new ValidationErrorDto();
       validationErrorDto.setMessage(message);
-      validationErrorDto.setContext(Map.of(field, value));
+      validationErrorDto.setField(field);
+      validationErrorDto.setValue(value);
       return validationErrorDto;
     }).collect(Collectors.toList());
-    errorDetailDto.setValidationErrors(validationErrorDtos);
+    errorDetailDto.setErrors(validationErrorDtos);
     userDataValidationErrorDto.setDetails(errorDetailDto);
     return new UserDataValidationException(userDataValidationErrorDto);
   }

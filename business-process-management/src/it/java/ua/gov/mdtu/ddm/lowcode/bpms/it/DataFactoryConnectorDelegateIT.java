@@ -71,9 +71,8 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
 
     assertThat(ex.getErrorDto()).isNotNull();
     assertThat(ex.getErrorDto().getTraceId()).isEqualTo("traceId1");
-    assertThat(ex.getErrorDto().getType()).isEqualTo("NOT_FOUND");
+    assertThat(ex.getErrorDto().getCode()).isEqualTo("NOT_FOUND");
     assertThat(ex.getErrorDto().getMessage()).isEqualTo("Validation error");
-    assertThat(ex.getErrorDto().getLocalizedMessage()).isEqualTo("Ресурс не знайдено");
     assertThat(ex.getErrorDto().getDetails()).isNull();
   }
 
@@ -95,16 +94,16 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
 
     assertThat(ex.getErrorDto()).isNotNull();
     assertThat(ex.getErrorDto().getTraceId()).isEqualTo("traceId1");
-    assertThat(ex.getErrorDto().getType()).isEqualTo("VALIDATION_ERROR");
+    assertThat(ex.getErrorDto().getCode()).isEqualTo("VALIDATION_ERROR");
     assertThat(ex.getErrorDto().getMessage()).isEqualTo("Validation error");
-    assertThat(ex.getErrorDto().getLocalizedMessage())
-        .isEqualTo("Значення змінної не відповідає правилам вказаним в домені");
     assertThat(ex.getErrorDto().getDetails()).isNotNull();
-    assertThat(ex.getErrorDto().getDetails().getValidationErrors()).hasSize(1);
-    assertThat(ex.getErrorDto().getDetails().getValidationErrors().get(0).getMessage())
+    assertThat(ex.getErrorDto().getDetails().getErrors()).hasSize(1);
+    assertThat(ex.getErrorDto().getDetails().getErrors().get(0).getMessage())
         .isEqualTo("message1");
-    assertThat(ex.getErrorDto().getDetails().getValidationErrors().get(0).getContext())
-        .containsEntry("field1", "value1");
+    assertThat(ex.getErrorDto().getDetails().getErrors().get(0).getField())
+        .isEqualTo("field1");
+    assertThat(ex.getErrorDto().getDetails().getErrors().get(0).getValue())
+        .isEqualTo("value1");
   }
 
   @Test
@@ -181,16 +180,16 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
 
     assertThat(ex.getErrorDto()).isNotNull();
     assertThat(ex.getErrorDto().getTraceId()).isEqualTo("traceId1");
-    assertThat(ex.getErrorDto().getType()).isEqualTo("VALIDATION_ERROR");
+    assertThat(ex.getErrorDto().getCode()).isEqualTo("VALIDATION_ERROR");
     assertThat(ex.getErrorDto().getMessage()).isEqualTo("Validation error");
-    assertThat(ex.getErrorDto().getLocalizedMessage())
-        .isEqualTo("Значення змінної не відповідає правилам вказаним в домені");
     assertThat(ex.getErrorDto().getDetails()).isNotNull();
-    assertThat(ex.getErrorDto().getDetails().getValidationErrors()).hasSize(1);
-    assertThat(ex.getErrorDto().getDetails().getValidationErrors().get(0).getMessage())
+    assertThat(ex.getErrorDto().getDetails().getErrors()).hasSize(1);
+    assertThat(ex.getErrorDto().getDetails().getErrors().get(0).getMessage())
         .isEqualTo("message1");
-    assertThat(ex.getErrorDto().getDetails().getValidationErrors().get(0).getContext())
-        .containsEntry("field1", "value1");
+    assertThat(ex.getErrorDto().getDetails().getErrors().get(0).getField())
+        .isEqualTo("field1");
+    assertThat(ex.getErrorDto().getDetails().getErrors().get(0).getValue())
+        .isEqualTo("value1");
   }
 
   @Test

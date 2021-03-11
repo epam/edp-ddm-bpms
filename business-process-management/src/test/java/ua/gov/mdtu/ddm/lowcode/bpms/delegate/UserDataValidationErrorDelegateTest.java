@@ -35,6 +35,6 @@ public class UserDataValidationErrorDelegateTest {
 
     assertThat(exception.getErrorDto()).isNotNull();
     assertThat(exception.getErrorDto().getDetails()).isNotNull();
-    assertThat(exception.getErrorDto().getDetails().getValidationErrors()).isEmpty();
+    assertThat(exception.getErrorDto().getDetails().getErrors()).isEmpty();
   }
 }

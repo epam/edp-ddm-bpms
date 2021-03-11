@@ -11,9 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserDataValidationErrorDto {
 
-  private String type;
-  private String message;
   private String traceId;
-  private String localizedMessage;
+  private String message;
+  private String code;
   private ErrorDetailsDto details;
 }
