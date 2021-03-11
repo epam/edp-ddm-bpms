@@ -26,3 +26,5 @@ ceph:
 
 monitoring:
   namespace: openshift-monitoring
+
+javaOpts: "-Duser.timezone=UTC"
