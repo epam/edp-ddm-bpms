@@ -1,7 +1,6 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector;
 
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.spin.Spin;
@@ -21,7 +20,6 @@ import ua.gov.mdtu.ddm.lowcode.bpms.service.MessageResolver;
 
 @Component("dataFactoryConnectorBatchCreateDelegate")
 @Logging
-@Slf4j
 public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelegate {
 
   private final String dataFactoryBaseUrl;
@@ -66,10 +64,7 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelega
 
       putSignatureToCeph(execution, stringJsonNode, systemSignature, nodeIndex);
 
-      log.debug("Post request to data factory, resource: {}, body: {}", resource, stringJsonNode);
-      var response = performPost(execution, resource, stringJsonNode);
-      log.debug("Response from data factory, code: {}, body: {}, headers: {}",
-          response.getStatusCode(), response.getResponseBody(), response.getHeaders());
+      performPost(execution, resource, stringJsonNode);
     }
     return DataFactoryConnectorResponse.builder()
         .statusCode(HttpStatus.CREATED.value())
@@ -101,14 +96,13 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelega
     return Spin.JSON(stringSystemSignature).prop("signature").value();
   }
 
-  private DataFactoryConnectorResponse performPost(DelegateExecution delegateExecution,
-      String resourceName, String body) {
+  private void performPost(DelegateExecution delegateExecution, String resourceName, String body) {
     var uri = UriComponentsBuilder.fromHttpUrl(dataFactoryBaseUrl).pathSegment(resourceName).build()
         .toUri();
 
     var requestEntity = RequestEntity.post(uri).headers(getHeaders(delegateExecution)).body(body);
     try {
-      return perform(requestEntity);
+      perform(requestEntity);
     } catch (RestClientResponseException ex) {
       throw buildUpdatableException(requestEntity, ex);
     }

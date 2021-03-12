@@ -15,6 +15,7 @@ import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import ua.gov.mdtu.ddm.general.integration.ceph.service.CephService;
@@ -46,8 +47,7 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
   protected DataFactoryConnectorResponse perform(RequestEntity<?> requestEntity) {
     var httpResponse = restTemplate.exchange(requestEntity, String.class);
 
-    log.info("Successfully sent {} request to {}", requestEntity.getMethod(),
-        requestEntity.getUrl());
+    logSuccessfulRequest(requestEntity, httpResponse);
 
     return DataFactoryConnectorResponse.builder()
         .statusCode(httpResponse.getStatusCode().value())
@@ -116,18 +116,9 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
 
   private RuntimeException buildException(RequestEntity<?> requestEntity,
       RestClientResponseException ex, boolean isValidationException) {
-    log.debug("Request headers : {}", requestEntity.getHeaders());
-    log.debug("Request payload : {}", requestEntity.getBody());
-    log.debug("Response body : {}", ex.getResponseBodyAsString());
-    if (isValidationException) {
-      log.info("{} request to {} returned result status {}, message - {}",
-          requestEntity.getMethod(), requestEntity.getUrl(),
-          ex.getRawStatusCode(), ex.getMessage(), ex);
-      return validationException(ex.getResponseBodyAsString());
-    }
-    log.error("{} request to {} failed with status {}, message - {}", requestEntity.getMethod(),
-        requestEntity.getUrl(), ex.getRawStatusCode(), ex.getMessage(), ex);
-    return camundaSystemException(ex.getResponseBodyAsString());
+    logExceptionRequest(requestEntity, ex, isValidationException);
+    return isValidationException ? validationException(ex.getResponseBodyAsString())
+        : camundaSystemException(ex.getResponseBodyAsString());
   }
 
   private CamundaSystemException camundaSystemException(String responseBody) {
@@ -181,5 +172,38 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
     errorDetailDto.setErrors(validationErrorDtos);
     userDataValidationErrorDto.setDetails(errorDetailDto);
     return new UserDataValidationException(userDataValidationErrorDto);
+  }
+
+  private void logSuccessfulRequest(RequestEntity<?> request, ResponseEntity<?> response) {
+    if (log.isDebugEnabled()) {
+      log.debug("{} request to {} with request payload - {} and headers - {} "
+              + "returned {} status code with response body - {}",
+          request.getMethod(), request.getUrl(), request.getBody(), request.getHeaders(),
+          response.getStatusCode(), response.getBody());
+      return;
+    }
+    log.info("{} request to {} returned {} status code", request.getMethod(), request.getUrl(),
+        response.getStatusCode());
+  }
+
+  private void logExceptionRequest(RequestEntity<?> requestEntity,
+      RestClientResponseException ex, boolean isValidationException) {
+    if (log.isDebugEnabled()) {
+      log.debug("{} request to {} with request payload - {} and headers - {} "
+              + "returned {} status code with message - {} and response body - {}",
+          requestEntity.getMethod(), requestEntity.getUrl(), requestEntity.getBody(),
+          requestEntity.getHeaders(), ex.getRawStatusCode(), ex.getMessage(),
+          ex.getResponseBodyAsString());
+      return;
+    }
+    if (isValidationException) {
+      log.info("{} request to {} returned {} status code with message - {}",
+          requestEntity.getMethod(), requestEntity.getUrl(), ex.getRawStatusCode(),
+          ex.getMessage());
+    } else {
+      log.error("{} request to {} returned {} status code with message - {}",
+          requestEntity.getMethod(), requestEntity.getUrl(), ex.getRawStatusCode(),
+          ex.getMessage());
+    }
   }
 }
