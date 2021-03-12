@@ -11,6 +11,8 @@ camundaVarsMountPath: "/app/config/camunda"
 appSecretsMountPath: "/app/secrets/main"
 cephSecretMountPath: "/app/secrets/ceph"
 prometheusScrapePath: "/actuator/prometheus"
+readinessPath: "/actuator/health/readiness"
+livenessPath: "/actuator/health/liveness"
 
 db:
   url: citus-master
