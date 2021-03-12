@@ -21,7 +21,7 @@ import ua.gov.mdtu.ddm.lowcode.bpms.exception.UserDataValidationException;
 @RequiredArgsConstructor
 public class UserDataValidationErrorDelegate implements JavaDelegate {
 
-  private static final String VAR_VALIDATION_ERRORS = "errors";
+  private static final String VAR_VALIDATION_ERRORS = "validationErrors";
 
   private final ObjectMapper objectMapper;
 

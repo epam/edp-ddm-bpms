@@ -12,7 +12,7 @@
     <bpmn:serviceTask id="Activity_1h4lusc" name="Business Validation Error Delegate" camunda:delegateExpression="#{userDataValidationErrorDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="errors">
+          <camunda:inputParameter name="validationErrors">
             <camunda:list>
               <camunda:value>{"value": "value", "field": "taxPayerId", "message": "test message"} </camunda:value>
               <camunda:value>{"value": "value2", "field": "taxPayerId2", "message": "test message2"} </camunda:value>
