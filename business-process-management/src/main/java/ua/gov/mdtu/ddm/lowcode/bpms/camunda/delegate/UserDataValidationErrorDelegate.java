@@ -48,6 +48,7 @@ public class UserDataValidationErrorDelegate implements JavaDelegate {
   private UserDataValidationErrorDto createUserDataValidationErrorDto(
       List<ValidationErrorDto> validationErrorDtos) {
     return UserDataValidationErrorDto.builder()
+        .message("Validation error")
         .details(new ErrorDetailsDto(validationErrorDtos))
         .build();
   }
