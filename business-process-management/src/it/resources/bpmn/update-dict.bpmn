@@ -20,7 +20,7 @@
       </bpmn:dataInputAssociation>
     </bpmn:serviceTask>
     <bpmn:dataStoreReference id="DataStoreReference_07leer0" name="Дата Фабрика" />
-    <bpmn:serviceTask id="Activity_06hhc0f" name="Пошук запису довідника" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
+    <bpmn:serviceTask id="Activity_06hhc0f" name="Пошук запису довідника" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="resource">factor-equal-factor-type-name-count</camunda:inputParameter>
@@ -53,13 +53,9 @@
         <bpmn:targetRef>DataObjectReference_0wkk4pu</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
       <bpmn:script>import static org.camunda.spin.Spin.JSON
-import org.camunda.bpm.engine.variable.Variables
 
 var formData = JSON(formDataOutput).prop("data")
-
-var name = formData.prop("name").prop("value").stringValue()
-
-return name</bpmn:script>
+var name = formData.prop("name").value()</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataStoreReference id="DataStoreReference_1kvphtn" name="Ceph" />
     <bpmn:exclusiveGateway id="Gateway_0citdqv" name="Запис довідника присутній?">
@@ -103,28 +99,22 @@ return !JSON(response.responseBody).elements().isEmpty()</bpmn:conditionExpressi
 
 return JSON(response.responseBody).elements().isEmpty()</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:scriptTask id="Activity_05txg3g" name="Підготовка даних для запису (transient var)" scriptFormat="groovy" camunda:resultVariable="dataPayload">
+    <bpmn:scriptTask id="Activity_05txg3g" name="Підготовка даних для запису (transient var)" scriptFormat="groovy">
       <bpmn:incoming>Flow_0bp8bjr</bpmn:incoming>
       <bpmn:outgoing>Flow_01w68ny</bpmn:outgoing>
-      <bpmn:script>import org.camunda.bpm.engine.variable.Variables
-
-import static org.camunda.spin.Spin.JSON
+      <bpmn:script>import static org.camunda.spin.Spin.JSON
 
 var formData = JSON(signedFormDataOutput).prop("data")
-var requestMap = [:]
 
-for (var name : formData.fieldNames()) {
-    requestMap[name] = formData.prop(name).prop("value").value()
-}
+formData.prop("factorType", "Хімічний: довільні")
 
-requestMap["factorType"] = "Хімічний: довільні"
+var dataPayload = formData.toString()
+execution.removeVariable("dataPayload")
+execution.setVariableLocalTransient("dataPayload", dataPayload)
 
-var dataPayload = Variables.stringValue(JSON(requestMap).toString(), true)
-
-var keyObj = ["data":dataPayload.value]
-execution.setVariable("dataKeyPayload", JSON(keyObj).toString())
-
-return dataPayload</bpmn:script>
+var keyObj = ["data":dataPayload ]
+execution.removeVariable("dataKeyPayload")
+execution.setVariableLocalTransient("dataKeyPayload", JSON(keyObj).toString())</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="Activity_0800121" name="Читання документа форми за ключем (transient var)" camunda:modelerTemplate="getFormDataFromCephDelegate" camunda:delegateExpression="${getFormDataFromCephDelegate}">
       <bpmn:extensionElements>
@@ -155,7 +145,7 @@ return dataPayload</bpmn:script>
         <bpmn:targetRef>DataStoreReference_0a6awxo</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
     </bpmn:serviceTask>
-    <bpmn:scriptTask id="Activity_0lh18ys" name="Підготовка даних для запису системного підпису" scriptFormat="groovy" camunda:resultVariable="systemSignaturePayload">
+    <bpmn:scriptTask id="Activity_0lh18ys" name="Підготовка даних для запису системного підпису" scriptFormat="groovy">
       <bpmn:incoming>Flow_07zg8yf</bpmn:incoming>
       <bpmn:outgoing>Flow_0qg15nl</bpmn:outgoing>
       <bpmn:script>import static org.camunda.spin.Spin.JSON
@@ -166,8 +156,8 @@ execution.setVariable("system_signature_ceph_key", "lowcode_${processInstanceId}
 var systemSignature = JSON(systemSignatureResponse).prop("signature").value()
 
 var cephObj = ["data":dataPayload, "signature":systemSignature]
-
-return JSON(cephObj).toString()</bpmn:script>
+execution.removeVariable("systemSignaturePayload")
+execution.setVariableLocalTransient("systemSignaturePayload", JSON(cephObj).toString())</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="Activity_0nio3tp" name="Запис системного підпису" camunda:modelerTemplate="putContentToCephDelegate" camunda:delegateExpression="${putContentToCephDelegate}">
       <bpmn:extensionElements>
@@ -247,7 +237,7 @@ return JSON(cephObj).toString()</bpmn:script>
     <bpmn:sequenceFlow id="Flow_05zp6us" sourceRef="Activity_0nio3tp" targetRef="Activity_0vxmbqo" />
     <bpmn:sequenceFlow id="Flow_0qqmlc5" sourceRef="Activity_0vxmbqo" targetRef="Activity_036b0c0" />
     <bpmn:sequenceFlow id="Flow_1d7odkh" sourceRef="Activity_036b0c0" targetRef="Event_09njj7c" />
-    <bpmn:serviceTask id="Activity_147fj7o" name="Формування помилки" camunda:delegateExpression="${userDataValidationErrorDelegate}">
+    <bpmn:serviceTask id="Activity_147fj7o" name="Формування помилки" camunda:modelerTemplate="userDataValidationErrorDelegate" camunda:delegateExpression="${userDataValidationErrorDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="validationErrors">
@@ -267,6 +257,47 @@ return JSON(cephObj).toString()</bpmn:script>
       <bpmndi:BPMNShape id="Participant_099v9ei_di" bpmnElement="Participant_099v9ei" isHorizontal="true">
         <dc:Bounds x="160" y="60" width="2200" height="650" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0fxiobg_di" bpmnElement="Flow_0fxiobg">
+        <di:waypoint x="720" y="530" />
+        <di:waypoint x="337" y="530" />
+        <di:waypoint x="337" y="315" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1d7odkh_di" bpmnElement="Flow_1d7odkh">
+        <di:waypoint x="2230" y="290" />
+        <di:waypoint x="2272" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qqmlc5_di" bpmnElement="Flow_0qqmlc5">
+        <di:waypoint x="2090" y="290" />
+        <di:waypoint x="2130" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_05zp6us_di" bpmnElement="Flow_05zp6us">
+        <di:waypoint x="1960" y="290" />
+        <di:waypoint x="1990" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qg15nl_di" bpmnElement="Flow_0qg15nl">
+        <di:waypoint x="1820" y="290" />
+        <di:waypoint x="1860" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07zg8yf_di" bpmnElement="Flow_07zg8yf">
+        <di:waypoint x="1700" y="290" />
+        <di:waypoint x="1720" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ui5pdc_di" bpmnElement="Flow_1ui5pdc">
+        <di:waypoint x="1150" y="290" />
+        <di:waypoint x="1190" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12lktg1_di" bpmnElement="Flow_12lktg1">
+        <di:waypoint x="1290" y="290" />
+        <di:waypoint x="1330" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_01w68ny_di" bpmnElement="Flow_01w68ny">
+        <di:waypoint x="1570" y="290" />
+        <di:waypoint x="1600" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0bp8bjr_di" bpmnElement="Flow_0bp8bjr">
+        <di:waypoint x="1430" y="290" />
+        <di:waypoint x="1470" y="290" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_003wsie_di" bpmnElement="Flow_003wsie">
         <di:waypoint x="1005" y="290" />
         <di:waypoint x="1050" y="290" />
@@ -305,47 +336,6 @@ return JSON(cephObj).toString()</bpmn:script>
       <bpmndi:BPMNEdge id="Flow_0wpj7a7_di" bpmnElement="Flow_0wpj7a7">
         <di:waypoint x="910" y="290" />
         <di:waypoint x="955" y="290" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0bp8bjr_di" bpmnElement="Flow_0bp8bjr">
-        <di:waypoint x="1430" y="290" />
-        <di:waypoint x="1470" y="290" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_01w68ny_di" bpmnElement="Flow_01w68ny">
-        <di:waypoint x="1570" y="290" />
-        <di:waypoint x="1600" y="290" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_12lktg1_di" bpmnElement="Flow_12lktg1">
-        <di:waypoint x="1290" y="290" />
-        <di:waypoint x="1330" y="290" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1ui5pdc_di" bpmnElement="Flow_1ui5pdc">
-        <di:waypoint x="1150" y="290" />
-        <di:waypoint x="1190" y="290" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_07zg8yf_di" bpmnElement="Flow_07zg8yf">
-        <di:waypoint x="1700" y="290" />
-        <di:waypoint x="1720" y="290" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0qg15nl_di" bpmnElement="Flow_0qg15nl">
-        <di:waypoint x="1820" y="290" />
-        <di:waypoint x="1860" y="290" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_05zp6us_di" bpmnElement="Flow_05zp6us">
-        <di:waypoint x="1960" y="290" />
-        <di:waypoint x="1990" y="290" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0qqmlc5_di" bpmnElement="Flow_0qqmlc5">
-        <di:waypoint x="2090" y="290" />
-        <di:waypoint x="2130" y="290" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1d7odkh_di" bpmnElement="Flow_1d7odkh">
-        <di:waypoint x="2230" y="290" />
-        <di:waypoint x="2272" y="290" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0fxiobg_di" bpmnElement="Flow_0fxiobg">
-        <di:waypoint x="720" y="530" />
-        <di:waypoint x="337" y="530" />
-        <di:waypoint x="337" y="315" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_0aip2n2_di" bpmnElement="Activity_0bi5s5f">
         <dc:Bounds x="540" y="250" width="100" height="80" />
@@ -473,23 +463,23 @@ return JSON(cephObj).toString()</bpmn:script>
         <di:waypoint x="1380" y="425" />
         <di:waypoint x="1380" y="330" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="DataOutputAssociation_0kqo9f4_di" bpmnElement="DataOutputAssociation_0kqo9f4">
-        <di:waypoint x="1240" y="330" />
-        <di:waypoint x="1240" y="425" />
-        <di:waypoint x="1285" y="425" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="DataOutputAssociation_0gbd6vc_di" bpmnElement="DataOutputAssociation_0gbd6vc">
         <di:waypoint x="1100" y="330" />
         <di:waypoint x="1100" y="395" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="DataOutputAssociation_0hvrm1e_di" bpmnElement="DataOutputAssociation_0hvrm1e">
-        <di:waypoint x="2040" y="330" />
-        <di:waypoint x="2040" y="395" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="DataInputAssociation_0syuatq_di" bpmnElement="DataInputAssociation_0syuatq">
         <di:waypoint x="1125" y="420" />
         <di:waypoint x="1220" y="420" />
         <di:waypoint x="1220" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_0kqo9f4_di" bpmnElement="DataOutputAssociation_0kqo9f4">
+        <di:waypoint x="1240" y="330" />
+        <di:waypoint x="1240" y="425" />
+        <di:waypoint x="1285" y="425" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_0hvrm1e_di" bpmnElement="DataOutputAssociation_0hvrm1e">
+        <di:waypoint x="2040" y="330" />
+        <di:waypoint x="2040" y="395" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

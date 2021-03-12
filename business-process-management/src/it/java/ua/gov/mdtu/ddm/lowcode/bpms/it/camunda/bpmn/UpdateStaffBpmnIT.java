@@ -12,7 +12,7 @@ import ua.gov.mdtu.ddm.lowcode.bpms.it.builder.StubData;
 public class UpdateStaffBpmnIT extends BaseBpmnIT {
 
   @Test
-  @Deployment(resources = {"bpmn/update-personnel-bp.bpmn"})
+  @Deployment(resources = {"bpmn/update-personnel.bpmn"})
   public void test() throws IOException {
 
     stubDataFactoryRead(StubData.builder()

@@ -39,17 +39,17 @@ public class AddLabBpmnTest extends BaseBpmnTest {
         .response("{}")
         .build());
 
-    ProcessInstance processInstance = runtimeService().startProcessInstanceByKey("add-lab-key");
+    ProcessInstance processInstance = runtimeService().startProcessInstanceByKey("add-lab");
     assertThat(processInstance).isStarted();
 
     //Внести дані про лабораторію
-    assertThat(processInstance).isWaitingAt("Activity_1ne2ryq");
-    completeTask("Activity_1ne2ryq", "/json/add-lab/Activity_1ne2ryq.json", processInstance.getId());
+    assertThat(processInstance).isWaitingAt("addLabFormActivity");
+    completeTask("addLabFormActivity", "/json/add-lab/Activity_1ne2ryq.json", processInstance.getId());
     //Підписати дані КЕП
-    assertThat(processInstance).isWaitingAt("Activity_0s05qmu");
-    completeTask("Activity_0s05qmu", "/json/add-lab/Activity_0s05qmu.json", processInstance.getId());
+    assertThat(processInstance).isWaitingAt("signLabFormActivity");
+    completeTask("signLabFormActivity", "/json/add-lab/Activity_0s05qmu.json", processInstance.getId());
 
-    assertThat(processInstance).hasPassed("Activity_1ne2ryq", "Activity_0s05qmu").isEnded();
+    assertThat(processInstance).hasPassed("addLabFormActivity", "signLabFormActivity").isEnded();
   }
 
 }

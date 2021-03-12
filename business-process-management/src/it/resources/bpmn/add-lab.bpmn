@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0cjpvm2" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
   <bpmn:collaboration id="Collaboration_0pn1cv8">
-    <bpmn:participant id="Participant_02zjlbh" name="Створення лабораторії" processRef="add-lab-key" />
+    <bpmn:participant id="Participant_02zjlbh" name="Створення лабораторії" processRef="add-lab" />
   </bpmn:collaboration>
-  <bpmn:process id="add-lab-key" name="Створення лабораторії" isExecutable="true">
-    <bpmn:sequenceFlow id="Flow_05s9076" sourceRef="Activity_09b9xcv" targetRef="Activity_1w3vw9u" />
-    <bpmn:sequenceFlow id="Flow_0shjvt5" sourceRef="Activity_1w497bf" targetRef="Activity_09b9xcv" />
-    <bpmn:sequenceFlow id="Flow_0i7crn5" sourceRef="Activity_1c1se7a" targetRef="Event_0llb5w6" />
-    <bpmn:sequenceFlow id="Flow_06zm02c" sourceRef="Activity_1amsqo0" targetRef="Activity_1ap9x8j" />
-    <bpmn:sequenceFlow id="Flow_18e8iv6" sourceRef="Activity_0s05qmu" targetRef="Activity_1amsqo0" />
-    <bpmn:sequenceFlow id="Flow_1so9oif" sourceRef="Activity_0570xco" targetRef="Gateway_1ohrijf" />
-    <bpmn:sequenceFlow id="Flow_0n9venr" sourceRef="Activity_1ne2ryq" targetRef="Activity_15o5gqa" />
+  <bpmn:process id="add-lab" name="Створення лабораторії" isExecutable="true">
+    <bpmn:sequenceFlow id="Flow_05s9076" sourceRef="putSystemSignatureToCephActivity" targetRef="sendLabToDataFactoryActivity" />
+    <bpmn:sequenceFlow id="Flow_0shjvt5" sourceRef="extractSignatureAndDataActivity" targetRef="putSystemSignatureToCephActivity" />
+    <bpmn:sequenceFlow id="Flow_0i7crn5" sourceRef="defineBusinessProcessStatusActivity" targetRef="Event_0llb5w6" />
+    <bpmn:sequenceFlow id="Flow_06zm02c" sourceRef="readSignLabFormFromCephActivity" targetRef="convertSignFormDataToDataFactoryFormatActivity" />
+    <bpmn:sequenceFlow id="Flow_18e8iv6" sourceRef="signLabFormActivity" targetRef="readSignLabFormFromCephActivity" />
+    <bpmn:sequenceFlow id="Flow_1so9oif" sourceRef="prepopulateSignLabFormActivity" targetRef="Gateway_1ohrijf" />
+    <bpmn:sequenceFlow id="Flow_0n9venr" sourceRef="addLabFormActivity" targetRef="readAddLabFormCephActivity" />
     <bpmn:sequenceFlow id="Flow_16mq6s1" sourceRef="Event_1dh8s72" targetRef="Gateway_1bx958j" />
-    <bpmn:sequenceFlow id="Flow_157otpm" sourceRef="Activity_15o5gqa" targetRef="Activity_04xojib" />
-    <bpmn:sequenceFlow id="Flow_02sxz24" sourceRef="Activity_1w3vw9u" targetRef="Activity_1c1se7a" />
+    <bpmn:sequenceFlow id="Flow_157otpm" sourceRef="readAddLabFormCephActivity" targetRef="extractNameAndEdrpouFromAddLabFormActivity" />
+    <bpmn:sequenceFlow id="Flow_02sxz24" sourceRef="sendLabToDataFactoryActivity" targetRef="defineBusinessProcessStatusActivity" />
     <bpmn:sequenceFlow id="Flow_0bjiays" sourceRef="Event_0e6oefg" targetRef="Gateway_1ohrijf" />
-    <bpmn:sequenceFlow id="Flow_0cmv72h" sourceRef="Gateway_1ohrijf" targetRef="Activity_0s05qmu" />
-    <bpmn:sequenceFlow id="Flow_1ncj0s9" sourceRef="Activity_04xojib" targetRef="Activity_0fwtr4o" />
-    <bpmn:sequenceFlow id="Flow_0cmz6jl" sourceRef="Activity_0fwtr4o" targetRef="Activity_147r0pt" />
-    <bpmn:sequenceFlow id="Flow_0s40qv5" name="ні" sourceRef="Gateway_0ev5pmg" targetRef="Activity_0570xco">
+    <bpmn:sequenceFlow id="Flow_0cmv72h" sourceRef="Gateway_1ohrijf" targetRef="signLabFormActivity" />
+    <bpmn:sequenceFlow id="Flow_1ncj0s9" sourceRef="extractNameAndEdrpouFromAddLabFormActivity" targetRef="searchForLabByNameAndEdrpouActivity" />
+    <bpmn:sequenceFlow id="Flow_0cmz6jl" sourceRef="searchForLabByNameAndEdrpouActivity" targetRef="extractIfLabExistsFlagFromResponseActivity" />
+    <bpmn:sequenceFlow id="isLaboratoryDoesNotExistFlow" name="ні" sourceRef="isLaboratoryExistGateway" targetRef="prepopulateSignLabFormActivity">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!isLaboratoryExist}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1l25tlz" name="так" sourceRef="Gateway_0ev5pmg" targetRef="Activity_0ynmc83">
+    <bpmn:sequenceFlow id="isLaboratoryAlreadyExistFlow" name="так" sourceRef="isLaboratoryExistGateway" targetRef="throwDuplicateLabValidationError">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isLaboratoryExist}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_09gp6fy" sourceRef="Gateway_1bx958j" targetRef="Activity_1ne2ryq" />
-    <bpmn:sequenceFlow id="Flow_166fwyk" sourceRef="Activity_0ynmc83" targetRef="Gateway_1bx958j" />
-    <bpmn:sequenceFlow id="Flow_0xrdxhl" sourceRef="Activity_147r0pt" targetRef="Gateway_0ev5pmg" />
+    <bpmn:sequenceFlow id="Flow_09gp6fy" sourceRef="Gateway_1bx958j" targetRef="addLabFormActivity" />
+    <bpmn:sequenceFlow id="Flow_166fwyk" sourceRef="throwDuplicateLabValidationError" targetRef="Gateway_1bx958j" />
+    <bpmn:sequenceFlow id="Flow_0xrdxhl" sourceRef="extractIfLabExistsFlagFromResponseActivity" targetRef="isLaboratoryExistGateway" />
     <bpmn:dataObjectReference id="DataObjectReference_0c83zff" dataObjectRef="DataObject_1u1xbyc" />
     <bpmn:dataObject id="DataObject_1u1xbyc" />
     <bpmn:dataStoreReference id="DataStoreReference_0zfe95b" name="Дата фабрика" />
     <bpmn:dataObjectReference id="DataObjectReference_0spxyj3" dataObjectRef="DataObject_0p3phz8" />
     <bpmn:dataObject id="DataObject_0p3phz8" />
-    <bpmn:serviceTask id="Activity_0ynmc83" name="Формування валідаційно помилки" camunda:modelerTemplate="userDataValidationErrorDelegate" camunda:delegateExpression="${userDataValidationErrorDelegate}">
+    <bpmn:serviceTask id="throwDuplicateLabValidationError" name="Формування валідаційно помилки" camunda:modelerTemplate="userDataValidationErrorDelegate" camunda:delegateExpression="${userDataValidationErrorDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="validationErrors">
@@ -42,12 +42,12 @@
           </camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1l25tlz</bpmn:incoming>
+      <bpmn:incoming>isLaboratoryAlreadyExistFlow</bpmn:incoming>
       <bpmn:outgoing>Flow_166fwyk</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:dataObjectReference id="DataObjectReference_0ab8b74" dataObjectRef="DataObject_1dd5ky9" />
     <bpmn:dataObject id="DataObject_1dd5ky9" />
-    <bpmn:serviceTask id="Activity_0fwtr4o" name="Пошук даних про лабораторію" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
+    <bpmn:serviceTask id="searchForLabByNameAndEdrpouActivity" name="Пошук даних про лабораторію" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="resource">laboratory-equal-edrpou-name-count</camunda:inputParameter>
@@ -57,7 +57,7 @@
               <camunda:entry key="edrpou">${edrpou.value}</camunda:entry>
             </camunda:map>
           </camunda:inputParameter>
-          <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-Activity_1ne2ryq")}</camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-addLabFormActivity")}</camunda:inputParameter>
           <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
@@ -72,7 +72,7 @@
         <bpmn:targetRef>DataStoreReference_0zfe95b</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
     </bpmn:serviceTask>
-    <bpmn:scriptTask id="Activity_147r0pt" name="Підготовка змінних після запиту" scriptFormat="groovy" camunda:resultVariable="isLaboratoryExist">
+    <bpmn:scriptTask id="extractIfLabExistsFlagFromResponseActivity" name="Підготовка змінних після запиту" scriptFormat="groovy" camunda:resultVariable="isLaboratoryExist">
       <bpmn:incoming>Flow_0cmz6jl</bpmn:incoming>
       <bpmn:outgoing>Flow_0xrdxhl</bpmn:outgoing>
       <bpmn:dataOutputAssociation id="DataOutputAssociation_1yuh7ho">
@@ -88,7 +88,7 @@ return !JSON(response.responseBody).elements().isEmpty()</bpmn:script>
       <bpmn:outgoing>Flow_0cmv72h</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:dataStoreReference id="DataStoreReference_1o3uhwv" name="Ceph" />
-    <bpmn:scriptTask id="Activity_1ap9x8j" name="Підготовка даних для запису (transient var)" scriptFormat="groovy" camunda:resultVariable="dataPayload">
+    <bpmn:scriptTask id="convertSignFormDataToDataFactoryFormatActivity" name="Підготовка даних для запису (transient var)" scriptFormat="groovy">
       <bpmn:incoming>Flow_06zm02c</bpmn:incoming>
       <bpmn:outgoing>Flow_0u9qq1c</bpmn:outgoing>
       <bpmn:dataOutputAssociation id="DataOutputAssociation_1b90eu1">
@@ -96,34 +96,28 @@ return !JSON(response.responseBody).elements().isEmpty()</bpmn:script>
       </bpmn:dataOutputAssociation>
       <bpmn:script>import static org.camunda.spin.Spin.JSON
 
-import org.camunda.bpm.engine.variable.Variables
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 var formData = JSON(signedFormDataOutput).prop("data")
 
-var requestMap = [:]
-
-for (var name : formData.fieldNames()) {
-  requestMap[name] = formData.prop(name).prop("value").value()
+if (formData.prop("accreditationEndDate").stringValue()?.trim()) {
+    def parsedDate = LocalDateTime.parse(formData.prop("accreditationEndDate").stringValue(), DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+    formData.prop("accreditationEndDate", parsedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
 }
 
-if (requestMap.accreditationEndDate?.trim()) {
-  def parsedDate = LocalDateTime.parse(requestMap.accreditationEndDate, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+var dataPayload= formData.toString()
+execution.removeVariable("dataPayload")
+execution.setVariableLocalTransient("dataPayload", dataPayload)
 
-  requestMap.accreditationEndDate = parsedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-}
-
-var dataPayload= Variables.stringValue(JSON(requestMap).toString(), true)
-
-var keyObj = ["data":dataPayload.value]
-execution.setVariable("dataKeyPayload", JSON(keyObj).toString())
-return dataPayload</bpmn:script>
+var keyObj = ["data":dataPayload]
+execution.removeVariable("dataKeyPayload")
+execution.setVariableLocalTransient("dataKeyPayload", JSON(keyObj).toString())</bpmn:script>
     </bpmn:scriptTask>
-    <bpmn:serviceTask id="Activity_1amsqo0" name="Читання документа форми за ключем (transient var)" camunda:modelerTemplate="getFormDataFromCephDelegate" camunda:delegateExpression="${getFormDataFromCephDelegate}">
+    <bpmn:serviceTask id="readSignLabFormFromCephActivity" name="Читання документа форми за ключем (transient var)" camunda:modelerTemplate="getFormDataFromCephDelegate" camunda:delegateExpression="${getFormDataFromCephDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="taskDefinitionKey">Activity_0s05qmu</camunda:inputParameter>
+          <camunda:inputParameter name="taskDefinitionKey">signLabFormActivity</camunda:inputParameter>
           <camunda:outputParameter name="signedFormDataOutput">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
@@ -135,7 +129,7 @@ return dataPayload</bpmn:script>
         <bpmn:targetRef>Property_1qqtsul</bpmn:targetRef>
       </bpmn:dataInputAssociation>
     </bpmn:serviceTask>
-    <bpmn:userTask id="Activity_0s05qmu" name="Підписати дані КЕП" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="shared-sign-lab" camunda:assignee="${initiator}">
+    <bpmn:userTask id="signLabFormActivity" name="Підписати дані КЕП" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="shared-sign-lab" camunda:assignee="${initiator}">
       <bpmn:extensionElements>
         <camunda:properties>
           <camunda:property name="eSign" value="true" />
@@ -153,14 +147,14 @@ return dataPayload</bpmn:script>
       </bpmn:dataOutputAssociation>
     </bpmn:userTask>
     <bpmn:dataStoreReference id="DataStoreReference_0rv655a" name="Ceph" />
-    <bpmn:serviceTask id="Activity_0570xco" name="Запис документа форми" camunda:delegateExpression="${putFormDataToCephDelegate}">
+    <bpmn:serviceTask id="prepopulateSignLabFormActivity" name="Запис документа форми" camunda:modelerTemplate="putFormDataToCephDelegate" camunda:delegateExpression="${putFormDataToCephDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="formData">${formDataOutput}</camunda:inputParameter>
-          <camunda:inputParameter name="taskDefinitionKey">Activity_0s05qmu</camunda:inputParameter>
+          <camunda:inputParameter name="taskDefinitionKey">signLabFormActivity</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0s40qv5</bpmn:incoming>
+      <bpmn:incoming>isLaboratoryDoesNotExistFlow</bpmn:incoming>
       <bpmn:outgoing>Flow_1so9oif</bpmn:outgoing>
       <bpmn:property id="Property_0ksmbam" name="__targetRef_placeholder" />
       <bpmn:dataInputAssociation id="DataInputAssociation_0m6r0a7">
@@ -171,17 +165,17 @@ return dataPayload</bpmn:script>
         <bpmn:targetRef>DataStoreReference_0rv655a</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
     </bpmn:serviceTask>
-    <bpmn:exclusiveGateway id="Gateway_0ev5pmg" name="Дані присутні?">
+    <bpmn:exclusiveGateway id="isLaboratoryExistGateway" name="Дані присутні?">
       <bpmn:incoming>Flow_0xrdxhl</bpmn:incoming>
-      <bpmn:outgoing>Flow_0s40qv5</bpmn:outgoing>
-      <bpmn:outgoing>Flow_1l25tlz</bpmn:outgoing>
+      <bpmn:outgoing>isLaboratoryDoesNotExistFlow</bpmn:outgoing>
+      <bpmn:outgoing>isLaboratoryAlreadyExistFlow</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:exclusiveGateway id="Gateway_1bx958j">
       <bpmn:incoming>Flow_16mq6s1</bpmn:incoming>
       <bpmn:incoming>Flow_166fwyk</bpmn:incoming>
       <bpmn:outgoing>Flow_09gp6fy</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:scriptTask id="Activity_04xojib" name="Підготовка зміних для отримання запису" scriptFormat="groovy">
+    <bpmn:scriptTask id="extractNameAndEdrpouFromAddLabFormActivity" name="Підготовка зміних для отримання запису" scriptFormat="groovy">
       <bpmn:incoming>Flow_157otpm</bpmn:incoming>
       <bpmn:outgoing>Flow_1ncj0s9</bpmn:outgoing>
       <bpmn:dataOutputAssociation id="DataOutputAssociation_1jn6rgt">
@@ -189,24 +183,20 @@ return dataPayload</bpmn:script>
       </bpmn:dataOutputAssociation>
       <bpmn:script>import static org.camunda.spin.Spin.JSON
 
-import org.camunda.bpm.engine.variable.Variables
-
-println formDataOutput
-
 var formData = JSON(formDataOutput).prop("data")
 
-var name = formData.prop("name").prop("value").stringValue()
-var edrpou = formData.prop("edrpou").prop("value").stringValue()
+var name = formData.prop("name").stringValue()
+var edrpou = formData.prop("edrpou").stringValue()
 
-println name
-
-execution.setVariable("name", Variables.stringValue(name, true))
-execution.setVariable("edrpou", Variables.stringValue(edrpou, true))</bpmn:script>
+execution.removeVariable("name")
+execution.removeVariable("edrpou")
+execution.setVariableLocalTransient("name", name)
+execution.setVariableLocalTransient("edrpou", edrpou)</bpmn:script>
     </bpmn:scriptTask>
-    <bpmn:serviceTask id="Activity_15o5gqa" name="Читання документа за ключем" camunda:modelerTemplate="getFormDataFromCephDelegate" camunda:delegateExpression="${getFormDataFromCephDelegate}">
+    <bpmn:serviceTask id="readAddLabFormCephActivity" name="Читання документа за ключем" camunda:modelerTemplate="getFormDataFromCephDelegate" camunda:delegateExpression="${getFormDataFromCephDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="taskDefinitionKey">Activity_1ne2ryq</camunda:inputParameter>
+          <camunda:inputParameter name="taskDefinitionKey">addLabFormActivity</camunda:inputParameter>
           <camunda:outputParameter name="formDataOutput">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
@@ -219,7 +209,7 @@ execution.setVariable("edrpou", Variables.stringValue(edrpou, true))</bpmn:scrip
       </bpmn:dataInputAssociation>
     </bpmn:serviceTask>
     <bpmn:dataStoreReference id="DataStoreReference_0v4z7ow" name="Ceph" />
-    <bpmn:userTask id="Activity_1ne2ryq" name="Внести дані про лабораторію" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="add-lab-bp-add-lab" camunda:assignee="${initiator}">
+    <bpmn:userTask id="addLabFormActivity" name="Внести дані про лабораторію" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="add-lab-bp-add-lab" camunda:assignee="${initiator}">
       <bpmn:extensionElements>
         <camunda:properties>
           <camunda:property name="eSign" value="" />
@@ -234,14 +224,14 @@ execution.setVariable("edrpou", Variables.stringValue(edrpou, true))</bpmn:scrip
     <bpmn:startEvent id="Event_1dh8s72" name="Початок" camunda:initiator="initiator">
       <bpmn:outgoing>Flow_16mq6s1</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:serviceTask id="Activity_1w3vw9u" name="Зберегти дані в Дата фабрику" camunda:modelerTemplate="dataFactoryConnectorCreateDelegate" camunda:delegateExpression="${dataFactoryConnectorCreateDelegate}">
+    <bpmn:serviceTask id="sendLabToDataFactoryActivity" name="Зберегти дані в Дата фабрику" camunda:modelerTemplate="dataFactoryConnectorCreateDelegate" camunda:delegateExpression="${dataFactoryConnectorCreateDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="resource">laboratory</camunda:inputParameter>
-          <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-Activity_0s05qmu")}</camunda:inputParameter>
-          <camunda:inputParameter name="x_digital_signature_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-Activity_0s05qmu")}</camunda:inputParameter>
           <camunda:inputParameter name="payload">${dataPayload}</camunda:inputParameter>
           <camunda:inputParameter name="x_digital_signature_derived_ceph_key">${system_signature_ceph_key}</camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-signLabFormActivity")}</camunda:inputParameter>
+          <camunda:inputParameter name="x_digital_signature_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-signLabFormActivity")}</camunda:inputParameter>
           <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
@@ -256,7 +246,7 @@ execution.setVariable("edrpou", Variables.stringValue(edrpou, true))</bpmn:scrip
         <bpmn:targetRef>DataStoreReference_0suitd4</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="Activity_1c1se7a" name="Результат виконання &#34;Лабораторія створена&#34;" camunda:delegateExpression="${defineBusinessProcessStatusDelegate}">
+    <bpmn:serviceTask id="defineBusinessProcessStatusActivity" name="Результат виконання &#34;Лабораторія створена&#34;" camunda:modelerTemplate="defineBusinessProcessStatusDelegate" camunda:delegateExpression="${defineBusinessProcessStatusDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="status">Лабораторія створена</camunda:inputParameter>
@@ -268,7 +258,7 @@ execution.setVariable("edrpou", Variables.stringValue(edrpou, true))</bpmn:scrip
     <bpmn:endEvent id="Event_0llb5w6" name="Лабораторія створена">
       <bpmn:incoming>Flow_0i7crn5</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:serviceTask id="Activity_09b9xcv" name="Запис системного підпису" camunda:delegateExpression="${putContentToCephDelegate}">
+    <bpmn:serviceTask id="putSystemSignatureToCephActivity" name="Запис системного підпису" camunda:modelerTemplate="putContentToCephDelegate" camunda:delegateExpression="${putContentToCephDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="key">${system_signature_ceph_key}</camunda:inputParameter>
@@ -286,7 +276,7 @@ execution.setVariable("edrpou", Variables.stringValue(edrpou, true))</bpmn:scrip
         <bpmn:targetRef>DataStoreReference_1xp2u3p</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
     </bpmn:serviceTask>
-    <bpmn:scriptTask id="Activity_1w497bf" name="Підготовка даних для запису системного підпису" scriptFormat="groovy" camunda:resultVariable="systemSignaturePayload">
+    <bpmn:scriptTask id="extractSignatureAndDataActivity" name="Підготовка даних для запису системного підпису (transient var)" scriptFormat="groovy">
       <bpmn:incoming>Flow_00jg10o</bpmn:incoming>
       <bpmn:outgoing>Flow_0shjvt5</bpmn:outgoing>
       <bpmn:property id="Property_07pg4vm" name="__targetRef_placeholder" />
@@ -305,23 +295,23 @@ execution.setVariable("system_signature_ceph_key", "lowcode_${processInstanceId}
 var systemSignature = JSON(systemSignatureResponse).prop("signature").value()
 
 var cephObj = ["data":dataPayload, "signature":systemSignature]
-
-return JSON(cephObj).toString()</bpmn:script>
+execution.removeVariable("systemSignaturePayload")
+execution.setVariableLocalTransient("systemSignaturePayload", JSON(cephObj).toString())</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataStoreReference id="DataStoreReference_0suitd4" name="Дата фабрика" />
     <bpmn:dataStoreReference id="DataStoreReference_0rottqj" name="КЕП сервіс" />
     <bpmn:dataObjectReference id="DataObjectReference_051zv77" dataObjectRef="DataObject_1mlzdtj" />
     <bpmn:dataObject id="DataObject_1mlzdtj" />
     <bpmn:dataStoreReference id="DataStoreReference_1xp2u3p" name="Ceph" />
-    <bpmn:boundaryEvent id="Event_0e6oefg" attachedToRef="Activity_1w3vw9u">
+    <bpmn:boundaryEvent id="Event_0e6oefg" attachedToRef="sendLabToDataFactoryActivity">
       <bpmn:outgoing>Flow_0bjiays</bpmn:outgoing>
       <bpmn:errorEventDefinition id="ErrorEventDefinition_0cuwp8y" />
     </bpmn:boundaryEvent>
-    <bpmn:serviceTask id="Activity_0vupfqk" name="Підписати дані системним ключем" camunda:delegateExpression="${digitalSignatureConnectorDelegate}">
+    <bpmn:serviceTask id="signFormDataWithDsoActivity" name="Підписати дані системним ключем" camunda:modelerTemplate="digitalSignatureConnectorDelegate" camunda:delegateExpression="${digitalSignatureConnectorDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-Activity_0s05qmu")}</camunda:inputParameter>
           <camunda:inputParameter name="payload">${dataKeyPayload}</camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-signLabFormActivity")}</camunda:inputParameter>
           <camunda:outputParameter name="systemSignatureResponse">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
@@ -336,8 +326,8 @@ return JSON(cephObj).toString()</bpmn:script>
         <bpmn:targetRef>DataStoreReference_0rottqj</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_00jg10o" sourceRef="Activity_0vupfqk" targetRef="Activity_1w497bf" />
-    <bpmn:sequenceFlow id="Flow_0u9qq1c" sourceRef="Activity_1ap9x8j" targetRef="Activity_0vupfqk" />
+    <bpmn:sequenceFlow id="Flow_00jg10o" sourceRef="signFormDataWithDsoActivity" targetRef="extractSignatureAndDataActivity" />
+    <bpmn:sequenceFlow id="Flow_0u9qq1c" sourceRef="convertSignFormDataToDataFactoryFormatActivity" targetRef="signFormDataWithDsoActivity" />
   </bpmn:process>
   <bpmn:error id="Error_11ddrup" name="Error_09c29ei" />
   <bpmn:error id="Error_0hpfqmx" name="Error_0agefa5" />
@@ -367,7 +357,7 @@ return JSON(cephObj).toString()</bpmn:script>
         <di:waypoint x="325" y="300" />
         <di:waypoint x="363" y="300" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1l25tlz_di" bpmnElement="Flow_1l25tlz">
+      <bpmndi:BPMNEdge id="Flow_1l25tlz_di" bpmnElement="isLaboratoryAlreadyExistFlow">
         <di:waypoint x="1050" y="275" />
         <di:waypoint x="1050" y="180" />
         <di:waypoint x="1000" y="180" />
@@ -375,7 +365,7 @@ return JSON(cephObj).toString()</bpmn:script>
           <dc:Bounds x="1027" y="218" width="16" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0s40qv5_di" bpmnElement="Flow_0s40qv5">
+      <bpmndi:BPMNEdge id="Flow_0s40qv5_di" bpmnElement="isLaboratoryDoesNotExistFlow">
         <di:waypoint x="1075" y="300" />
         <di:waypoint x="1140" y="300" />
         <bpmndi:BPMNLabel>
@@ -452,16 +442,16 @@ return JSON(cephObj).toString()</bpmn:script>
       <bpmndi:BPMNShape id="DataObjectReference_0spxyj3_di" bpmnElement="DataObjectReference_0spxyj3">
         <dc:Bounds x="932" y="405" width="36" height="50" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_01vir3d_di" bpmnElement="Activity_0ynmc83">
+      <bpmndi:BPMNShape id="Activity_01vir3d_di" bpmnElement="throwDuplicateLabValidationError">
         <dc:Bounds x="900" y="140" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="DataObjectReference_0ab8b74_di" bpmnElement="DataObjectReference_0ab8b74">
         <dc:Bounds x="652" y="405" width="36" height="50" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_095rzpt_di" bpmnElement="Activity_0fwtr4o">
+      <bpmndi:BPMNShape id="Activity_095rzpt_di" bpmnElement="searchForLabByNameAndEdrpouActivity">
         <dc:Bounds x="760" y="260" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0o79t5s_di" bpmnElement="Activity_147r0pt">
+      <bpmndi:BPMNShape id="Activity_0o79t5s_di" bpmnElement="extractIfLabExistsFlagFromResponseActivity">
         <dc:Bounds x="900" y="260" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_1ohrijf_di" bpmnElement="Gateway_1ohrijf" isMarkerVisible="true">
@@ -473,13 +463,13 @@ return JSON(cephObj).toString()</bpmn:script>
           <dc:Bounds x="1506" y="465" width="27" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1ap9x8j_di" bpmnElement="Activity_1ap9x8j">
+      <bpmndi:BPMNShape id="Activity_1ap9x8j_di" bpmnElement="convertSignFormDataToDataFactoryFormatActivity">
         <dc:Bounds x="1610" y="260" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1amsqo0_di" bpmnElement="Activity_1amsqo0">
+      <bpmndi:BPMNShape id="Activity_1amsqo0_di" bpmnElement="readSignLabFormFromCephActivity">
         <dc:Bounds x="1470" y="260" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0s05qmu_di" bpmnElement="Activity_0s05qmu">
+      <bpmndi:BPMNShape id="Activity_0s05qmu_di" bpmnElement="signLabFormActivity">
         <dc:Bounds x="1340" y="260" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="DataStoreReference_0rv655a_di" bpmnElement="DataStoreReference_0rv655a">
@@ -488,10 +478,10 @@ return JSON(cephObj).toString()</bpmn:script>
           <dc:Bounds x="1197" y="462" width="27" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0570xco_di" bpmnElement="Activity_0570xco">
+      <bpmndi:BPMNShape id="Activity_0570xco_di" bpmnElement="prepopulateSignLabFormActivity">
         <dc:Bounds x="1140" y="260" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_0ev5pmg_di" bpmnElement="Gateway_0ev5pmg" isMarkerVisible="true">
+      <bpmndi:BPMNShape id="Gateway_0ev5pmg_di" bpmnElement="isLaboratoryExistGateway" isMarkerVisible="true">
         <dc:Bounds x="1025" y="275" width="50" height="50" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1013" y="335" width="74" height="14" />
@@ -500,10 +490,10 @@ return JSON(cephObj).toString()</bpmn:script>
       <bpmndi:BPMNShape id="Gateway_1bx958j_di" bpmnElement="Gateway_1bx958j" isMarkerVisible="true">
         <dc:Bounds x="275" y="275" width="50" height="50" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1l3ghmj_di" bpmnElement="Activity_04xojib">
+      <bpmndi:BPMNShape id="Activity_1l3ghmj_di" bpmnElement="extractNameAndEdrpouFromAddLabFormActivity">
         <dc:Bounds x="620" y="260" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_15o5gqa_di" bpmnElement="Activity_15o5gqa">
+      <bpmndi:BPMNShape id="Activity_15o5gqa_di" bpmnElement="readAddLabFormCephActivity">
         <dc:Bounds x="490" y="260" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="DataStoreReference_0v4z7ow_di" bpmnElement="DataStoreReference_0v4z7ow">
@@ -512,7 +502,7 @@ return JSON(cephObj).toString()</bpmn:script>
           <dc:Bounds x="527" y="462" width="27" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1ne2ryq_di" bpmnElement="Activity_1ne2ryq">
+      <bpmndi:BPMNShape id="Activity_1ne2ryq_di" bpmnElement="addLabFormActivity">
         <dc:Bounds x="363" y="260" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1dh8s72_di" bpmnElement="Event_1dh8s72">
@@ -521,10 +511,10 @@ return JSON(cephObj).toString()</bpmn:script>
           <dc:Bounds x="210" y="325" width="43" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1w3vw9u_di" bpmnElement="Activity_1w3vw9u">
+      <bpmndi:BPMNShape id="Activity_1w3vw9u_di" bpmnElement="sendLabToDataFactoryActivity">
         <dc:Bounds x="2150" y="260" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1c1se7a_di" bpmnElement="Activity_1c1se7a">
+      <bpmndi:BPMNShape id="Activity_1c1se7a_di" bpmnElement="defineBusinessProcessStatusActivity">
         <dc:Bounds x="2310" y="260" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0llb5w6_di" bpmnElement="Event_0llb5w6">
@@ -533,10 +523,10 @@ return JSON(cephObj).toString()</bpmn:script>
           <dc:Bounds x="2449" y="325" width="63" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1987vi8_di" bpmnElement="Activity_09b9xcv">
+      <bpmndi:BPMNShape id="Activity_1987vi8_di" bpmnElement="putSystemSignatureToCephActivity">
         <dc:Bounds x="2020" y="260" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1jvd4cs_di" bpmnElement="Activity_1w497bf">
+      <bpmndi:BPMNShape id="Activity_1jvd4cs_di" bpmnElement="extractSignatureAndDataActivity">
         <dc:Bounds x="1890" y="260" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="DataStoreReference_0suitd4_di" bpmnElement="DataStoreReference_0suitd4">
@@ -560,7 +550,7 @@ return JSON(cephObj).toString()</bpmn:script>
           <dc:Bounds x="2077" y="462" width="27" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_06njcfn_di" bpmnElement="Activity_0vupfqk">
+      <bpmndi:BPMNShape id="Activity_06njcfn_di" bpmnElement="signFormDataWithDsoActivity">
         <dc:Bounds x="1750" y="260" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0z509ng_di" bpmnElement="Event_0e6oefg">

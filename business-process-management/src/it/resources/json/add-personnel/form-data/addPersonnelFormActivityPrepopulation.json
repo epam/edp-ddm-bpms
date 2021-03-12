@@ -1,10 +1,6 @@
 {
   "data": {
-    "name": {
-      "value": "labName"
-    },
-    "edrpou": {
-      "value": "11111111"
-    }
+    "name": "labName",
+    "edrpou": "11111111"
   }
 }

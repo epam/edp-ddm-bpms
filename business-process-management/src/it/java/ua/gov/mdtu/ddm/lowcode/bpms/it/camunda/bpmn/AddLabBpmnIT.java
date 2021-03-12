@@ -32,17 +32,17 @@ public class AddLabBpmnIT extends BaseBpmnIT {
         .build());
 
     //start process
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("add-lab-key", new HashMap<>());
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("add-lab", new HashMap<>());
     String processInstanceId = processInstance.getId();
 
-    BpmnAwareTests.assertThat(processInstance).isWaitingAt("Activity_1ne2ryq");
-    completeTask("Activity_1ne2ryq", processInstanceId, "/json/add-lab/Activity_1ne2ryq.json");
+    BpmnAwareTests.assertThat(processInstance).isWaitingAt("addLabFormActivity");
+    completeTask("addLabFormActivity", processInstanceId, "/json/add-lab/Activity_1ne2ryq.json");
 
-    BpmnAwareTests.assertThat(processInstance).isWaitingAt("Activity_0s05qmu");
-    completeTask("Activity_0s05qmu", processInstanceId, "/json/add-lab/Activity_0s05qmu.json");
+    BpmnAwareTests.assertThat(processInstance).isWaitingAt("signLabFormActivity");
+    completeTask("signLabFormActivity", processInstanceId, "/json/add-lab/Activity_0s05qmu.json");
 
     //then
-    BpmnAwareTests.assertThat(processInstance).hasPassed("Activity_1ne2ryq", "Activity_0s05qmu").isEnded();
+    BpmnAwareTests.assertThat(processInstance).hasPassed("addLabFormActivity", "signLabFormActivity").isEnded();
   }
 
 }
