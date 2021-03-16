@@ -12,6 +12,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import ua.gov.mdtu.ddm.lowcode.bpms.config.CamundaSystemVariablesSupportListener;
+import ua.gov.mdtu.ddm.lowcode.bpms.config.CamundaSystemVariablesSupportListenerPlugin;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CamundaSystemVariablesSupportListenerPluginTest {

@@ -17,6 +17,9 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import ua.gov.mdtu.ddm.lowcode.bpms.listener.AuthorizationStartEventListener;
+import ua.gov.mdtu.ddm.lowcode.bpms.config.CamundaProperties;
+import ua.gov.mdtu.ddm.lowcode.bpms.config.CamundaSystemVariablesSupportListener;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CamundaSystemVariablesSupportListenerTest {

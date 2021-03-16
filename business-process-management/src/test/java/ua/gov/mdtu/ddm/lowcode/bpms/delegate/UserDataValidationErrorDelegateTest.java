@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import ua.gov.mdtu.ddm.lowcode.bpms.camunda.delegate.UserDataValidationErrorDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.exception.UserDataValidationException;
 
 @RunWith(MockitoJUnitRunner.class)

@@ -7,7 +7,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import ua.gov.mdtu.ddm.lowcode.bpms.camunda.config.CamundaProperties;
+import ua.gov.mdtu.ddm.lowcode.bpms.config.CamundaProperties;
 
 public class InitBusinessProcessesIT extends BaseIT {
 

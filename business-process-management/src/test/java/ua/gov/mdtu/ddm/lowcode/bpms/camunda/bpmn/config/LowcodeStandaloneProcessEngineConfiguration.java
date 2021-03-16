@@ -1,7 +1,7 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.camunda.bpmn.config;
 
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import ua.gov.mdtu.ddm.lowcode.bpms.camunda.config.parse.TransientBpmnParseFactory;
+import ua.gov.mdtu.ddm.lowcode.bpms.config.parse.TransientBpmnParseFactory;
 
 public class LowcodeStandaloneProcessEngineConfiguration extends
     StandaloneProcessEngineConfiguration {

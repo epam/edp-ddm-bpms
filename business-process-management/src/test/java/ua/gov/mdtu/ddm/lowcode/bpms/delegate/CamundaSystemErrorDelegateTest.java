@@ -11,7 +11,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import ua.gov.mdtu.ddm.lowcode.bpms.camunda.delegate.CamundaSystemErrorDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.exception.CamundaSystemException;
 
 @RunWith(MockitoJUnitRunner.class)
