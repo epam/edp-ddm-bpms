@@ -14,7 +14,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.HashMap;
 import java.util.Map;
 import org.assertj.core.util.Lists;
-import org.assertj.core.util.Maps;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
@@ -92,7 +91,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
 
   @Test
   public void shouldReturn403TaskById() throws JsonProcessingException {
-    var errorDto403 = new ErrorDto("type", "message403");
+    var errorDto403 = new ErrorDto("testTraceId", "type", "message403", "testLocalizedMsg");
     restClientWireMock.addStubMapping(
         stubFor(get(urlPathEqualTo("/api/task/tid403"))
             .willReturn(aResponse()
@@ -105,13 +104,15 @@ public class CamundaTaskRestClientIT extends BaseIT {
     var exception = assertThrows(AuthorizationException.class,
         () -> camundaTaskRestClient.getTaskById("tid403"));
 
+    assertThat(exception.getTraceId()).isEqualTo("testTraceId");
     assertThat(exception.getType()).isEqualTo("type");
     assertThat(exception.getMessage()).isEqualTo("message403");
+    assertThat(exception.getLocalizedMessage()).isEqualTo("testLocalizedMsg");
   }
 
   @Test
   public void shouldReturn404TaskById() throws JsonProcessingException {
-    var errorDto404 = new ErrorDto("type", "message404");
+    var errorDto404 = new ErrorDto("testTraceId", "type", "message404", "testLocalizedMsg");
     restClientWireMock.addStubMapping(
         stubFor(get(urlPathEqualTo("/api/task/tid404"))
             .willReturn(aResponse()
@@ -124,8 +125,10 @@ public class CamundaTaskRestClientIT extends BaseIT {
     var exception = assertThrows(TaskNotFoundException.class,
         () -> camundaTaskRestClient.getTaskById("tid404"));
 
+    assertThat(exception.getTraceId()).isEqualTo("testTraceId");
     assertThat(exception.getType()).isEqualTo("type");
     assertThat(exception.getMessage()).isEqualTo("message404");
+    assertThat(exception.getLocalizedMessage()).isEqualTo("testLocalizedMsg");
   }
 
   @Test

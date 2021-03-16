@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ErrorDto {
 
+  private String traceId;
   private String type;
   private String message;
+  private String localizedMessage;
 }

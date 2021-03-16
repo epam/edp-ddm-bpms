@@ -96,7 +96,7 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
 
   @Test
   public void shouldReturn404OnMissingProcessDefinition() throws JsonProcessingException {
-    var errorDto = new ErrorDto("type", "error");
+    var errorDto = new ErrorDto("testTraceId", "type", "error","testLocalizedMsg");
     restClientWireMock.addStubMapping(
         stubFor(get(urlEqualTo("/api/process-definition/testId404"))
             .willReturn(aResponse()
@@ -109,8 +109,10 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
     var exception = assertThrows(ProcessDefinitionNotFoundException.class,
         () -> processDefinitionRestClient.getProcessDefinition("testId404"));
 
+    assertThat(exception.getTraceId()).isEqualTo("testTraceId");
     assertThat(exception.getType()).isEqualTo("type");
     assertThat(exception.getMessage()).isEqualTo("error");
+    assertThat(exception.getLocalizedMessage()).isEqualTo("testLocalizedMsg");
   }
 
   @Test
