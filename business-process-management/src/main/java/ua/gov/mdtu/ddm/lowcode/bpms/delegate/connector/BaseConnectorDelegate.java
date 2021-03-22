@@ -25,6 +25,7 @@ import ua.gov.mdtu.ddm.general.errorhandling.dto.ValidationErrorDto;
 import ua.gov.mdtu.ddm.general.errorhandling.exception.SystemException;
 import ua.gov.mdtu.ddm.general.errorhandling.exception.ValidationException;
 import ua.gov.mdtu.ddm.general.integration.ceph.service.CephService;
+import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.enums.PlatformHttpHeader;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.dto.DataFactoryConnectorResponse;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.dto.enums.DataFactoryError;
 import ua.gov.mdtu.ddm.lowcode.bpms.service.MessageResolver;
@@ -61,24 +62,25 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
   protected HttpHeaders getHeaders(DelegateExecution delegateExecution) {
     var headers = new HttpHeaders();
     headers.add("Content-Type", "application/json");
-    headers.add("X-Source-System", "Low-code Platform");
-    headers.add("X-Source-Application", springAppName);
-    headers.add("X-Source-Business-Process",
+    headers.add(PlatformHttpHeader.X_SOURCE_SYSTEM.getName(), "Low-code Platform");
+    headers.add(PlatformHttpHeader.X_SOURCE_APPLICATION.getName(), springAppName);
+    headers.add(PlatformHttpHeader.X_SOURCE_BUSINESS_PROCESS.getName(),
         ((ExecutionEntity) delegateExecution).getProcessDefinition().getName());
-    headers.add("X-Source-Business-Activity",
+    headers.add(PlatformHttpHeader.X_SOURCE_BUSINESS_ACTIVITY.getName(),
         delegateExecution.getActivityInstanceId());
 
     getAccessToken(delegateExecution).ifPresent(xAccessToken ->
-        headers.add("X-Access-Token", xAccessToken));
+        headers.add(PlatformHttpHeader.X_ACCESS_TOKEN.getName(), xAccessToken));
     var xDigitalSignatureCephKey = (String) delegateExecution
         .getVariable("x_digital_signature_ceph_key");
     if (!StringUtils.isBlank(xDigitalSignatureCephKey)) {
-      headers.add("X-Digital-Signature", xDigitalSignatureCephKey);
+      headers.add(PlatformHttpHeader.X_DIGITAL_SIGNATURE.getName(), xDigitalSignatureCephKey);
     }
     var xDigitalSignatureDerivedCephKey = (String) delegateExecution
         .getVariable("x_digital_signature_derived_ceph_key");
     if (!StringUtils.isBlank(xDigitalSignatureDerivedCephKey)) {
-      headers.add("X-Digital-Signature-Derived", xDigitalSignatureDerivedCephKey);
+      headers.add(PlatformHttpHeader.X_DIGITAL_SIGNATURE_DERIVED.getName(),
+          xDigitalSignatureDerivedCephKey);
     }
 
     var customHeaders = (Map<String, String>) delegateExecution.getVariable("headers");
