@@ -13,7 +13,7 @@
 
   <groupId>ua.gov.mdtu.ddm.lowcode</groupId>
   <artifactId>business-process-management-parent</artifactId>
-  <version>0.0.3-SNAPSHOT</version>
+  <version>0.0.4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -59,6 +59,11 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>ua.gov.mdtu.ddm.general</groupId>
+      <artifactId>platform-error-handling-starter</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <artifactId>wiremock</artifactId>

@@ -12,6 +12,8 @@ import static ua.gov.mdtu.ddm.lowcode.bpms.it.util.TestUtils.formDataVariableNam
 import static ua.gov.mdtu.ddm.lowcode.bpms.it.util.TestUtils.formDataVariableValue;
 import static ua.gov.mdtu.ddm.lowcode.bpms.it.util.TestUtils.getContent;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
@@ -20,7 +22,6 @@ import org.camunda.bpm.engine.test.mock.Mocks;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,9 +38,9 @@ import ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector.DataFactoryConnectorCreat
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector.DataFactoryConnectorReadDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector.DataFactoryConnectorSearchDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector.DigitalSignatureConnectorDelegate;
-import ua.gov.mdtu.ddm.lowcode.bpms.service.MessageResolver;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.builder.StubData;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.config.TestCephServiceImpl;
+import ua.gov.mdtu.ddm.lowcode.bpms.service.MessageResolver;
 
 @RunWith(MockitoJUnitRunner.class)
 public abstract class BaseBpmnTest {
@@ -55,7 +56,7 @@ public abstract class BaseBpmnTest {
 
   protected MockRestServiceServer mockServer = MockRestServiceServer.createServer(restTemplate);
 
-  protected JacksonJsonParser jacksonJsonParser = new JacksonJsonParser();
+  protected ObjectMapper objectMapper = new ObjectMapper();
   protected MessageResolver messageResolver = mock(MessageResolver.class);
 
   @Rule
@@ -68,21 +69,21 @@ public abstract class BaseBpmnTest {
     var putContentToCephDelegate = new PutContentToCephDelegate(cephBucketName, cephService);
 
     var dataFactoryConnectorSearchDelegate = new DataFactoryConnectorSearchDelegate(restTemplate,
-        cephService, jacksonJsonParser, messageResolver, springAppName, cephBucketName,
+        cephService, objectMapper, messageResolver, springAppName, cephBucketName,
         dataFactoryUrl);
     var dataFactoryConnectorCreateDelegate = new DataFactoryConnectorCreateDelegate(restTemplate,
-        cephService, jacksonJsonParser, messageResolver, springAppName, cephBucketName,
+        cephService, objectMapper, messageResolver, springAppName, cephBucketName,
         dataFactoryUrl);
     var dataFactoryConnectorReadDelegate = new DataFactoryConnectorReadDelegate(restTemplate,
-        cephService, jacksonJsonParser, messageResolver, springAppName, cephBucketName,
+        cephService, objectMapper, messageResolver, springAppName, cephBucketName,
         dataFactoryUrl);
 
     var digitalSignatureConnectorDelegate = new DigitalSignatureConnectorDelegate(restTemplate,
-        cephService, jacksonJsonParser, messageResolver, springAppName, cephBucketName,
+        cephService, objectMapper, messageResolver, springAppName, cephBucketName,
         digitalSignatureUrl);
 
     var dataFactoryConnectorBatchCreateDelegate = new DataFactoryConnectorBatchCreateDelegate(
-        restTemplate, cephService, jacksonJsonParser, messageResolver,
+        restTemplate, cephService, objectMapper, messageResolver,
         digitalSignatureConnectorDelegate, springAppName, cephBucketName, dataFactoryUrl);
 
     Mocks.register("getFormDataFromCephDelegate", getFormDataFromCephDelegate);
@@ -158,10 +159,18 @@ public abstract class BaseBpmnTest {
   protected void assertCephContent(Map<String, String> expectedContent) {
     Assertions.assertThat(cephService.getStorage()).hasSize(expectedContent.size());
     expectedContent.forEach((key, value) -> {
-      var expectedMap = jacksonJsonParser.parseMap(value);
-      var actualMap = jacksonJsonParser.parseMap(cephService.getContent(cephBucketName, key));
+      var expectedMap = parseMap(value);
+      var actualMap = parseMap(cephService.getContent(cephBucketName, key));
 
       Assertions.assertThat(actualMap).isEqualTo(expectedMap);
     });
+  }
+
+  private Map<String, Object> parseMap(String json) {
+    try {
+      return objectMapper.readerForMapOf(Object.class).readValue(json);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

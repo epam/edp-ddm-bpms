@@ -21,8 +21,8 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import ua.gov.mdtu.ddm.lowcode.bpms.exception.CamundaSystemException;
-import ua.gov.mdtu.ddm.lowcode.bpms.exception.UserDataValidationException;
+import ua.gov.mdtu.ddm.general.errorhandling.exception.SystemException;
+import ua.gov.mdtu.ddm.general.errorhandling.exception.ValidationException;
 
 public class DataFactoryConnectorDelegateIT extends BaseIT {
 
@@ -66,14 +66,18 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
             .willReturn(aResponse().withStatus(404)
                 .withBody("{\"traceId\":\"traceId1\",\"code\":\"NOT_FOUND\"}"))));
 
-    var ex = assertThrows(UserDataValidationException.class, () -> runtimeService
+    var ex = assertThrows(ValidationException.class, () -> runtimeService
         .startProcessInstanceByKey("testDataFactoryConnectorReadDelegate_key"));
 
-    assertThat(ex.getErrorDto()).isNotNull();
-    assertThat(ex.getErrorDto().getTraceId()).isEqualTo("traceId1");
-    assertThat(ex.getErrorDto().getCode()).isEqualTo("NOT_FOUND");
-    assertThat(ex.getErrorDto().getMessage()).isEqualTo("Validation error");
-    assertThat(ex.getErrorDto().getDetails()).isNull();
+    assertThat(ex).isNotNull();
+    assertThat(ex.getTraceId()).isEqualTo("traceId1");
+    assertThat(ex.getCode()).isEqualTo("NOT_FOUND");
+    assertThat(ex.getMessage()).isNull();
+    assertThat(ex.getDetails()).isNotNull();
+    assertThat(ex.getDetails().getErrors()).hasSize(1);
+    assertThat(ex.getDetails().getErrors().get(0).getMessage()).isEqualTo("Ресурс не знайдено");
+    assertThat(ex.getDetails().getErrors().get(0).getField()).isNull();
+    assertThat(ex.getDetails().getErrors().get(0).getValue()).isNull();
   }
 
   @Test
@@ -86,24 +90,23 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
             .withHeader("X-Source-Application", equalTo("business-process-management"))
             .willReturn(aResponse().withStatus(422)
                 .withBody("{\"traceId\":\"traceId1\",\"code\":\"VALIDATION_ERROR\","
+                    + "\"message\":\"Validation error\","
                     + "\"details\":{\"errors\":[{\"field\":\"field1\",\"value\":\"value1\","
                     + "\"message\":\"message1\"}]}}"))));
 
-    var ex = assertThrows(UserDataValidationException.class, () -> runtimeService
+    var ex = assertThrows(ValidationException.class, () -> runtimeService
         .startProcessInstanceByKey("testDataFactoryConnectorReadDelegate_key"));
 
-    assertThat(ex.getErrorDto()).isNotNull();
-    assertThat(ex.getErrorDto().getTraceId()).isEqualTo("traceId1");
-    assertThat(ex.getErrorDto().getCode()).isEqualTo("VALIDATION_ERROR");
-    assertThat(ex.getErrorDto().getMessage()).isEqualTo("Validation error");
-    assertThat(ex.getErrorDto().getDetails()).isNotNull();
-    assertThat(ex.getErrorDto().getDetails().getErrors()).hasSize(1);
-    assertThat(ex.getErrorDto().getDetails().getErrors().get(0).getMessage())
-        .isEqualTo("message1");
-    assertThat(ex.getErrorDto().getDetails().getErrors().get(0).getField())
-        .isEqualTo("field1");
-    assertThat(ex.getErrorDto().getDetails().getErrors().get(0).getValue())
-        .isEqualTo("value1");
+    assertThat(ex).isNotNull();
+    assertThat(ex.getTraceId()).isEqualTo("traceId1");
+    assertThat(ex.getCode()).isEqualTo("VALIDATION_ERROR");
+    assertThat(ex.getMessage()).isEqualTo("Validation error");
+    assertThat(ex.getDetails()).isNotNull();
+    assertThat(ex.getDetails().getErrors()).hasSize(1);
+    assertThat(ex.getDetails().getErrors().get(0).getMessage())
+        .isEqualTo("Значення змінної не відповідає правилам вказаним в домені");
+    assertThat(ex.getDetails().getErrors().get(0).getField()).isEqualTo("field1");
+    assertThat(ex.getDetails().getErrors().get(0).getValue()).isEqualTo("value1");
   }
 
   @Test
@@ -115,13 +118,14 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
             .withHeader("X-Source-System", equalTo("Low-code Platform"))
             .withHeader("X-Source-Application", equalTo("business-process-management"))
             .willReturn(aResponse().withStatus(409)
-                .withBody("{\"traceId\":\"traceId1\",\"code\":\"CONSTRAINT_VIOLATION\"}"))));
+                .withBody("{\"traceId\":\"traceId1\",\"code\":\"CONSTRAINT_VIOLATION\","
+                    + "\"message\":\"System Error\"}"))));
 
-    var ex = assertThrows(CamundaSystemException.class, () -> runtimeService
+    var ex = assertThrows(SystemException.class, () -> runtimeService
         .startProcessInstanceByKey("testDataFactoryConnectorReadDelegate_key"));
 
     assertThat(ex.getTraceId()).isEqualTo("traceId1");
-    assertThat(ex.getType()).isEqualTo("CONSTRAINT_VIOLATION");
+    assertThat(ex.getCode()).isEqualTo("CONSTRAINT_VIOLATION");
     assertThat(ex.getMessage()).isEqualTo("System Error");
     assertThat(ex.getLocalizedMessage()).isEqualTo("Порушення одного з обмежень на рівні БД");
   }
@@ -137,12 +141,12 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
             .willReturn(aResponse().withStatus(400)
                 .withBody("{\"traceId\":\"traceId1\",\"code\":\"HEADERS_ARE_MISSING\"}"))));
 
-    var ex = assertThrows(CamundaSystemException.class, () -> runtimeService
+    var ex = assertThrows(SystemException.class, () -> runtimeService
         .startProcessInstanceByKey("testDataFactoryConnectorDeleteDelegate_key"));
 
     assertThat(ex.getTraceId()).isEqualTo("traceId1");
-    assertThat(ex.getType()).isEqualTo("HEADERS_ARE_MISSING");
-    assertThat(ex.getMessage()).isEqualTo("System Error");
+    assertThat(ex.getCode()).isEqualTo("HEADERS_ARE_MISSING");
+    assertThat(ex.getMessage()).isNull();
     assertThat(ex.getLocalizedMessage()).isEqualTo("Відсутній обов’язковий заголовок");
   }
 
@@ -175,21 +179,19 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
 
     Map<String, Object> variables = ImmutableMap
         .of("secure-sys-var-ref-task-form-data-testActivity", "cephKey");
-    var ex = assertThrows(UserDataValidationException.class, () -> runtimeService
+    var ex = assertThrows(ValidationException.class, () -> runtimeService
         .startProcessInstanceByKey("testDataFactoryConnectorUpdateDelegate_key", variables));
 
-    assertThat(ex.getErrorDto()).isNotNull();
-    assertThat(ex.getErrorDto().getTraceId()).isEqualTo("traceId1");
-    assertThat(ex.getErrorDto().getCode()).isEqualTo("VALIDATION_ERROR");
-    assertThat(ex.getErrorDto().getMessage()).isEqualTo("Validation error");
-    assertThat(ex.getErrorDto().getDetails()).isNotNull();
-    assertThat(ex.getErrorDto().getDetails().getErrors()).hasSize(1);
-    assertThat(ex.getErrorDto().getDetails().getErrors().get(0).getMessage())
-        .isEqualTo("message1");
-    assertThat(ex.getErrorDto().getDetails().getErrors().get(0).getField())
-        .isEqualTo("field1");
-    assertThat(ex.getErrorDto().getDetails().getErrors().get(0).getValue())
-        .isEqualTo("value1");
+    assertThat(ex).isNotNull();
+    assertThat(ex.getTraceId()).isEqualTo("traceId1");
+    assertThat(ex.getCode()).isEqualTo("VALIDATION_ERROR");
+    assertThat(ex.getMessage()).isNull();
+    assertThat(ex.getDetails()).isNotNull();
+    assertThat(ex.getDetails().getErrors()).hasSize(1);
+    assertThat(ex.getDetails().getErrors().get(0).getMessage())
+        .isEqualTo("Значення змінної не відповідає правилам вказаним в домені");
+    assertThat(ex.getDetails().getErrors().get(0).getField()).isEqualTo("field1");
+    assertThat(ex.getDetails().getErrors().get(0).getValue()).isEqualTo("value1");
   }
 
   @Test
@@ -212,12 +214,12 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
             .willReturn(aResponse().withStatus(412)
                 .withBody("{\"traceId\":\"traceId1\",\"code\":\"SIGNATURE_VIOLATION\"}"))));
 
-    var ex = assertThrows(CamundaSystemException.class, () -> runtimeService
+    var ex = assertThrows(SystemException.class, () -> runtimeService
         .startProcessInstanceByKey("testDataFactoryConnectorSearchDelegate_key"));
 
     assertThat(ex.getTraceId()).isEqualTo("traceId1");
-    assertThat(ex.getType()).isEqualTo("SIGNATURE_VIOLATION");
-    assertThat(ex.getMessage()).isEqualTo("System Error");
+    assertThat(ex.getCode()).isEqualTo("SIGNATURE_VIOLATION");
+    assertThat(ex.getMessage()).isNull();
     assertThat(ex.getLocalizedMessage()).isEqualTo("Данні в тілі не відповідають підпису");
   }
 

@@ -5,14 +5,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 import org.apache.http.HttpStatus;
-import ua.gov.mdtu.ddm.lowcode.bpms.exception.CamundaSystemException;
+import ua.gov.mdtu.ddm.general.errorhandling.exception.SystemException;
 
 @Provider
-public class CamundaSystemExceptionMapper implements
-    ExceptionMapper<CamundaSystemException> {
+public class CamundaSystemExceptionMapper implements ExceptionMapper<SystemException> {
 
   @Override
-  public Response toResponse(CamundaSystemException ex) {
+  public Response toResponse(SystemException ex) {
     return Response.status(HttpStatus.SC_INTERNAL_SERVER_ERROR)
         .entity(ex).type(MediaType.APPLICATION_JSON).build();
   }

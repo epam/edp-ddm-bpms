@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import ua.gov.mdtu.ddm.lowcode.bpms.exception.UserDataValidationException;
+import ua.gov.mdtu.ddm.general.errorhandling.exception.ValidationException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserDataValidationErrorDelegateTest {
@@ -29,11 +29,11 @@ public class UserDataValidationErrorDelegateTest {
   public void testNoMessagesFromUser() {
     when(delegateExecution.hasVariable("validationErrors")).thenReturn(false);
 
-    UserDataValidationException exception = assertThrows(
-        UserDataValidationException.class, () -> delegate.execute(delegateExecution));
+    var exception = assertThrows(ValidationException.class,
+        () -> delegate.execute(delegateExecution));
 
-    assertThat(exception.getErrorDto()).isNotNull();
-    assertThat(exception.getErrorDto().getDetails()).isNotNull();
-    assertThat(exception.getErrorDto().getDetails().getErrors()).isEmpty();
+    assertThat(exception).isNotNull();
+    assertThat(exception.getDetails()).isNotNull();
+    assertThat(exception.getDetails().getErrors()).isEmpty();
   }
 }

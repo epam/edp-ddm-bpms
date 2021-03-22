@@ -12,6 +12,8 @@ import static ua.gov.mdtu.ddm.lowcode.bpms.it.util.TestUtils.VARIABLE_NAME;
 import static ua.gov.mdtu.ddm.lowcode.bpms.it.util.TestUtils.VARIABLE_VALUE;
 import static ua.gov.mdtu.ddm.lowcode.bpms.it.util.TestUtils.getContent;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
 import java.io.IOException;
@@ -23,7 +25,6 @@ import org.assertj.core.util.Maps;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.web.util.UriComponentsBuilder;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.BaseIT;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.builder.StubData;
@@ -44,9 +45,8 @@ public abstract class BaseBpmnIT extends BaseIT {
 
   @Inject
   protected TestCephServiceImpl cephService;
-
   @Inject
-  protected JacksonJsonParser jacksonJsonParser;
+  protected ObjectMapper objectMapper;
 
   @Before
   public void init() {
@@ -126,10 +126,18 @@ public abstract class BaseBpmnIT extends BaseIT {
   protected void assertCephContent(Map<String, String> expectedContent) {
     Assertions.assertThat(cephService.getStorage()).hasSize(expectedContent.size());
     expectedContent.forEach((key, value) -> {
-      var expectedMap = jacksonJsonParser.parseMap(value);
-      var actualMap = jacksonJsonParser.parseMap(cephService.getContent(cephBucketName, key));
+      var expectedMap = parseMap(value);
+      var actualMap = parseMap(cephService.getContent(cephBucketName, key));
 
       Assertions.assertThat(actualMap).isEqualTo(expectedMap);
     });
+  }
+
+  private Map<String, Object> parseMap(String json) {
+    try {
+      return objectMapper.readerForMapOf(Object.class).readValue(json);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

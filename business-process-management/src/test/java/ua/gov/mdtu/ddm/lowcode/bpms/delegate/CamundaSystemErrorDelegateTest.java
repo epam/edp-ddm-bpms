@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import ua.gov.mdtu.ddm.lowcode.bpms.exception.CamundaSystemException;
+import ua.gov.mdtu.ddm.general.errorhandling.exception.SystemException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CamundaSystemErrorDelegateTest {
@@ -25,9 +25,9 @@ public class CamundaSystemErrorDelegateTest {
   public void testEmptyCamundaSystemError() {
     when(delegateExecution.hasVariable("systemError")).thenReturn(false);
 
-    var exception = assertThrows(CamundaSystemException.class,
-        () -> delegate.execute(delegateExecution));
+    var exception = assertThrows(SystemException.class, () -> delegate.execute(delegateExecution));
 
-    assertThat(exception.getMessage()).isEqualTo(StringUtils.EMPTY);
+    assertThat(exception.getMessage()).isEqualTo("System error");
+    assertThat(exception.getLocalizedMessage()).isEqualTo(StringUtils.EMPTY);
   }
 }

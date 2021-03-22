@@ -9,10 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
-import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.ErrorDetailsDto;
-import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.UserDataValidationErrorDto;
-import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.ValidationErrorDto;
-import ua.gov.mdtu.ddm.lowcode.bpms.exception.UserDataValidationException;
+import ua.gov.mdtu.ddm.general.errorhandling.dto.ErrorDetailDto;
+import ua.gov.mdtu.ddm.general.errorhandling.dto.ErrorsListDto;
+import ua.gov.mdtu.ddm.general.errorhandling.dto.ValidationErrorDto;
+import ua.gov.mdtu.ddm.general.errorhandling.exception.ValidationException;
 
 /**
  * Throws user data validation exception with details based on user input.
@@ -28,29 +28,29 @@ public class UserDataValidationErrorDelegate implements JavaDelegate {
   @Override
   @SuppressWarnings("unchecked")
   public void execute(DelegateExecution execution) {
-    List<ValidationErrorDto> validationErrorDtos =
+    List<ErrorDetailDto> validationErrorDtos =
         execution.hasVariable(VAR_VALIDATION_ERRORS) ?
             ((List<String>) execution.getVariable(VAR_VALIDATION_ERRORS))
                 .stream().map(this::readValidationErrorValue).collect(Collectors.toList())
             : Collections.emptyList();
 
-    throw new UserDataValidationException(createUserDataValidationErrorDto(validationErrorDtos));
+    throw new ValidationException(createUserDataValidationErrorDto(validationErrorDtos));
   }
 
-  private ValidationErrorDto readValidationErrorValue(String value) {
+  private ErrorDetailDto readValidationErrorValue(String value) {
     try {
-      return objectMapper.readValue(value, ValidationErrorDto.class);
+      return objectMapper.readValue(value, ErrorDetailDto.class);
     } catch (JsonProcessingException ex) {
       throw new IllegalStateException(String.format("couldn't serialize %s", value), ex);
     }
   }
 
-  private UserDataValidationErrorDto createUserDataValidationErrorDto(
-      List<ValidationErrorDto> validationErrorDtos) {
-    return UserDataValidationErrorDto.builder()
+  private ValidationErrorDto createUserDataValidationErrorDto(
+      List<ErrorDetailDto> validationErrorDtos) {
+    return ValidationErrorDto.builder()
         .code("VALIDATION_ERROR")
         .message("Validation error")
-        .details(new ErrorDetailsDto(validationErrorDtos))
+        .details(new ErrorsListDto(validationErrorDtos))
         .build();
   }
 }

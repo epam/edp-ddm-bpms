@@ -1,32 +1,33 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector;
 
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
+import ua.gov.mdtu.ddm.general.errorhandling.dto.ErrorDetailDto;
+import ua.gov.mdtu.ddm.general.errorhandling.dto.ErrorsListDto;
+import ua.gov.mdtu.ddm.general.errorhandling.dto.SystemErrorDto;
+import ua.gov.mdtu.ddm.general.errorhandling.dto.ValidationErrorDto;
+import ua.gov.mdtu.ddm.general.errorhandling.exception.SystemException;
+import ua.gov.mdtu.ddm.general.errorhandling.exception.ValidationException;
 import ua.gov.mdtu.ddm.general.integration.ceph.service.CephService;
-import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.ErrorDetailsDto;
-import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.UserDataValidationErrorDto;
-import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.ValidationErrorDto;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.dto.DataFactoryConnectorResponse;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.dto.enums.DataFactoryError;
 import ua.gov.mdtu.ddm.lowcode.bpms.service.MessageResolver;
-import ua.gov.mdtu.ddm.lowcode.bpms.exception.CamundaSystemException;
-import ua.gov.mdtu.ddm.lowcode.bpms.exception.UserDataValidationException;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -39,7 +40,7 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
 
   private final RestTemplate restTemplate;
   private final CephService cephService;
-  private final JacksonJsonParser jacksonJsonParser;
+  private final ObjectMapper objectMapper;
   private final MessageResolver messageResolver;
   private final String springAppName;
   private final String cephBucketName;
@@ -88,6 +89,8 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
 
     return headers;
   }
+
+  @SneakyThrows
   protected Optional<String> getAccessToken(DelegateExecution delegateExecution) {
     var xAccessTokenCephKey = (String) delegateExecution.getVariable("x_access_token_ceph_key");
     if (StringUtils.isBlank(xAccessTokenCephKey)) {
@@ -95,7 +98,8 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
     }
     var xAccessTokenCephDoc = cephService.getContent(cephBucketName, xAccessTokenCephKey);
 
-    Map<String, Object> map = jacksonJsonParser.parseMap(xAccessTokenCephDoc);
+    Map<String, Object> map = objectMapper.readerForMapOf(Object.class)
+        .readValue(xAccessTokenCephDoc);
     return Optional.ofNullable(map.get("x-access-token")).map(Object::toString);
   }
 
@@ -104,7 +108,18 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
     var httpStatus = HttpStatus.valueOf(ex.getRawStatusCode());
     var isValidationException = Objects.equals(HttpStatus.UNPROCESSABLE_ENTITY, httpStatus) ||
         Objects.equals(HttpStatus.NOT_FOUND, httpStatus);
-    return buildException(requestEntity, ex, isValidationException);
+
+    var exception = buildException(requestEntity, ex, isValidationException);
+
+    if (Objects.equals(HttpStatus.NOT_FOUND, httpStatus)) {
+      var localizedMessage = messageResolver
+          .getMessage(DataFactoryError.NOT_FOUND.getTitleKey());
+
+      ((ValidationException) exception).getDetails()
+          .setErrors(Collections.singletonList(new ErrorDetailDto(localizedMessage, null, null)));
+    }
+
+    return exception;
   }
 
   protected RuntimeException buildUpdatableException(RequestEntity<?> requestEntity,
@@ -121,57 +136,31 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
         : camundaSystemException(ex.getResponseBodyAsString());
   }
 
-  private CamundaSystemException camundaSystemException(String responseBody) {
-    var responseMap = jacksonJsonParser.parseMap(responseBody);
+  @SneakyThrows
+  private SystemException camundaSystemException(String responseBody) {
+    var systemErrorDto = objectMapper.readValue(responseBody, SystemErrorDto.class);
 
-    var traceId = (String) responseMap.get("traceId");
-    var code = (String) responseMap.get("code");
-
-    var message = "System Error";
-    var dataFactoryError = DataFactoryError.fromNameOrDefaultRuntimeError(code);
+    var dataFactoryError = DataFactoryError.fromNameOrDefaultRuntimeError(systemErrorDto.getCode());
     var localizedMessage = messageResolver.getMessage(dataFactoryError.getTitleKey());
-    return new CamundaSystemException(traceId, code, message, localizedMessage);
+
+    systemErrorDto.setLocalizedMessage(localizedMessage);
+    return new SystemException(systemErrorDto);
   }
 
-  @SuppressWarnings("unchecked")
-  private UserDataValidationException validationException(String responseBody) {
-    var responseMap = jacksonJsonParser.parseMap(responseBody);
+  @SneakyThrows
+  private ValidationException validationException(String responseBody) {
+    var validationErrorDto = objectMapper.readValue(responseBody, ValidationErrorDto.class);
 
-    var traceId = (String) responseMap.get("traceId");
-    var code = (String) responseMap.get("code");
-
-    var userDataValidationErrorDto = new UserDataValidationErrorDto();
-    userDataValidationErrorDto.setTraceId(traceId);
-    userDataValidationErrorDto.setCode(code);
-    userDataValidationErrorDto.setMessage("Validation error");
-
-    var details = (Map<String, Object>) responseMap.get("details");
-    if (details == null) {
-      return new UserDataValidationException(userDataValidationErrorDto);
+    if (Objects.nonNull(validationErrorDto.getDetails())) {
+      var localizedMessage = messageResolver
+          .getMessage(DataFactoryError.VALIDATION_ERROR.getTitleKey());
+      validationErrorDto.getDetails().getErrors()
+          .forEach(errorDetailDto -> errorDetailDto.setMessage(localizedMessage));
+    } else {
+      validationErrorDto.setDetails(new ErrorsListDto());
     }
 
-    var errors = (List<Object>) details.get("errors");
-    if (errors == null) {
-      return new UserDataValidationException(userDataValidationErrorDto);
-    }
-
-    var errorDetailDto = new ErrorDetailsDto();
-    var validationErrorDtos = errors.stream().map(error -> {
-      var errorMap = (Map<String, Object>) error;
-
-      var message = (String) errorMap.get("message");
-      var field = (String) errorMap.get("field");
-      var value = (String) errorMap.get("value");
-
-      var validationErrorDto = new ValidationErrorDto();
-      validationErrorDto.setMessage(message);
-      validationErrorDto.setField(field);
-      validationErrorDto.setValue(value);
-      return validationErrorDto;
-    }).collect(Collectors.toList());
-    errorDetailDto.setErrors(validationErrorDtos);
-    userDataValidationErrorDto.setDetails(errorDetailDto);
-    return new UserDataValidationException(userDataValidationErrorDto);
+    return new ValidationException(validationErrorDto);
   }
 
   private void logSuccessfulRequest(RequestEntity<?> request, ResponseEntity<?> response) {

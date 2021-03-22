@@ -8,7 +8,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
-import ua.gov.mdtu.ddm.lowcode.bpms.exception.CamundaSystemException;
+import ua.gov.mdtu.ddm.general.errorhandling.exception.SystemException;
 
 public class CamundaSystemErrorDelegateIT extends BaseIT {
 
@@ -22,8 +22,9 @@ public class CamundaSystemErrorDelegateIT extends BaseIT {
         .list();
 
     var id = tasks.get(0).getId();
-    var ex = assertThrows(CamundaSystemException.class, () -> taskService.complete(id));
+    var ex = assertThrows(SystemException.class, () -> taskService.complete(id));
 
-    assertThat(ex.getMessage()).isEqualTo("Something wrong");
+    assertThat(ex.getMessage()).isEqualTo("System error");
+    assertThat(ex.getLocalizedMessage()).isEqualTo("Something wrong");
   }
 }

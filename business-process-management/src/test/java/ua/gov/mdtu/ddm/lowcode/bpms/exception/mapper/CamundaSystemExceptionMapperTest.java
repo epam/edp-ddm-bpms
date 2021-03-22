@@ -5,13 +5,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.junit.Test;
-import ua.gov.mdtu.ddm.lowcode.bpms.exception.CamundaSystemException;
+import ua.gov.mdtu.ddm.general.errorhandling.exception.SystemException;
 
 public class CamundaSystemExceptionMapperTest {
 
   @Test
   public void testUserDataValidationExceptionMapper() {
-    var ex = new CamundaSystemException(null);
+    var ex = new SystemException(null);
 
     Response response = new CamundaSystemExceptionMapper().toResponse(ex);
 

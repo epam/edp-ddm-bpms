@@ -1,10 +1,10 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientResponseException;
@@ -23,11 +23,11 @@ public class DataFactoryConnectorUpdateDelegate extends BaseConnectorDelegate {
 
   @Autowired
   public DataFactoryConnectorUpdateDelegate(RestTemplate restTemplate, CephService cephService,
-      JacksonJsonParser jacksonJsonParser, MessageResolver messageResolver,
+      ObjectMapper objectMapper, MessageResolver messageResolver,
       @Value("${spring.application.name}") String springAppName,
       @Value("${ceph.bucket}") String cephBucketName,
       @Value("${camunda.system-variables.const_dataFactoryBaseUrl}") String dataFactoryBaseUrl) {
-    super(restTemplate, cephService, jacksonJsonParser, messageResolver, springAppName,
+    super(restTemplate, cephService, objectMapper, messageResolver, springAppName,
         cephBucketName);
     this.dataFactoryBaseUrl = dataFactoryBaseUrl;
   }

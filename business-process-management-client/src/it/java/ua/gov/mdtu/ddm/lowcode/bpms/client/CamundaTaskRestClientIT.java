@@ -21,14 +21,14 @@ import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.ErrorDetailsDto;
-import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.ErrorDto;
+import ua.gov.mdtu.ddm.general.errorhandling.dto.ErrorDetailDto;
+import ua.gov.mdtu.ddm.general.errorhandling.dto.ErrorsListDto;
+import ua.gov.mdtu.ddm.general.errorhandling.dto.SystemErrorDto;
+import ua.gov.mdtu.ddm.general.errorhandling.dto.ValidationErrorDto;
+import ua.gov.mdtu.ddm.general.errorhandling.exception.ValidationException;
 import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.TaskQueryDto;
-import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.UserDataValidationErrorDto;
-import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.ValidationErrorDto;
 import ua.gov.mdtu.ddm.lowcode.bpms.client.exception.AuthorizationException;
 import ua.gov.mdtu.ddm.lowcode.bpms.client.exception.TaskNotFoundException;
-import ua.gov.mdtu.ddm.lowcode.bpms.client.exception.UserDataValidationException;
 
 public class CamundaTaskRestClientIT extends BaseIT {
 
@@ -91,7 +91,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
 
   @Test
   public void shouldReturn403TaskById() throws JsonProcessingException {
-    var errorDto403 = new ErrorDto("testTraceId", "type", "message403", "testLocalizedMsg");
+    var errorDto403 = new SystemErrorDto("testTraceId", "type", "message403", "testLocalizedMsg");
     restClientWireMock.addStubMapping(
         stubFor(get(urlPathEqualTo("/api/task/tid403"))
             .willReturn(aResponse()
@@ -105,14 +105,14 @@ public class CamundaTaskRestClientIT extends BaseIT {
         () -> camundaTaskRestClient.getTaskById("tid403"));
 
     assertThat(exception.getTraceId()).isEqualTo("testTraceId");
-    assertThat(exception.getType()).isEqualTo("type");
+    assertThat(exception.getCode()).isEqualTo("type");
     assertThat(exception.getMessage()).isEqualTo("message403");
     assertThat(exception.getLocalizedMessage()).isEqualTo("testLocalizedMsg");
   }
 
   @Test
   public void shouldReturn404TaskById() throws JsonProcessingException {
-    var errorDto404 = new ErrorDto("testTraceId", "type", "message404", "testLocalizedMsg");
+    var errorDto404 = new SystemErrorDto("testTraceId", "type", "message404", "testLocalizedMsg");
     restClientWireMock.addStubMapping(
         stubFor(get(urlPathEqualTo("/api/task/tid404"))
             .willReturn(aResponse()
@@ -126,7 +126,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
         () -> camundaTaskRestClient.getTaskById("tid404"));
 
     assertThat(exception.getTraceId()).isEqualTo("testTraceId");
-    assertThat(exception.getType()).isEqualTo("type");
+    assertThat(exception.getCode()).isEqualTo("type");
     assertThat(exception.getMessage()).isEqualTo("message404");
     assertThat(exception.getLocalizedMessage()).isEqualTo("testLocalizedMsg");
   }
@@ -221,10 +221,10 @@ public class CamundaTaskRestClientIT extends BaseIT {
 
   @Test
   public void shouldReturn422DuringTaskCompletion() throws JsonProcessingException {
-    var details = new ErrorDetailsDto();
-    details.setErrors(Lists.newArrayList(new ValidationErrorDto("test msg",
+    var details = new ErrorsListDto();
+    details.setErrors(Lists.newArrayList(new ErrorDetailDto("test msg",
         "key1", "val1")));
-    var errorDto422 = UserDataValidationErrorDto.builder().details(details).build();
+    var errorDto422 = ValidationErrorDto.builder().details(details).build();
     restClientWireMock.addStubMapping(
         stubFor(post(urlPathEqualTo("/api/task/taskId/complete"))
             .willReturn(aResponse()
@@ -235,7 +235,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
     );
 
     var completeTaskDto = new CompleteTaskDto();
-    var exception = assertThrows(UserDataValidationException.class,
+    var exception = assertThrows(ValidationException.class,
         () -> camundaTaskRestClient.completeTaskById("taskId", completeTaskDto));
 
     assertThat(exception.getDetails().getErrors().get(0).getMessage())

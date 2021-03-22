@@ -1,13 +1,11 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.stream.Stream;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
 import org.springframework.boot.jdbc.DatabaseDriver;
-import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -25,11 +23,6 @@ public class GeneralConfig {
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
-    }
-
-    @Bean
-    public JacksonJsonParser jacksonJsonParser(ObjectMapper objectMapper) {
-        return new JacksonJsonParser(objectMapper);
     }
 
     @Bean

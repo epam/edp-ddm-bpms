@@ -20,7 +20,7 @@ import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.ErrorDto;
+import ua.gov.mdtu.ddm.general.errorhandling.dto.SystemErrorDto;
 import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.ProcessDefinitionQueryDto;
 import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.enums.SortOrder;
 import ua.gov.mdtu.ddm.lowcode.bpms.client.exception.ProcessDefinitionNotFoundException;
@@ -96,7 +96,7 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
 
   @Test
   public void shouldReturn404OnMissingProcessDefinition() throws JsonProcessingException {
-    var errorDto = new ErrorDto("testTraceId", "type", "error","testLocalizedMsg");
+    var errorDto = new SystemErrorDto("testTraceId", "type", "error", "testLocalizedMsg");
     restClientWireMock.addStubMapping(
         stubFor(get(urlEqualTo("/api/process-definition/testId404"))
             .willReturn(aResponse()
@@ -110,7 +110,7 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
         () -> processDefinitionRestClient.getProcessDefinition("testId404"));
 
     assertThat(exception.getTraceId()).isEqualTo("testTraceId");
-    assertThat(exception.getType()).isEqualTo("type");
+    assertThat(exception.getCode()).isEqualTo("type");
     assertThat(exception.getMessage()).isEqualTo("error");
     assertThat(exception.getLocalizedMessage()).isEqualTo("testLocalizedMsg");
   }
