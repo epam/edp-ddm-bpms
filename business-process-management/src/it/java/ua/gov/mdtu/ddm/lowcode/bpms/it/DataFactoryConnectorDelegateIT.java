@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import ua.gov.mdtu.ddm.general.integration.ceph.dto.FormDataDto;
 import ua.gov.mdtu.ddm.general.errorhandling.exception.SystemException;
 import ua.gov.mdtu.ddm.general.errorhandling.exception.ValidationException;
 
@@ -161,7 +162,8 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
                     + "<Buckets><Bucket><Name>" + cephBucketName + "</Name></Bucket></Buckets>"
                     + "</ListAllMyBucketsResult>"))));
 
-    cephService.putContent(cephBucketName, "cephKey", CONTENT);
+    formDataCephService.putFormData("cephKey", FormDataDto.builder()
+        .accessToken("token").build());
 
     dataFactoryMockServer.addStubMapping(
         stubFor(put(urlPathEqualTo("/mock-server/laboratory/id"))
@@ -226,7 +228,8 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
   @Test
   @Deployment(resources = {"bpmn/connector/testDataFactoryConnectorBatchCreateDelegate.bpmn"})
   public void testDataFactoryConnectorBatchCreateDelegate() {
-    cephService.putContent(cephBucketName, "tokenKey", CONTENT);
+    formDataCephService.putFormData("tokenKey", FormDataDto.builder()
+        .accessToken("token").build());
 
     digitalSignatureMockServer.addStubMapping(stubFor(
         post(urlPathEqualTo("/api/eseal/sign"))

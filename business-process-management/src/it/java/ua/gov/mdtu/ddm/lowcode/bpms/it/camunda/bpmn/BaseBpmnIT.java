@@ -26,6 +26,7 @@ import org.junit.Before;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.util.UriComponentsBuilder;
+import ua.gov.mdtu.ddm.general.integration.ceph.dto.FormDataDto;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.BaseIT;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.builder.StubData;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.config.TestCephServiceImpl;
@@ -44,20 +45,19 @@ public abstract class BaseBpmnIT extends BaseIT {
   protected String cephBucketName;
 
   @Inject
-  protected TestCephServiceImpl cephService;
-  @Inject
   protected ObjectMapper objectMapper;
 
   @Before
   public void init() {
     cephService.clearStorage();
+    formDataCephService.clearStorage();
   }
 
   protected void completeTask(String taskId, String processInstanceId, String formData)
       throws IOException {
     var variableName = String.format(VARIABLE_NAME, taskId);
     var variableValue = String.format(VARIABLE_VALUE, processInstanceId, variableName);
-    cephService.putContent(cephBucketName, variableValue, getContent(formData));
+    formDataCephService.putFormData(variableValue, deserializeFormData(getContent(formData)));
     String id = taskService.createTaskQuery().taskDefinitionKey(taskId).singleResult().getId();
     taskService.complete(id, Maps.newHashMap(variableName, variableValue));
   }
@@ -123,21 +123,20 @@ public abstract class BaseBpmnIT extends BaseIT {
     digitalSignatureMockServer.addStubMapping(stubFor(mappingBuilder));
   }
 
-  protected void assertCephContent(Map<String, String> expectedContent) {
-    Assertions.assertThat(cephService.getStorage()).hasSize(expectedContent.size());
+  protected void assertCephContent(Map<String, Object> expectedContent) {
     expectedContent.forEach((key, value) -> {
-      var expectedMap = parseMap(value);
-      var actualMap = parseMap(cephService.getContent(cephBucketName, key));
+      var actualMap = formDataCephService.getFormData(key);
 
-      Assertions.assertThat(actualMap).isEqualTo(expectedMap);
+      Assertions.assertThat(actualMap).isEqualTo(value);
     });
   }
 
-  private Map<String, Object> parseMap(String json) {
+  protected FormDataDto deserializeFormData(String formData) {
     try {
-      return objectMapper.readerForMapOf(Object.class).readValue(json);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
+      return this.objectMapper.readValue(formData, FormDataDto.class);
+    } catch (JsonProcessingException var4) {
+      var4.clearLocation();
+      throw new IllegalStateException("Couldn't deserialize form data", var4);
     }
   }
 }

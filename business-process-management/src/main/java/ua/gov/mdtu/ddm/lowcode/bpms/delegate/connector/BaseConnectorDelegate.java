@@ -24,7 +24,7 @@ import ua.gov.mdtu.ddm.general.errorhandling.dto.SystemErrorDto;
 import ua.gov.mdtu.ddm.general.errorhandling.dto.ValidationErrorDto;
 import ua.gov.mdtu.ddm.general.errorhandling.exception.SystemException;
 import ua.gov.mdtu.ddm.general.errorhandling.exception.ValidationException;
-import ua.gov.mdtu.ddm.general.integration.ceph.service.CephService;
+import ua.gov.mdtu.ddm.general.integration.ceph.service.FormDataCephService;
 import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.enums.PlatformHttpHeader;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.dto.DataFactoryConnectorResponse;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.dto.enums.DataFactoryError;
@@ -40,11 +40,10 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
   protected static final String RESPONSE_VARIABLE = "response";
 
   private final RestTemplate restTemplate;
-  private final CephService cephService;
+  private final FormDataCephService formDataCephService;
   private final ObjectMapper objectMapper;
   private final MessageResolver messageResolver;
   private final String springAppName;
-  private final String cephBucketName;
 
   protected DataFactoryConnectorResponse perform(RequestEntity<?> requestEntity) {
     var httpResponse = restTemplate.exchange(requestEntity, String.class);
@@ -98,11 +97,9 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
     if (StringUtils.isBlank(xAccessTokenCephKey)) {
       return Optional.empty();
     }
-    var xAccessTokenCephDoc = cephService.getContent(cephBucketName, xAccessTokenCephKey);
+    var xAccessTokenCephFromData = formDataCephService.getFormData(xAccessTokenCephKey);
 
-    Map<String, Object> map = objectMapper.readerForMapOf(Object.class)
-        .readValue(xAccessTokenCephDoc);
-    return Optional.ofNullable(map.get("x-access-token")).map(Object::toString);
+    return Optional.ofNullable(xAccessTokenCephFromData.getAccessToken());
   }
 
   protected RuntimeException buildReadableException(RequestEntity<?> requestEntity,

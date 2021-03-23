@@ -9,6 +9,8 @@ import static ua.gov.mdtu.ddm.lowcode.bpms.it.util.TestUtils.getContent;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Before;
 import org.junit.Test;
@@ -79,7 +81,7 @@ public class AddPersonnelBpmnTest extends BaseBpmnTest {
         systemSignatureCephKeyRefVarName + "_0";
 
     var expectedVariablesMap = new HashMap<String, Object>();
-    var expectedCephStorage = new HashMap<String, String>();
+    var expectedCephStorage = new HashMap<String, Object>();
 
     expectedVariablesMap.put("initiator", initiator);
     //search lab task
@@ -98,9 +100,9 @@ public class AddPersonnelBpmnTest extends BaseBpmnTest {
     expectedVariablesMap.put(viewLabDataFormRefVarName, viewLabDataFormCephKey);
 
     expectedCephStorage.put(searchLabFormCephKey,
-        getContent("/json/add-personnel/form-data/searchLabFormActivity.json"));
+        deserializeFormData(getContent("/json/add-personnel/form-data/searchLabFormActivity.json")));
     expectedCephStorage.put(viewLabDataFormCephKey,
-        getContent("/json/add-personnel/form-data/viewLabDataFormActivityPrepopulation.json"));
+        deserializeFormData(getContent("/json/add-personnel/form-data/viewLabDataFormActivityPrepopulation.json")));
 
     //view lab data task
     assertThat(processInstance).isWaitingAt(viewLabDataFormActivityDefinitionKey);
@@ -115,9 +117,9 @@ public class AddPersonnelBpmnTest extends BaseBpmnTest {
     expectedVariablesMap.put(addPersonnelFormRefVarName, addPersonnelFormCephKey);
 
     expectedCephStorage.put(viewLabDataFormCephKey,
-        getContent("/json/add-personnel/form-data/viewLabDataFormActivity.json"));
+        deserializeFormData(getContent("/json/add-personnel/form-data/viewLabDataFormActivity.json")));
     expectedCephStorage.put(addPersonnelFormCephKey,
-        getContent("/json/add-personnel/form-data/addPersonnelFormActivityPrepopulation.json"));
+        deserializeFormData(getContent("/json/add-personnel/form-data/addPersonnelFormActivityPrepopulation.json")));
 
     assertThat(processInstance).isWaitingAt(addPersonnelFormActivityDefinitionKey);
     assertThat(task(addPersonnelFormActivityDefinitionKey))
@@ -132,9 +134,9 @@ public class AddPersonnelBpmnTest extends BaseBpmnTest {
     expectedVariablesMap.put(signPersonnelFormRefVarName, signPersonnelFormCephKey);
 
     expectedCephStorage.put(addPersonnelFormCephKey,
-        getContent("/json/add-personnel/form-data/addPersonnelFormActivity.json"));
+        deserializeFormData(getContent("/json/add-personnel/form-data/addPersonnelFormActivity.json")));
     expectedCephStorage.put(signPersonnelFormCephKey,
-        getContent("/json/add-personnel/form-data/addPersonnelFormActivity.json"));
+        deserializeFormData(getContent("/json/add-personnel/form-data/addPersonnelFormActivity.json")));
 
     assertThat(processInstance).isWaitingAt(signPersonnelFormActivityDefinitionKey);
     assertThat(task(signPersonnelFormActivityDefinitionKey))
@@ -151,9 +153,11 @@ public class AddPersonnelBpmnTest extends BaseBpmnTest {
         .put("sys-var-process-completion-result", "Дані про кадровий склад внесені");
 
     expectedCephStorage.put(signPersonnelFormCephKey,
-        getContent("/json/add-personnel/form-data/signPersonnelFormActivity.json"));
-    expectedCephStorage.put(systemSignatureCephKey,
-        getContent("/json/add-personnel/dso/systemSignatureCephContent.json"));
+        deserializeFormData(getContent("/json/add-personnel/form-data/signPersonnelFormActivity.json")));
+    String signature = cephService.getContent(cephBucketName, systemSignatureCephKey);
+    Map<String, Object> signatureMap = objectMapper.readerForMapOf(Object.class).readValue(signature);
+    Map<String, Object> expectedSignatureMap = objectMapper.readerForMapOf(Object.class).readValue(getContent("/json/add-personnel/dso/systemSignatureCephContent.json"));
+    Assertions.assertThat(signatureMap).isEqualTo(expectedSignatureMap);
 
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().hasSize(15).containsAllEntriesOf(expectedVariablesMap);

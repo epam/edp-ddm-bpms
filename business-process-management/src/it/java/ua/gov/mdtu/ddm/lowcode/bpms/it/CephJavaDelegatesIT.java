@@ -89,7 +89,7 @@ public class CephJavaDelegatesIT extends BaseIT {
 
   @Test
   public void shouldPutTaskFormDataToCeph() {
-    var content = "{\"name\":{\"value\":\"value ek\"}}";
+    var content = "{\"data\":{\"name\":\"value ek\"}}";
 
     Map<String, Object> vars = ImmutableMap.of("formData", Variables.stringValue(content, true));
     var processInstance = runtimeService
@@ -108,9 +108,9 @@ public class CephJavaDelegatesIT extends BaseIT {
         .containsEntry("secure-sys-var-ref-task-form-data-userTask", expectedCephKey)
         .doesNotContainKey("formDataOutput");
 
-    String data = cephService.getContent(cephBucketName, expectedCephKey);
+    var data = formDataCephService.getFormData(expectedCephKey);
     assertThat(data).isNotNull();
-    assertThat(data).isEqualTo(content);
+    assertThat(data.getData().get("name")).isEqualTo("value ek");
   }
 
   @Test

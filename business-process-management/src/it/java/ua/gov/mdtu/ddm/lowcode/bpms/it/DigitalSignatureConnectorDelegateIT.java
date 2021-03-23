@@ -15,10 +15,9 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import ua.gov.mdtu.ddm.general.integration.ceph.dto.FormDataDto;
 
 public class DigitalSignatureConnectorDelegateIT extends BaseIT {
-
-  private static final String CONTENT = "{\"x-access-token\":\"token\"}";
 
   @Inject
   @Qualifier("cephWireMockServer")
@@ -32,7 +31,8 @@ public class DigitalSignatureConnectorDelegateIT extends BaseIT {
   @Test
   @Deployment(resources = {"bpmn/connector/testDigitalSignatureConnectorDelegate.bpmn"})
   public void testDigitalSignatureConnectorDelegate() {
-    cephService.putContent(cephBucketName, "cephKey", CONTENT);
+    formDataCephService.putFormData("cephKey", FormDataDto.builder()
+        .accessToken("token").build());
 
     digitalSignatureMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo("/api/eseal/sign"))

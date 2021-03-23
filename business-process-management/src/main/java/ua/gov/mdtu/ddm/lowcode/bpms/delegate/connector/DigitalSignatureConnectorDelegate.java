@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import ua.gov.mdtu.ddm.general.integration.ceph.service.CephService;
+import ua.gov.mdtu.ddm.general.integration.ceph.service.FormDataCephService;
 import ua.gov.mdtu.ddm.general.starter.logger.annotation.Logging;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.dto.DataFactoryConnectorResponse;
 import ua.gov.mdtu.ddm.lowcode.bpms.service.MessageResolver;
@@ -24,12 +24,11 @@ public class DigitalSignatureConnectorDelegate extends BaseConnectorDelegate {
   private final String dsoBaseUrl;
 
   @Autowired
-  public DigitalSignatureConnectorDelegate(RestTemplate restTemplate, CephService cephService,
+  public DigitalSignatureConnectorDelegate(RestTemplate restTemplate, FormDataCephService formDataCephService,
       ObjectMapper objectMapper, MessageResolver messageResolver,
       @Value("${spring.application.name}") String springAppName,
-      @Value("${ceph.bucket}") String cephBucketName,
       @Value("${dso.url}") String dsoBaseUrl) {
-    super(restTemplate, cephService, objectMapper, messageResolver, springAppName, cephBucketName);
+    super(restTemplate, formDataCephService, objectMapper, messageResolver, springAppName);
     this.dsoBaseUrl = dsoBaseUrl;
   }
 

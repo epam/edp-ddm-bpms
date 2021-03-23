@@ -22,6 +22,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.config.TestCephServiceImpl;
+import ua.gov.mdtu.ddm.lowcode.bpms.it.config.TestFormDataCephServiceImpl;
 
 @ActiveProfiles("test")
 @RunWith(SpringRunner.class)
@@ -42,6 +43,8 @@ public abstract class BaseIT {
   protected ObjectMapper objectMapper;
   @Inject
   protected TestCephServiceImpl cephService;
+  @Inject
+  protected TestFormDataCephServiceImpl formDataCephService;
 
   @LocalServerPort
   protected int port;

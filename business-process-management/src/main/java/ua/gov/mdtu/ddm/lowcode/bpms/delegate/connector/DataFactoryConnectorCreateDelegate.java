@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import ua.gov.mdtu.ddm.general.integration.ceph.service.CephService;
+import ua.gov.mdtu.ddm.general.integration.ceph.service.FormDataCephService;
 import ua.gov.mdtu.ddm.general.starter.logger.annotation.Logging;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.dto.DataFactoryConnectorResponse;
 import ua.gov.mdtu.ddm.lowcode.bpms.service.MessageResolver;
@@ -22,13 +22,11 @@ public class DataFactoryConnectorCreateDelegate extends BaseConnectorDelegate {
   private final String dataFactoryBaseUrl;
 
   @Autowired
-  public DataFactoryConnectorCreateDelegate(RestTemplate restTemplate, CephService cephService,
+  public DataFactoryConnectorCreateDelegate(RestTemplate restTemplate, FormDataCephService formDataCephService,
       ObjectMapper objectMapper, MessageResolver messageResolver,
       @Value("${spring.application.name}") String springAppName,
-      @Value("${ceph.bucket}") String cephBucketName,
       @Value("${camunda.system-variables.const_dataFactoryBaseUrl}") String dataFactoryBaseUrl) {
-    super(restTemplate, cephService, objectMapper, messageResolver, springAppName,
-        cephBucketName);
+    super(restTemplate, formDataCephService, objectMapper, messageResolver, springAppName);
     this.dataFactoryBaseUrl = dataFactoryBaseUrl;
   }
 
