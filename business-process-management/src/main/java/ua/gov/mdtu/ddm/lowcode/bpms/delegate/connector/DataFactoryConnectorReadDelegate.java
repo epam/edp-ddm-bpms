@@ -11,9 +11,9 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ua.gov.mdtu.ddm.general.integration.ceph.service.FormDataCephService;
+import ua.gov.mdtu.ddm.general.localization.MessageResolver;
 import ua.gov.mdtu.ddm.general.starter.logger.annotation.Logging;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.dto.DataFactoryConnectorResponse;
-import ua.gov.mdtu.ddm.lowcode.bpms.service.MessageResolver;
 
 /**
  * The class represents an implementation of {@link BaseConnectorDelegate} that is used to read data

@@ -3,13 +3,14 @@ package ua.gov.mdtu.ddm.lowcode.bpms.delegate.dto.enums;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import ua.gov.mdtu.ddm.general.localization.MessageTitle;
 
 /**
  * Enumeration of data factory errors.
  */
 @Getter
 @RequiredArgsConstructor
-public enum DataFactoryError {
+public enum DataFactoryError implements MessageTitle {
   CLIENT_ERROR("data-factory.error.client-error"),
   HEADERS_ARE_MISSING("data-factory.error.header-are-missing"),
   INVALID_HEADER_VALUE("data-factory.error.invalid-header-value"),

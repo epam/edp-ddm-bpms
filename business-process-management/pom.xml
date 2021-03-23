@@ -70,6 +70,11 @@
       <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-ui</artifactId>
     </dependency>
+    <dependency>
+      <groupId>ua.gov.mdtu.ddm.general</groupId>
+      <artifactId>platform-localization-starter</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
 
     <dependency>
       <artifactId>spring-cloud-starter-kubernetes-config</artifactId>

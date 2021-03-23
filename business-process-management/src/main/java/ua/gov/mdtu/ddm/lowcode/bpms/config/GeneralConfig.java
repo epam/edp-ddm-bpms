@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.jdbc.support.DatabaseStartupValidator;
 import org.springframework.web.client.RestTemplate;
 import ua.gov.mdtu.ddm.general.integration.ceph.config.CephConfig;
@@ -28,15 +27,6 @@ public class GeneralConfig {
   @Bean
   public RestTemplate restTemplate() {
     return new RestTemplate();
-  }
-
-  @Bean
-  public ResourceBundleMessageSource messageSource() {
-    ResourceBundleMessageSource rs = new ResourceBundleMessageSource();
-    rs.setUseCodeAsDefaultMessage(true);
-    rs.setDefaultEncoding("UTF-8");
-    rs.setBasename("lang/messages");
-    return rs;
   }
 
   @Bean

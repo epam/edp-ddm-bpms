@@ -34,6 +34,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ua.gov.mdtu.ddm.general.integration.ceph.dto.FormDataDto;
+import ua.gov.mdtu.ddm.general.localization.MessageResolver;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.DefineBusinessProcessStatusDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.GetFormDataFromCephDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.PutContentToCephDelegate;
@@ -47,7 +48,6 @@ import ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector.DigitalSignatureConnector
 import ua.gov.mdtu.ddm.lowcode.bpms.it.builder.StubData;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.config.TestCephServiceImpl;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.config.TestFormDataCephServiceImpl;
-import ua.gov.mdtu.ddm.lowcode.bpms.service.MessageResolver;
 
 @RunWith(MockitoJUnitRunner.class)
 public abstract class BaseBpmnTest {

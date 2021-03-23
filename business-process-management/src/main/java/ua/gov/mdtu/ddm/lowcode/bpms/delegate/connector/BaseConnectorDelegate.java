@@ -25,10 +25,10 @@ import ua.gov.mdtu.ddm.general.errorhandling.dto.ValidationErrorDto;
 import ua.gov.mdtu.ddm.general.errorhandling.exception.SystemException;
 import ua.gov.mdtu.ddm.general.errorhandling.exception.ValidationException;
 import ua.gov.mdtu.ddm.general.integration.ceph.service.FormDataCephService;
+import ua.gov.mdtu.ddm.general.localization.MessageResolver;
 import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.enums.PlatformHttpHeader;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.dto.DataFactoryConnectorResponse;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.dto.enums.DataFactoryError;
-import ua.gov.mdtu.ddm.lowcode.bpms.service.MessageResolver;
 
 /**
  * The class represents an implementation of {@link JavaDelegate} that is used to provide common
