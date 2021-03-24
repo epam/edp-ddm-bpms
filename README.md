@@ -68,3 +68,11 @@ scrape_configs:
     * *@Confidential* - can annotate method or method parameters to exclude confidential data from logs:
         - For a method - exclude the result of execution;
         - For method parameters - exclude method parameters;
+
+### Postman
+
+##### Collections:
+* `camunda.postman_collection.json` - this collection contain the rest-api enpoints related to Camunda REST API
+##### Usage:
+- Import collection to your postman;
+- Set up all required environments.
