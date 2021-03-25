@@ -6,7 +6,7 @@
   <parent>
     <groupId>ua.gov.mdtu.ddm.lowcode</groupId>
     <artifactId>business-process-management-parent</artifactId>
-    <version>0.0.4-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>business-process-management</artifactId>
@@ -91,12 +91,12 @@
     <dependency>
       <groupId>ua.gov.mdtu.ddm.general</groupId>
       <artifactId>platform-logger-spring-boot-starter</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>1.1.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>ua.gov.mdtu.ddm.general</groupId>
       <artifactId>platform-security-spring-boot-starter</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>1.1.0-SNAPSHOT</version>
     </dependency>
 
     <!--Camunda dependencies-->
