@@ -2,13 +2,9 @@ package ua.gov.mdtu.ddm.lowcode.bpms.it.camunda.bpmn;
 
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
-import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
-import static ua.gov.mdtu.ddm.lowcode.bpms.it.util.TestUtils.formDataVariableName;
-import static ua.gov.mdtu.ddm.lowcode.bpms.it.util.TestUtils.formDataVariableValue;
 import static ua.gov.mdtu.ddm.lowcode.bpms.it.util.TestUtils.getContent;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.test.Deployment;
@@ -56,93 +52,56 @@ public class AddPersonnelBpmnIT extends BaseBpmnIT {
     String initiator = null;
 
     var searchLabFormActivityDefinitionKey = "searchLabFormActivity";
-    var searchLabFormRefVarName = formDataVariableName(searchLabFormActivityDefinitionKey);
-    var searchLabFormCephKey = formDataVariableValue(processInstanceId, searchLabFormRefVarName);
-
     var viewLabDataFormActivityDefinitionKey = "viewLabDataFormActivity";
-    var viewLabDataFormRefVarName = formDataVariableName(viewLabDataFormActivityDefinitionKey);
-    var viewLabDataFormCephKey = formDataVariableValue(processInstanceId,
-        viewLabDataFormRefVarName);
-
     var addPersonnelFormActivityDefinitionKey = "addPersonnelFormActivity";
-    var addPersonnelFormRefVarName = formDataVariableName(addPersonnelFormActivityDefinitionKey);
-    var addPersonnelFormCephKey = formDataVariableValue(processInstanceId,
-        addPersonnelFormRefVarName);
-
     var signPersonnelFormActivityDefinitionKey = "signPersonnelFormActivity";
-    var signPersonnelFormRefVarName = formDataVariableName(signPersonnelFormActivityDefinitionKey);
-    var signPersonnelFormCephKey = formDataVariableValue(processInstanceId,
-        signPersonnelFormRefVarName);
 
     var systemSignatureCephKeyRefVarName = "system_signature_ceph_key";
     var systemSignatureCephKey = "lowcode_" + processInstanceId + "_" +
         systemSignatureCephKeyRefVarName + "_0";
 
-    var expectedVariablesMap = new HashMap<String, Object>();
-    var expectedCephStorage = new HashMap<String, Object>();
-
     expectedVariablesMap.put("initiator", initiator);
     expectedVariablesMap.put("const_dataFactoryBaseUrl", dataFactoryBaseUrl);
     //search lab task
-    assertThat(processInstance).isWaitingAt(searchLabFormActivityDefinitionKey);
-    assertThat(task(searchLabFormActivityDefinitionKey)).hasFormKey("shared-search-lab");
-    assertThat(processInstance).variables().hasSize(expectedVariablesMap.size())
-        .containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent(expectedCephStorage);
+    assertWaitingActivity(processInstance, searchLabFormActivityDefinitionKey,
+        "shared-search-lab");
 
     completeTask(searchLabFormActivityDefinitionKey, processInstanceId,
         "/json/add-personnel/form-data/searchLabFormActivity.json");
 
-    expectedVariablesMap.put(searchLabFormRefVarName, searchLabFormCephKey);
     expectedVariablesMap.put("laboratoryId", labId);
     expectedVariablesMap.put("koatuuId", koatuuId);
-    expectedVariablesMap.put(viewLabDataFormRefVarName, viewLabDataFormCephKey);
 
-    expectedCephStorage.put(searchLabFormCephKey,
-        deserializeFormData(getContent("/json/add-personnel/form-data/searchLabFormActivity.json")));
-    expectedCephStorage.put(viewLabDataFormCephKey,
-        deserializeFormData(getContent("/json/add-personnel/form-data/viewLabDataFormActivityPrepopulation.json")));
+    addExpectedCephContent(processInstanceId, searchLabFormActivityDefinitionKey,
+        "/json/add-personnel/form-data/searchLabFormActivity.json");
+    addExpectedCephContent(processInstanceId, viewLabDataFormActivityDefinitionKey,
+        "/json/add-personnel/form-data/viewLabDataFormActivityPrepopulation.json");
 
     //view lab data task
-    assertThat(processInstance).isWaitingAt(viewLabDataFormActivityDefinitionKey);
-    assertThat(task(viewLabDataFormActivityDefinitionKey)).hasFormKey("shared-view-lab-data");
-    assertThat(processInstance).variables().hasSize(expectedVariablesMap.size())
-        .containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent(expectedCephStorage);
+    assertWaitingActivity(processInstance, viewLabDataFormActivityDefinitionKey,
+        "shared-view-lab-data");
 
     completeTask(viewLabDataFormActivityDefinitionKey, processInstanceId,
         "/json/add-personnel/form-data/viewLabDataFormActivity.json");
 
-    expectedVariablesMap.put(addPersonnelFormRefVarName, addPersonnelFormCephKey);
+    addExpectedCephContent(processInstanceId, viewLabDataFormActivityDefinitionKey,
+        "/json/add-personnel/form-data/viewLabDataFormActivity.json");
+    addExpectedCephContent(processInstanceId, addPersonnelFormActivityDefinitionKey,
+        "/json/add-personnel/form-data/addPersonnelFormActivityPrepopulation.json");
 
-    expectedCephStorage.put(viewLabDataFormCephKey,
-        deserializeFormData(getContent("/json/add-personnel/form-data/viewLabDataFormActivity.json")));
-    expectedCephStorage.put(addPersonnelFormCephKey,
-        deserializeFormData(getContent("/json/add-personnel/form-data/addPersonnelFormActivityPrepopulation.json")));
-
-    assertThat(processInstance).isWaitingAt(addPersonnelFormActivityDefinitionKey);
-    assertThat(task(addPersonnelFormActivityDefinitionKey))
-        .hasFormKey("add-personnel-bp-add-personnel");
-    assertThat(processInstance).variables().hasSize(expectedVariablesMap.size())
-        .containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent(expectedCephStorage);
+    assertWaitingActivity(processInstance, addPersonnelFormActivityDefinitionKey,
+        "add-personnel-bp-add-personnel");
 
     completeTask(addPersonnelFormActivityDefinitionKey, processInstanceId,
         "/json/add-personnel/form-data/addPersonnelFormActivity.json");
 
-    expectedVariablesMap.put(signPersonnelFormRefVarName, signPersonnelFormCephKey);
+    addExpectedCephContent(processInstanceId, addPersonnelFormActivityDefinitionKey,
+        "/json/add-personnel/form-data/addPersonnelFormActivity.json");
+    addExpectedCephContent(processInstanceId, signPersonnelFormActivityDefinitionKey,
+        "/json/add-personnel/form-data/addPersonnelFormActivity.json");
 
-    expectedCephStorage.put(addPersonnelFormCephKey,
-        deserializeFormData(getContent("/json/add-personnel/form-data/addPersonnelFormActivity.json")));
-    expectedCephStorage.put(signPersonnelFormCephKey,
-        deserializeFormData(getContent("/json/add-personnel/form-data/addPersonnelFormActivity.json")));
-
-    assertThat(processInstance).isWaitingAt(signPersonnelFormActivityDefinitionKey);
-    assertThat(task(signPersonnelFormActivityDefinitionKey))
-        .hasFormKey("add-personnel-bp-sign-personnel");
-    assertThat(processInstance).variables().hasSize(expectedVariablesMap.size())
-        .containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent(expectedCephStorage);
+    assertWaitingActivity(processInstance, signPersonnelFormActivityDefinitionKey,
+        "add-personnel-bp-sign-personnel");
 
     completeTask(signPersonnelFormActivityDefinitionKey, processInstanceId,
         "/json/add-personnel/form-data/signPersonnelFormActivity.json");
@@ -151,16 +110,18 @@ public class AddPersonnelBpmnIT extends BaseBpmnIT {
     expectedVariablesMap
         .put("sys-var-process-completion-result", "Дані про кадровий склад внесені");
 
-    expectedCephStorage.put(signPersonnelFormCephKey,
-        deserializeFormData(getContent("/json/add-personnel/form-data/signPersonnelFormActivity.json")));
+    addExpectedCephContent(processInstanceId, signPersonnelFormActivityDefinitionKey,
+        "/json/add-personnel/form-data/signPersonnelFormActivity.json");
 
     String signature = cephService.getContent(cephBucketName, systemSignatureCephKey);
-    Map<String, Object> signatureMap = objectMapper.readerForMapOf(Object.class).readValue(signature);
-    Map<String, Object> expectedSignatureMap = objectMapper.readerForMapOf(Object.class).readValue(getContent("/json/add-personnel/dso/systemSignatureCephContent.json"));
+    Map<String, Object> signatureMap = objectMapper.readerForMapOf(Object.class)
+        .readValue(signature);
+    Map<String, Object> expectedSignatureMap = objectMapper.readerForMapOf(Object.class)
+        .readValue(getContent("/json/add-personnel/dso/systemSignatureCephContent.json"));
     Assertions.assertThat(signatureMap).isEqualTo(expectedSignatureMap);
 
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().hasSize(16).containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent(expectedCephStorage);
+    assertCephContent();
   }
 }

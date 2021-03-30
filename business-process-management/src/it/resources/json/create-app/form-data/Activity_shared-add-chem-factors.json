@@ -1,0 +1,20 @@
+{
+  "data": {
+    "name": "labName",
+    "registrationNo": "1234567890-primary-add",
+    "chemfactgost": [
+      "chemfactgost1"
+    ],
+    "chemfacthyge": [
+      "chemfacthyge1"
+    ],
+    "chemfactobrv": [
+      "chemfactobrv1"
+    ],
+    "chemfactodovilni": [
+      "chemfactodovilni1"
+    ],
+    "errorCheckFlag": false
+  },
+  "x-access-token": "token"
+}

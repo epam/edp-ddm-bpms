@@ -8,8 +8,12 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
 import static ua.gov.mdtu.ddm.lowcode.bpms.it.util.TestUtils.VARIABLE_NAME;
 import static ua.gov.mdtu.ddm.lowcode.bpms.it.util.TestUtils.VARIABLE_VALUE;
+import static ua.gov.mdtu.ddm.lowcode.bpms.it.util.TestUtils.formDataVariableName;
+import static ua.gov.mdtu.ddm.lowcode.bpms.it.util.TestUtils.formDataVariableValue;
 import static ua.gov.mdtu.ddm.lowcode.bpms.it.util.TestUtils.getContent;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -18,13 +22,16 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Maps;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.web.util.UriComponentsBuilder;
 import ua.gov.mdtu.ddm.general.integration.ceph.dto.FormDataDto;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.BaseIT;
@@ -46,10 +53,18 @@ public abstract class BaseBpmnIT extends BaseIT {
   @Inject
   protected ObjectMapper objectMapper;
 
+  protected final Map<String, Object> expectedVariablesMap = new HashMap<>();
+  private final Map<String, Object> expectedCephStorage = new HashMap<>();
+
   @Before
   public void init() {
     cephService.clearStorage();
     formDataCephService.clearStorage();
+    expectedVariablesMap.clear();
+    expectedCephStorage.clear();
+    runtimeService.createProcessInstanceQuery().list().forEach(
+        processInstance -> runtimeService
+            .deleteProcessInstance(processInstance.getId(), "test clear"));
   }
 
   protected void completeTask(String taskId, String processInstanceId, String formData)
@@ -108,7 +123,9 @@ public abstract class BaseBpmnIT extends BaseIT {
     var uri = UriComponentsBuilder.fromPath(MOCK_SERVER)
         .pathSegment(stubData.getResource(), stubData.getResourceId()).encode().build().toUri();
     var mappingBuilder = get(urlPathEqualTo(uri.getPath()))
-        .willReturn(aResponse().withStatus(200).withBody(getContent(stubData.getResponse())));
+        .willReturn(aResponse().withStatus(200)
+            .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+            .withBody(getContent(stubData.getResponse())));
     dataFactoryMockServer.addStubMapping(stubFor(mappingBuilder));
   }
 
@@ -122,8 +139,8 @@ public abstract class BaseBpmnIT extends BaseIT {
     digitalSignatureMockServer.addStubMapping(stubFor(mappingBuilder));
   }
 
-  protected void assertCephContent(Map<String, Object> expectedContent) {
-    expectedContent.forEach((key, value) -> {
+  protected void assertCephContent() {
+    expectedCephStorage.forEach((key, value) -> {
       var actualMap = formDataCephService.getFormData(key);
 
       Assertions.assertThat(actualMap).isEqualTo(value);
@@ -137,5 +154,23 @@ public abstract class BaseBpmnIT extends BaseIT {
       var4.clearLocation();
       throw new IllegalStateException("Couldn't deserialize form data", var4);
     }
+  }
+
+  protected void addExpectedCephContent(String processInstanceId, String taskDefinitionKey,
+      String cephContent) throws IOException {
+    var refVarName = formDataVariableName(taskDefinitionKey);
+    var cephKey = formDataVariableValue(processInstanceId, refVarName);
+
+    expectedVariablesMap.put(refVarName, cephKey);
+    expectedCephStorage.put(cephKey, deserializeFormData(getContent(cephContent)));
+  }
+
+  protected void assertWaitingActivity(ProcessInstance processInstance,
+      String searchLabFormActivityDefinitionKey, String formKey) {
+    assertThat(processInstance).isWaitingAt(searchLabFormActivityDefinitionKey);
+    assertThat(task(searchLabFormActivityDefinitionKey)).hasFormKey(formKey);
+    assertThat(processInstance).variables().hasSize(expectedVariablesMap.size())
+        .containsAllEntriesOf(expectedVariablesMap);
+    assertCephContent();
   }
 }

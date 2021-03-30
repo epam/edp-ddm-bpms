@@ -1,0 +1,32 @@
+{
+  "data": {
+    "name": "labName",
+    "registrationNo": "1234567890-primary-add",
+    "errorCheckFlag": true,
+    "regComplianceFlag": true,
+    "regRefusalReasonId": [
+      "regRefusalReasonId1"
+    ],
+    "factorComplianceFlag": true,
+    "factorRefusalReasonId": [
+      "factorRefusalReasonId1"
+    ],
+    "zvtComplianceFlag": true,
+    "zvtRefusalReasonId": [
+      "zvtRefusalReasonId1"
+    ],
+    "staffComplianceFlag": true,
+    "staffRefusalReasonId": [
+      "staffRefusalReasonId1"
+    ],
+    "reagentComplianceFlag": true,
+    "reagentRefusalReasonId": [
+      "reagentRefusalReasonId1"
+    ],
+    "facilityComplianceFlag": true,
+    "facilityRefusalReasonId": [
+      "facilityRefusalReasonId1"
+    ]
+  },
+  "x-access-token": "token"
+}

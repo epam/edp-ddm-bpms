@@ -1,5 +1,6 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.camunda.bpmn;
 
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.complete;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
@@ -15,10 +16,13 @@ import static ua.gov.mdtu.ddm.lowcode.bpms.it.util.TestUtils.getContent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.mock.Mocks;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -34,16 +38,15 @@ import ua.gov.mdtu.ddm.lowcode.bpms.delegate.DefineBusinessProcessStatusDelegate
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.GetFormDataFromCephDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.PutContentToCephDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.PutFormDataToCephDelegate;
+import ua.gov.mdtu.ddm.lowcode.bpms.delegate.UserDataValidationErrorDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector.DataFactoryConnectorBatchCreateDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector.DataFactoryConnectorCreateDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector.DataFactoryConnectorReadDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector.DataFactoryConnectorSearchDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector.DigitalSignatureConnectorDelegate;
-import ua.gov.mdtu.ddm.lowcode.bpms.it.config.TestCephServiceImpl;
-import ua.gov.mdtu.ddm.lowcode.bpms.it.config.TestFormDataCephServiceImpl;
-import ua.gov.mdtu.ddm.lowcode.bpms.service.MessageResolver;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.builder.StubData;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.config.TestCephServiceImpl;
+import ua.gov.mdtu.ddm.lowcode.bpms.it.config.TestFormDataCephServiceImpl;
 import ua.gov.mdtu.ddm.lowcode.bpms.service.MessageResolver;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -67,10 +70,16 @@ public abstract class BaseBpmnTest {
   @Rule
   public ProcessEngineRule processEngineRule = new ProcessEngineRule();
 
+  protected final Map<String, Object> expectedVariablesMap = new HashMap<>();
+  protected final Map<String, Object> expectedCephStorage = new HashMap<>();
+
+  @Before
   public void init() {
 
-    var getFormDataFromCephDelegate = new GetFormDataFromCephDelegate(objectMapper, formDataCephService);
-    var putFormDataToCephDelegate = new PutFormDataToCephDelegate(objectMapper, formDataCephService);
+    var getFormDataFromCephDelegate = new GetFormDataFromCephDelegate(objectMapper,
+        formDataCephService);
+    var putFormDataToCephDelegate = new PutFormDataToCephDelegate(objectMapper,
+        formDataCephService);
     var putContentToCephDelegate = new PutContentToCephDelegate(cephBucketName, cephService);
 
     var dataFactoryConnectorSearchDelegate = new DataFactoryConnectorSearchDelegate(restTemplate,
@@ -91,6 +100,8 @@ public abstract class BaseBpmnTest {
         restTemplate, formDataCephService, cephService, objectMapper, messageResolver,
         digitalSignatureConnectorDelegate, springAppName, cephBucketName, dataFactoryUrl);
 
+    var userDataValidationErrorDelegate = new UserDataValidationErrorDelegate(objectMapper);
+
     Mocks.register("getFormDataFromCephDelegate", getFormDataFromCephDelegate);
     Mocks.register("putFormDataToCephDelegate", putFormDataToCephDelegate);
     Mocks.register("putContentToCephDelegate", putContentToCephDelegate);
@@ -105,6 +116,8 @@ public abstract class BaseBpmnTest {
 
     Mocks
         .register("defineBusinessProcessStatusDelegate", new DefineBusinessProcessStatusDelegate());
+
+    Mocks.register("userDataValidationErrorDelegate", userDataValidationErrorDelegate);
   }
 
   protected void completeTask(String taskDefinitionKey, String formData,
@@ -161,8 +174,8 @@ public abstract class BaseBpmnTest {
         );
   }
 
-  protected void assertCephContent(Map<String, Object> expectedContent) {
-    expectedContent.forEach((key, value) -> {
+  protected void assertCephContent() {
+    expectedCephStorage.forEach((key, value) -> {
       var actualMap = formDataCephService.getFormData(key);
 
       Assertions.assertThat(actualMap).isEqualTo(value);
@@ -175,5 +188,23 @@ public abstract class BaseBpmnTest {
     } catch (JsonProcessingException ex) {
       throw new IllegalStateException("Couldn't deserialize form data", ex);
     }
+  }
+
+  protected void addExpectedCephContent(String processInstanceId, String taskDefinitionKey,
+      String cephContent) throws IOException {
+    var refVarName = formDataVariableName(taskDefinitionKey);
+    var cephKey = formDataVariableValue(processInstanceId, refVarName);
+
+    expectedVariablesMap.put(refVarName, cephKey);
+    expectedCephStorage.put(cephKey, deserializeFormData(getContent(cephContent)));
+  }
+
+  protected void assertWaitingActivity(ProcessInstance processInstance,
+      String searchLabFormActivityDefinitionKey, String formKey) {
+    assertThat(processInstance).isWaitingAt(searchLabFormActivityDefinitionKey);
+    assertThat(task(searchLabFormActivityDefinitionKey)).hasFormKey(formKey);
+    assertThat(processInstance).variables().hasSize(expectedVariablesMap.size())
+        .containsAllEntriesOf(expectedVariablesMap);
+    assertCephContent();
   }
 }

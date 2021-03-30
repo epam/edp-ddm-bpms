@@ -1,0 +1,40 @@
+{
+  "data": {
+    "name": "labName",
+    "edrpou": "11111111",
+    "registrationSource": "держпраці",
+    "registrationNo": "1234567890-primary-add",
+    "createdDate": "2021-03-25",
+    "acceptedBy": "Full Name",
+    "FactorsPhys": [
+      "FactorsPhys1"
+    ],
+    "laborfact": [
+      "laborfact1"
+    ],
+    "biofactors": [
+      "biofactors"
+    ],
+    "chemfactgost": [
+      "chemfactgost1"
+    ],
+    "chemfacthyge": [
+      "chemfacthyge1"
+    ],
+    "chemfactobrv": [
+      "chemfactobrv1"
+    ],
+    "chemfactodovilni": [
+      "chemfactodovilni1"
+    ],
+    "solutionName": "Внести до інформаційного переліку",
+    "solutionDate": "2021-03-24",
+    "letterNo": "1234567890-letterNo",
+    "letterDate": "2021-03-23",
+    "receivedBy": "receiver",
+    "certifiedBy": "multipass",
+    "notes": "smth noted"
+  },
+  "x-access-token": "token",
+  "signature": "signature"
+}

@@ -4,24 +4,17 @@ import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertT
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import org.apache.groovy.util.Maps;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
-import org.junit.Before;
 import org.junit.Test;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.builder.StubData;
 
 public class AddLabBpmnTest extends BaseBpmnTest {
 
-  @Before
-  public void setup() {
-    super.init();
-  }
-
   @Test
   @Deployment(resources = {"bpmn/add-lab.bpmn"})
-  public void test() throws IOException, URISyntaxException {
+  public void test() throws IOException {
     mockDataFactorySearch(StubData.builder()
         .resource("laboratory-equal-edrpou-name-count")
         .response("[]")
