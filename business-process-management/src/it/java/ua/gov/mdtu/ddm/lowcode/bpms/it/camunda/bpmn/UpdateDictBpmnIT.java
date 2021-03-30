@@ -6,7 +6,6 @@ import java.util.Map;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
-import org.junit.Ignore;
 import org.junit.Test;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.builder.StubData;
 
@@ -14,7 +13,6 @@ import ua.gov.mdtu.ddm.lowcode.bpms.it.builder.StubData;
 public class UpdateDictBpmnIT extends BaseBpmnIT {
 
   @Test
-  @Ignore //issues with cyrillic in json using 'mvn install'
   public void testHappyPath() throws IOException {
     stubDataFactorySearch(StubData.builder()
         .resource("factor-equal-factor-type-name-count")

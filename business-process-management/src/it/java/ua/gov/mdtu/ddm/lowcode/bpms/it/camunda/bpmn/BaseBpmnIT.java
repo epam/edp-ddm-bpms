@@ -29,7 +29,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import ua.gov.mdtu.ddm.general.integration.ceph.dto.FormDataDto;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.BaseIT;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.builder.StubData;
-import ua.gov.mdtu.ddm.lowcode.bpms.it.config.TestCephServiceImpl;
 
 public abstract class BaseBpmnIT extends BaseIT {
 
