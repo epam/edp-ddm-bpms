@@ -3,6 +3,9 @@ package ua.gov.mdtu.ddm.lowcode.bpms.api.dto;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * The class represents a data transfer object for building query to get finished task.
+ */
 @Data
 @Builder
 public class HistoryTaskQueryDto {

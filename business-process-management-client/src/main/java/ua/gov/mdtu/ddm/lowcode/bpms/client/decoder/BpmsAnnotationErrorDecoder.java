@@ -9,6 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ua.gov.mdtu.ddm.lowcode.bpms.client.BaseFeignClient;
 
+/**
+ * The class represents an implementation of {@link ErrorDecoder} error decoder that is used to
+ * build error decoder chain with custom {@link BpmsResponseDecoder} decoder for mapping {@link
+ * Response} response to exception.
+ */
 @Component
 public class BpmsAnnotationErrorDecoder implements ErrorDecoder {
 

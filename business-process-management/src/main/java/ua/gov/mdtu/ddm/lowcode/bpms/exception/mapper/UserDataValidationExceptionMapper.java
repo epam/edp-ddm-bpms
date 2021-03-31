@@ -7,6 +7,10 @@ import javax.ws.rs.ext.Provider;
 import org.apache.http.HttpStatus;
 import ua.gov.mdtu.ddm.general.errorhandling.exception.ValidationException;
 
+/**
+ * The class represents an implementation of {@link ExceptionMapper<ValidationException>} that is
+ * used to map {@link ValidationException} to response
+ */
 @Provider
 public class UserDataValidationExceptionMapper implements
     ExceptionMapper<ValidationException> {

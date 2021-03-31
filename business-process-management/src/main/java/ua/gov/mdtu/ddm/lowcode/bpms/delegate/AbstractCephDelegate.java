@@ -6,11 +6,22 @@ import lombok.AllArgsConstructor;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import ua.gov.mdtu.ddm.general.integration.ceph.dto.FormDataDto;
 
+/**
+ * The class represents an implementation of {@link JavaDelegate} that is used to work with ceph.
+ * Contains methods for serialize/deserialize form data using {@link ObjectMapper}.
+ */
 @AllArgsConstructor
 public abstract class AbstractCephDelegate implements JavaDelegate {
 
   private final ObjectMapper objectMapper;
 
+  /**
+   * Convert string data to {@link FormDataDto} entity
+   *
+   * @param formData data for converting
+   * @return {@link FormDataDto} entity
+   * @throws IllegalStateException if the data cannot be converted
+   */
   protected FormDataDto deserializeFormData(String formData) {
     try {
       return this.objectMapper.readValue(formData, FormDataDto.class);
@@ -20,6 +31,13 @@ public abstract class AbstractCephDelegate implements JavaDelegate {
     }
   }
 
+  /**
+   * Convert {@link FormDataDto} entity to string data
+   *
+   * @param formData data for converting
+   * @return string data
+   * @throws IllegalStateException if the data cannot be converted
+   */
   protected String serializeFormData(FormDataDto formData) {
     try {
       return this.objectMapper.writeValueAsString(formData);

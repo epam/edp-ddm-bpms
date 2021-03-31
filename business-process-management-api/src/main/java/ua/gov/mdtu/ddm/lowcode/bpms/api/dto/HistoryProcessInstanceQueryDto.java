@@ -3,6 +3,9 @@ package ua.gov.mdtu.ddm.lowcode.bpms.api.dto;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * The class represents a data transfer object for building query to get history process instance.
+ */
 @Data
 @Builder
 public class HistoryProcessInstanceQueryDto {
@@ -12,7 +15,11 @@ public class HistoryProcessInstanceQueryDto {
   private String sortBy;
   private String sortOrder;
 
+  /**
+   * The class represents a list of constants that is used for history process instance sorting.
+   */
   public static final class SortByConstants {
+
     public static final String SORT_BY_INSTANCE_ID = "instanceId";
     public static final String SORT_BY_DEFINITION_ID = "definitionId";
     public static final String SORT_BY_DEFINITION_KEY = "definitionKey";

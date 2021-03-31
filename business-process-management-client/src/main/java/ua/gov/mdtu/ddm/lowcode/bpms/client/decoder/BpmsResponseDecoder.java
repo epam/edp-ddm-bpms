@@ -10,6 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+/**
+ * The class represents an implementation of {@link Decoder} decoder that is used to decode {@link
+ * Response} response by {@link Type} type.
+ */
 @Component
 public class BpmsResponseDecoder implements Decoder {
 

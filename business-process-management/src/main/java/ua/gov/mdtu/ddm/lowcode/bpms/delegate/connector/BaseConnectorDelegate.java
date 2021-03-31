@@ -30,6 +30,10 @@ import ua.gov.mdtu.ddm.lowcode.bpms.delegate.dto.DataFactoryConnectorResponse;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.dto.enums.DataFactoryError;
 import ua.gov.mdtu.ddm.lowcode.bpms.service.MessageResolver;
 
+/**
+ * The class represents an implementation of {@link JavaDelegate} that is used to provide common
+ * logic for working with the data factory for all delegates
+ */
 @RequiredArgsConstructor
 @Slf4j
 public abstract class BaseConnectorDelegate implements JavaDelegate {
@@ -45,6 +49,12 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
   private final MessageResolver messageResolver;
   private final String springAppName;
 
+  /**
+   * Method for performing requests to data factory
+   *
+   * @param requestEntity {@link RequestEntity} entity
+   * @return response from data factory
+   */
   protected DataFactoryConnectorResponse perform(RequestEntity<?> requestEntity) {
     var httpResponse = restTemplate.exchange(requestEntity, String.class);
 
@@ -57,6 +67,13 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
         .build();
   }
 
+  /**
+   * Method for getting http headers from {@link DelegateExecution} object. Additionally sets the
+   * system http headers.
+   *
+   * @param delegateExecution {@link DelegateExecution} object
+   * @return list of http headers
+   */
   @SuppressWarnings("unchecked")
   protected HttpHeaders getHeaders(DelegateExecution delegateExecution) {
     var headers = new HttpHeaders();
@@ -91,6 +108,12 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
     return headers;
   }
 
+  /**
+   * Method for getting an access token from {@link DelegateExecution} object.
+   *
+   * @param delegateExecution {@link DelegateExecution} object
+   * @return access token body
+   */
   @SneakyThrows
   protected Optional<String> getAccessToken(DelegateExecution delegateExecution) {
     var xAccessTokenCephKey = (String) delegateExecution.getVariable("x_access_token_ceph_key");
@@ -102,6 +125,13 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
     return Optional.ofNullable(xAccessTokenCephFromData.getAccessToken());
   }
 
+  /**
+   * Method for building an error that occurs when reading data from a data factory.
+   *
+   * @param requestEntity {@link RequestEntity} entity
+   * @param ex {@link RestClientResponseException} exception
+   * @return a runtime exception
+   */
   protected RuntimeException buildReadableException(RequestEntity<?> requestEntity,
       RestClientResponseException ex) {
     var httpStatus = HttpStatus.valueOf(ex.getRawStatusCode());
@@ -121,6 +151,13 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
     return exception;
   }
 
+  /**
+   * Method for building an error that occurs when updating data in a data factory.
+   *
+   * @param requestEntity {@link RequestEntity} entity
+   * @param ex {@link RestClientResponseException} exception
+   * @return a runtime exception
+   */
   protected RuntimeException buildUpdatableException(RequestEntity<?> requestEntity,
       RestClientResponseException ex) {
     var httpStatus = HttpStatus.valueOf(ex.getRawStatusCode());

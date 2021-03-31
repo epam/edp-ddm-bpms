@@ -7,8 +7,8 @@ import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
- * TransientInputParameter is used for saving transient flag in setting variable from outer to inner
- * scope
+ * The class extends {@link InputParameter} class and used for saving transient flag in setting
+ * variable from outer to inner scope.
  */
 public class TransientInputParameter extends InputParameter {
 

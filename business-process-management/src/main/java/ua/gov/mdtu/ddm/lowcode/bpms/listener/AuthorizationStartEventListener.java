@@ -21,7 +21,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * Listener that sets authorizations for current user before process instance starts.
+ * The class represents an implementation of {@link ExecutionListener} listener that is used to set
+ * authorizations for current user before process instance starts.
  */
 @Slf4j
 @Component

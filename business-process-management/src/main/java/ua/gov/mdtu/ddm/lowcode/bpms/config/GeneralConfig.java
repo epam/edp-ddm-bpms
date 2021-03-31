@@ -15,44 +15,49 @@ import org.springframework.jdbc.support.DatabaseStartupValidator;
 import org.springframework.web.client.RestTemplate;
 import ua.gov.mdtu.ddm.general.integration.ceph.config.CephConfig;
 
+/**
+ * The class represents a holder for beans of the general configuration. Each method produces a bean
+ * and must be annotated with @Bean annotation to be managed by the Spring container. The method
+ * should create, set up and return an instance of a bean.
+ */
 @Configuration
 @EnableAspectJAutoProxy
 @Import(CephConfig.class)
 public class GeneralConfig {
 
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
+  @Bean
+  public RestTemplate restTemplate() {
+    return new RestTemplate();
+  }
 
-    @Bean
-    public ResourceBundleMessageSource messageSource() {
-        ResourceBundleMessageSource rs = new ResourceBundleMessageSource();
-        rs.setUseCodeAsDefaultMessage(true);
-        rs.setDefaultEncoding("UTF-8");
-        rs.setBasename("lang/messages");
-        return rs;
-    }
+  @Bean
+  public ResourceBundleMessageSource messageSource() {
+    ResourceBundleMessageSource rs = new ResourceBundleMessageSource();
+    rs.setUseCodeAsDefaultMessage(true);
+    rs.setDefaultEncoding("UTF-8");
+    rs.setBasename("lang/messages");
+    return rs;
+  }
 
-    @Bean
-    public DatabaseStartupValidator databaseStartupValidator(DataSource dataSource,
-        @Value("${database-startup-validator.interval:10}") int interval,
-        @Value("${database-startup-validator.timeout:100}") int timeout) {
-        var dsv = new DatabaseStartupValidator();
-        dsv.setInterval(interval);
-        dsv.setTimeout(timeout);
-        dsv.setDataSource(dataSource);
-        dsv.setValidationQuery(DatabaseDriver.POSTGRESQL.getValidationQuery());
-        return dsv;
-    }
+  @Bean
+  public DatabaseStartupValidator databaseStartupValidator(DataSource dataSource,
+      @Value("${database-startup-validator.interval:10}") int interval,
+      @Value("${database-startup-validator.timeout:100}") int timeout) {
+    var dsv = new DatabaseStartupValidator();
+    dsv.setInterval(interval);
+    dsv.setTimeout(timeout);
+    dsv.setDataSource(dataSource);
+    dsv.setValidationQuery(DatabaseDriver.POSTGRESQL.getValidationQuery());
+    return dsv;
+  }
 
-    @Bean
-    public static BeanFactoryPostProcessor dependsOnPostProcessor() {
-        return bf -> {
-            String[] jpa = bf.getBeanNamesForType(JpaBaseConfiguration.class);
-            Stream.of(jpa)
-                .map(bf::getBeanDefinition)
-                .forEach(it -> it.setDependsOn("databaseStartupValidator"));
-        };
-    }
+  @Bean
+  public static BeanFactoryPostProcessor dependsOnPostProcessor() {
+    return bf -> {
+      String[] jpa = bf.getBeanNamesForType(JpaBaseConfiguration.class);
+      Stream.of(jpa)
+          .map(bf::getBeanDefinition)
+          .forEach(it -> it.setDependsOn("databaseStartupValidator"));
+    };
+  }
 }

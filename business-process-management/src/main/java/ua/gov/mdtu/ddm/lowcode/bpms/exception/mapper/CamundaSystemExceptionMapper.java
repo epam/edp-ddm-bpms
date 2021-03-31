@@ -7,6 +7,10 @@ import javax.ws.rs.ext.Provider;
 import org.apache.http.HttpStatus;
 import ua.gov.mdtu.ddm.general.errorhandling.exception.SystemException;
 
+/**
+ * The class represents an implementation of {@link ExceptionMapper<SystemException>} that is used
+ * to map {@link SystemException} to response
+ */
 @Provider
 public class CamundaSystemExceptionMapper implements ExceptionMapper<SystemException> {
 

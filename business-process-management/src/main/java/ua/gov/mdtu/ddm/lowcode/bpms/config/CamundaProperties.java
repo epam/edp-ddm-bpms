@@ -7,6 +7,9 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+/**
+ * The class represents a container for camunda system variables
+ */
 @Getter
 @Setter
 @Component

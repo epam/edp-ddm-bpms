@@ -12,7 +12,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
- * Filter that sets camunda authorizations for authenticated user.
+ * The class extends {@link OncePerRequestFilter} class and represents a filter that sets camunda
+ * authorizations for authenticated user.
  */
 @Component
 @RequiredArgsConstructor

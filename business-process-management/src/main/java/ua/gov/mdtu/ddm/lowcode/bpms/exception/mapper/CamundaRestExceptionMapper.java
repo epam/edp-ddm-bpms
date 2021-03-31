@@ -9,6 +9,10 @@ import org.slf4j.MDC;
 import ua.gov.mdtu.ddm.general.errorhandling.BaseRestExceptionHandler;
 import ua.gov.mdtu.ddm.general.errorhandling.dto.SystemErrorDto;
 
+/**
+ * The class represents an implementation of {@link ExceptionMapper<RestException>} that is used to
+ * map camunda {@link RestException} to response
+ */
 public class CamundaRestExceptionMapper implements ExceptionMapper<RestException> {
 
   @Override

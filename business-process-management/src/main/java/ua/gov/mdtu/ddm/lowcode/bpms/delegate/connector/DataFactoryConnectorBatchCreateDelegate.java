@@ -19,6 +19,10 @@ import ua.gov.mdtu.ddm.general.starter.logger.annotation.Logging;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.dto.DataFactoryConnectorResponse;
 import ua.gov.mdtu.ddm.lowcode.bpms.service.MessageResolver;
 
+/**
+ * The class represents an implementation of {@link BaseConnectorDelegate} that is used to execute
+ * data batch creation in Data Factory
+ */
 @Component("dataFactoryConnectorBatchCreateDelegate")
 @Logging
 public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelegate {

@@ -4,10 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ua.gov.mdtu.ddm.general.integration.ceph.dto.FormDataDto;
 import ua.gov.mdtu.ddm.general.integration.ceph.service.FormDataCephService;
 import ua.gov.mdtu.ddm.general.starter.logger.annotation.Logging;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.constants.CamundaDelegateConstants;
 
+/**
+ * The class extends {@link AbstractCephDelegate} delegate and used to put {@link FormDataDto}
+ * entity in ceph using {@link FormDataCephService} service.
+ */
 @Component("putFormDataToCephDelegate")
 @Logging
 public class PutFormDataToCephDelegate extends AbstractCephDelegate {

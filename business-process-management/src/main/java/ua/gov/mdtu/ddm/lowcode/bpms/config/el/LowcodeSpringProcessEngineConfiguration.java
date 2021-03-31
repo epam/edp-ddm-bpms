@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Lowcode implementation of SpringProcessEngineConfiguration that is used for overriding default
- * camunda process engine configuration
+ * The class represents an implementation of {@link SpringProcessEngineConfiguration} that is used
+ * for overriding default camunda process engine configuration.
  */
 @Component
 public class LowcodeSpringProcessEngineConfiguration extends SpringProcessEngineConfiguration {

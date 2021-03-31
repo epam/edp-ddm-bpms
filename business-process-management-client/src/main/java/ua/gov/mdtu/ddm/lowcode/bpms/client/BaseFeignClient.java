@@ -9,6 +9,10 @@ import ua.gov.mdtu.ddm.lowcode.bpms.client.exception.CamundaCommunicationExcepti
 import ua.gov.mdtu.ddm.lowcode.bpms.client.exception.InternalServerErrorException;
 import ua.gov.mdtu.ddm.lowcode.bpms.client.exception.NotFoundException;
 
+/**
+ * The interface represents a base feign client and contains common error handling logic for all
+ * feign clients
+ */
 @ErrorHandling(codeSpecific = {
     @ErrorCodes(codes = {400}, generate = BadRequestException.class),
     @ErrorCodes(codes = {401}, generate = AuthenticationException.class),

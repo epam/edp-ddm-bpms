@@ -3,6 +3,9 @@ package ua.gov.mdtu.ddm.lowcode.bpms.api.dto.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+/**
+ * Enumeration of platform http headers
+ */
 @Getter
 @AllArgsConstructor
 public enum PlatformHttpHeader {

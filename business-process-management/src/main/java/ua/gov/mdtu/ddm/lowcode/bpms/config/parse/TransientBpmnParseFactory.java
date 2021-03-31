@@ -6,7 +6,8 @@ import org.camunda.bpm.engine.impl.cfg.BpmnParseFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * Implementation of BpmnParseFactory that creates an instance of TransientBpmnParse
+ * The class represents an implementation of {@link BpmnParseFactory} that is used for creating an
+ * instance of custom {@link  TransientBpmnParse} parser.
  */
 @Component
 public class TransientBpmnParseFactory implements BpmnParseFactory {

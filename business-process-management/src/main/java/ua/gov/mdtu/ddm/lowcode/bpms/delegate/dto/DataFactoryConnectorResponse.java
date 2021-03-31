@@ -6,6 +6,9 @@ import java.util.Map;
 import lombok.Builder;
 import lombok.Getter;
 
+/**
+ * The class represents a response that is used to map response from data factory.
+ */
 @Builder
 @Getter
 public class DataFactoryConnectorResponse implements Serializable {

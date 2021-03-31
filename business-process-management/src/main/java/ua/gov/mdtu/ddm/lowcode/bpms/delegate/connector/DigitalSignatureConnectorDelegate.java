@@ -17,6 +17,10 @@ import ua.gov.mdtu.ddm.general.starter.logger.annotation.Logging;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.dto.DataFactoryConnectorResponse;
 import ua.gov.mdtu.ddm.lowcode.bpms.service.MessageResolver;
 
+/**
+ * The class represents an implementation of {@link BaseConnectorDelegate} that is used for digital
+ * signature of data
+ */
 @Component("digitalSignatureConnectorDelegate")
 @Logging
 public class DigitalSignatureConnectorDelegate extends BaseConnectorDelegate {

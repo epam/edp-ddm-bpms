@@ -22,6 +22,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+/**
+ * The class represents a provider that is used to manage camunda authentication for user.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -33,11 +36,19 @@ public class CamundaAuthProvider {
   private final IdentityService identityService;
   private final AuthorizationService authorizationService;
 
+  /**
+   * Method allows clearing the current camunda authentication for user
+   */
   public void clearAuthentication() {
     identityService.clearAuthentication();
     log.debug("Clear Camunda authentication");
   }
 
+  /**
+   * Method for creating camunda authentication for user
+   *
+   * @param authentication {@link Authentication} object
+   */
   public void createAuthentication(Authentication authentication) {
     if (Objects.isNull(authentication)) {
       log.debug("User is not authenticated in application");

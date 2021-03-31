@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Data;
 
+/**
+ * The class represents a data transfer object for building query to get process definition.
+ */
 @Data
 @Builder
 public class ProcessDefinitionQueryDto {
@@ -19,6 +22,9 @@ public class ProcessDefinitionQueryDto {
   @Default
   private boolean active = false;
 
+  /**
+   * The class represents a list of constants that is used for process definitions sorting.
+   */
   public static final class SortByConstants {
 
     public static final String SORT_BY_CATEGORY = "category";

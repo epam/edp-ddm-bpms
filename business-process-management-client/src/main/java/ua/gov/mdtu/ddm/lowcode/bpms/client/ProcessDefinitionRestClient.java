@@ -17,27 +17,56 @@ import org.springframework.web.bind.annotation.RequestBody;
 import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.ProcessDefinitionQueryDto;
 import ua.gov.mdtu.ddm.lowcode.bpms.client.exception.ProcessDefinitionNotFoundException;
 
+/**
+ * The interface extends {@link BaseFeignClient} and used to perform operations on camunda process
+ * definition
+ */
 @FeignClient(name = "camunda-process-definition-client", url = "${bpms.url}/api/process-definition")
 public interface ProcessDefinitionRestClient extends BaseFeignClient {
 
+  /**
+   * Method for getting the number of camunda process definitions
+   *
+   * @param requestDto object with search parameters
+   * @return the number of process definitions
+   */
   @GetMapping("/count")
   @ErrorHandling
   @CollectionFormat(feign.CollectionFormat.CSV)
   CountResultDto getProcessDefinitionsCount(
       @SpringQueryMap ProcessDefinitionQueryDto requestDto);
 
+  /**
+   * Method for getting list of camunda process definitions
+   *
+   * @param requestDto bject with search parameters
+   * @return the list of camunda process definitions
+   */
   @GetMapping
   @ErrorHandling
   @CollectionFormat(feign.CollectionFormat.CSV)
   List<ProcessDefinitionDto> getProcessDefinitionsByParams(
       @SpringQueryMap ProcessDefinitionQueryDto requestDto);
 
+  /**
+   * Method for getting camunda process definition by id
+   *
+   * @param id process definition identifier
+   * @return a camunda process definition
+   */
   @GetMapping("/{id}")
   @ErrorHandling(codeSpecific = {
       @ErrorCodes(codes = {404}, generate = ProcessDefinitionNotFoundException.class)
   })
   ProcessDefinitionDto getProcessDefinition(@PathVariable("id") String id);
 
+  /**
+   * Method for starting process instance by process definition id
+   *
+   * @param id                      process definition identifier
+   * @param startProcessInstanceDto {@link StartProcessInstanceDto} entity
+   * @return a started process instance
+   */
   @PostMapping("/{id}/start")
   @ErrorHandling
   ProcessInstanceDto startProcessInstance(@PathVariable("id") String id,

@@ -7,6 +7,10 @@ import ua.gov.mdtu.ddm.lowcode.bpms.exception.mapper.CamundaRestExceptionMapper;
 import ua.gov.mdtu.ddm.lowcode.bpms.exception.mapper.CamundaSystemExceptionMapper;
 import ua.gov.mdtu.ddm.lowcode.bpms.exception.mapper.UserDataValidationExceptionMapper;
 
+/**
+ * The class represents an implementation of {@link CamundaJerseyResourceConfig} that is used to
+ * register additional resources.
+ */
 @Component
 public class LowcodeJerseyConfig extends CamundaJerseyResourceConfig {
 

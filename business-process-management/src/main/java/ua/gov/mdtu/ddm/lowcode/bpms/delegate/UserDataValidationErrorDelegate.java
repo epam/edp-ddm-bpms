@@ -15,7 +15,8 @@ import ua.gov.mdtu.ddm.general.errorhandling.dto.ValidationErrorDto;
 import ua.gov.mdtu.ddm.general.errorhandling.exception.ValidationException;
 
 /**
- * Throws user data validation exception with details based on user input.
+ * The class represents an implementation of {@link JavaDelegate} that is used to throw a user data
+ * validation exception with details based on user input.
  */
 @Component("userDataValidationErrorDelegate")
 @RequiredArgsConstructor

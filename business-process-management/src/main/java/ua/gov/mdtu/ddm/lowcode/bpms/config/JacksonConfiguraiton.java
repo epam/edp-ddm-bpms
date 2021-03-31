@@ -11,6 +11,11 @@ import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilde
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * The class represents a holder for beans of the jackson configuration. Each method produces a bean
+ * and must be annotated with @Bean annotation to be managed by the Spring container. The method
+ * should create, set up and return an instance of a bean.
+ */
 @Configuration
 public class JacksonConfiguraiton {
 

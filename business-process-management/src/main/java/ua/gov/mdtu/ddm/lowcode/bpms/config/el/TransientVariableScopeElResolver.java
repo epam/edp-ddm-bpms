@@ -5,6 +5,10 @@ import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.el.VariableScopeElResolver;
 import org.camunda.bpm.engine.impl.javax.el.ELContext;
 
+/**
+ * The class represents an implementation of {@link VariableScopeElResolver} that is used for
+ * setting transient scope variable.
+ */
 public class TransientVariableScopeElResolver extends VariableScopeElResolver {
 
   @Override

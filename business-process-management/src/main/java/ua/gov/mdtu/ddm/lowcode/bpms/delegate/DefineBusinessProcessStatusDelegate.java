@@ -6,6 +6,10 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
 import ua.gov.mdtu.ddm.general.starter.logger.annotation.Logging;
 
+/**
+ * The class represents an implementation of {@link JavaDelegate} that is used to define the status
+ * of a business process
+ */
 @Component("defineBusinessProcessStatusDelegate")
 @RequiredArgsConstructor
 @Logging

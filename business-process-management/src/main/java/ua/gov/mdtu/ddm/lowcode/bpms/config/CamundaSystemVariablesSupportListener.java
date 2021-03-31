@@ -7,11 +7,11 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.springframework.stereotype.Component;
-import ua.gov.mdtu.ddm.lowcode.bpms.config.CamundaProperties;
 import ua.gov.mdtu.ddm.lowcode.bpms.listener.AuthorizationStartEventListener;
 
 /**
- * Bpmn parser listener that adds additional execution listeners to elements.
+ * The class extends {@link AbstractBpmnParseListener} class and used for adding additional
+ * execution listeners to elements.
  */
 @Component
 @RequiredArgsConstructor

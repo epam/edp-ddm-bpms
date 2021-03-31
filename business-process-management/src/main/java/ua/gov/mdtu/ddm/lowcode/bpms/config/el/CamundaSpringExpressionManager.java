@@ -6,6 +6,10 @@ import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 import org.camunda.bpm.engine.spring.SpringExpressionManager;
 import org.springframework.context.ApplicationContext;
 
+/**
+ * The class represents an implementation of {@link SpringExpressionManager} that is used for adding
+ * custom {@link TransientVariableScopeElResolver} resolver.
+ */
 public class CamundaSpringExpressionManager extends SpringExpressionManager {
 
   public CamundaSpringExpressionManager(ApplicationContext applicationContext,

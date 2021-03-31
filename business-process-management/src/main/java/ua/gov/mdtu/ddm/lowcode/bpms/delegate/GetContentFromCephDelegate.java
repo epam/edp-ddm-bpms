@@ -9,6 +9,10 @@ import org.springframework.stereotype.Component;
 import ua.gov.mdtu.ddm.general.integration.ceph.service.CephService;
 import ua.gov.mdtu.ddm.general.starter.logger.annotation.Logging;
 
+/**
+ * The class represents an implementation of {@link JavaDelegate} that is used to get data from ceph
+ * as string using {@link CephService} service.
+ */
 @Component("getContentFromCephDelegate")
 @RequiredArgsConstructor
 @Logging

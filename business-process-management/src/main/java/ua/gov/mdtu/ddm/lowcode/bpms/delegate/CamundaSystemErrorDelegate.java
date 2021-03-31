@@ -10,7 +10,8 @@ import ua.gov.mdtu.ddm.general.errorhandling.BaseRestExceptionHandler;
 import ua.gov.mdtu.ddm.general.errorhandling.exception.SystemException;
 
 /**
- * Throws user data validation exception with details based on user input.
+ * The class represents an implementation of {@link JavaDelegate} that is used to throw a camunda
+ * system exception.
  */
 @Component("camundaSystemErrorDelegate")
 @RequiredArgsConstructor

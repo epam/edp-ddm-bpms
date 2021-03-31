@@ -9,8 +9,8 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 
 /**
- * Implementation of BpmnParse that is used for overriding default camunda bpmn parsing for saving
- * properties transient flag
+ * The class represents an implementation of {@link BpmnParse} that is used for overriding default
+ * camunda bpmn parsing for saving properties transient flag.
  */
 public class TransientBpmnParse extends BpmnParse {
 

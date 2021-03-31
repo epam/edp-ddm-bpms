@@ -6,6 +6,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import ua.gov.mdtu.ddm.lowcode.bpms.client.BaseFeignClient;
 
+/**
+ * The class represents a configuration for all feign clients.
+ */
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan(basePackageClasses = BaseFeignClient.class)

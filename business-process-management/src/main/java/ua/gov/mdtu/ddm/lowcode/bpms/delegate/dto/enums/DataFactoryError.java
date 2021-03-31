@@ -4,6 +4,9 @@ import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Enumeration of data factory errors.
+ */
 @Getter
 @RequiredArgsConstructor
 public enum DataFactoryError {
@@ -27,6 +30,12 @@ public enum DataFactoryError {
 
   private final String titleKey;
 
+  /**
+   * Search data factory error by name
+   *
+   * @param name error name
+   * @return {@link DataFactoryError} object
+   */
   public static DataFactoryError fromNameOrDefaultRuntimeError(String name) {
 
     return Arrays.stream(values())

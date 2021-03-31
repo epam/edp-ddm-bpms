@@ -15,6 +15,10 @@ import ua.gov.mdtu.ddm.general.starter.logger.annotation.Logging;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.dto.DataFactoryConnectorResponse;
 import ua.gov.mdtu.ddm.lowcode.bpms.service.MessageResolver;
 
+/**
+ * The class represents an implementation of {@link BaseConnectorDelegate} that is used to create
+ * data in Data Factory
+ */
 @Component("dataFactoryConnectorCreateDelegate")
 @Logging
 public class DataFactoryConnectorCreateDelegate extends BaseConnectorDelegate {
@@ -22,7 +26,8 @@ public class DataFactoryConnectorCreateDelegate extends BaseConnectorDelegate {
   private final String dataFactoryBaseUrl;
 
   @Autowired
-  public DataFactoryConnectorCreateDelegate(RestTemplate restTemplate, FormDataCephService formDataCephService,
+  public DataFactoryConnectorCreateDelegate(RestTemplate restTemplate,
+      FormDataCephService formDataCephService,
       ObjectMapper objectMapper, MessageResolver messageResolver,
       @Value("${spring.application.name}") String springAppName,
       @Value("${camunda.system-variables.const_dataFactoryBaseUrl}") String dataFactoryBaseUrl) {

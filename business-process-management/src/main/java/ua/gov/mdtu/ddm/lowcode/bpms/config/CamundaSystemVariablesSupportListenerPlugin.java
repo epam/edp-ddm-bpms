@@ -10,7 +10,8 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Plugin that enables additional pre/post parse listeners.
+ * The class extends {@link AbstractProcessEnginePlugin} class and used for enabling additional
+ * pre/post parse listeners.
  */
 @Configuration
 @RequiredArgsConstructor
