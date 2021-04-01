@@ -5,7 +5,7 @@ spring:
       config:
         enabled: false
 logging:
-  config: '' # falling back to Spring Boot default logging system configuration
+  config: classpath:log4j2-local-console.xml
 
 ---
 spring:

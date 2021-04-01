@@ -1,0 +1,8 @@
+spring:
+  profiles: local
+logging:
+  config: classpath:log4j2-local-console.xml
+
+---
+logging:
+  config: classpath:log4j2-json-console.xml
