@@ -42,6 +42,7 @@ import ua.gov.mdtu.ddm.lowcode.bpms.delegate.PutContentToCephDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.PutFormDataToCephDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.UserDataValidationErrorDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector.DataFactoryConnectorBatchCreateDelegate;
+import ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector.DataFactoryConnectorBatchReadDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector.DataFactoryConnectorCreateDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector.DataFactoryConnectorReadDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector.DataFactoryConnectorSearchDelegate;
@@ -118,6 +119,10 @@ public abstract class BaseBpmnTest {
         .register("defineBusinessProcessStatusDelegate", new DefineBusinessProcessStatusDelegate());
 
     Mocks.register("userDataValidationErrorDelegate", userDataValidationErrorDelegate);
+
+    Mocks.register("dataFactoryConnectorBatchReadDelegate",
+        new DataFactoryConnectorBatchReadDelegate(restTemplate, formDataCephService, objectMapper,
+            springAppName, dataFactoryUrl));
   }
 
   protected void completeTask(String taskDefinitionKey, String formData,

@@ -41,7 +41,7 @@ public class DataFactoryConnectorReadDelegate extends BaseConnectorDelegate {
     ((AbstractVariableScope) execution).setVariableLocalTransient(RESPONSE_VARIABLE, response);
   }
 
-  private DataFactoryConnectorResponse performGet(DelegateExecution delegateExecution,
+  protected DataFactoryConnectorResponse performGet(DelegateExecution delegateExecution,
       String resourceName, String resourceId) {
     var uri = UriComponentsBuilder.fromHttpUrl(dataFactoryBaseUrl).pathSegment(resourceName)
         .pathSegment(resourceId).build().toUri();
