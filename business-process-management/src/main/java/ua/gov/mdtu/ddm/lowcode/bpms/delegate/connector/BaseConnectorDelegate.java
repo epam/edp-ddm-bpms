@@ -1,9 +1,6 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -13,22 +10,12 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
-import ua.gov.mdtu.ddm.general.errorhandling.dto.ErrorDetailDto;
-import ua.gov.mdtu.ddm.general.errorhandling.dto.ErrorsListDto;
-import ua.gov.mdtu.ddm.general.errorhandling.dto.SystemErrorDto;
-import ua.gov.mdtu.ddm.general.errorhandling.dto.ValidationErrorDto;
-import ua.gov.mdtu.ddm.general.errorhandling.exception.SystemException;
-import ua.gov.mdtu.ddm.general.errorhandling.exception.ValidationException;
 import ua.gov.mdtu.ddm.general.integration.ceph.service.FormDataCephService;
-import ua.gov.mdtu.ddm.general.localization.MessageResolver;
 import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.enums.PlatformHttpHeader;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.dto.DataFactoryConnectorResponse;
-import ua.gov.mdtu.ddm.lowcode.bpms.delegate.dto.enums.DataFactoryError;
 
 /**
  * The class represents an implementation of {@link JavaDelegate} that is used to provide common
@@ -45,8 +32,6 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
 
   private final RestTemplate restTemplate;
   private final FormDataCephService formDataCephService;
-  private final ObjectMapper objectMapper;
-  private final MessageResolver messageResolver;
   private final String springAppName;
 
   /**
@@ -56,9 +41,9 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
    * @return response from data factory
    */
   protected DataFactoryConnectorResponse perform(RequestEntity<?> requestEntity) {
+    logRequest(requestEntity);
     var httpResponse = restTemplate.exchange(requestEntity, String.class);
-
-    logSuccessfulRequest(requestEntity, httpResponse);
+    logResponse(httpResponse);
 
     return DataFactoryConnectorResponse.builder()
         .statusCode(httpResponse.getStatusCode().value())
@@ -125,110 +110,21 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
     return Optional.ofNullable(xAccessTokenCephFromData.getAccessToken());
   }
 
-  /**
-   * Method for building an error that occurs when reading data from a data factory.
-   *
-   * @param requestEntity {@link RequestEntity} entity
-   * @param ex {@link RestClientResponseException} exception
-   * @return a runtime exception
-   */
-  protected RuntimeException buildReadableException(RequestEntity<?> requestEntity,
-      RestClientResponseException ex) {
-    var httpStatus = HttpStatus.valueOf(ex.getRawStatusCode());
-    var isValidationException = Objects.equals(HttpStatus.UNPROCESSABLE_ENTITY, httpStatus) ||
-        Objects.equals(HttpStatus.NOT_FOUND, httpStatus);
-
-    var exception = buildException(requestEntity, ex, isValidationException);
-
-    if (Objects.equals(HttpStatus.NOT_FOUND, httpStatus)) {
-      var localizedMessage = messageResolver
-          .getMessage(DataFactoryError.NOT_FOUND.getTitleKey());
-
-      ((ValidationException) exception).getDetails()
-          .setErrors(Collections.singletonList(new ErrorDetailDto(localizedMessage, null, null)));
-    }
-
-    return exception;
-  }
-
-  /**
-   * Method for building an error that occurs when updating data in a data factory.
-   *
-   * @param requestEntity {@link RequestEntity} entity
-   * @param ex {@link RestClientResponseException} exception
-   * @return a runtime exception
-   */
-  protected RuntimeException buildUpdatableException(RequestEntity<?> requestEntity,
-      RestClientResponseException ex) {
-    var httpStatus = HttpStatus.valueOf(ex.getRawStatusCode());
-    var isValidationException = Objects.equals(HttpStatus.UNPROCESSABLE_ENTITY, httpStatus);
-    return buildException(requestEntity, ex, isValidationException);
-  }
-
-  private RuntimeException buildException(RequestEntity<?> requestEntity,
-      RestClientResponseException ex, boolean isValidationException) {
-    logExceptionRequest(requestEntity, ex, isValidationException);
-    return isValidationException ? validationException(ex.getResponseBodyAsString())
-        : camundaSystemException(ex.getResponseBodyAsString());
-  }
-
-  @SneakyThrows
-  private SystemException camundaSystemException(String responseBody) {
-    var systemErrorDto = objectMapper.readValue(responseBody, SystemErrorDto.class);
-
-    var dataFactoryError = DataFactoryError.fromNameOrDefaultRuntimeError(systemErrorDto.getCode());
-    var localizedMessage = messageResolver.getMessage(dataFactoryError.getTitleKey());
-
-    systemErrorDto.setLocalizedMessage(localizedMessage);
-    return new SystemException(systemErrorDto);
-  }
-
-  @SneakyThrows
-  private ValidationException validationException(String responseBody) {
-    var validationErrorDto = objectMapper.readValue(responseBody, ValidationErrorDto.class);
-
-    if (Objects.nonNull(validationErrorDto.getDetails())) {
-      var localizedMessage = messageResolver
-          .getMessage(DataFactoryError.VALIDATION_ERROR.getTitleKey());
-      validationErrorDto.getDetails().getErrors()
-          .forEach(errorDetailDto -> errorDetailDto.setMessage(localizedMessage));
-    } else {
-      validationErrorDto.setDetails(new ErrorsListDto());
-    }
-
-    return new ValidationException(validationErrorDto);
-  }
-
-  private void logSuccessfulRequest(RequestEntity<?> request, ResponseEntity<?> response) {
+  private void logRequest(RequestEntity<?> request) {
     if (log.isDebugEnabled()) {
-      log.debug("{} request to {} with request payload - {} and headers - {} "
-              + "returned {} status code with response body - {}",
-          request.getMethod(), request.getUrl(), request.getBody(), request.getHeaders(),
-          response.getStatusCode(), response.getBody());
+      log.debug("Sending {} request to {} with request payload - {} and headers - {}",
+          request.getMethod(), request.getUrl(), request.getBody(), request.getHeaders());
       return;
     }
-    log.info("{} request to {} returned {} status code", request.getMethod(), request.getUrl(),
-        response.getStatusCode());
+    log.info("Sending {} request to {}", request.getMethod(), request.getUrl());
   }
 
-  private void logExceptionRequest(RequestEntity<?> requestEntity,
-      RestClientResponseException ex, boolean isValidationException) {
+  private void logResponse(ResponseEntity<?> response) {
     if (log.isDebugEnabled()) {
-      log.debug("{} request to {} with request payload - {} and headers - {} "
-              + "returned {} status code with message - {} and response body - {}",
-          requestEntity.getMethod(), requestEntity.getUrl(), requestEntity.getBody(),
-          requestEntity.getHeaders(), ex.getRawStatusCode(), ex.getMessage(),
-          ex.getResponseBodyAsString());
+      log.debug("Received {} status code with response body - {}", response.getStatusCode(),
+          response.getBody());
       return;
     }
-    if (isValidationException) {
-      log.info("{} request to {} returned {} status code with message - {}",
-          requestEntity.getMethod(), requestEntity.getUrl(), ex.getRawStatusCode(),
-          ex.getMessage());
-    } else {
-      log.error("{} request to {} returned {} status code with message - {}",
-          requestEntity.getMethod(), requestEntity.getUrl(), ex.getRawStatusCode(),
-          ex.getMessage());
-    }
+    log.info("Received {} status code", response.getStatusCode());
   }
 }

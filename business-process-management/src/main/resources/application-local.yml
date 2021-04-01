@@ -35,6 +35,9 @@ lowcode:
   security:
     enabled: false
 
+dso:
+  url: http://localhost:8100
+
 ceph:
   http-endpoint: http://localhost:8100
   access-key: access-key

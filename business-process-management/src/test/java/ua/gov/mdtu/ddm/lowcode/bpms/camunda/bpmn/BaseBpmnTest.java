@@ -26,6 +26,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -45,6 +46,7 @@ import ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector.DataFactoryConnectorCreat
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector.DataFactoryConnectorReadDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector.DataFactoryConnectorSearchDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector.DigitalSignatureConnectorDelegate;
+import ua.gov.mdtu.ddm.lowcode.bpms.exception.handler.ConnectorResponseErrorHandler;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.builder.StubData;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.config.TestCephServiceImpl;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.config.TestFormDataCephServiceImpl;
@@ -57,15 +59,17 @@ public abstract class BaseBpmnTest {
   protected final String digitalSignatureUrl = "http://digital-signature-ops:8080/";
   protected final String springAppName = "business-process-management";
 
-  protected final TestFormDataCephServiceImpl formDataCephService = new TestFormDataCephServiceImpl(cephBucketName);
+  protected final TestFormDataCephServiceImpl formDataCephService = new TestFormDataCephServiceImpl(
+      cephBucketName);
   protected final TestCephServiceImpl cephService = new TestCephServiceImpl(cephBucketName);
-
-  protected final RestTemplate restTemplate = new RestTemplate();
-
-  protected MockRestServiceServer mockServer = MockRestServiceServer.createServer(restTemplate);
 
   protected ObjectMapper objectMapper = new ObjectMapper();
   protected MessageResolver messageResolver = mock(MessageResolver.class);
+
+  protected final RestTemplate restTemplate = new RestTemplateBuilder()
+      .errorHandler(new ConnectorResponseErrorHandler(objectMapper, messageResolver)).build();
+
+  protected MockRestServiceServer mockServer = MockRestServiceServer.createServer(restTemplate);
 
   @Rule
   public ProcessEngineRule processEngineRule = new ProcessEngineRule();
@@ -83,22 +87,18 @@ public abstract class BaseBpmnTest {
     var putContentToCephDelegate = new PutContentToCephDelegate(cephBucketName, cephService);
 
     var dataFactoryConnectorSearchDelegate = new DataFactoryConnectorSearchDelegate(restTemplate,
-        formDataCephService, objectMapper, messageResolver, springAppName,
-        dataFactoryUrl);
+        formDataCephService, springAppName, dataFactoryUrl);
     var dataFactoryConnectorCreateDelegate = new DataFactoryConnectorCreateDelegate(restTemplate,
-        formDataCephService, objectMapper, messageResolver, springAppName,
-        dataFactoryUrl);
+        formDataCephService, springAppName, dataFactoryUrl);
     var dataFactoryConnectorReadDelegate = new DataFactoryConnectorReadDelegate(restTemplate,
-        formDataCephService, objectMapper, messageResolver, springAppName,
-        dataFactoryUrl);
+        formDataCephService, springAppName, dataFactoryUrl);
 
     var digitalSignatureConnectorDelegate = new DigitalSignatureConnectorDelegate(restTemplate,
-        formDataCephService, objectMapper, messageResolver, springAppName,
-        digitalSignatureUrl);
+        formDataCephService, springAppName, digitalSignatureUrl);
 
     var dataFactoryConnectorBatchCreateDelegate = new DataFactoryConnectorBatchCreateDelegate(
-        restTemplate, formDataCephService, cephService, objectMapper, messageResolver,
-        digitalSignatureConnectorDelegate, springAppName, cephBucketName, dataFactoryUrl);
+        restTemplate, formDataCephService, cephService, digitalSignatureConnectorDelegate,
+        springAppName, cephBucketName, dataFactoryUrl);
 
     var userDataValidationErrorDelegate = new UserDataValidationErrorDelegate(objectMapper);
 

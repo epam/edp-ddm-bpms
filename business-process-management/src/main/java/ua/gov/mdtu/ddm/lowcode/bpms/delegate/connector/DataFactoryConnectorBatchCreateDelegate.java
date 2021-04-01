@@ -1,6 +1,5 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
@@ -10,12 +9,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ua.gov.mdtu.ddm.general.integration.ceph.service.CephService;
 import ua.gov.mdtu.ddm.general.integration.ceph.service.FormDataCephService;
-import ua.gov.mdtu.ddm.general.localization.MessageResolver;
 import ua.gov.mdtu.ddm.general.starter.logger.annotation.Logging;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.dto.DataFactoryConnectorResponse;
 
@@ -35,12 +32,11 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelega
 
   public DataFactoryConnectorBatchCreateDelegate(RestTemplate restTemplate,
       FormDataCephService formDataCephService, CephService cephService,
-      ObjectMapper objectmapper, MessageResolver messageResolver,
       DigitalSignatureConnectorDelegate digitalSignatureConnectorDelegate,
       @Value("${spring.application.name}") String springAppName,
       @Value("${ceph.bucket}") String cephBucketName,
       @Value("${camunda.system-variables.const_dataFactoryBaseUrl}") String dataFactoryBaseUrl) {
-    super(restTemplate, formDataCephService, objectmapper, messageResolver, springAppName);
+    super(restTemplate, formDataCephService, springAppName);
     this.dataFactoryBaseUrl = dataFactoryBaseUrl;
     this.digitalSignatureConnectorDelegate = digitalSignatureConnectorDelegate;
     this.cephService = cephService;
@@ -105,11 +101,6 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelega
     var uri = UriComponentsBuilder.fromHttpUrl(dataFactoryBaseUrl).pathSegment(resourceName).build()
         .toUri();
 
-    var requestEntity = RequestEntity.post(uri).headers(getHeaders(delegateExecution)).body(body);
-    try {
-      perform(requestEntity);
-    } catch (RestClientResponseException ex) {
-      throw buildUpdatableException(requestEntity, ex);
-    }
+    perform(RequestEntity.post(uri).headers(getHeaders(delegateExecution)).body(body));
   }
 }

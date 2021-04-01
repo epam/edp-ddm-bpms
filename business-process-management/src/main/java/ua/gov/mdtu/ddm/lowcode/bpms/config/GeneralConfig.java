@@ -6,11 +6,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
 import org.springframework.boot.jdbc.DatabaseDriver;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.support.DatabaseStartupValidator;
+import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 import ua.gov.mdtu.ddm.general.integration.ceph.config.CephConfig;
 
@@ -25,8 +27,8 @@ import ua.gov.mdtu.ddm.general.integration.ceph.config.CephConfig;
 public class GeneralConfig {
 
   @Bean
-  public RestTemplate restTemplate() {
-    return new RestTemplate();
+  public RestTemplate restTemplate(ResponseErrorHandler responseErrorHandler) {
+    return new RestTemplateBuilder().errorHandler(responseErrorHandler).build();
   }
 
   @Bean
