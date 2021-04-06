@@ -6,7 +6,7 @@
   <parent>
     <groupId>ua.gov.mdtu.ddm.lowcode</groupId>
     <artifactId>business-process-management-parent</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>business-process-management</artifactId>
@@ -73,7 +73,7 @@
     <dependency>
       <groupId>ua.gov.mdtu.ddm.general</groupId>
       <artifactId>platform-localization-starter</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>${ddm-starter-localization.version}</version>
     </dependency>
 
     <dependency>
@@ -94,12 +94,12 @@
     <dependency>
       <groupId>ua.gov.mdtu.ddm.general</groupId>
       <artifactId>platform-logger-spring-boot-starter</artifactId>
-      <version>1.1.0-SNAPSHOT</version>
+      <version>${ddm-starter-logging.version}</version>
     </dependency>
     <dependency>
       <groupId>ua.gov.mdtu.ddm.general</groupId>
       <artifactId>platform-security-spring-boot-starter</artifactId>
-      <version>1.1.0-SNAPSHOT</version>
+      <version>${ddm-starter-security.version}</version>
     </dependency>
 
     <!--Camunda dependencies-->
@@ -126,7 +126,7 @@
     <dependency>
       <groupId>ua.gov.mdtu.ddm.general</groupId>
       <artifactId>platform-ceph-client</artifactId>
-      <version>${platform-ceph-client.version}</version>
+      <version>${ddm-ceph-client.version}</version>
     </dependency>
 
     <dependency>

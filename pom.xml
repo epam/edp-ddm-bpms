@@ -7,13 +7,12 @@
   <parent>
     <groupId>ua.gov.mdtu.ddm.lowcode</groupId>
     <artifactId>low-code-platform-parent</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.1-SNAPSHOT</version>
     <relativePath/>
   </parent>
 
-  <groupId>ua.gov.mdtu.ddm.lowcode</groupId>
   <artifactId>business-process-management-parent</artifactId>
-  <version>1.1.0-SNAPSHOT</version>
+  <version>1.1.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -24,7 +23,10 @@
 
   <properties>
     <groovy.version>3.0.6</groovy.version>
-    <platform-ceph-client.version>1.1.0-SNAPSHOT</platform-ceph-client.version>
+    <ddm-ceph-client.version>1.1.1-SNAPSHOT</ddm-ceph-client.version>
+    <ddm-starter-localization.version>1.1.1-SNAPSHOT</ddm-starter-localization.version>
+    <ddm-starter-logging.version>1.1.1-SNAPSHOT</ddm-starter-logging.version>
+    <ddm-starter-security.version>1.1.1-SNAPSHOT</ddm-starter-security.version>
 
     <deployable.module>business-process-management</deployable.module>
   </properties>
@@ -38,7 +40,7 @@
     <dependency>
       <groupId>ua.gov.mdtu.ddm.general</groupId>
       <artifactId>platform-error-handling-starter</artifactId>
-      <version>1.1.0-SNAPSHOT</version>
+      <version>1.1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <artifactId>wiremock</artifactId>
