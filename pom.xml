@@ -30,6 +30,10 @@
     <ddm-starter-security.version>1.1.1-SNAPSHOT</ddm-starter-security.version>
 
     <deployable.module>business-process-management</deployable.module>
+
+    <!-- This property is set by jacoco and used in the surefire config
+			Set it to empty to avoid JVM startup error related to "@{argLine}" when run without jacoco -->
+    <argLine/>
   </properties>
 
   <dependencies>
