@@ -51,8 +51,9 @@
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-actuator</artifactId>
+      <groupId>ua.gov.mdtu.ddm.general</groupId>
+      <artifactId>ddm-starter-actuator</artifactId>
+      <version>${ddm-starter-actuator.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.cloud</groupId>
