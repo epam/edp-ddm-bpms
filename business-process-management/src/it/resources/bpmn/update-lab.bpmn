@@ -10,7 +10,7 @@
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">searchLabFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="formData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1bqihyv</bpmn:incoming>
@@ -91,7 +91,7 @@
         <camunda:inputOutput>
           <camunda:inputParameter name="resource">laboratory</camunda:inputParameter>
           <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-searchLabFormActivity")}</camunda:inputParameter>
-          <camunda:inputParameter name="id">${S(formDataOutput.value).prop('data').prop('laboratoryId').value()}</camunda:inputParameter>
+          <camunda:inputParameter name="id">${formData.value.prop('laboratoryId').value()}</camunda:inputParameter>
           <camunda:outputParameter name="labResponse">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
@@ -146,7 +146,7 @@
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">viewLabDataFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="formData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0o5fdsc</bpmn:incoming>
@@ -160,8 +160,8 @@
     <bpmn:serviceTask id="prepopulateUpdateLabFormActivity" name="Запис документа форми" camunda:modelerTemplate="putFormDataToCephDelegate" camunda:delegateExpression="${putFormDataToCephDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="formData">${formDataOutput}</camunda:inputParameter>
           <camunda:inputParameter name="taskDefinitionKey">updateLabFormActivity</camunda:inputParameter>
+          <camunda:inputParameter name="formData">${formData}</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0egdpjq</bpmn:incoming>
@@ -184,7 +184,7 @@ labResponse.responseBody.fieldNames().each {
 cephObj.data.oblast = oblResponse.responseBody.prop('level1').value()
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').toString())
+execution.setVariableLocalTransient('payload', S(cephObj, 'application/json'))
 
 execution.setVariable('laboratoryId', labResponse.responseBody.prop('laboratoryId').value())</bpmn:script>
     </bpmn:scriptTask>
@@ -235,7 +235,7 @@ execution.setVariable('laboratoryId', labResponse.responseBody.prop('laboratoryI
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">updateLabFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="formData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0z4nbr8</bpmn:incoming>
@@ -250,9 +250,7 @@ execution.setVariable('laboratoryId', labResponse.responseBody.prop('laboratoryI
     <bpmn:scriptTask id="extractNameAndEdrpouFromUpdateLabFormActivity" name="Підготовка зміних для отримання запису" scriptFormat="groovy">
       <bpmn:incoming>Flow_0d01pf1</bpmn:incoming>
       <bpmn:outgoing>Flow_0hz7hdv</bpmn:outgoing>
-      <bpmn:script>var formData = S(formDataOutput).prop('data')
-
-var name = formData.prop('name').stringValue()
+      <bpmn:script>var name = formData.prop('name').stringValue()
 var edrpou = formData.prop('edrpou').stringValue()
 
 execution.removeVariable('name')
@@ -260,9 +258,7 @@ execution.removeVariable('edrpou')
 execution.setVariableLocalTransient('name', name)
 execution.setVariableLocalTransient('edrpou', edrpou)
 
-var viewLabDataformData = S(viewLabDataformDataOutput).prop('data')
-
-var oldName = viewLabDataformData.prop('name').stringValue()
+var oldName = viewLabDataFormData.prop('name').stringValue()
 execution.removeVariable('oldName')
 execution.setVariableLocalTransient('oldName', oldName)</bpmn:script>
     </bpmn:scriptTask>
@@ -270,7 +266,7 @@ execution.setVariableLocalTransient('oldName', oldName)</bpmn:script>
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">viewLabDataFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="viewLabDataformDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="viewLabDataFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0tmmbv3</bpmn:incoming>
@@ -310,8 +306,8 @@ execution.setVariableLocalTransient('oldName', oldName)</bpmn:script>
     <bpmn:serviceTask id="prepopulateSignLabFormActivity" name="Запис документа форми" camunda:modelerTemplate="putFormDataToCephDelegate" camunda:delegateExpression="${putFormDataToCephDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="formData">${formDataOutput}</camunda:inputParameter>
           <camunda:inputParameter name="taskDefinitionKey">signLabFormActivity</camunda:inputParameter>
+          <camunda:inputParameter name="formData">${formData}</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_09rm3a8</bpmn:incoming>
@@ -341,7 +337,7 @@ execution.setVariableLocalTransient('oldName', oldName)</bpmn:script>
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">signLabFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="signedFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="signedFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1gea1y9</bpmn:incoming>
@@ -358,16 +354,14 @@ execution.setVariableLocalTransient('oldName', oldName)</bpmn:script>
       <bpmn:dataOutputAssociation id="DataOutputAssociation_0hjhmrk">
         <bpmn:targetRef>DataObjectReference_1burbk6</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
-      <bpmn:script>var formData = S(signedFormDataOutput).prop('data')
-
-if (!formData.prop('accreditationFlag').boolValue()) {
-  formData.prop('accreditationEndDate', null as String)
+      <bpmn:script>if (!signedFormData.prop('accreditationFlag').boolValue()) {
+  signedFormData.prop('accreditationEndDate', null as String)
 }
 
 execution.removeVariable('dataPayload')
-execution.setVariableLocalTransient("dataPayload", formData)
+execution.setVariableLocalTransient('dataPayload', signedFormData)
 
-var keyObj = ['data':formData.toString()]
+var keyObj = ['data':signedFormData.toString()]
 execution.removeVariable('dataKeyPayload')
 execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>

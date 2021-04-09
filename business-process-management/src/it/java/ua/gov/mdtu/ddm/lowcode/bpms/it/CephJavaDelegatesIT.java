@@ -14,11 +14,13 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.google.common.collect.ImmutableMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import javax.inject.Inject;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.spin.Spin;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -83,15 +85,15 @@ public class CephJavaDelegatesIT extends BaseIT {
     assertTrue(process.isEnded());
 
     String content = cephService.getContent(cephBucketName, "testKey");
-    assertThat(content).isNotNull();
-    assertThat(content).isEqualTo(contentToPut);
+    assertThat(content).isNotNull()
+        .isEqualTo(contentToPut);
   }
 
   @Test
   public void shouldPutTaskFormDataToCeph() {
-    var content = "{\"data\":{\"name\":\"value ek\"}}";
+    var content = Spin.JSON("{\"name\":\"value ek\"}");
 
-    Map<String, Object> vars = ImmutableMap.of("formData", Variables.stringValue(content, true));
+    Map<String, Object> vars = ImmutableMap.of("formData", Variables.objectValue(content, true));
     var processInstance = runtimeService
         .startProcessInstanceByKey("testCephFormDataDelegates_key", "key", vars);
 
@@ -99,6 +101,7 @@ public class CephJavaDelegatesIT extends BaseIT {
 
     var resultVariables = historyService.createHistoricVariableInstanceQuery()
         .processInstanceId(processInstance.getId()).list().stream()
+        .filter(historicVariableInstance -> Objects.nonNull(historicVariableInstance.getValue()))
         .collect(toMap(HistoricVariableInstance::getName, HistoricVariableInstance::getValue,
             (o1, o2) -> o1));
 

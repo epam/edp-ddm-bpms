@@ -19,12 +19,12 @@
       <bpmn:outgoing>Flow_09oeymr</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:sequenceFlow id="Flow_1vs5ys0" name="так" sourceRef="Gateway_04pw09i" targetRef="Activity_0wnn70u">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${JSON(formDataOutput.value).prop("data").prop("errorCheckFlag").boolValue()}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${formData.value.prop('errorCheckFlag').boolValue()}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_1iprvcd" sourceRef="Activity_0wnn70u" targetRef="Activity_1e08895" />
     <bpmn:sequenceFlow id="Flow_01suttv" sourceRef="Activity_0qxn3m4" targetRef="Activity_01n89u4" />
     <bpmn:sequenceFlow id="Flow_0jego92" name="ні" sourceRef="Gateway_04pw09i" targetRef="Activity_0qxn3m4">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!JSON(formDataOutput.value).prop("data").prop("errorCheckFlag").boolValue()}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!formData.value.prop('errorCheckFlag').boolValue()}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_1cz9rwb" sourceRef="Activity_0g747qa" targetRef="Gateway_0wa0mxl" />
     <bpmn:sequenceFlow id="Flow_08prsae" name="ні" sourceRef="Gateway_01wk2q7" targetRef="Activity_0g747qa">
@@ -124,7 +124,7 @@
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_shared-search-lab</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="formData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1ltqeqf</bpmn:incoming>
@@ -148,7 +148,7 @@
         <camunda:inputOutput>
           <camunda:inputParameter name="resource">laboratory</camunda:inputParameter>
           <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable('secure-sys-var-ref-task-form-data-Activity_shared-search-lab')}</camunda:inputParameter>
-          <camunda:inputParameter name="id">${S(formDataOutput.value).prop('data').prop('laboratoryId').stringValue()}</camunda:inputParameter>
+          <camunda:inputParameter name="id">${formData.value.prop('laboratoryId').stringValue()}</camunda:inputParameter>
           <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
@@ -174,7 +174,7 @@
           <camunda:inputParameter name="resource">staff-equal-laboratory-id-count</camunda:inputParameter>
           <camunda:inputParameter name="searchConditions">
             <camunda:map>
-              <camunda:entry key="laboratoryId">${JSON(formDataOutput.value).prop("data").prop("laboratoryId").stringValue()}</camunda:entry>
+              <camunda:entry key="laboratoryId">${formData.value.prop('laboratoryId').value()}</camunda:entry>
             </camunda:map>
           </camunda:inputParameter>
           <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-Activity_shared-search-lab")}</camunda:inputParameter>
@@ -201,19 +201,17 @@
     <bpmn:scriptTask id="Activity_19gsmcp" name="Підготовка даних документа для показу" scriptFormat="groovy">
       <bpmn:incoming>Flow_1cn73cl</bpmn:incoming>
       <bpmn:outgoing>Flow_1l2hixa</bpmn:outgoing>
-      <bpmn:script>def formData = S(formDataOutput).prop('data')
-
-def cephObj = ['data': [:]]
-['name', 'registrationNo'].each { cephObj.data[it] = formData.prop(it).stringValue() }
+      <bpmn:script>def cephData = [:]
+['name', 'registrationNo'].each { cephData[it] = formData.prop(it).value() }
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').toString())</bpmn:script>
+execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="Activity_1v25ik1" name="Читання документа за ключем" camunda:modelerTemplate="getFormDataFromCephDelegate" camunda:delegateExpression="${getFormDataFromCephDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_shared-add-application</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="formData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_19t2g28</bpmn:incoming>
@@ -223,18 +221,17 @@ execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').to
     <bpmn:scriptTask id="Activity_1xdhhss" name="Підготовка даних документа для показу" scriptFormat="groovy">
       <bpmn:incoming>Flow_0nhszsd</bpmn:incoming>
       <bpmn:outgoing>Flow_0l7mjsy</bpmn:outgoing>
-      <bpmn:script>def cephObj = ['data': [:]]
-def formData = S(formDataOutput).prop('data')
-['name', 'registrationNo'].each { cephObj.data[it] = formData.prop(it).stringValue() }
+      <bpmn:script>def cephData = [:]
+['name', 'registrationNo'].each { cephData[it] = formData.prop(it).value() }
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').toString())</bpmn:script>
+execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="Activity_0wn10o6" name="Читання документа за ключем" camunda:modelerTemplate="getFormDataFromCephDelegate" camunda:delegateExpression="${getFormDataFromCephDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_shared-add-application</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="formData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1e2ivqf</bpmn:incoming>
@@ -260,7 +257,7 @@ execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').to
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_shared-check-complience</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="formData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_12s7c0i</bpmn:incoming>
@@ -387,10 +384,10 @@ execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').to
       <bpmn:dataOutputAssociation id="DataOutputAssociation_1pukws3">
         <bpmn:targetRef>DataObjectReference_0jq9gy6</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
-      <bpmn:script>def cephObj = ['data': [:]]
-['name', 'edrpou'].each { cephObj.data[it] = response.responseBody.prop(it).stringValue() }
+      <bpmn:script>def cephData = [:]
+['name', 'edrpou'].each { cephData[it] = response.responseBody.prop(it).value() }
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').toString())
+execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))
 
 execution.setVariable('laboratoryId', response.responseBody.prop('laboratoryId').stringValue())</bpmn:script>
     </bpmn:scriptTask>
@@ -412,15 +409,14 @@ execution.setVariable('laboratoryId', response.responseBody.prop('laboratoryId')
       <bpmn:dataOutputAssociation id="DataOutputAssociation_1kuu4h5">
         <bpmn:targetRef>DataObjectReference_1clqi6b</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
-      <bpmn:script>def cephObj = ['data': [:]]
-def formData = S(formDataOutput).prop('data')
-['name', 'registrationNo'].each { cephObj.data[it] = formData.prop(it).stringValue() }
+      <bpmn:script>def cephData = [:]
+['name', 'registrationNo'].each { cephData[it] = formData.prop(it).value() }
 
 def solution = solutionResponse.responseBody.elements()[0]
-cephObj.data['solutionName'] = solution.prop('name').stringValue()
+cephData['solutionName'] = solution.prop('name').stringValue()
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').toString())
+execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))
 
 execution.setVariable('solutionTypeId', solution.prop('solutionTypeId').stringValue())</bpmn:script>
     </bpmn:scriptTask>
@@ -451,15 +447,14 @@ execution.setVariable('solutionTypeId', solution.prop('solutionTypeId').stringVa
       <bpmn:dataOutputAssociation id="DataOutputAssociation_0noz5fx">
         <bpmn:targetRef>DataObjectReference_1f331jk</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
-      <bpmn:script>def cephObj = ['data': [:]]
-def formData = S(formDataOutput).prop('data')
-['name', 'registrationNo'].each { cephObj.data[it] = formData.prop(it).stringValue() }
+      <bpmn:script>def cephData = [:]
+['name', 'registrationNo'].each { cephData[it] = formData.prop(it).value() }
 
 def solution = solutionResponse.responseBody.elements()[0]
-cephObj.data['solutionName'] = solution.prop('name').stringValue()
+cephData['solutionName'] = solution.prop('name').stringValue()
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').toString())
+execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))
 
 execution.setVariable('solutionTypeId', solution.prop('solutionTypeId').stringValue())</bpmn:script>
     </bpmn:scriptTask>
@@ -489,7 +484,7 @@ execution.setVariable('solutionTypeId', solution.prop('solutionTypeId').stringVa
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_shared-add-decision-include</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="formData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1mss6lk</bpmn:incoming>
@@ -528,7 +523,7 @@ execution.setVariable('solutionTypeId', solution.prop('solutionTypeId').stringVa
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_shared-add-decision-deny</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="formData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1qtm8ta</bpmn:incoming>
@@ -602,22 +597,20 @@ execution.setVariable('solutionTypeId', solution.prop('solutionTypeId').stringVa
     <bpmn:scriptTask id="Activity_1y6ev6g" name="Підготовка даних документа для показу" scriptFormat="groovy">
       <bpmn:incoming>Flow_18xeyzp</bpmn:incoming>
       <bpmn:outgoing>Flow_13vt6x6</bpmn:outgoing>
-      <bpmn:script>def formData = S(formDataOutput).prop('data')
-
-def cephObj = ['data':[:]]
+      <bpmn:script>def cephData = [:]
 ['name', 'registrationNo', 'solutionName'].each {
-  cephObj.data[it] = formData.prop(it).value()
+  cephData[it] = formData.prop(it).value()
 }
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').toString())</bpmn:script>
+execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataStoreReference id="DataStoreReference_04ahhnb" name="Ceph" />
     <bpmn:serviceTask id="Activity_1kfzjvb" name="Читання документа за ключем" camunda:modelerTemplate="getFormDataFromCephDelegate" camunda:delegateExpression="${getFormDataFromCephDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_shared-add-chem-factors</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutputSharedAddChemFactors">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="addChemFactorsFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0eee9pi</bpmn:incoming>
@@ -628,7 +621,7 @@ execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').to
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_shared-add-bio-phys-labor-factors</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutputSharedAddBioPhysLaborFactors">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="addBioPhysLaborFactorsFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1ibdoma</bpmn:incoming>
@@ -639,7 +632,7 @@ execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').to
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_shared-add-decision-deny</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutputSharedAddDecisionDeny">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="addDecisionDenyFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_058vtm0</bpmn:incoming>
@@ -650,7 +643,7 @@ execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').to
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_1eujure</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutputSharedAddLetterData">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="addLetterDataFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1vjquue</bpmn:incoming>
@@ -661,30 +654,23 @@ execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').to
       <bpmn:incoming>Flow_03dnc52</bpmn:incoming>
       <bpmn:outgoing>Flow_002ddyj</bpmn:outgoing>
       <bpmn:script>def cephData = [:]
-def addApplicationFormData = S(formDataOutputSharedAddApplication).prop('data')
 ['name', 'edrpou', 'registrationSource', 'registrationNo', 'createdDate', 'acceptedBy'].each {
-    cephData[it] = addApplicationFormData.prop(it).stringValue()
+    cephData[it] = addAppFormData.prop(it).stringValue()
 }
 
-def addChemFactorsFormData = S(formDataOutputSharedAddChemFactors).prop('data')
 ['chemfactgost', 'chemfacthyge', 'chemfactobrv', 'chemfactodovilni'].each {
     cephData[it] = addChemFactorsFormData.prop(it).elements().collect { it.stringValue() }
 }
 
-def addBioPhysLaborFactorsFormData = S(formDataOutputSharedAddBioPhysLaborFactors).prop('data')
 ['FactorsPhys', 'laborfact', 'biofactors'].each {
     cephData[it] = addBioPhysLaborFactorsFormData.prop(it).elements().collect { it.stringValue() }
 }
 
-def addDecisionDenyFormData = S(formDataOutputSharedAddDecisionDeny).prop('data')
 ['solutionName', 'solutionDate', 'letterNo', 'letterDate'].each { cephData[it] = addDecisionDenyFormData.prop(it).stringValue() }
 
-def addLetterDataFormData = S(formDataOutputSharedAddLetterData).prop('data')
 ['receivedBy', 'certifiedBy', 'notes'].each { cephData[it] = addLetterDataFormData.prop(it).stringValue() }
 
 //refusal reasons
-def checkComplianceFormData = S(formDataOutputSharedCheckComplience).prop('data')
-
 ['errorCheckFlag', 'regComplianceFlag', 'factorComplianceFlag', 'zvtComplianceFlag', 'staffComplianceFlag', 'reagentComplianceFlag', 'facilityComplianceFlag'].each { cephData[it] = checkComplianceFormData.prop(it).boolValue() }
 
 ['regRefusalReasonId', 'factorRefusalReasonId', 'zvtRefusalReasonId', 'staffRefusalReasonId', 'reagentRefusalReasonId', 'facilityRefusalReasonId'].each {
@@ -694,7 +680,7 @@ def checkComplianceFormData = S(formDataOutputSharedCheckComplience).prop('data'
 }
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(["data": cephData], 'application/json').toString())</bpmn:script>
+execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:userTask id="Activity_1eujure" name="Внести дані про отримання листа з рішенням (Дата, ПІБ, №)" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="shared-add-letter-data" camunda:assignee="${initiator}">
       <bpmn:extensionElements>
@@ -727,18 +713,17 @@ execution.setVariableLocalTransient('payload', S(["data": cephData], 'applicatio
     <bpmn:scriptTask id="Activity_0xp7isz" name="Підготовка даних документа для показу" scriptFormat="groovy">
       <bpmn:incoming>Flow_16ivyhk</bpmn:incoming>
       <bpmn:outgoing>Flow_1h0vxfq</bpmn:outgoing>
-      <bpmn:script>def cephObj = ['data': [:]]
-def formData = S(formDataOutput).prop("data")
-['name', 'registrationNo', 'solutionName'].each { cephObj.data[it] = formData.prop(it).stringValue() }
+      <bpmn:script>def cephData = [:]
+['name', 'registrationNo', 'solutionName'].each { cephData[it] = formData.prop(it).value() }
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').toString())</bpmn:script>
+execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="Activity_1c8viyf" name="Читання документа за ключем" camunda:modelerTemplate="getFormDataFromCephDelegate" camunda:delegateExpression="${getFormDataFromCephDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_shared-add-application</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutputSharedAddApplication">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="addAppFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_04gfe8o</bpmn:incoming>
@@ -749,7 +734,7 @@ execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').to
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_shared-check-complience</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutputSharedCheckComplience">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="checkComplianceFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1rfh5n7</bpmn:incoming>
@@ -780,33 +765,28 @@ execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').to
       <bpmn:outgoing>Flow_00sxavd</bpmn:outgoing>
       <bpmn:script>def cephData = [:]
 
-def addAppFormData = S(formDataOutputSharedAddApplication).prop('data')
 ['name', 'edrpou', 'registrationSource', 'registrationNo', 'createdDate', 'acceptedBy'].each { cephData[it] = addAppFormData.prop(it).stringValue() }
 
-def addChemFactorsFormData = S(formDataOutputSharedAddChemFactors).prop('data')
 ['chemfactgost', 'chemfacthyge', 'chemfactobrv', 'chemfactodovilni'].each {
     cephData[it] = addChemFactorsFormData.prop(it).elements().collect { it.stringValue() }
 }
 
-def addBioPhysLaborFactorsFormData = S(formDataOutputSharedAddBioPhysLaborFactors).prop('data')
 ['FactorsPhys', 'laborfact', 'biofactors'].each {
     cephData[it] = addBioPhysLaborFactorsFormData.prop(it).elements().collect { it.stringValue() }
 }
 
-def addDecisionIncludeFormData = S(formDataOutputSharedAddDecisionInclude).prop('data')
 ['solutionName', 'solutionDate', 'letterNo', 'letterDate'].each { cephData[it] = addDecisionIncludeFormData.prop(it).stringValue() }
 
-def addLetterDataFormData = S(formDataOutputSharedAddLetterData).prop('data')
 ['receivedBy', 'certifiedBy', 'notes'].each { cephData[it] = addLetterDataFormData.prop(it).stringValue() }
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(["data": cephData], 'application/json').toString())</bpmn:script>
+execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="Activity_0u9rf0k" name="Читання документа за ключем" camunda:modelerTemplate="getFormDataFromCephDelegate" camunda:delegateExpression="${getFormDataFromCephDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_shared-add-letter-data</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutputSharedAddLetterData">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="addLetterDataFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0dnsppv</bpmn:incoming>
@@ -817,7 +797,7 @@ execution.setVariableLocalTransient('payload', S(["data": cephData], 'applicatio
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_shared-add-decision-include</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutputSharedAddDecisionInclude">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="addDecisionIncludeFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_19i5gtz</bpmn:incoming>
@@ -828,7 +808,7 @@ execution.setVariableLocalTransient('payload', S(["data": cephData], 'applicatio
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_shared-add-bio-phys-labor-factors</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutputSharedAddBioPhysLaborFactors">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="addBioPhysLaborFactorsFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1hnzn9g</bpmn:incoming>
@@ -839,7 +819,7 @@ execution.setVariableLocalTransient('payload', S(["data": cephData], 'applicatio
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_shared-add-chem-factors</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutputSharedAddChemFactors">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="addChemFactorsFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1wb6kiy</bpmn:incoming>
@@ -850,7 +830,7 @@ execution.setVariableLocalTransient('payload', S(["data": cephData], 'applicatio
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_shared-add-application</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutputSharedAddApplication">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="addAppFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1umalop</bpmn:incoming>
@@ -936,21 +916,20 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
     <bpmn:scriptTask id="Activity_1183rrp" name="Підготовка даних для запису (transient var)" scriptFormat="groovy">
       <bpmn:incoming>Flow_1fgoqvc</bpmn:incoming>
       <bpmn:outgoing>Flow_0wspxc0</bpmn:outgoing>
-      <bpmn:script>def formData = S(signedFormDataOutput).prop('data')
-def requestMap = [:]
+      <bpmn:script>def requestMap = [:]
 def factors = []
 def factorNames = ['FactorsPhys', 'laborfact', 'biofactors', 'chemfactgost', 'chemfacthyge', 'chemfactobrv', 'chemfactodovilni']
-factorNames.each { factors.addAll(formData.prop(it).elements().collect { it.stringValue() }) }
+factorNames.each { factors.addAll(signedFormData.prop(it).elements().collect { it.stringValue() }) }
 
 //reasonIds
 def reasonIds = ['regRefusalReasonId', 'factorRefusalReasonId', 'zvtRefusalReasonId', 'staffRefusalReasonId', 'reagentRefusalReasonId', 'facilityRefusalReasonId']
 reasonIds.each {
-    if (formData.hasProp(it) &amp;&amp; formData.prop(it).elements().size() &gt; 0) {
-        requestMap[it] = formData.prop(it).elements().get(0).stringValue()
+    if (signedFormData.hasProp(it) &amp;&amp; signedFormData.prop(it).elements().size() &gt; 0) {
+        requestMap[it] = signedFormData.prop(it).elements().get(0).stringValue()
     }
 }
 
-formData.fieldNames().findAll { fieldName -&gt; !factorNames.contains(fieldName) &amp;&amp; !reasonIds.contains(fieldName) }.each { requestMap[it] = formData.prop(it).value() }
+signedFormData.fieldNames().findAll { fieldName -&gt; !factorNames.contains(fieldName) &amp;&amp; !reasonIds.contains(fieldName) }.each { requestMap[it] = signedFormData.prop(it).value() }
 
 requestMap['factors'] = factors
 requestMap.put('applicationTypeId', applicationTypeResponse.responseBody.elements()[0].prop('applicationTypeId').stringValue())
@@ -969,7 +948,7 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_shared-sign-app-deny</camunda:inputParameter>
-          <camunda:outputParameter name="signedFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="signedFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1kxv40d</bpmn:incoming>
@@ -1022,7 +1001,7 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_shared-sign-app-include</camunda:inputParameter>
-          <camunda:outputParameter name="signedFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="signedFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_00h2je0</bpmn:incoming>
@@ -1053,14 +1032,13 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
     <bpmn:scriptTask id="Activity_0xtdm1d" name="Підготовка даних для запису (transient var)" scriptFormat="groovy">
       <bpmn:incoming>Flow_03wl7uy</bpmn:incoming>
       <bpmn:outgoing>Flow_1xbtxzz</bpmn:outgoing>
-      <bpmn:script>def formData = S(signedFormDataOutput).prop('data')
-def requestMap = [:]
+      <bpmn:script>def requestMap = [:]
 def factors = []
 
 factorNames = ['FactorsPhys', 'laborfact', 'biofactors', 'chemfactgost', 'chemfacthyge', 'chemfactobrv', 'chemfactodovilni']
-factorNames.each { factors.addAll(formData.prop(it).elements().collect { it.stringValue() }) }
+factorNames.each { factors.addAll(signedFormData.prop(it).elements().collect { it.stringValue() }) }
 
-formData.fieldNames().findAll { fieldName -&gt; !factorNames.contains(fieldName) }.each { requestMap[it] = formData.prop(it).stringValue() }
+signedFormData.fieldNames().findAll { fieldName -&gt; !factorNames.contains(fieldName) }.each { requestMap[it] = signedFormData.prop(it).value() }
 
 requestMap['factors'] = factors
 requestMap['applicationTypeId'] = applicationTypeResponse.responseBody.elements()[0].prop('applicationTypeId').stringValue()
@@ -1186,7 +1164,7 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
         <camunda:inputOutput>
           <camunda:inputParameter name="validationErrors">
             <camunda:list>
-              <camunda:value>{"field": "id", "value": "${JSON(formDataOutput.value).prop("data").prop("laboratoryId").stringValue()}", "message": "Немає ознаки акредитованості"}</camunda:value>
+              <camunda:value>{"field": "id", "value": "${formData.value.prop('laboratoryId').value()}", "message": "Немає ознаки акредитованості"}</camunda:value>
             </camunda:list>
           </camunda:inputParameter>
         </camunda:inputOutput>
@@ -1253,39 +1231,6 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1ta1se6">
       <bpmndi:BPMNShape id="Participant_11d2pgr_di" bpmnElement="Participant_11d2pgr" isHorizontal="true">
         <dc:Bounds x="180" y="80" width="6820" height="770" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_00mov38_di" bpmnElement="TextAnnotation_00mov38">
-        <dc:Bounds x="4361" y="111" width="137" height="58" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_0k6pg3n_di" bpmnElement="TextAnnotation_0k6pg3n">
-        <dc:Bounds x="4939" y="106" width="162" height="68" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_1l0klck_di" bpmnElement="TextAnnotation_1l0klck">
-        <dc:Bounds x="4500" y="111" width="162" height="43" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_0dez9ez_di" bpmnElement="TextAnnotation_0dez9ez">
-        <dc:Bounds x="4640" y="106" width="162" height="54" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_117oq3o_di" bpmnElement="TextAnnotation_117oq3o">
-        <dc:Bounds x="4789" y="106" width="162" height="68" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_1xhu25f_di" bpmnElement="TextAnnotation_1xhu25f">
-        <dc:Bounds x="4471" y="521" width="137" height="58" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_0wg8u1a_di" bpmnElement="TextAnnotation_0wg8u1a">
-        <dc:Bounds x="4610" y="521" width="162" height="43" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_1jrpreq_di" bpmnElement="TextAnnotation_1jrpreq">
-        <dc:Bounds x="4750" y="516" width="162" height="54" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_0wtlfsj_di" bpmnElement="TextAnnotation_0wtlfsj">
-        <dc:Bounds x="4899" y="516" width="162" height="68" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_12w473y_di" bpmnElement="TextAnnotation_12w473y">
-        <dc:Bounds x="5049" y="516" width="162" height="68" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_07v39t0_di" bpmnElement="TextAnnotation_07v39t0">
-        <dc:Bounds x="4330" y="521" width="137" height="58" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_05een4y_di" bpmnElement="Flow_05een4y">
         <di:waypoint x="662" y="260" />
@@ -2053,6 +1998,48 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
           <dc:Bounds x="5627" y="402" width="27" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_00mov38_di" bpmnElement="TextAnnotation_00mov38">
+        <dc:Bounds x="4361" y="111" width="137" height="58" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0k6pg3n_di" bpmnElement="TextAnnotation_0k6pg3n">
+        <dc:Bounds x="4939" y="106" width="162" height="68" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1l0klck_di" bpmnElement="TextAnnotation_1l0klck">
+        <dc:Bounds x="4500" y="111" width="162" height="43" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0dez9ez_di" bpmnElement="TextAnnotation_0dez9ez">
+        <dc:Bounds x="4640" y="106" width="162" height="54" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_117oq3o_di" bpmnElement="TextAnnotation_117oq3o">
+        <dc:Bounds x="4789" y="106" width="162" height="68" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1xhu25f_di" bpmnElement="TextAnnotation_1xhu25f">
+        <dc:Bounds x="4471" y="521" width="137" height="58" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0wg8u1a_di" bpmnElement="TextAnnotation_0wg8u1a">
+        <dc:Bounds x="4610" y="521" width="162" height="43" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1jrpreq_di" bpmnElement="TextAnnotation_1jrpreq">
+        <dc:Bounds x="4750" y="516" width="162" height="54" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0wtlfsj_di" bpmnElement="TextAnnotation_0wtlfsj">
+        <dc:Bounds x="4899" y="516" width="162" height="68" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_12w473y_di" bpmnElement="TextAnnotation_12w473y">
+        <dc:Bounds x="5049" y="516" width="162" height="68" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_07v39t0_di" bpmnElement="TextAnnotation_07v39t0">
+        <dc:Bounds x="4330" y="521" width="137" height="58" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_18b7kji_di" bpmnElement="Event_18b7kji">
+        <dc:Bounds x="6572" y="202" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0u00wib_di" bpmnElement="Event_0u00wib">
+        <dc:Bounds x="6642" y="612" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1n5bhse_di" bpmnElement="Event_1n5bhse">
+        <dc:Bounds x="740" y="202" width="36" height="36" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Association_1oswj4l_di" bpmnElement="Association_1oswj4l">
         <di:waypoint x="4430" y="220" />
         <di:waypoint x="4430" y="169" />
@@ -2097,15 +2084,6 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
         <di:waypoint x="4410" y="630" />
         <di:waypoint x="4410" y="579" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Event_1n5bhse_di" bpmnElement="Event_1n5bhse">
-        <dc:Bounds x="740" y="202" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0u00wib_di" bpmnElement="Event_0u00wib">
-        <dc:Bounds x="6642" y="612" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_18b7kji_di" bpmnElement="Event_18b7kji">
-        <dc:Bounds x="6572" y="202" width="36" height="36" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="DataOutputAssociation_02wzpn3_di" bpmnElement="DataOutputAssociation_02wzpn3">
         <di:waypoint x="485" y="300" />
         <di:waypoint x="485" y="395" />

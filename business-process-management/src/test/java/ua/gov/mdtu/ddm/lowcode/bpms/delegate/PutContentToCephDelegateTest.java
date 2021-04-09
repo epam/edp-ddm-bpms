@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import ua.gov.mdtu.ddm.general.integration.ceph.service.CephService;
+import ua.gov.mdtu.ddm.lowcode.bpms.delegate.ceph.PutContentToCephDelegate;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PutContentToCephDelegateTest {

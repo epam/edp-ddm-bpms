@@ -8,7 +8,7 @@
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_update-dict-bp-add-name</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="formData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0pvin7q</bpmn:incoming>
@@ -68,7 +68,7 @@
           <camunda:inputParameter name="resource">factor-equal-factor-type-name-count</camunda:inputParameter>
           <camunda:inputParameter name="searchConditions">
             <camunda:map>
-              <camunda:entry key="name">${S(formDataOutput.value).prop('data').prop('name').value()}</camunda:entry>
+              <camunda:entry key="name">${formData.value.prop('name').value()}</camunda:entry>
             </camunda:map>
           </camunda:inputParameter>
           <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-Activity_update-dict-bp-add-name")}</camunda:inputParameter>
@@ -89,14 +89,12 @@
     <bpmn:scriptTask id="Activity_05txg3g" name="Підготовка даних для запису (transient var)" scriptFormat="groovy">
       <bpmn:incoming>Flow_0bp8bjr</bpmn:incoming>
       <bpmn:outgoing>Flow_01w68ny</bpmn:outgoing>
-      <bpmn:script>var formData = S(signedFormDataOutput).prop('data')
-
-formData.prop('factorType', 'Хімічний: довільні')
+      <bpmn:script>signedFormData.prop('factorType', 'Хімічний: довільні')
 
 execution.removeVariable('dataPayload')
-execution.setVariableLocalTransient('dataPayload', formData)
+execution.setVariableLocalTransient('dataPayload', signedFormData)
 
-var keyObj = ['data':formData.toString() ]
+var keyObj = ['data':signedFormData.toString() ]
 execution.removeVariable('dataKeyPayload')
 execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
@@ -104,7 +102,7 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_update-dict-bp-sign-add-name</camunda:inputParameter>
-          <camunda:outputParameter name="signedFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="signedFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_12lktg1</bpmn:incoming>
@@ -120,7 +118,7 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_update-dict-bp-sign-add-name</camunda:inputParameter>
-          <camunda:inputParameter name="formData">${formDataOutput}</camunda:inputParameter>
+          <camunda:inputParameter name="formData">${formData}</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_003wsie</bpmn:incoming>
@@ -215,7 +213,7 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
         <camunda:inputOutput>
           <camunda:inputParameter name="validationErrors">
             <camunda:list>
-              <camunda:value>{"field": "name", "value": "${name.replaceAll("\"", "\\\\\"")}", "message": "Такий запис вже існує"}</camunda:value>
+              <camunda:value>{"field": "name", "value": "${formData.value.prop('name').stringValue().replaceAll("\"", "\\\\\"")}", "message": "Такий запис вже існує"}</camunda:value>
             </camunda:list>
           </camunda:inputParameter>
         </camunda:inputOutput>
@@ -229,6 +227,10 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
       <bpmndi:BPMNShape id="Participant_099v9ei_di" bpmnElement="Participant_099v9ei" isHorizontal="true">
         <dc:Bounds x="160" y="60" width="2070" height="650" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0riq4mp_di" bpmnElement="Flow_0riq4mp">
+        <di:waypoint x="640" y="290" />
+        <di:waypoint x="680" y="290" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0fxiobg_di" bpmnElement="Flow_0fxiobg">
         <di:waypoint x="690" y="530" />
         <di:waypoint x="337" y="530" />
@@ -300,10 +302,6 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
       <bpmndi:BPMNEdge id="Flow_0wpj7a7_di" bpmnElement="Flow_0wpj7a7">
         <di:waypoint x="780" y="290" />
         <di:waypoint x="825" y="290" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0riq4mp_di" bpmnElement="Flow_0riq4mp">
-        <di:waypoint x="640" y="290" />
-        <di:waypoint x="680" y="290" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_0aip2n2_di" bpmnElement="Activity_0bi5s5f">
         <dc:Bounds x="540" y="250" width="100" height="80" />
@@ -399,14 +397,14 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
         <di:waypoint x="590" y="395" />
         <di:waypoint x="590" y="330" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="DataOutputAssociation_0637w2n_di" bpmnElement="DataOutputAssociation_0637w2n">
-        <di:waypoint x="738" y="330" />
-        <di:waypoint x="740" y="395" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="DataOutputAssociation_0x7gd31_di" bpmnElement="DataOutputAssociation_0x7gd31">
         <di:waypoint x="450" y="330" />
         <di:waypoint x="450" y="425" />
         <di:waypoint x="565" y="425" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_0637w2n_di" bpmnElement="DataOutputAssociation_0637w2n">
+        <di:waypoint x="738" y="330" />
+        <di:waypoint x="740" y="395" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="DataInputAssociation_1qk8qlx_di" bpmnElement="DataInputAssociation_1qk8qlx">
         <di:waypoint x="1210" y="425" />

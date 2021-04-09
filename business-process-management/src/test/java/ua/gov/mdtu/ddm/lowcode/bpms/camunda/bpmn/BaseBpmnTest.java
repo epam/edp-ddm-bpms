@@ -37,10 +37,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import ua.gov.mdtu.ddm.general.integration.ceph.dto.FormDataDto;
 import ua.gov.mdtu.ddm.general.localization.MessageResolver;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.DefineBusinessProcessStatusDelegate;
-import ua.gov.mdtu.ddm.lowcode.bpms.delegate.GetFormDataFromCephDelegate;
-import ua.gov.mdtu.ddm.lowcode.bpms.delegate.PutContentToCephDelegate;
-import ua.gov.mdtu.ddm.lowcode.bpms.delegate.PutFormDataToCephDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.UserDataValidationErrorDelegate;
+import ua.gov.mdtu.ddm.lowcode.bpms.delegate.ceph.GetFormDataFromCephDelegate;
+import ua.gov.mdtu.ddm.lowcode.bpms.delegate.ceph.PutContentToCephDelegate;
+import ua.gov.mdtu.ddm.lowcode.bpms.delegate.ceph.PutFormDataToCephDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector.DataFactoryConnectorBatchCreateDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector.DataFactoryConnectorBatchReadDelegate;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector.DataFactoryConnectorCreateDelegate;
@@ -81,10 +81,9 @@ public abstract class BaseBpmnTest {
   @Before
   public void init() {
 
-    var getFormDataFromCephDelegate = new GetFormDataFromCephDelegate(objectMapper,
-        formDataCephService);
-    var putFormDataToCephDelegate = new PutFormDataToCephDelegate(objectMapper,
-        formDataCephService);
+    var getFormDataFromCephDelegate = new GetFormDataFromCephDelegate(formDataCephService);
+    var putFormDataToCephDelegate = new PutFormDataToCephDelegate(formDataCephService,
+        objectMapper);
     var putContentToCephDelegate = new PutContentToCephDelegate(cephBucketName, cephService);
 
     var dataFactoryConnectorSearchDelegate = new DataFactoryConnectorSearchDelegate(restTemplate,

@@ -1,9 +1,10 @@
-package ua.gov.mdtu.ddm.lowcode.bpms.delegate;
+package ua.gov.mdtu.ddm.lowcode.bpms.delegate.ceph;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.camunda.spin.Spin;
 import org.springframework.stereotype.Component;
 import ua.gov.mdtu.ddm.general.integration.ceph.dto.FormDataDto;
 import ua.gov.mdtu.ddm.general.integration.ceph.service.FormDataCephService;
@@ -11,21 +12,15 @@ import ua.gov.mdtu.ddm.general.starter.logger.annotation.Logging;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.constants.CamundaDelegateConstants;
 
 /**
- * The class extends {@link AbstractCephDelegate} delegate and used to get {@link FormDataDto}
- * entity from ceph using {@link FormDataCephService} service.
+ * The class used to get {@link FormDataDto} entity from ceph using {@link FormDataCephService}
+ * service, map the formData to {@link org.camunda.spin.json.SpinJsonNode} and return it.
  */
 @Component("getFormDataFromCephDelegate")
 @Logging
-public class GetFormDataFromCephDelegate extends AbstractCephDelegate {
+@RequiredArgsConstructor
+public class GetFormDataFromCephDelegate implements JavaDelegate {
 
   private final FormDataCephService cephService;
-
-  @Autowired
-  public GetFormDataFromCephDelegate(ObjectMapper objectMapper,
-      FormDataCephService cephService) {
-    super(objectMapper);
-    this.cephService = cephService;
-  }
 
   @Override
   public void execute(DelegateExecution execution) {
@@ -36,6 +31,7 @@ public class GetFormDataFromCephDelegate extends AbstractCephDelegate {
     var cephKey = (String) execution.getVariable(taskFormDataVariableName);
     var formData = cephService.getFormData(cephKey);
 
-    ((AbstractVariableScope) execution).setVariableLocalTransient("formData", serializeFormData(formData));
+    ((AbstractVariableScope) execution)
+        .setVariableLocalTransient("formData", Spin.JSON(formData.getData()));
   }
 }

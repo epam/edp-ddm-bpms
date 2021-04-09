@@ -53,7 +53,7 @@
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">searchLabFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="searchLabFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="searchLabFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0fxf2l6</bpmn:incoming>
@@ -70,7 +70,7 @@
       <bpmn:dataOutputAssociation id="DataOutputAssociation_0ew8akq">
         <bpmn:targetRef>DataObjectReference_1cwxxiw</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
-      <bpmn:script>S(searchLabFormDataOutput).prop('data').prop('laboratoryId').value()</bpmn:script>
+      <bpmn:script>searchLabFormData.prop('laboratoryId').value()</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:boundaryEvent id="Event_1nsz758" attachedToRef="searchLabInDataFactoryActivity">
       <bpmn:outgoing>Flow_1pv5l44</bpmn:outgoing>
@@ -123,15 +123,13 @@
       <bpmn:dataOutputAssociation id="DataOutputAssociation_04zeby9">
         <bpmn:targetRef>DataObjectReference_1pkoxd8</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
-      <bpmn:script>var viewLabDataFormData = S(viewLabDataFormDataOutput).prop('data')
-
-var name = viewLabDataFormData.prop('name').value()
+      <bpmn:script>var name = viewLabDataFormData.prop('name').value()
 var edrpou = viewLabDataFormData.prop('edrpou').value()
 
-var cephObj = ['data':['edrpou':edrpou,'name':name]]
+var cephData = ['edrpou':edrpou,'name':name]
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').toString())</bpmn:script>
+execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:scriptTask id="convertDataFactoryResponseToCephContentAvtivity" name="Підготовка даних документа для показу" scriptFormat="groovy">
       <bpmn:incoming>Flow_09mh96l</bpmn:incoming>
@@ -139,16 +137,16 @@ execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').to
       <bpmn:dataOutputAssociation id="DataOutputAssociation_00esq3q">
         <bpmn:targetRef>DataObjectReference_0jw8v0p</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
-      <bpmn:script>def cephObj = ['data':[:]]
+      <bpmn:script>def cephData = [:]
 
 labResponse.responseBody.fieldNames().each {
-  cephObj.data[it] = labResponse.responseBody.prop(it).value()
+  cephData[it] = labResponse.responseBody.prop(it).value()
 }
 
-cephObj.data.oblast = oblResponse.responseBody.prop('level1').value()
+cephData.oblast = oblResponse.responseBody.prop('level1').value()
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').toString())</bpmn:script>
+execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataObjectReference id="DataObjectReference_0jw8v0p" dataObjectRef="DataObject_0r3fidq" />
     <bpmn:dataObject id="DataObject_0r3fidq" />
@@ -213,7 +211,7 @@ execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').to
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">addPersonnelFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="addPersonnelFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="addPersonnelFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1smrdzi</bpmn:incoming>
@@ -228,7 +226,7 @@ execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').to
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">viewLabDataFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="viewLabDataFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="viewLabDataFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0468gnx</bpmn:incoming>
@@ -258,8 +256,8 @@ execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').to
     <bpmn:serviceTask id="signPersonnelFormPrepopulationActivity" name="Запис документа форми" camunda:modelerTemplate="putFormDataToCephDelegate" camunda:delegateExpression="${putFormDataToCephDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="formData">${addPersonnelFormDataOutput}</camunda:inputParameter>
           <camunda:inputParameter name="taskDefinitionKey">signPersonnelFormActivity</camunda:inputParameter>
+          <camunda:inputParameter name="formData">${addPersonnelFormData}</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1mmt42h</bpmn:incoming>
@@ -291,7 +289,7 @@ execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').to
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">signPersonnelFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="signPersonnelFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="signPersonnelFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1tm5bud</bpmn:incoming>
@@ -308,7 +306,7 @@ execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').to
       <bpmn:dataOutputAssociation id="DataOutputAssociation_029lnr6">
         <bpmn:targetRef>DataObjectReference_14byvl4</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
-      <bpmn:script>def personnelGrid = S(signPersonnelFormDataOutput).prop('data').prop('personnelGrid').elements()
+      <bpmn:script>def personnelGrid = signPersonnelFormData.prop('personnelGrid').elements()
 
 personnelGrid.each { it.prop('laboratoryId', laboratoryId) }
 

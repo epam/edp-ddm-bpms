@@ -23,7 +23,7 @@
       <bpmn:outgoing>Flow_1y7yep8</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_0on3fs3" sourceRef="Activity_0me4tx4" targetRef="Activity_0qci6bv" />
-    <bpmn:serviceTask id="Activity_0me4tx4" name="Get formData from ceph" camunda:class="ua.gov.mdtu.ddm.lowcode.bpms.delegate.GetFormDataFromCephDelegate">
+    <bpmn:serviceTask id="Activity_0me4tx4" name="Get formData from ceph" camunda:class="ua.gov.mdtu.ddm.lowcode.bpms.delegate.ceph.GetFormDataFromCephDelegate">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">userTask</camunda:inputParameter>
@@ -37,8 +37,7 @@
     <bpmn:scriptTask id="Activity_0qci6bv" name="Assert" scriptFormat="groovy">
       <bpmn:incoming>Flow_0on3fs3</bpmn:incoming>
       <bpmn:outgoing>Flow_0avqqip</bpmn:outgoing>
-      <bpmn:script>var formData = execution.getVariable('formDataOutput')
-assert formData.equals('{"data":{"name":"value ek"}}')</bpmn:script>
+      <bpmn:script>assert formDataOutput.toString().equals('{"name":"value ek"}')</bpmn:script>
     </bpmn:scriptTask>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">

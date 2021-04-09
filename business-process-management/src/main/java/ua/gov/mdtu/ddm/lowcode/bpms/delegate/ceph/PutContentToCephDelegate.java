@@ -1,4 +1,4 @@
-package ua.gov.mdtu.ddm.lowcode.bpms.delegate;
+package ua.gov.mdtu.ddm.lowcode.bpms.delegate.ceph;
 
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;

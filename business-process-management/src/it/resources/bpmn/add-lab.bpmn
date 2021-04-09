@@ -70,8 +70,8 @@
           <camunda:inputParameter name="resource">laboratory-equal-edrpou-name-count</camunda:inputParameter>
           <camunda:inputParameter name="searchConditions">
             <camunda:map>
-              <camunda:entry key="name">${S(addLabForm.value).jsonPath('$.data.name').stringValue()}</camunda:entry>
-              <camunda:entry key="edrpou">${S(addLabForm.value).jsonPath('$.data.edrpou').stringValue()}</camunda:entry>
+              <camunda:entry key="name">${addLabForm.value.prop('name').value()}</camunda:entry>
+              <camunda:entry key="edrpou">${addLabForm.value.prop('edrpou').value()}</camunda:entry>
             </camunda:map>
           </camunda:inputParameter>
           <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-addLabFormActivity")}</camunda:inputParameter>
@@ -94,8 +94,8 @@
         <camunda:inputOutput>
           <camunda:inputParameter name="validationErrors">
             <camunda:list>
-              <camunda:value>{"field": "name", "value": "${name.value.replaceAll("\"", "\\\\\"")}", "message": "Дані про цю лабораторію вже присутні"}</camunda:value>
-              <camunda:value>{"field": "edrpou", "value": "${edrpou.value}", "message": "Дані про цю лабораторію вже присутні"}</camunda:value>
+              <camunda:value>{"field": "name", "value": "${addLabForm.value.prop('name').stringValue().replaceAll("\"", "\\\\\"")}", "message": "Дані про цю лабораторію вже присутні"}</camunda:value>
+              <camunda:value>{"field": "edrpou", "value": "${addLabForm.value.prop('edrpou').value()}", "message": "Дані про цю лабораторію вже присутні"}</camunda:value>
             </camunda:list>
           </camunda:inputParameter>
         </camunda:inputOutput>
@@ -117,11 +117,10 @@
       <bpmn:dataOutputAssociation id="DataOutputAssociation_1b90eu1">
         <bpmn:targetRef>DataObjectReference_0c83zff</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
-      <bpmn:script>var dataPayload= S(signedFormDataOutput).prop('data')
-execution.removeVariable('dataPayload')
-execution.setVariableLocalTransient('dataPayload', dataPayload)
+      <bpmn:script>execution.removeVariable('dataPayload')
+execution.setVariableLocalTransient('dataPayload', signedFormData)
 
-var keyObj = ['data':dataPayload.toString()]
+var keyObj = ['data':signedFormData.toString()]
 execution.removeVariable('dataKeyPayload')
 execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
@@ -129,7 +128,7 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">signLabFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="signedFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="signedFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_18e8iv6</bpmn:incoming>

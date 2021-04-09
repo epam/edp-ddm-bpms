@@ -71,7 +71,7 @@
       <bpmn:dataOutputAssociation id="DataOutputAssociation_03uts4u">
         <bpmn:targetRef>DataObjectReference_1x4nsvj</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
-      <bpmn:script>S(searchLabFormDataOutput).prop('data').prop('laboratoryId').value()</bpmn:script>
+      <bpmn:script>searchLabFormData.prop('laboratoryId').value()</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataObjectReference id="DataObjectReference_1x4nsvj" name="DOC" dataObjectRef="DataObject_04ip4hr" />
     <bpmn:dataObject id="DataObject_04ip4hr" />
@@ -107,7 +107,7 @@
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">searchLabFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="searchLabFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="searchLabFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_07oy377</bpmn:incoming>
@@ -143,15 +143,13 @@
       <bpmn:dataOutputAssociation id="DataOutputAssociation_18o1gyn">
         <bpmn:targetRef>DataObjectReference_0334p0g</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
-      <bpmn:script>var name = labResponse.responseBody.prop('name').value()
-var edrpou = labResponse.responseBody.prop('edrpou').value()
-
-var cephObj = ['data':[:]]
-cephObj.data.name = name
-cephObj.data.edrpou = edrpou
+      <bpmn:script>var cephData = [:]
+['name', 'edrpou'].each {
+  cephData[it] = labResponse.responseBody.prop(it).value()
+}
 
 execution.removeVariable('addApplicationFormPayload')
-execution.setVariableLocalTransient('addApplicationFormPayload', S(cephObj, 'application/json').toString())</bpmn:script>
+execution.setVariableLocalTransient('addApplicationFormPayload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataObjectReference id="DataObjectReference_0334p0g" dataObjectRef="DataObject_0wgzepu" />
     <bpmn:dataObject id="DataObject_0wgzepu" />
@@ -193,8 +191,8 @@ execution.setVariableLocalTransient('addApplicationFormPayload', S(cephObj, 'app
     <bpmn:serviceTask id="prepopulateCheckComplienceFormActivity" name="Запис документа форми" camunda:modelerTemplate="putFormDataToCephDelegate" camunda:delegateExpression="${putFormDataToCephDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="formData">${addApplicatonFormDataOutput}</camunda:inputParameter>
           <camunda:inputParameter name="taskDefinitionKey">checkComplianceFormActivity</camunda:inputParameter>
+          <camunda:inputParameter name="formData">${addAppFormData}</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0k1gmms</bpmn:incoming>
@@ -213,7 +211,7 @@ execution.setVariableLocalTransient('addApplicationFormPayload', S(cephObj, 'app
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">addApplicationFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="addApplicatonFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="addAppFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1jgk2gf</bpmn:incoming>
@@ -227,7 +225,7 @@ execution.setVariableLocalTransient('addApplicationFormPayload', S(cephObj, 'app
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">checkComplianceFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="checkComplienceFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="checkComplienceFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0ebqe8e</bpmn:incoming>
@@ -296,17 +294,19 @@ execution.setVariableLocalTransient('addApplicationFormPayload', S(cephObj, 'app
       <bpmn:dataOutputAssociation id="DataOutputAssociation_1h7qmad">
         <bpmn:targetRef>DataObjectReference_1pv4cgs</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
-      <bpmn:script>var checkComplienceFormObj = S(checkComplienceFormDataOutput).prop('data')
-var name = checkComplienceFormObj.prop('name').value()
-var registrationNo = checkComplienceFormObj.prop('registrationNo').value()
+      <bpmn:script>def cephData = [:]
+
+['name', 'registrationNo'].each {
+  cephData[it] = checkComplienceFormData.prop(it).value()
+}
 
 var solutionResponseObj = solutionResponse.responseBody.elements()[0]
 var solutionName = solutionResponseObj.prop('name').value()
 
-var cephObj = ['data':['name':name,'registrationNo':registrationNo,'solutionName':solutionName]]
+cephData['solutionName'] = solutionName
 
 execution.removeVariable('addDecisionDenyFormData')
-execution.setVariableLocalTransient('addDecisionDenyFormData', S(cephObj, 'application/json').toString())
+execution.setVariableLocalTransient('addDecisionDenyFormData', S(cephData, 'application/json'))
 
 execution.setVariable('solutionTypeId', solutionResponseObj.prop('solutionTypeId').value())</bpmn:script>
     </bpmn:scriptTask>
@@ -333,17 +333,19 @@ execution.setVariable('solutionTypeId', solutionResponseObj.prop('solutionTypeId
       <bpmn:dataOutputAssociation id="DataOutputAssociation_1cvunpq">
         <bpmn:targetRef>DataObjectReference_05volo6</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
-      <bpmn:script>var checkComplienceFormObj = S(checkComplienceFormDataOutput).prop('data')
-var name = checkComplienceFormObj.prop('name').value()
-var registrationNo = checkComplienceFormObj.prop('registrationNo').value()
+      <bpmn:script>def cephData = [:]
+
+['name', 'registrationNo'].each {
+  cephData[it] = checkComplienceFormData.prop(it).value()
+}
 
 var solutionResponseObj = solutionResponse.responseBody.elements()[0]
 var solutionName = solutionResponseObj.prop('name').value()
 
-var cephObj = ['data':['name':name,'registrationNo':registrationNo,'solutionName':solutionName]]
+cephData['solutionName'] = solutionName
 
 execution.removeVariable('addDecisionExcludeFormData')
-execution.setVariableLocalTransient('addDecisionExcludeFormData', S(cephObj, 'application/json').toString())
+execution.setVariableLocalTransient('addDecisionExcludeFormData', S(cephData, 'application/json'))
 
 execution.setVariable('solutionTypeId', solutionResponseObj.prop('solutionTypeId').value())</bpmn:script>
     </bpmn:scriptTask>
@@ -374,13 +376,9 @@ execution.setVariable('solutionTypeId', solutionResponseObj.prop('solutionTypeId
     <bpmn:scriptTask id="parseCheckComplienceFormActivity" name="Перевірити наявність помилок" scriptFormat="groovy">
       <bpmn:incoming>Flow_1ganry9</bpmn:incoming>
       <bpmn:outgoing>Flow_1umse39</bpmn:outgoing>
-      <bpmn:script>var checkComplienceFormObj = S(checkComplienceFormDataOutput).prop('data')
-
-var errorCheckFlag = checkComplienceFormObj.prop('errorCheckFlag').value()
-execution.setVariable('errorCheckFlag', errorCheckFlag)
-
-var initiated = checkComplienceFormObj.prop('initiated').value()
-execution.setVariable('initiated', initiated)</bpmn:script>
+      <bpmn:script>['errorCheckFlag', 'initiated'].each {
+  execution.setVariable(it, checkComplienceFormData.prop(it).value())
+}</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:sequenceFlow id="Flow_1ol6diw" sourceRef="readSignAppExcludeFormActivity" targetRef="searchApplicationTypeIdForExclusionActivity" />
     <bpmn:sequenceFlow id="Flow_1il1rk2" sourceRef="signAppExcludeFormActivity" targetRef="readSignAppExcludeFormActivity" />
@@ -410,16 +408,14 @@ execution.setVariable('initiated', initiated)</bpmn:script>
       <bpmn:dataOutputAssociation id="DataOutputAssociation_14037a3">
         <bpmn:targetRef>DataObjectReference_0wtzo87</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
-      <bpmn:script>var addDecisionExcludeFormData = S(addDecisionExcludeFormDataOutput).prop('data')
+      <bpmn:script>def cephData = [:]
 
-var name = addDecisionExcludeFormData.prop('name').value()
-var registrationNo = addDecisionExcludeFormData.prop('registrationNo').value()
-var solutionName = addDecisionExcludeFormData.prop('solutionName').value()
-
-var cephObj = ['data':['name':name,'registrationNo':registrationNo,'solutionName':solutionName]]
+['name', 'registrationNo', 'solutionName'].each {
+  cephData[it] = addDecisionExcludeFormData.prop(it).value()
+}
 
 execution.removeVariable('addLetterDataFormDataForExclusion')
-execution.setVariableLocalTransient('addLetterDataFormDataForExclusion', S(cephObj, 'application/json').toString())</bpmn:script>
+execution.setVariableLocalTransient('addLetterDataFormDataForExclusion', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataObjectReference id="DataObjectReference_0wtzo87" dataObjectRef="DataObject_1impntl" />
     <bpmn:dataObject id="DataObject_1impntl" />
@@ -429,16 +425,14 @@ execution.setVariableLocalTransient('addLetterDataFormDataForExclusion', S(cephO
       <bpmn:dataOutputAssociation id="DataOutputAssociation_0gx20my">
         <bpmn:targetRef>DataObjectReference_19qo55m</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
-      <bpmn:script>var addDecisionDenyFormData = S(addDecisionDenyFormDataOutput).prop('data')
+      <bpmn:script>def cephData = [:]
 
-var name = addDecisionDenyFormData.prop('name').value()
-var registrationNo = addDecisionDenyFormData.prop('registrationNo').value()
-var solutionName = addDecisionDenyFormData.prop('solutionName').value()
-
-var cephObj = ['data':['name':name,'registrationNo':registrationNo,'solutionName':solutionName]]
+['name', 'registrationNo', 'solutionName'].each {
+  cephData[it] = addDecisionDenyFormData.prop(it).value()
+}
 
 execution.removeVariable('addLetterDataFormDataForDeny')
-execution.setVariableLocalTransient('addLetterDataFormDataForDeny', S(cephObj, 'application/json').toString())</bpmn:script>
+execution.setVariableLocalTransient('addLetterDataFormDataForDeny', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataObjectReference id="DataObjectReference_19qo55m" dataObjectRef="DataObject_11u4u66" />
     <bpmn:dataObject id="DataObject_11u4u66" />
@@ -522,7 +516,7 @@ execution.setVariableLocalTransient('addLetterDataFormDataForDeny', S(cephObj, '
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">addDecisionExcludeFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="addDecisionExcludeFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="addDecisionExcludeFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0s0wsvr</bpmn:incoming>
@@ -532,7 +526,7 @@ execution.setVariableLocalTransient('addLetterDataFormDataForDeny', S(cephObj, '
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">checkComplianceFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="checkComplianceFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="checkComplianceFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0hdem9w</bpmn:incoming>
@@ -542,7 +536,7 @@ execution.setVariableLocalTransient('addLetterDataFormDataForDeny', S(cephObj, '
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">addApplicationFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="addApplicationFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="addAppFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_04z17kz</bpmn:incoming>
@@ -552,7 +546,7 @@ execution.setVariableLocalTransient('addLetterDataFormDataForDeny', S(cephObj, '
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">addLetterDataFormForExclusionActivity</camunda:inputParameter>
-          <camunda:outputParameter name="addLetterDataFormDataForExclusionOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="addLetterDataFormDataForExclusion">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_053dudb</bpmn:incoming>
@@ -562,7 +556,7 @@ execution.setVariableLocalTransient('addLetterDataFormDataForDeny', S(cephObj, '
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">addDecisionExcludeFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="addDecisionExcludeFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="addDecisionExcludeFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1dxtp73</bpmn:incoming>
@@ -573,7 +567,7 @@ execution.setVariableLocalTransient('addLetterDataFormDataForDeny', S(cephObj, '
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">addDecisionDenyFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="addDecisionDenyFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="addDecisionDenyFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0h6zovr</bpmn:incoming>
@@ -584,7 +578,7 @@ execution.setVariableLocalTransient('addLetterDataFormDataForDeny', S(cephObj, '
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">addLetterDataFormForDenyActivity</camunda:inputParameter>
-          <camunda:outputParameter name="addLetterDataFormDataForDenyOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="addLetterDataFormDataForDeny">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1qb0apf</bpmn:incoming>
@@ -597,7 +591,7 @@ execution.setVariableLocalTransient('addLetterDataFormDataForDeny', S(cephObj, '
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">addDecisionDenyFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="addDecisionDenyFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="addDecisionDenyFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0uwwm0r</bpmn:incoming>
@@ -607,7 +601,7 @@ execution.setVariableLocalTransient('addLetterDataFormDataForDeny', S(cephObj, '
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">checkComplianceFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="checkComplianceFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="checkComplianceFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0h3mjuw</bpmn:incoming>
@@ -617,7 +611,7 @@ execution.setVariableLocalTransient('addLetterDataFormDataForDeny', S(cephObj, '
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">addApplicationFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="addApplicationFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="addAppFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_13yba14</bpmn:incoming>
@@ -631,21 +625,19 @@ execution.setVariableLocalTransient('addLetterDataFormDataForDeny', S(cephObj, '
       <bpmn:dataOutputAssociation id="DataOutputAssociation_1spi27d">
         <bpmn:targetRef>DataObjectReference_0yh7yjl</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
-      <bpmn:script>var cephObj = ['data':[:]]
+      <bpmn:script>var cephData = [:]
 
-var formDataOutput = ['addLetterDataFormDataForDenyOutput', 'addDecisionDenyFormDataOutput','checkComplianceFormDataOutput', 'addApplicationFormDataOutput']
+var formDataOutput = ['addLetterDataFormDataForDeny', 'addDecisionDenyFormData','checkComplianceFormData', 'addAppFormData']
 
 formDataOutput.stream()
   .map(execution::getVariable)
   .filter(Objects::nonNull)
-  .map(fd -&gt; S(fd).prop('data')).collect().each {data -&gt;
-    data.fieldNames().each {
-      cephObj["data"][it] = data.prop(it).value()
-    }
-  }
+  .forEach(data -&gt; data.fieldNames().each {
+    cephData[it] = data.prop(it).value()
+  })
 
 execution.removeVariable('signAppDenyFormData')
-execution.setVariableLocalTransient('signAppDenyFormData', S(cephObj, 'application/json').toString())</bpmn:script>
+execution.setVariableLocalTransient('signAppDenyFormData', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataObjectReference id="DataObjectReference_0yh7yjl" dataObjectRef="DataObject_0idi6wc" />
     <bpmn:dataObject id="DataObject_0idi6wc" />
@@ -655,21 +647,19 @@ execution.setVariableLocalTransient('signAppDenyFormData', S(cephObj, 'applicati
       <bpmn:dataOutputAssociation id="DataOutputAssociation_1xvezph">
         <bpmn:targetRef>DataObjectReference_1vbykj3</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
-      <bpmn:script>var cephObj = ['data':[:]]
+      <bpmn:script>var cephData = [:]
 
-var formDataOutput = ['addLetterDataFormDataForExclusionOutput', 'addDecisionExcludeFormDataOutput','checkComplianceFormDataOutput', 'addApplicationFormDataOutput']
+var formDataOutput = ['addLetterDataFormDataForExclusion', 'addDecisionExcludeFormData','checkComplianceFormData', 'addAppFormData']
 
 formDataOutput.stream()
   .map(execution::getVariable)
   .filter(Objects::nonNull)
-  .map(fd -&gt; S(fd).prop('data')).collect().each {data -&gt;
-    data.fieldNames().each {
-      cephObj.data[it] = data.prop(it).value()
-    }
-  }
+  .forEach(data -&gt; data.fieldNames().each {
+    cephData[it] = data.prop(it).value()
+  })
 
 execution.removeVariable('signAppExcludeFormData')
-execution.setVariableLocalTransient('signAppExcludeFormData', S(cephObj, 'application/json').toString())</bpmn:script>
+execution.setVariableLocalTransient('signAppExcludeFormData', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataObjectReference id="DataObjectReference_1vbykj3" dataObjectRef="DataObject_14x8q8s" />
     <bpmn:dataObject id="DataObject_14x8q8s" />
@@ -750,7 +740,7 @@ execution.setVariableLocalTransient('signAppExcludeFormData', S(cephObj, 'applic
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">signAppExcludeFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="signAppExcludeFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="signAppExcludeFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1il1rk2</bpmn:incoming>
@@ -848,12 +838,10 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
     <bpmn:scriptTask id="convertSignFormDataForExclusionToDataFactoryFormatActivity" name="Підготовка даних для запису (transient var)" scriptFormat="groovy">
       <bpmn:incoming>Flow_1hm6nx7</bpmn:incoming>
       <bpmn:outgoing>Flow_1sbtxi3</bpmn:outgoing>
-      <bpmn:script>var formData = S(signAppExcludeFormDataOutput).prop('data')
+      <bpmn:script>var requestMap = [:]
 
-var requestMap = [:]
-
-formData.fieldNames().each {
-    requestMap[it] = formData.prop(it).value()
+signAppExcludeFormData.fieldNames().each {
+  requestMap[it] = signAppExcludeFormData.prop(it).value()
 }
 
 def appType = applicationTypeResponse.responseBody.elements()[0]
@@ -990,12 +978,10 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
     <bpmn:scriptTask id="convertSignFormDataForDenyToDataFactoryFormatActivity" name="Підготовка даних для запису (transient var)" scriptFormat="groovy">
       <bpmn:incoming>Flow_1u0et77</bpmn:incoming>
       <bpmn:outgoing>Flow_18ptw92</bpmn:outgoing>
-      <bpmn:script>var formData = S(signAppDenyFormDataOutput).prop('data')
+      <bpmn:script>var requestMap = [:]
 
-var requestMap = [:]
-
-formData.fieldNames().each {
-    requestMap[it] = formData.prop(it).value()
+signAppDenyFormData.fieldNames().each {
+    requestMap[it] = signAppDenyFormData.prop(it).value()
 }
 
 def appType = applicationTypeResponse.responseBody.elements()[0]
@@ -1036,7 +1022,7 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">signAppDenyFormActivity</camunda:inputParameter>
-          <camunda:outputParameter name="signAppDenyFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="signAppDenyFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0co0rj3</bpmn:incoming>

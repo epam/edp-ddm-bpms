@@ -30,7 +30,7 @@
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_update-personnel-bp-search-personnel</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="formData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1szkktk</bpmn:incoming>
@@ -45,7 +45,7 @@
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_update-personnel-bp-update-personnel</camunda:inputParameter>
-          <camunda:outputParameter name="formDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="formData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0n5we1k</bpmn:incoming>
@@ -101,31 +101,31 @@
       <bpmn:dataOutputAssociation id="DataOutputAssociation_10zrvlo">
         <bpmn:targetRef>DataObjectReference_0dgncr9</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
-      <bpmn:script>def cephObj = ['data':[:]]
+      <bpmn:script>def cephData = [:]
 
-cephObj.data['researches'] = []
+cephData['researches'] = []
 response.responseBody.prop('researches').elements().each {
-  cephObj.data.researches.add(it.value())
+  cephData.researches.add(it.value())
 }
 response.responseBody.deleteProp('researches')
 
 response.responseBody.fieldNames().each {
-  cephObj.data[it] = response.responseBody.prop(it).value()
+  cephData[it] = response.responseBody.prop(it).value()
 }
 
 ['name', 'edrpou'].each {
-  cephObj.data[it] = labResponse.responseBody.prop(it).value()
+  cephData[it] = labResponse.responseBody.prop(it).value()
 }
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').toString())</bpmn:script>
+execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="Activity_144szld" name="Пошук даних про лабораторію" camunda:modelerTemplate="dataFactoryConnectorReadDelegate" camunda:delegateExpression="${dataFactoryConnectorReadDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="resource">laboratory</camunda:inputParameter>
-          <camunda:inputParameter name="id">${S(formDataOutput.value).prop('data').prop('laboratoryId').stringValue()}</camunda:inputParameter>
           <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable('secure-sys-var-ref-task-form-data-Activity_update-personnel-bp-search-personnel')}</camunda:inputParameter>
+          <camunda:inputParameter name="id">${formData.value.prop('laboratoryId').stringValue()}</camunda:inputParameter>
           <camunda:outputParameter name="labResponse">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
@@ -137,7 +137,7 @@ execution.setVariableLocalTransient('payload', S(cephObj, 'application/json').to
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_update-personnel-bp-sign-personnel</camunda:inputParameter>
-          <camunda:inputParameter name="formData">${formDataOutput}</camunda:inputParameter>
+          <camunda:inputParameter name="formData">${formData}</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1377709</bpmn:incoming>
@@ -213,27 +213,25 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
     <bpmn:scriptTask id="Activity_1b2fmpe" name="Підготовка даних для запису (transient var)" scriptFormat="groovy">
       <bpmn:incoming>Flow_0c3k45v</bpmn:incoming>
       <bpmn:outgoing>Flow_0q8v9yz</bpmn:outgoing>
-      <bpmn:script>var formData = S(signedFormDataOutput).prop('data')
-
-var staffId = formData.prop('staffId').stringValue()
+      <bpmn:script>var staffId = signedFormData.prop('staffId').stringValue()
 execution.setVariableLocalTransient('staffId', staffId)
 
-formData.deleteProp('name')
-formData.deleteProp('edrpou')
+signedFormData.deleteProp('name')
+signedFormData.deleteProp('edrpou')
 
-if(!formData.prop('hygienistFlag').boolValue()) {
-  formData.prop('specializationDate', null as String)
-  formData.prop('specializationEndDate', null as String)
+if(!signedFormData.prop('hygienistFlag').boolValue()) {
+  signedFormData.prop('specializationDate', null as String)
+  signedFormData.prop('specializationEndDate', null as String)
 }
 
-if(!formData.prop('fixedTermContractFlag').boolValue()) {
-  formData.prop('contractEndDate', null as String)
+if(!signedFormData.prop('fixedTermContractFlag').boolValue()) {
+  signedFormData.prop('contractEndDate', null as String)
 }
 
 execution.removeVariable('dataPayload')
-execution.setVariableLocalTransient('dataPayload', formData)
+execution.setVariableLocalTransient('dataPayload', signedFormData)
 
-var keyObj = ['data':formData.toString()]
+var keyObj = ['data':signedFormData.toString()]
 execution.removeVariable('dataKeyPayload')
 execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
@@ -242,7 +240,7 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">Activity_update-personnel-bp-sign-personnel</camunda:inputParameter>
-          <camunda:outputParameter name="signedFormDataOutput">${ formData }</camunda:outputParameter>
+          <camunda:outputParameter name="signedFormData">${ formData }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0oh85vb</bpmn:incoming>
@@ -276,7 +274,7 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
         <camunda:inputOutput>
           <camunda:inputParameter name="resource">staff</camunda:inputParameter>
           <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-Activity_update-personnel-bp-search-personnel")}</camunda:inputParameter>
-          <camunda:inputParameter name="id">${S(formDataOutput.value).prop('data').prop('staffId').stringValue()}</camunda:inputParameter>
+          <camunda:inputParameter name="id">${formData.value.prop('staffId').stringValue()}</camunda:inputParameter>
           <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>

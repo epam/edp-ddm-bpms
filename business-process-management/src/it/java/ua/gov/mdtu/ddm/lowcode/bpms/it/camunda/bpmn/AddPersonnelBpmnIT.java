@@ -97,7 +97,7 @@ public class AddPersonnelBpmnIT extends BaseBpmnIT {
     addExpectedCephContent(processInstanceId, addPersonnelFormActivityDefinitionKey,
         "/json/add-personnel/form-data/addPersonnelFormActivity.json");
     addExpectedCephContent(processInstanceId, signPersonnelFormActivityDefinitionKey,
-        "/json/add-personnel/form-data/addPersonnelFormActivity.json");
+        "/json/add-personnel/form-data/signPersonnelFormActivityPrepopulation.json");
 
     assertWaitingActivity(processInstance, signPersonnelFormActivityDefinitionKey,
         "add-personnel-bp-sign-personnel");
