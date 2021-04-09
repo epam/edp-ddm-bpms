@@ -2,6 +2,7 @@ package ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.spin.json.SpinJsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -25,7 +26,8 @@ public class DigitalSignatureConnectorDelegate extends BaseConnectorDelegate {
   private final String dsoBaseUrl;
 
   @Autowired
-  public DigitalSignatureConnectorDelegate(RestTemplate restTemplate, FormDataCephService formDataCephService,
+  public DigitalSignatureConnectorDelegate(RestTemplate restTemplate,
+      FormDataCephService formDataCephService,
       @Value("${spring.application.name}") String springAppName,
       @Value("${dso.url}") String dsoBaseUrl) {
     super(restTemplate, formDataCephService, springAppName);
@@ -34,8 +36,8 @@ public class DigitalSignatureConnectorDelegate extends BaseConnectorDelegate {
 
   @Override
   public void execute(DelegateExecution execution) {
-    var payload = (String) execution.getVariable(PAYLOAD_VARIABLE);
-    var response = performPost(execution, payload);
+    var payload = (SpinJsonNode) execution.getVariable(PAYLOAD_VARIABLE);
+    var response = performPost(execution, payload.toString());
 
     ((AbstractVariableScope) execution)
         .setVariableLocalTransient(RESPONSE_VARIABLE, response.getResponseBody());

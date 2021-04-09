@@ -422,7 +422,6 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
         "/json/create-app/form-data/Activity_shared-search-lab_without_accreditation.json");
 
     expectedVariablesMap.put("laboratoryId", labId);
-    expectedVariablesMap.put("staffCount", 1);
     addExpectedCephContent(processInstanceId, searchLabFormActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-search-lab_without_accreditation.json");
     addExpectedCephContent(processInstanceId, addApplicationActivityDefinitionKey,

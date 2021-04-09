@@ -2,6 +2,7 @@ package ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.spin.json.SpinJsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
@@ -34,9 +35,9 @@ public class DataFactoryConnectorCreateDelegate extends BaseConnectorDelegate {
   @Override
   public void execute(DelegateExecution execution) {
     var resource = (String) execution.getVariable(RESOURCE_VARIABLE);
-    var payload = (String) execution.getVariable(PAYLOAD_VARIABLE);
+    var payload = (SpinJsonNode) execution.getVariable(PAYLOAD_VARIABLE);
 
-    var response = performPost(execution, resource, payload);
+    var response = performPost(execution, resource, payload.toString());
 
     ((AbstractVariableScope) execution).setVariableLocalTransient(RESPONSE_VARIABLE, response);
   }

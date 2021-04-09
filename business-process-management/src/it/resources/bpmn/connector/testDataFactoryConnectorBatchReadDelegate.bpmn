@@ -24,9 +24,7 @@
     <bpmn:scriptTask id="Activity_1d65s2h" name="Assert" scriptFormat="groovy">
       <bpmn:incoming>Flow_1br1mor</bpmn:incoming>
       <bpmn:outgoing>Flow_122mlox</bpmn:outgoing>
-      <bpmn:script>import static org.camunda.spin.Spin.JSON
-
-var researches = JSON(researchResponse.responseBody).elements()
+      <bpmn:script>var researches = researchResponse.responseBody.elements()
 
 assert researches.size() == 2
 var chemResearch = researches.stream()

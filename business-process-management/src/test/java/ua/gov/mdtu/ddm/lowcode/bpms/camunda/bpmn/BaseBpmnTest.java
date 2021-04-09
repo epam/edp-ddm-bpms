@@ -121,8 +121,8 @@ public abstract class BaseBpmnTest {
     Mocks.register("userDataValidationErrorDelegate", userDataValidationErrorDelegate);
 
     Mocks.register("dataFactoryConnectorBatchReadDelegate",
-        new DataFactoryConnectorBatchReadDelegate(restTemplate, formDataCephService, objectMapper,
-            springAppName, dataFactoryUrl));
+        new DataFactoryConnectorBatchReadDelegate(restTemplate, formDataCephService, springAppName,
+            dataFactoryUrl));
   }
 
   protected void completeTask(String taskDefinitionKey, String formData,

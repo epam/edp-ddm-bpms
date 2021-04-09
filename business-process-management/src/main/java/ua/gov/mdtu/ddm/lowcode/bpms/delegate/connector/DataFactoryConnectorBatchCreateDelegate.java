@@ -86,7 +86,7 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelega
 
   private Object signNode(DelegateExecution execution, String stringJsonNode) {
     var signRequestMap = Map.of("data", stringJsonNode);
-    var signRequestPayload = Spin.JSON(signRequestMap).toString();
+    var signRequestPayload = Spin.JSON(signRequestMap);
 
     execution.removeVariable(PAYLOAD_VARIABLE);
     ((AbstractVariableScope) execution)

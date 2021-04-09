@@ -14,19 +14,13 @@ import javax.inject.Inject;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import ua.gov.mdtu.ddm.general.integration.ceph.dto.FormDataDto;
 
 public class DigitalSignatureConnectorDelegateIT extends BaseIT {
 
   @Inject
-  @Qualifier("cephWireMockServer")
-  private WireMockServer cephWireMockServer;
-  @Inject
   @Qualifier("digitalSignatureMockServer")
   private WireMockServer digitalSignatureMockServer;
-  @Value("${ceph.bucket}")
-  private String cephBucketName;
 
   @Test
   @Deployment(resources = {"bpmn/connector/testDigitalSignatureConnectorDelegate.bpmn"})
@@ -38,7 +32,7 @@ public class DigitalSignatureConnectorDelegateIT extends BaseIT {
         stubFor(post(urlPathEqualTo("/api/eseal/sign"))
             .withHeader("Content-Type", equalTo("application/json"))
             .withHeader("X-Access-Token", equalTo("token"))
-            .withRequestBody(equalTo("{\"data\": \"data to sign\"}"))
+            .withRequestBody(equalTo("{\"data\":\"data to sign\"}"))
             .willReturn(aResponse().withStatus(200).withBody("{\"signature\": \"test\"}"))));
 
     Map<String, Object> variables = ImmutableMap

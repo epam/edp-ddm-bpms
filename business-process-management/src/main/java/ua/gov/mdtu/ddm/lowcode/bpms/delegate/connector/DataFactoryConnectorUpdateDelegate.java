@@ -2,6 +2,7 @@ package ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.spin.json.SpinJsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
@@ -23,7 +24,8 @@ public class DataFactoryConnectorUpdateDelegate extends BaseConnectorDelegate {
   private final String dataFactoryBaseUrl;
 
   @Autowired
-  public DataFactoryConnectorUpdateDelegate(RestTemplate restTemplate, FormDataCephService formDataCephService,
+  public DataFactoryConnectorUpdateDelegate(RestTemplate restTemplate,
+      FormDataCephService formDataCephService,
       @Value("${spring.application.name}") String springAppName,
       @Value("${camunda.system-variables.const_dataFactoryBaseUrl}") String dataFactoryBaseUrl) {
     super(restTemplate, formDataCephService, springAppName);
@@ -34,9 +36,9 @@ public class DataFactoryConnectorUpdateDelegate extends BaseConnectorDelegate {
   public void execute(DelegateExecution execution) {
     var resource = (String) execution.getVariable(RESOURCE_VARIABLE);
     var id = (String) execution.getVariable(RESOURCE_ID_VARIABLE);
-    var payload = (String) execution.getVariable(PAYLOAD_VARIABLE);
+    var payload = (SpinJsonNode) execution.getVariable(PAYLOAD_VARIABLE);
 
-    var response = performPut(execution, resource, id, payload);
+    var response = performPut(execution, resource, id, payload.toString());
 
     ((AbstractVariableScope) execution).setVariableLocalTransient(RESPONSE_VARIABLE, response);
   }

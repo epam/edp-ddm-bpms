@@ -21,9 +21,9 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import ua.gov.mdtu.ddm.general.integration.ceph.dto.FormDataDto;
 import ua.gov.mdtu.ddm.general.errorhandling.exception.SystemException;
 import ua.gov.mdtu.ddm.general.errorhandling.exception.ValidationException;
+import ua.gov.mdtu.ddm.general.integration.ceph.dto.FormDataDto;
 
 public class DataFactoryConnectorDelegateIT extends BaseIT {
 
@@ -173,7 +173,7 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
             .withHeader("X-Access-Token", equalTo("token"))
             .withHeader("X-Digital-Signature", equalTo("cephKey"))
             .withHeader("X-Digital-Signature-Derived", equalTo("cephKey"))
-            .withRequestBody(equalTo("{\"var\", \"value\"}"))
+            .withRequestBody(equalTo("{\"var\":\"value\"}"))
             .willReturn(aResponse().withStatus(422)
                 .withBody("{\"traceId\":\"traceId1\",\"code\":\"VALIDATION_ERROR\","
                     + "\"details\":{\"errors\":[{\"field\":\"field1\",\"value\":\"value1\","

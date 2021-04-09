@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1td2znt" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.4.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1td2znt" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
   <bpmn:process id="testDigitalSignatureConnectorDelegate_key" isExecutable="true">
     <bpmn:startEvent id="StartEvent_1" name="start">
       <bpmn:outgoing>Flow_0icgft6</bpmn:outgoing>
@@ -14,7 +14,7 @@
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-testActivity")}</camunda:inputParameter>
-          <camunda:inputParameter name="payload">{"data": "data to sign"}</camunda:inputParameter>
+          <camunda:inputParameter name="payload">${S('{"data": "data to sign"}')}</camunda:inputParameter>
           <camunda:outputParameter name="response">${response}</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
@@ -24,22 +24,22 @@
     <bpmn:scriptTask id="Activity_0gsj5pa" name="Assert" scriptFormat="groovy">
       <bpmn:incoming>Flow_0lsfy7o</bpmn:incoming>
       <bpmn:outgoing>Flow_1lp38py</bpmn:outgoing>
-      <bpmn:script>assert response.equals('{"signature": "test"}')</bpmn:script>
+      <bpmn:script>assert response.toString().equals('{"signature":"test"}')</bpmn:script>
     </bpmn:scriptTask>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testDigitalSignatureConnectorDelegate_key">
-      <bpmndi:BPMNEdge id="Flow_0icgft6_di" bpmnElement="Flow_0icgft6">
-        <di:waypoint x="188" y="120" />
-        <di:waypoint x="280" y="120" />
+      <bpmndi:BPMNEdge id="Flow_1lp38py_di" bpmnElement="Flow_1lp38py">
+        <di:waypoint x="580" y="120" />
+        <di:waypoint x="682" y="120" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0lsfy7o_di" bpmnElement="Flow_0lsfy7o">
         <di:waypoint x="380" y="120" />
         <di:waypoint x="480" y="120" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1lp38py_di" bpmnElement="Flow_1lp38py">
-        <di:waypoint x="580" y="120" />
-        <di:waypoint x="682" y="120" />
+      <bpmndi:BPMNEdge id="Flow_0icgft6_di" bpmnElement="Flow_0icgft6">
+        <di:waypoint x="188" y="120" />
+        <di:waypoint x="280" y="120" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
         <dc:Bounds x="152" y="102" width="36" height="36" />

@@ -66,7 +66,6 @@ public class AddPersonnelBpmnTest extends BaseBpmnTest {
     addExpectedCephContent(processInstanceId, searchLabFormActivityDefinitionKey,
         "/json/add-personnel/form-data/searchLabFormActivity.json");
     expectedVariablesMap.put("laboratoryId", labId);
-    expectedVariablesMap.put("koatuuId", koatuuId);
     addExpectedCephContent(processInstanceId, viewLabDataFormActivityDefinitionKey,
         "/json/add-personnel/form-data/viewLabDataFormActivityPrepopulation.json");
 
@@ -113,7 +112,7 @@ public class AddPersonnelBpmnTest extends BaseBpmnTest {
     Assertions.assertThat(signatureMap).isEqualTo(expectedSignatureMap);
 
     assertThat(processInstance).isEnded();
-    assertThat(processInstance).variables().hasSize(15).containsAllEntriesOf(expectedVariablesMap);
+    assertThat(processInstance).variables().hasSize(14).containsAllEntriesOf(expectedVariablesMap);
     assertCephContent();
 
     mockServer.verify();

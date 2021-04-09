@@ -13,10 +13,10 @@
           "research2"
         ],
         "staffStatusId": "12",
-        "specializationDate": "2021-03-02T00:00:00+02:00",
-        "specializationEndDate": "2021-03-09T00:00:00+02:00",
+        "specializationDate": "2021-03-02",
+        "specializationEndDate": "2021-03-09",
         "salary": 0.99,
-        "contractEndDate": "2021-03-22T00:00:00+02:00"
+        "contractEndDate": "2021-03-22"
       }
     ],
     "submit": true

@@ -1,6 +1,7 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.delegate.connector;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -9,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.spin.Spin;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -45,9 +47,10 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
     var httpResponse = restTemplate.exchange(requestEntity, String.class);
     logResponse(httpResponse);
 
+    var spin = Objects.isNull(httpResponse.getBody()) ? null : Spin.JSON(httpResponse.getBody());
     return DataFactoryConnectorResponse.builder()
         .statusCode(httpResponse.getStatusCode().value())
-        .responseBody(httpResponse.getBody())
+        .responseBody(spin)
         .headers(httpResponse.getHeaders())
         .build();
   }
