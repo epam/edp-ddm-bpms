@@ -6,26 +6,47 @@
     "registrationNo": "1234567890-primary-add",
     "createdDate": "2021-03-25",
     "acceptedBy": "Full Name",
-    "FactorsPhys": [
-      "FactorsPhys1"
-    ],
-    "laborfact": [
-      "laborfact1"
-    ],
-    "biofactors": [
-      "biofactors"
-    ],
     "chemfactgost": [
-      "chemfactgost1"
+      {
+        "factorId": "chemfactgost1",
+        "name": "string"
+      }
     ],
     "chemfacthyge": [
-      "chemfacthyge1"
+      {
+        "factorId": "chemfacthyge1",
+        "name": "string"
+      }
     ],
     "chemfactobrv": [
-      "chemfactobrv1"
+      {
+        "factorId": "chemfactobrv1",
+        "name": "string"
+      }
     ],
     "chemfactodovilni": [
-      "chemfactodovilni1"
+      {
+        "factorId": "chemfactodovilni1",
+        "name": "string"
+      }
+    ],
+    "FactorsPhys": [
+      {
+        "factorId": "FactorsPhys1",
+        "name": "string"
+      }
+    ],
+    "laborfact": [
+      {
+        "factorId": "laborfact1",
+        "name": "string"
+      }
+    ],
+    "biofactors": [
+      {
+        "factorId": "biofactors",
+        "name": "string"
+      }
     ],
     "solutionName": "Внести до інформаційного переліку",
     "solutionDate": "2021-03-24",

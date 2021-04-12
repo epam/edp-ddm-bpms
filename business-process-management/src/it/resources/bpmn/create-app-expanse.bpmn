@@ -148,7 +148,7 @@
         <camunda:inputOutput>
           <camunda:inputParameter name="resource">laboratory</camunda:inputParameter>
           <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable('secure-sys-var-ref-task-form-data-Activity_shared-search-lab')}</camunda:inputParameter>
-          <camunda:inputParameter name="id">${formData.value.prop('laboratoryId').stringValue()}</camunda:inputParameter>
+          <camunda:inputParameter name="id">${formData.value.prop('laboratory').prop('laboratoryId').stringValue()}</camunda:inputParameter>
           <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
@@ -174,7 +174,7 @@
           <camunda:inputParameter name="resource">staff-equal-laboratory-id-count</camunda:inputParameter>
           <camunda:inputParameter name="searchConditions">
             <camunda:map>
-              <camunda:entry key="laboratoryId">${formData.value.prop('laboratoryId').value()}</camunda:entry>
+              <camunda:entry key="laboratoryId">${formData.value.prop('laboratory').prop('laboratoryId').value()}</camunda:entry>
             </camunda:map>
           </camunda:inputParameter>
           <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-Activity_shared-search-lab")}</camunda:inputParameter>
@@ -409,7 +409,7 @@ execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))<
         <camunda:inputOutput>
           <camunda:inputParameter name="validationErrors">
             <camunda:list>
-              <camunda:value>{"field": "id", "value": "${formData.value.prop('laboratoryId').value()}", "message": "Немає ознаки акредитованості"}</camunda:value>
+              <camunda:value>{"field": "id", "value": "${formData.value.prop('laboratory').prop('laboratoryId').value()}", "message": "Немає ознаки акредитованості"}</camunda:value>
             </camunda:list>
           </camunda:inputParameter>
         </camunda:inputOutput>
@@ -683,11 +683,15 @@ execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))<
 }
 
 ['chemfactgost', 'chemfacthyge', 'chemfactobrv', 'chemfactodovilni'].each {
-    cephData[it] = addChemFactorsFormData.prop(it).elements().collect { it.stringValue() }
+    cephData[it] = addChemFactorsFormData.prop(it).elements().stream().map(elem -&gt; {
+        return ["factorId": elem.prop("factorId").value(), "name": elem.prop("name").value()]
+    }).collect()
 }
 
 ['FactorsPhys', 'laborfact', 'biofactors'].each {
-    cephData[it] = addBioPhysLaborFactorsFormData.prop(it).elements().collect { it.stringValue() }
+    cephData[it] = addBioPhysLaborFactorsFormData.prop(it).elements().stream().map(elem -&gt; {
+        return ["factorId": elem.prop("factorId").value(), "name": elem.prop("name").value()]
+    }).collect()
 }
 
 ['solutionName', 'solutionDate', 'letterNo', 'letterDate'].each { cephData[it] = addDecisionDenyFormData.prop(it).stringValue() }
@@ -697,9 +701,11 @@ execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))<
 //refusal reasons
 ['errorCheckFlag', 'regComplianceFlag', 'factorComplianceFlag', 'zvtComplianceFlag', 'staffComplianceFlag', 'reagentComplianceFlag', 'facilityComplianceFlag'].each { cephData[it] = checkComplianceFormData.prop(it).boolValue() }
 
-['regRefusalReasonId', 'factorRefusalReasonId', 'zvtRefusalReasonId', 'staffRefusalReasonId', 'reagentRefusalReasonId', 'facilityRefusalReasonId'].each {
+['regRefusalReason', 'factorRefusalReason', 'zvtRefusalReason', 'staffRefusalReason', 'reagentRefusalReason', 'facilityRefusalReason'].each {
     if (checkComplianceFormData.hasProp(it)) {
-        cephData[it] = checkComplianceFormData.prop(it).elements().collect { it.stringValue() }
+        cephData[it] = checkComplianceFormData.prop(it).elements().stream().map(elem -&gt; {
+            return ["refusalReasonId": elem.prop("refusalReasonId").value(), "name": elem.prop("name").value()]
+        }).collect()
     }
 }
 
@@ -811,11 +817,15 @@ execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))<
 ['name', 'edrpou', 'registrationSource', 'registrationNo', 'createdDate', 'acceptedBy'].each { cephData[it] = addAppFormData.prop(it).stringValue() }
 
 ['chemfactgost', 'chemfacthyge', 'chemfactobrv', 'chemfactodovilni'].each {
-    cephData[it] = addChemFactorsFormData.prop(it).elements().collect { it.stringValue() }
+    cephData[it] = addChemFactorsFormData.prop(it).elements().stream().map(elem -&gt; {
+        return ["factorId": elem.prop('factorId').value(), "name": elem.prop("name").value()]
+    }).collect()
 }
 
 ['FactorsPhys', 'laborfact', 'biofactors'].each {
-    cephData[it] = addBioPhysLaborFactorsFormData.prop(it).elements().collect { it.stringValue() }
+    cephData[it] = addBioPhysLaborFactorsFormData.prop(it).elements().stream().map(elem -&gt; {
+        return ["factorId": elem.prop("factorId").value(), "name": elem.prop("name").value()]
+    }).collect()
 }
 
 ['solutionName', 'solutionDate', 'letterNo', 'letterDate'].each { cephData[it] = addDecisionIncludeFormData.prop(it).stringValue() }
@@ -1019,13 +1029,13 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
       <bpmn:script>def requestMap = [:]
 def factors = []
 def factorNames = ['FactorsPhys', 'laborfact', 'biofactors', 'chemfactgost', 'chemfacthyge', 'chemfactobrv', 'chemfactodovilni']
-factorNames.each { factors.addAll(signedFormData.prop(it).elements().collect { it.stringValue() }) }
+factorNames.each { factors.addAll(signedFormData.prop(it).elements().collect { it.prop("factorId").stringValue() }) }
 
 //reasonIds
-def reasonIds = ['regRefusalReasonId', 'factorRefusalReasonId', 'zvtRefusalReasonId', 'staffRefusalReasonId', 'reagentRefusalReasonId', 'facilityRefusalReasonId']
+def reasonIds = ['regRefusalReason', 'factorRefusalReason', 'zvtRefusalReason', 'staffRefusalReason', 'reagentRefusalReason', 'facilityRefusalReason']
 reasonIds.each {
     if (signedFormData.hasProp(it) &amp;&amp; signedFormData.prop(it).elements().size() &gt; 0) {
-        requestMap[it] = signedFormData.prop(it).elements().get(0).stringValue()
+        requestMap[it + 'Id'] = signedFormData.prop(it).elements().get(0).prop("refusalReasonId").stringValue()
     }
 }
 
@@ -1063,9 +1073,9 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
 def factors = []
 
 factorNames = ['FactorsPhys', 'laborfact', 'biofactors', 'chemfactgost', 'chemfacthyge', 'chemfactobrv', 'chemfactodovilni']
-factorNames.each { factors.addAll(signedFormData.prop(it).elements().collect { it.stringValue() }) }
+factorNames.each { factors.addAll(signedFormData.prop(it).elements().collect { it.prop('factorId').stringValue() }) }
 
-signedFormData.fieldNames().findAll { fieldName -&gt; !factorNames.contains(fieldName) }.each { requestMap[it] = signedFormData.prop(it).stringValue() }
+signedFormData.fieldNames().findAll { fieldName -&gt; !factorNames.contains(fieldName) }.each { requestMap[it] = signedFormData.prop(it).value() }
 
 requestMap['factors'] = factors
 requestMap['applicationTypeId'] = applicationTypeResponse.responseBody.elements()[0].prop('applicationTypeId').stringValue()
@@ -1243,39 +1253,6 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1ta1se6">
       <bpmndi:BPMNShape id="Participant_11d2pgr_di" bpmnElement="Participant_11d2pgr" isHorizontal="true">
         <dc:Bounds x="160" y="80" width="6880" height="770" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_00mov38_di" bpmnElement="TextAnnotation_00mov38">
-        <dc:Bounds x="4311" y="111" width="137" height="58" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_0k6pg3n_di" bpmnElement="TextAnnotation_0k6pg3n">
-        <dc:Bounds x="4889" y="106" width="162" height="68" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_1l0klck_di" bpmnElement="TextAnnotation_1l0klck">
-        <dc:Bounds x="4450" y="111" width="162" height="43" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_0dez9ez_di" bpmnElement="TextAnnotation_0dez9ez">
-        <dc:Bounds x="4590" y="106" width="162" height="54" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_117oq3o_di" bpmnElement="TextAnnotation_117oq3o">
-        <dc:Bounds x="4739" y="106" width="162" height="68" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_1xhu25f_di" bpmnElement="TextAnnotation_1xhu25f">
-        <dc:Bounds x="4421" y="521" width="137" height="58" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_0wg8u1a_di" bpmnElement="TextAnnotation_0wg8u1a">
-        <dc:Bounds x="4560" y="521" width="162" height="43" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_1jrpreq_di" bpmnElement="TextAnnotation_1jrpreq">
-        <dc:Bounds x="4700" y="516" width="162" height="54" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_0wtlfsj_di" bpmnElement="TextAnnotation_0wtlfsj">
-        <dc:Bounds x="4849" y="516" width="162" height="68" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_12w473y_di" bpmnElement="TextAnnotation_12w473y">
-        <dc:Bounds x="4999" y="516" width="162" height="68" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_07v39t0_di" bpmnElement="TextAnnotation_07v39t0">
-        <dc:Bounds x="4280" y="521" width="137" height="58" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1b7o1hn_di" bpmnElement="Flow_1b7o1hn">
         <di:waypoint x="650" y="260" />
@@ -2044,6 +2021,48 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
           <dc:Bounds x="5284" y="422" width="27" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_00mov38_di" bpmnElement="TextAnnotation_00mov38">
+        <dc:Bounds x="4311" y="111" width="137" height="58" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0k6pg3n_di" bpmnElement="TextAnnotation_0k6pg3n">
+        <dc:Bounds x="4889" y="106" width="162" height="68" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1l0klck_di" bpmnElement="TextAnnotation_1l0klck">
+        <dc:Bounds x="4450" y="111" width="162" height="43" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0dez9ez_di" bpmnElement="TextAnnotation_0dez9ez">
+        <dc:Bounds x="4590" y="106" width="162" height="54" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_117oq3o_di" bpmnElement="TextAnnotation_117oq3o">
+        <dc:Bounds x="4739" y="106" width="162" height="68" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1xhu25f_di" bpmnElement="TextAnnotation_1xhu25f">
+        <dc:Bounds x="4421" y="521" width="137" height="58" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0wg8u1a_di" bpmnElement="TextAnnotation_0wg8u1a">
+        <dc:Bounds x="4560" y="521" width="162" height="43" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1jrpreq_di" bpmnElement="TextAnnotation_1jrpreq">
+        <dc:Bounds x="4700" y="516" width="162" height="54" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0wtlfsj_di" bpmnElement="TextAnnotation_0wtlfsj">
+        <dc:Bounds x="4849" y="516" width="162" height="68" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_12w473y_di" bpmnElement="TextAnnotation_12w473y">
+        <dc:Bounds x="4999" y="516" width="162" height="68" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_07v39t0_di" bpmnElement="TextAnnotation_07v39t0">
+        <dc:Bounds x="4280" y="521" width="137" height="58" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1lubmwc_di" bpmnElement="Event_1lubmwc">
+        <dc:Bounds x="6592" y="202" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0q95h6c_di" bpmnElement="Event_0q95h6c">
+        <dc:Bounds x="6682" y="612" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_02gwdxe_di" bpmnElement="Event_02gwdxe">
+        <dc:Bounds x="732" y="202" width="36" height="36" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Association_1oswj4l_di" bpmnElement="Association_1oswj4l">
         <di:waypoint x="4380" y="220" />
         <di:waypoint x="4380" y="169" />
@@ -2088,15 +2107,6 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
         <di:waypoint x="4360" y="630" />
         <di:waypoint x="4360" y="579" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Event_02gwdxe_di" bpmnElement="Event_02gwdxe">
-        <dc:Bounds x="732" y="202" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0q95h6c_di" bpmnElement="Event_0q95h6c">
-        <dc:Bounds x="6682" y="612" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1lubmwc_di" bpmnElement="Event_1lubmwc">
-        <dc:Bounds x="6592" y="202" width="36" height="36" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="DataOutputAssociation_02wzpn3_di" bpmnElement="DataOutputAssociation_02wzpn3">
         <di:waypoint x="443" y="300" />
         <di:waypoint x="443" y="395" />

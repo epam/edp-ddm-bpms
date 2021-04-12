@@ -1,7 +1,11 @@
 {
   "data": {
     "edrpou": "11111111",
-    "laboratoryId": "bb652d3f-a36f-465a-b7ba-232a5a1680c5"
+    "laboratory": {
+      "edrpou": "11111111",
+      "laboratoryId": "bb652d3f-a36f-465a-b7ba-232a5a1680c5",
+      "name": "labName"
+    }
   },
   "x-access-token": "token"
 }

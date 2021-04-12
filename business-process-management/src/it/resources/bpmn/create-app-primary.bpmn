@@ -148,7 +148,7 @@
         <camunda:inputOutput>
           <camunda:inputParameter name="resource">laboratory</camunda:inputParameter>
           <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable('secure-sys-var-ref-task-form-data-Activity_shared-search-lab')}</camunda:inputParameter>
-          <camunda:inputParameter name="id">${formData.value.prop('laboratoryId').stringValue()}</camunda:inputParameter>
+          <camunda:inputParameter name="id">${formData.value.prop('laboratory').prop('laboratoryId').stringValue()}</camunda:inputParameter>
           <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
@@ -174,7 +174,7 @@
           <camunda:inputParameter name="resource">staff-equal-laboratory-id-count</camunda:inputParameter>
           <camunda:inputParameter name="searchConditions">
             <camunda:map>
-              <camunda:entry key="laboratoryId">${formData.value.prop('laboratoryId').value()}</camunda:entry>
+              <camunda:entry key="laboratoryId">${formData.value.prop('laboratory').prop('laboratoryId').value()}</camunda:entry>
             </camunda:map>
           </camunda:inputParameter>
           <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-Activity_shared-search-lab")}</camunda:inputParameter>
@@ -659,11 +659,15 @@ execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))<
 }
 
 ['chemfactgost', 'chemfacthyge', 'chemfactobrv', 'chemfactodovilni'].each {
-    cephData[it] = addChemFactorsFormData.prop(it).elements().collect { it.stringValue() }
+    cephData[it] = addChemFactorsFormData.prop(it).elements().stream().map(elem -&gt; {
+        return ["factorId": elem.prop("factorId").value(), "name": elem.prop("name").value()]
+    }).collect()
 }
 
 ['FactorsPhys', 'laborfact', 'biofactors'].each {
-    cephData[it] = addBioPhysLaborFactorsFormData.prop(it).elements().collect { it.stringValue() }
+    cephData[it] = addBioPhysLaborFactorsFormData.prop(it).elements().stream().map(elem -&gt; {
+        return ["factorId": elem.prop("factorId").value(), "name": elem.prop("name").value()]
+    }).collect()
 }
 
 ['solutionName', 'solutionDate', 'letterNo', 'letterDate'].each { cephData[it] = addDecisionDenyFormData.prop(it).stringValue() }
@@ -673,9 +677,11 @@ execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))<
 //refusal reasons
 ['errorCheckFlag', 'regComplianceFlag', 'factorComplianceFlag', 'zvtComplianceFlag', 'staffComplianceFlag', 'reagentComplianceFlag', 'facilityComplianceFlag'].each { cephData[it] = checkComplianceFormData.prop(it).boolValue() }
 
-['regRefusalReasonId', 'factorRefusalReasonId', 'zvtRefusalReasonId', 'staffRefusalReasonId', 'reagentRefusalReasonId', 'facilityRefusalReasonId'].each {
+['regRefusalReason', 'factorRefusalReason', 'zvtRefusalReason', 'staffRefusalReason', 'reagentRefusalReason', 'facilityRefusalReason'].each {
     if (checkComplianceFormData.hasProp(it)) {
-        cephData[it] = checkComplianceFormData.prop(it).elements().collect { it.stringValue() }
+        cephData[it] = checkComplianceFormData.prop(it).elements().stream().map(elem -&gt; {
+            return ["refusalReasonId": elem.prop("refusalReasonId").value(), "name": elem.prop("name").value()]
+        }).collect()
     }
 }
 
@@ -768,11 +774,15 @@ execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))<
 ['name', 'edrpou', 'registrationSource', 'registrationNo', 'createdDate', 'acceptedBy'].each { cephData[it] = addAppFormData.prop(it).stringValue() }
 
 ['chemfactgost', 'chemfacthyge', 'chemfactobrv', 'chemfactodovilni'].each {
-    cephData[it] = addChemFactorsFormData.prop(it).elements().collect { it.stringValue() }
+    cephData[it] = addChemFactorsFormData.prop(it).elements().stream().map(elem -&gt; {
+        return ["factorId": elem.prop('factorId').value(), "name": elem.prop("name").value()]
+    }).collect()
 }
 
 ['FactorsPhys', 'laborfact', 'biofactors'].each {
-    cephData[it] = addBioPhysLaborFactorsFormData.prop(it).elements().collect { it.stringValue() }
+    cephData[it] = addBioPhysLaborFactorsFormData.prop(it).elements().stream().map(elem -&gt; {
+        return ["factorId": elem.prop("factorId").value(), "name": elem.prop("name").value()]
+    }).collect()
 }
 
 ['solutionName', 'solutionDate', 'letterNo', 'letterDate'].each { cephData[it] = addDecisionIncludeFormData.prop(it).stringValue() }
@@ -919,13 +929,13 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
       <bpmn:script>def requestMap = [:]
 def factors = []
 def factorNames = ['FactorsPhys', 'laborfact', 'biofactors', 'chemfactgost', 'chemfacthyge', 'chemfactobrv', 'chemfactodovilni']
-factorNames.each { factors.addAll(signedFormData.prop(it).elements().collect { it.stringValue() }) }
+factorNames.each { factors.addAll(signedFormData.prop(it).elements().collect { it.prop("factorId").stringValue() }) }
 
 //reasonIds
-def reasonIds = ['regRefusalReasonId', 'factorRefusalReasonId', 'zvtRefusalReasonId', 'staffRefusalReasonId', 'reagentRefusalReasonId', 'facilityRefusalReasonId']
+def reasonIds = ['regRefusalReason', 'factorRefusalReason', 'zvtRefusalReason', 'staffRefusalReason', 'reagentRefusalReason', 'facilityRefusalReason']
 reasonIds.each {
     if (signedFormData.hasProp(it) &amp;&amp; signedFormData.prop(it).elements().size() &gt; 0) {
-        requestMap[it] = signedFormData.prop(it).elements().get(0).stringValue()
+        requestMap[it + 'Id'] = signedFormData.prop(it).elements().get(0).prop("refusalReasonId").stringValue()
     }
 }
 
@@ -1036,7 +1046,7 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
 def factors = []
 
 factorNames = ['FactorsPhys', 'laborfact', 'biofactors', 'chemfactgost', 'chemfacthyge', 'chemfactobrv', 'chemfactodovilni']
-factorNames.each { factors.addAll(signedFormData.prop(it).elements().collect { it.stringValue() }) }
+factorNames.each { factors.addAll(signedFormData.prop(it).elements().collect { it.prop('factorId').stringValue() }) }
 
 signedFormData.fieldNames().findAll { fieldName -&gt; !factorNames.contains(fieldName) }.each { requestMap[it] = signedFormData.prop(it).value() }
 
@@ -1164,7 +1174,7 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
         <camunda:inputOutput>
           <camunda:inputParameter name="validationErrors">
             <camunda:list>
-              <camunda:value>{"field": "id", "value": "${formData.value.prop('laboratoryId').value()}", "message": "Немає ознаки акредитованості"}</camunda:value>
+              <camunda:value>{"field": "id", "value": "${formData.value.prop('laboratory').prop('laboratoryId').value()}", "message": "Немає ознаки акредитованості"}</camunda:value>
             </camunda:list>
           </camunda:inputParameter>
         </camunda:inputOutput>

@@ -6,51 +6,47 @@
     "registrationNo": "1234567890-primary-add",
     "createdDate": "2021-03-25",
     "acceptedBy": "Full Name",
-    "FactorsPhys": [
-      "FactorsPhys1"
-    ],
-    "laborfact": [
-      "laborfact1"
-    ],
-    "biofactors": [
-      "biofactors"
-    ],
     "chemfactgost": [
-      "chemfactgost1"
+      {
+        "factorId": "chemfactgost1",
+        "name": "string"
+      }
     ],
     "chemfacthyge": [
-      "chemfacthyge1"
+      {
+        "factorId": "chemfacthyge1",
+        "name": "string"
+      }
     ],
     "chemfactobrv": [
-      "chemfactobrv1"
+      {
+        "factorId": "chemfactobrv1",
+        "name": "string"
+      }
     ],
     "chemfactodovilni": [
-      "chemfactodovilni1"
+      {
+        "factorId": "chemfactodovilni1",
+        "name": "string"
+      }
     ],
-    "errorCheckFlag": true,
-    "regComplianceFlag": true,
-    "regRefusalReasonId": [
-      "regRefusalReasonId1"
+    "FactorsPhys": [
+      {
+        "factorId": "FactorsPhys1",
+        "name": "string"
+      }
     ],
-    "factorComplianceFlag": true,
-    "factorRefusalReasonId": [
-      "factorRefusalReasonId1"
+    "laborfact": [
+      {
+        "factorId": "laborfact1",
+        "name": "string"
+      }
     ],
-    "zvtComplianceFlag": true,
-    "zvtRefusalReasonId": [
-      "zvtRefusalReasonId1"
-    ],
-    "staffComplianceFlag": true,
-    "staffRefusalReasonId": [
-      "staffRefusalReasonId1"
-    ],
-    "reagentComplianceFlag": true,
-    "reagentRefusalReasonId": [
-      "reagentRefusalReasonId1"
-    ],
-    "facilityComplianceFlag": true,
-    "facilityRefusalReasonId": [
-      "facilityRefusalReasonId1"
+    "biofactors": [
+      {
+        "factorId": "biofactors",
+        "name": "string"
+      }
     ],
     "solutionName": "Залишити без розгляду",
     "solutionDate": "2021-03-24",
@@ -58,6 +54,49 @@
     "letterDate": "2021-03-23",
     "receivedBy": "receiver",
     "certifiedBy": "multipass",
-    "notes": "smth noted"
+    "notes": "smth noted",
+    "errorCheckFlag": true,
+    "regComplianceFlag": true,
+    "factorComplianceFlag": true,
+    "zvtComplianceFlag": true,
+    "staffComplianceFlag": true,
+    "reagentComplianceFlag": true,
+    "facilityComplianceFlag": true,
+    "regRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "regRefusalReasonId1"
+      }
+    ],
+    "factorRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "factorRefusalReasonId1"
+      }
+    ],
+    "zvtRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "zvtRefusalReasonId1"
+      }
+    ],
+    "staffRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "staffRefusalReasonId1"
+      }
+    ],
+    "reagentRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "reagentRefusalReasonId1"
+      }
+    ],
+    "facilityRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "facilityRefusalReasonId1"
+      }
+    ]
   }
 }

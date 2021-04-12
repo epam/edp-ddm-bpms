@@ -6,51 +6,90 @@
     "registrationNo": "1234567890-primary-add",
     "createdDate": "2021-03-25",
     "acceptedBy": "Full Name",
-    "FactorsPhys": [
-      "FactorsPhys1"
-    ],
-    "laborfact": [
-      "laborfact1"
-    ],
-    "biofactors": [
-      "biofactors"
-    ],
     "chemfactgost": [
-      "chemfactgost1"
+      {
+        "factorId": "chemfactgost1",
+        "name": "string"
+      }
     ],
     "chemfacthyge": [
-      "chemfacthyge1"
+      {
+        "factorId": "chemfacthyge1",
+        "name": "string"
+      }
     ],
     "chemfactobrv": [
-      "chemfactobrv1"
+      {
+        "factorId": "chemfactobrv1",
+        "name": "string"
+      }
     ],
     "chemfactodovilni": [
-      "chemfactodovilni1"
+      {
+        "factorId": "chemfactodovilni1",
+        "name": "string"
+      }
+    ],
+    "FactorsPhys": [
+      {
+        "factorId": "FactorsPhys1",
+        "name": "string"
+      }
+    ],
+    "laborfact": [
+      {
+        "factorId": "laborfact1",
+        "name": "string"
+      }
+    ],
+    "biofactors": [
+      {
+        "factorId": "biofactors",
+        "name": "string"
+      }
     ],
     "errorCheckFlag": true,
     "regComplianceFlag": true,
-    "regRefusalReasonId": [
-      "regRefusalReasonId1"
+    "regRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "regRefusalReasonId1"
+      }
     ],
     "factorComplianceFlag": true,
-    "factorRefusalReasonId": [
-      "factorRefusalReasonId1"
+    "factorRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "factorRefusalReasonId1"
+      }
     ],
     "zvtComplianceFlag": true,
-    "zvtRefusalReasonId": [
-      "zvtRefusalReasonId1"
+    "zvtRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "zvtRefusalReasonId1"
+      }
     ],
     "staffComplianceFlag": true,
-    "staffRefusalReasonId": [
-      "staffRefusalReasonId1"
+    "staffRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "staffRefusalReasonId1"
+      }
     ],
     "reagentComplianceFlag": true,
-    "reagentRefusalReasonId": [
-      "reagentRefusalReasonId1"
+    "reagentRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "reagentRefusalReasonId1"
+      }
     ],
     "facilityComplianceFlag": true,
-    "facilityRefusalReasonId": [
-      "facilityRefusalReasonId1"
+    "facilityRefusalReason": [
+      {
+        "name": "string",
+        "refusalReasonId": "facilityRefusalReasonId1"
+      }
     ],
     "solutionName": "Залишити без розгляду",
     "solutionDate": "2021-03-24",

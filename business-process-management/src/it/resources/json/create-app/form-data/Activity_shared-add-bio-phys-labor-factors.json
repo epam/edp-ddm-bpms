@@ -3,13 +3,22 @@
     "name": "labName",
     "registrationNo": "1234567890-primary-add",
     "FactorsPhys": [
-      "FactorsPhys1"
+      {
+        "factorId": "FactorsPhys1",
+        "name": "string"
+      }
     ],
     "laborfact": [
-      "laborfact1"
+      {
+        "factorId": "laborfact1",
+        "name": "string"
+      }
     ],
     "biofactors": [
-      "biofactors"
+      {
+        "factorId": "biofactors",
+        "name": "string"
+      }
     ]
   },
   "x-access-token": "token"

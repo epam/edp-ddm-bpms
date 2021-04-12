@@ -3,16 +3,28 @@
     "name": "labName",
     "registrationNo": "1234567890-primary-add",
     "chemfactgost": [
-      "chemfactgost1"
+      {
+        "factorId": "chemfactgost1",
+        "name": "string"
+      }
     ],
     "chemfacthyge": [
-      "chemfacthyge1"
+      {
+        "factorId": "chemfacthyge1",
+        "name": "string"
+      }
     ],
     "chemfactobrv": [
-      "chemfactobrv1"
+      {
+        "factorId": "chemfactobrv1",
+        "name": "string"
+      }
     ],
     "chemfactodovilni": [
-      "chemfactodovilni1"
+      {
+        "factorId": "chemfactodovilni1",
+        "name": "string"
+      }
     ],
     "errorCheckFlag": false
   },

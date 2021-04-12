@@ -4,28 +4,52 @@
     "registrationNo": "1234567890-primary-add",
     "errorCheckFlag": true,
     "regComplianceFlag": true,
-    "regRefusalReasonId": [
-      "regRefusalReasonId1"
+    "regRefusalReason": [
+      {
+        "constantCode": "string",
+        "name": "string",
+        "refusalReasonId": "regRefusalReasonId1"
+      }
     ],
     "factorComplianceFlag": true,
-    "factorRefusalReasonId": [
-      "factorRefusalReasonId1"
+    "factorRefusalReason": [
+      {
+        "constantCode": "string",
+        "name": "string",
+        "refusalReasonId": "factorRefusalReasonId1"
+      }
     ],
     "zvtComplianceFlag": true,
-    "zvtRefusalReasonId": [
-      "zvtRefusalReasonId1"
+    "zvtRefusalReason": [
+      {
+        "constantCode": "string",
+        "name": "string",
+        "refusalReasonId": "zvtRefusalReasonId1"
+      }
     ],
     "staffComplianceFlag": true,
-    "staffRefusalReasonId": [
-      "staffRefusalReasonId1"
+    "staffRefusalReason": [
+      {
+        "constantCode": "string",
+        "name": "string",
+        "refusalReasonId": "staffRefusalReasonId1"
+      }
     ],
     "reagentComplianceFlag": true,
-    "reagentRefusalReasonId": [
-      "reagentRefusalReasonId1"
+    "reagentRefusalReason": [
+      {
+        "constantCode": "string",
+        "name": "string",
+        "refusalReasonId": "reagentRefusalReasonId1"
+      }
     ],
     "facilityComplianceFlag": true,
-    "facilityRefusalReasonId": [
-      "facilityRefusalReasonId1"
+    "facilityRefusalReason": [
+      {
+        "constantCode": "string",
+        "name": "string",
+        "refusalReasonId": "facilityRefusalReasonId1"
+      }
     ]
   },
   "x-access-token": "token"
