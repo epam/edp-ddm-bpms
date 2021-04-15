@@ -12,9 +12,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.support.DatabaseStartupValidator;
-import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 import ua.gov.mdtu.ddm.general.integration.ceph.config.CephConfig;
+import ua.gov.mdtu.ddm.lowcode.bpms.exception.handler.ConnectorResponseErrorHandler;
 
 /**
  * The class represents a holder for beans of the general configuration. Each method produces a bean
@@ -27,7 +27,7 @@ import ua.gov.mdtu.ddm.general.integration.ceph.config.CephConfig;
 public class GeneralConfig {
 
   @Bean
-  public RestTemplate restTemplate(ResponseErrorHandler responseErrorHandler) {
+  public RestTemplate restTemplate(ConnectorResponseErrorHandler responseErrorHandler) {
     return new RestTemplateBuilder().errorHandler(responseErrorHandler).build();
   }
 
