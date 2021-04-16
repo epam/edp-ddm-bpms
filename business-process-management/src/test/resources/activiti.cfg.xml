@@ -5,7 +5,7 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <bean id="processEngineConfiguration"
-    class="ua.gov.mdtu.ddm.lowcode.bpms.camunda.bpmn.config.LowcodeStandaloneProcessEngineConfiguration">
+    class="com.epam.digital.data.platform.bpms.camunda.bpmn.config.LowcodeStandaloneProcessEngineConfiguration">
 
     <property name="jdbcUrl" value="jdbc:h2:mem:camunda;DB_CLOSE_DELAY=1000"/>
     <property name="jdbcDriver" value="org.h2.Driver"/>
@@ -25,7 +25,7 @@
     </property>
 
     <property name="expressionManager">
-      <bean class="ua.gov.mdtu.ddm.lowcode.bpms.camunda.bpmn.config.TestExpresionManager"/>
+      <bean class="com.epam.digital.data.platform.bpms.camunda.bpmn.config.TestExpresionManager"/>
     </property>
   </bean>
 
