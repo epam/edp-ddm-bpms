@@ -3,11 +3,11 @@ package ua.gov.mdtu.ddm.lowcode.bpms.it;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 
+import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import java.util.HashMap;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
-import ua.gov.mdtu.ddm.general.errorhandling.exception.ValidationException;
 
 public class UserDataValidationErrorDelegateIT extends BaseIT {
 

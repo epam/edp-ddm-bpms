@@ -2,11 +2,11 @@ package ua.gov.mdtu.ddm.lowcode.bpms.exception.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.epam.digital.data.platform.starter.errorhandling.dto.ValidationErrorDto;
+import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.junit.Test;
-import ua.gov.mdtu.ddm.general.errorhandling.dto.ValidationErrorDto;
-import ua.gov.mdtu.ddm.general.errorhandling.exception.ValidationException;
 
 public class UserDataValidationExceptionMapperTest {
 

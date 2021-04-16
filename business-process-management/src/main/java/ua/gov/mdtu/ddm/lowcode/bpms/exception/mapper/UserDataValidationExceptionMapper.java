@@ -1,11 +1,11 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.exception.mapper;
 
+import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 import org.apache.http.HttpStatus;
-import ua.gov.mdtu.ddm.general.errorhandling.exception.ValidationException;
 
 /**
  * The class represents an implementation of {@link ExceptionMapper<ValidationException>} that is

@@ -1,5 +1,11 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.exception.handler;
 
+import com.epam.digital.data.platform.starter.errorhandling.dto.ErrorDetailDto;
+import com.epam.digital.data.platform.starter.errorhandling.dto.ErrorsListDto;
+import com.epam.digital.data.platform.starter.errorhandling.dto.SystemErrorDto;
+import com.epam.digital.data.platform.starter.errorhandling.dto.ValidationErrorDto;
+import com.epam.digital.data.platform.starter.errorhandling.exception.SystemException;
+import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,12 +21,6 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.DefaultResponseErrorHandler;
-import ua.gov.mdtu.ddm.general.errorhandling.dto.ErrorDetailDto;
-import ua.gov.mdtu.ddm.general.errorhandling.dto.ErrorsListDto;
-import ua.gov.mdtu.ddm.general.errorhandling.dto.SystemErrorDto;
-import ua.gov.mdtu.ddm.general.errorhandling.dto.ValidationErrorDto;
-import ua.gov.mdtu.ddm.general.errorhandling.exception.SystemException;
-import ua.gov.mdtu.ddm.general.errorhandling.exception.ValidationException;
 import ua.gov.mdtu.ddm.general.localization.MessageResolver;
 import ua.gov.mdtu.ddm.lowcode.bpms.delegate.dto.enums.DataFactoryError;
 

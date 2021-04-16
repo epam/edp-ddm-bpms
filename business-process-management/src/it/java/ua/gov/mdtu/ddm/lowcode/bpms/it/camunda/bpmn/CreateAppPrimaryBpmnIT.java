@@ -5,14 +5,14 @@ import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtime
 import static org.junit.Assert.assertThrows;
 import static ua.gov.mdtu.ddm.lowcode.bpms.it.util.TestUtils.getContent;
 
+import com.epam.digital.data.platform.starter.errorhandling.dto.ErrorDetailDto;
+import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import java.io.IOException;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Value;
-import ua.gov.mdtu.ddm.general.errorhandling.dto.ErrorDetailDto;
-import ua.gov.mdtu.ddm.general.errorhandling.exception.ValidationException;
 import ua.gov.mdtu.ddm.lowcode.bpms.it.builder.StubData;
 
 public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {

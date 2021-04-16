@@ -1,8 +1,8 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.client.exception;
 
+import com.epam.digital.data.platform.starter.errorhandling.dto.ValidationErrorDto;
+import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import feign.error.FeignExceptionConstructor;
-import ua.gov.mdtu.ddm.general.errorhandling.dto.ValidationErrorDto;
-import ua.gov.mdtu.ddm.general.errorhandling.exception.ValidationException;
 
 /**
  * The class represents an exception for client validation error which will be thrown in case when

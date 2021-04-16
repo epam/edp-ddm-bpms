@@ -98,7 +98,7 @@
       <version>${ddm-starter-logging.version}</version>
     </dependency>
     <dependency>
-      <groupId>ua.gov.mdtu.ddm.general</groupId>
+      <groupId>com.epam.digital.data.platform</groupId>
       <artifactId>ddm-starter-security</artifactId>
       <version>${ddm-starter-security.version}</version>
     </dependency>

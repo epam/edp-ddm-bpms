@@ -10,6 +10,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 
+import com.epam.digital.data.platform.starter.errorhandling.dto.SystemErrorDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.assertj.core.util.Lists;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -20,7 +21,6 @@ import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import ua.gov.mdtu.ddm.general.errorhandling.dto.SystemErrorDto;
 import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.ProcessDefinitionQueryDto;
 import ua.gov.mdtu.ddm.lowcode.bpms.api.dto.enums.SortOrder;
 import ua.gov.mdtu.ddm.lowcode.bpms.client.exception.ProcessDefinitionNotFoundException;

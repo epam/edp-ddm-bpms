@@ -3,12 +3,12 @@ package ua.gov.mdtu.ddm.lowcode.bpms.it;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 
+import com.epam.digital.data.platform.starter.errorhandling.exception.SystemException;
 import java.util.List;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
-import ua.gov.mdtu.ddm.general.errorhandling.exception.SystemException;
 
 public class CamundaSystemErrorDelegateIT extends BaseIT {
 

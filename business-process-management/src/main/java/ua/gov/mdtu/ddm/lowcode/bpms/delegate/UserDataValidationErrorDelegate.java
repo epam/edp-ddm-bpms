@@ -1,5 +1,9 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.delegate;
 
+import com.epam.digital.data.platform.starter.errorhandling.dto.ErrorDetailDto;
+import com.epam.digital.data.platform.starter.errorhandling.dto.ErrorsListDto;
+import com.epam.digital.data.platform.starter.errorhandling.dto.ValidationErrorDto;
+import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
@@ -9,10 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
-import ua.gov.mdtu.ddm.general.errorhandling.dto.ErrorDetailDto;
-import ua.gov.mdtu.ddm.general.errorhandling.dto.ErrorsListDto;
-import ua.gov.mdtu.ddm.general.errorhandling.dto.ValidationErrorDto;
-import ua.gov.mdtu.ddm.general.errorhandling.exception.ValidationException;
 
 /**
  * The class represents an implementation of {@link JavaDelegate} that is used to throw a user data

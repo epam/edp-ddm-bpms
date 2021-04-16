@@ -1,13 +1,13 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.delegate;
 
+import com.epam.digital.data.platform.starter.errorhandling.BaseRestExceptionHandler;
+import com.epam.digital.data.platform.starter.errorhandling.exception.SystemException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
-import ua.gov.mdtu.ddm.general.errorhandling.BaseRestExceptionHandler;
-import ua.gov.mdtu.ddm.general.errorhandling.exception.SystemException;
 
 /**
  * The class represents an implementation of {@link JavaDelegate} that is used to throw a camunda

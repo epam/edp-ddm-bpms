@@ -13,6 +13,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.epam.digital.data.platform.starter.errorhandling.exception.SystemException;
+import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
@@ -21,8 +23,6 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import ua.gov.mdtu.ddm.general.errorhandling.exception.SystemException;
-import ua.gov.mdtu.ddm.general.errorhandling.exception.ValidationException;
 import ua.gov.mdtu.ddm.general.integration.ceph.dto.FormDataDto;
 
 public class DataFactoryConnectorDelegateIT extends BaseIT {

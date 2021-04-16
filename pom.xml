@@ -43,7 +43,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>ua.gov.mdtu.ddm.general</groupId>
+      <groupId>com.epam.digital.data.platform</groupId>
       <artifactId>ddm-starter-error-handler</artifactId>
       <version>1.1.1-SNAPSHOT</version>
     </dependency>

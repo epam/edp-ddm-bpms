@@ -1,13 +1,13 @@
 package ua.gov.mdtu.ddm.lowcode.bpms.exception.mapper;
 
+import com.epam.digital.data.platform.starter.errorhandling.BaseRestExceptionHandler;
+import com.epam.digital.data.platform.starter.errorhandling.dto.SystemErrorDto;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import org.camunda.bpm.engine.rest.exception.ExceptionHandlerHelper;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.slf4j.MDC;
-import ua.gov.mdtu.ddm.general.errorhandling.BaseRestExceptionHandler;
-import ua.gov.mdtu.ddm.general.errorhandling.dto.SystemErrorDto;
 
 /**
  * The class represents an implementation of {@link ExceptionMapper<RestException>} that is used to
