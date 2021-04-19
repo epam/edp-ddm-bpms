@@ -1,6 +1,5 @@
 package com.epam.digital.data.platform.bpms.delegate.ceph;
 
-import com.epam.digital.data.platform.bpms.delegate.constants.CamundaDelegateConstants;
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.epam.digital.data.platform.integration.ceph.service.FormDataCephService;
 import com.epam.digital.data.platform.starter.logger.annotation.Logging;
@@ -21,14 +20,13 @@ import org.springframework.stereotype.Component;
 public class GetFormDataFromCephDelegate implements JavaDelegate {
 
   private final FormDataCephService cephService;
+  private final CephKeyProvider cephKeyProvider;
 
   @Override
   public void execute(DelegateExecution execution) {
-    var taskDefinitionKey = execution.getVariable("taskDefinitionKey");
-    var taskFormDataVariableName = String.format(
-        CamundaDelegateConstants.TASK_FORM_DATA_STRING_FORMAT, taskDefinitionKey);
+    var taskDefinitionKey = (String) execution.getVariable("taskDefinitionKey");
 
-    var cephKey = (String) execution.getVariable(taskFormDataVariableName);
+    var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, execution.getProcessInstanceId());
     var formData = cephService.getFormData(cephKey);
 
     ((AbstractVariableScope) execution)

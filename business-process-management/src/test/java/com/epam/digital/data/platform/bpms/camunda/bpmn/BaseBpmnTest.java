@@ -12,6 +12,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 import com.epam.digital.data.platform.bpms.delegate.DefineBusinessProcessStatusDelegate;
 import com.epam.digital.data.platform.bpms.delegate.UserDataValidationErrorDelegate;
+import com.epam.digital.data.platform.bpms.delegate.ceph.CephKeyProvider;
 import com.epam.digital.data.platform.bpms.delegate.ceph.GetFormDataFromCephDelegate;
 import com.epam.digital.data.platform.bpms.delegate.ceph.PutContentToCephDelegate;
 import com.epam.digital.data.platform.bpms.delegate.ceph.PutFormDataToCephDelegate;
@@ -61,6 +62,7 @@ public abstract class BaseBpmnTest {
   protected final TestFormDataCephServiceImpl formDataCephService = new TestFormDataCephServiceImpl(
       cephBucketName);
   protected final TestCephServiceImpl cephService = new TestCephServiceImpl(cephBucketName);
+  protected final CephKeyProvider cephKeyProvider = new CephKeyProvider();
 
   protected ObjectMapper objectMapper = new ObjectMapper();
   protected MessageResolver messageResolver = mock(MessageResolver.class);
@@ -79,7 +81,7 @@ public abstract class BaseBpmnTest {
   @Before
   public void init() {
 
-    var getFormDataFromCephDelegate = new GetFormDataFromCephDelegate(formDataCephService);
+    var getFormDataFromCephDelegate = new GetFormDataFromCephDelegate(formDataCephService, cephKeyProvider);
     var putFormDataToCephDelegate = new PutFormDataToCephDelegate(formDataCephService,
         objectMapper);
     var putContentToCephDelegate = new PutContentToCephDelegate(cephBucketName, cephService);
