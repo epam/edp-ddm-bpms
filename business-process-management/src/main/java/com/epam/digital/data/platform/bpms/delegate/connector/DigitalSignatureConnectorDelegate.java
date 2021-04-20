@@ -1,5 +1,6 @@
 package com.epam.digital.data.platform.bpms.delegate.connector;
 
+import com.epam.digital.data.platform.bpms.delegate.ceph.CephKeyProvider;
 import com.epam.digital.data.platform.bpms.delegate.dto.DataFactoryConnectorResponse;
 import com.epam.digital.data.platform.integration.ceph.service.FormDataCephService;
 import com.epam.digital.data.platform.starter.logger.annotation.Logging;
@@ -27,10 +28,10 @@ public class DigitalSignatureConnectorDelegate extends BaseConnectorDelegate {
 
   @Autowired
   public DigitalSignatureConnectorDelegate(RestTemplate restTemplate,
-      FormDataCephService formDataCephService,
+      FormDataCephService formDataCephService, CephKeyProvider cephKeyProvider,
       @Value("${spring.application.name}") String springAppName,
       @Value("${dso.url}") String dsoBaseUrl) {
-    super(restTemplate, formDataCephService, springAppName);
+    super(restTemplate, formDataCephService, springAppName, cephKeyProvider);
     this.dsoBaseUrl = dsoBaseUrl;
   }
 

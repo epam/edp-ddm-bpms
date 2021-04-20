@@ -1,5 +1,6 @@
 package com.epam.digital.data.platform.bpms.delegate.connector;
 
+import com.epam.digital.data.platform.bpms.delegate.ceph.CephKeyProvider;
 import com.epam.digital.data.platform.bpms.delegate.dto.DataFactoryConnectorResponse;
 import com.epam.digital.data.platform.integration.ceph.service.FormDataCephService;
 import java.util.List;
@@ -19,10 +20,10 @@ public class DataFactoryConnectorBatchReadDelegate extends DataFactoryConnectorR
 
   @Autowired
   public DataFactoryConnectorBatchReadDelegate(RestTemplate restTemplate,
-      FormDataCephService formDataCephService,
+      FormDataCephService formDataCephService, CephKeyProvider cephKeyProvider,
       @Value("${spring.application.name}") String springAppName,
       @Value("${camunda.system-variables.const_dataFactoryBaseUrl}") String dataFactoryBaseUrl) {
-    super(restTemplate, formDataCephService, springAppName, dataFactoryBaseUrl);
+    super(restTemplate, formDataCephService, cephKeyProvider, springAppName, dataFactoryBaseUrl);
   }
 
   @Override

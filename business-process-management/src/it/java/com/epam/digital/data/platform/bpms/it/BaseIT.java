@@ -1,5 +1,6 @@
 package com.epam.digital.data.platform.bpms.it;
 
+import com.epam.digital.data.platform.bpms.delegate.ceph.CephKeyProvider;
 import com.epam.digital.data.platform.bpms.it.config.TestCephServiceImpl;
 import com.epam.digital.data.platform.bpms.it.config.TestFormDataCephServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -44,6 +45,8 @@ public abstract class BaseIT {
   protected TestCephServiceImpl cephService;
   @Inject
   protected TestFormDataCephServiceImpl formDataCephService;
+  @Inject
+  protected CephKeyProvider cephKeyProvider;
 
   @LocalServerPort
   protected int port;

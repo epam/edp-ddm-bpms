@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import javax.inject.Inject;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -170,8 +171,7 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
             .withHeader("Content-Type", equalTo("application/json"))
             .withHeader("X-Source-System", equalTo("Low-code Platform"))
             .withHeader("X-Source-Application", equalTo("business-process-management"))
-            .withHeader("X-Access-Token", equalTo("token"))
-            .withHeader("X-Digital-Signature", equalTo("cephKey"))
+            .withHeader("X-Digital-Signature", matching(".*"))
             .withHeader("X-Digital-Signature-Derived", equalTo("cephKey"))
             .withRequestBody(equalTo("{\"var\":\"value\"}"))
             .willReturn(aResponse().withStatus(422)
@@ -228,19 +228,18 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
   @Test
   @Deployment(resources = {"bpmn/connector/testDataFactoryConnectorBatchCreateDelegate.bpmn"})
   public void testDataFactoryConnectorBatchCreateDelegate() {
-    formDataCephService.putFormData("tokenKey", FormDataDto.builder()
-        .accessToken("token").build());
-
     digitalSignatureMockServer.addStubMapping(stubFor(
         post(urlPathEqualTo("/api/eseal/sign"))
             .withHeader("X-Access-Token", equalTo("token"))
             .withRequestBody(equalTo(
                 "{\"data\":\"{\\\"data\\\":\\\"test data\\\",\\\"description\\\":\\\"some description\\\"}\"}"))
             .willReturn(aResponse().withStatus(200).withBody("{\"signature\":\"signature\"}"))));
+
     dataFactoryMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo("/mock-server/test"))
             .withHeader("X-Access-Token", equalTo("token"))
-            .withHeader("X-Digital-Signature", equalTo("testSignature"))
+            .withHeader("X-Digital-Signature",
+                matching("lowcode-.*-secure-sys-var-ref-task-form-data-test_signature"))
             .withHeader("X-Digital-Signature-Derived",
                 matching("lowcode_.*_system_signature_ceph_key_0"))
             .withRequestBody(
@@ -253,22 +252,28 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
             .withRequestBody(equalTo(
                 "{\"data\":\"{\\\"data2\\\":\\\"test data2\\\",\\\"description2\\\":\\\"some description2\\\"}\"}"))
             .willReturn(aResponse().withStatus(200).withBody("{\"signature\":\"signature2\"}"))));
+
     dataFactoryMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo("/mock-server/test"))
             .withHeader("X-Access-Token", equalTo("token"))
-            .withHeader("X-Digital-Signature", equalTo("testSignature"))
+            .withHeader("X-Digital-Signature",
+                matching("lowcode-.*-secure-sys-var-ref-task-form-data-test_signature"))
             .withHeader("X-Digital-Signature-Derived",
                 matching("lowcode_.*_system_signature_ceph_key_1"))
             .withRequestBody(
                 equalTo("{\"data2\":\"test data2\",\"description2\":\"some description2\"}"))
             .willReturn(aResponse().withStatus(201))));
 
-    Map<String, Object> variables = ImmutableMap
-        .of("secure-sys-var-ref-task-form-data-test_token", "tokenKey",
-            "secure-sys-var-ref-task-form-data-test_signature", "testSignature");
-
     var processInstance = runtimeService
-        .startProcessInstanceByKey("testDataFactoryConnectorBatchCreateDelegate_key", variables);
-    assertThat(processInstance.isEnded()).isTrue();
+        .startProcessInstanceByKey("testDataFactoryConnectorBatchCreateDelegate_key");
+
+    var cephKeyToken = cephKeyProvider
+        .generateKey("test_token", processInstance.getProcessInstanceId());
+    formDataCephService.putFormData(cephKeyToken, FormDataDto.builder().accessToken("token").build());
+
+    String taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionTask").singleResult().getId();
+    taskService.complete(taskId);
+
+    BpmnAwareTests.assertThat(processInstance).isEnded();
   }
 }

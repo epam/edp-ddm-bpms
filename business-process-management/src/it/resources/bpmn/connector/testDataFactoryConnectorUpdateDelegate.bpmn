@@ -4,7 +4,6 @@
     <bpmn:startEvent id="StartEvent_1" name="start">
       <bpmn:outgoing>Flow_0c2sso8</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:sequenceFlow id="Flow_0c2sso8" sourceRef="StartEvent_1" targetRef="Activity_1uev980" />
     <bpmn:sequenceFlow id="Flow_0a4no4l" sourceRef="Activity_1uev980" targetRef="Activity_0uzvndv" />
     <bpmn:scriptTask id="Activity_0uzvndv" name="Assert PUT" scriptFormat="groovy">
       <bpmn:incoming>Flow_0a4no4l</bpmn:incoming>
@@ -15,21 +14,22 @@
       <bpmn:incoming>Flow_1kmjsjz</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_1kmjsjz" sourceRef="Activity_0uzvndv" targetRef="Event_0wml8gq" />
-    <bpmn:serviceTask id="Activity_1uev980" name="Test PUT" camunda:modelerTemplate="dataFactoryConnectorUpdateDelegate" camunda:delegateExpression="${dataFactoryConnectorUpdateDelegate}">
+    <bpmn:serviceTask id="Activity_1uev980" name="Test PUT" camunda:delegateExpression="${dataFactoryConnectorUpdateDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="resource">laboratory</camunda:inputParameter>
           <camunda:inputParameter name="id">id</camunda:inputParameter>
-          <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-testActivity")}</camunda:inputParameter>
-          <camunda:inputParameter name="x_digital_signature_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-testActivity")}</camunda:inputParameter>
           <camunda:inputParameter name="x_digital_signature_derived_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-testActivity")}</camunda:inputParameter>
           <camunda:inputParameter name="payload">${S('{"var": "value"}')}</camunda:inputParameter>
+          <camunda:inputParameter name="x_digital_signature_task_definition_key">testActivity</camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token_task_definition_key" />
           <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0c2sso8</bpmn:incoming>
       <bpmn:outgoing>Flow_0a4no4l</bpmn:outgoing>
     </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0c2sso8" sourceRef="StartEvent_1" targetRef="Activity_1uev980" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testDataFactoryConnectorUpdateDelegate_key">

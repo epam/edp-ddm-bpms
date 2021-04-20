@@ -4,8 +4,7 @@
     <bpmn:startEvent id="StartEvent_1" name="start">
       <bpmn:outgoing>Flow_0icgft6</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:sequenceFlow id="Flow_0icgft6" sourceRef="StartEvent_1" targetRef="Activity_1qxebdp" />
-    <bpmn:sequenceFlow id="Flow_0lsfy7o" sourceRef="Activity_1qxebdp" targetRef="Activity_0gsj5pa" />
+    <bpmn:sequenceFlow id="Flow_0icgft6" sourceRef="StartEvent_1" targetRef="waitConditionTask" />
     <bpmn:endEvent id="Event_0s1xd96" name="fin">
       <bpmn:incoming>Flow_1lp38py</bpmn:incoming>
     </bpmn:endEvent>
@@ -13,12 +12,12 @@
     <bpmn:serviceTask id="Activity_1qxebdp" name="Test sign data" camunda:delegateExpression="${digitalSignatureConnectorDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-testActivity")}</camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token_task_definition_key">testActivity</camunda:inputParameter>
           <camunda:inputParameter name="payload">${S('{"data": "data to sign"}')}</camunda:inputParameter>
           <camunda:outputParameter name="response">${response}</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0icgft6</bpmn:incoming>
+      <bpmn:incoming>Flow_1plwfpy</bpmn:incoming>
       <bpmn:outgoing>Flow_0lsfy7o</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:scriptTask id="Activity_0gsj5pa" name="Assert" scriptFormat="groovy">
@@ -26,20 +25,35 @@
       <bpmn:outgoing>Flow_1lp38py</bpmn:outgoing>
       <bpmn:script>assert response.toString().equals('{"signature":"test"}')</bpmn:script>
     </bpmn:scriptTask>
+    <bpmn:userTask id="waitConditionTask" name="Wait to get process instance id" camunda:formKey="testForm">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="eSign" value="" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0icgft6</bpmn:incoming>
+      <bpmn:outgoing>Flow_1plwfpy</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0lsfy7o" sourceRef="Activity_1qxebdp" targetRef="Activity_0gsj5pa" />
+    <bpmn:sequenceFlow id="Flow_1plwfpy" sourceRef="waitConditionTask" targetRef="Activity_1qxebdp" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testDigitalSignatureConnectorDelegate_key">
       <bpmndi:BPMNEdge id="Flow_1lp38py_di" bpmnElement="Flow_1lp38py">
-        <di:waypoint x="580" y="120" />
-        <di:waypoint x="682" y="120" />
+        <di:waypoint x="670" y="120" />
+        <di:waypoint x="732" y="120" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0lsfy7o_di" bpmnElement="Flow_0lsfy7o">
-        <di:waypoint x="380" y="120" />
-        <di:waypoint x="480" y="120" />
+        <di:waypoint x="510" y="120" />
+        <di:waypoint x="570" y="120" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0icgft6_di" bpmnElement="Flow_0icgft6">
         <di:waypoint x="188" y="120" />
-        <di:waypoint x="280" y="120" />
+        <di:waypoint x="250" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1plwfpy_di" bpmnElement="Flow_1plwfpy">
+        <di:waypoint x="350" y="120" />
+        <di:waypoint x="410" y="120" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
         <dc:Bounds x="152" y="102" width="36" height="36" />
@@ -47,17 +61,20 @@
           <dc:Bounds x="159" y="145" width="23" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0s1xd96_di" bpmnElement="Event_0s1xd96">
-        <dc:Bounds x="682" y="102" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="694" y="145" width="12" height="14" />
-        </bpmndi:BPMNLabel>
+      <bpmndi:BPMNShape id="Activity_18k8sbd_di" bpmnElement="waitConditionTask">
+        <dc:Bounds x="250" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0ft2t5m_di" bpmnElement="Activity_1qxebdp">
-        <dc:Bounds x="280" y="80" width="100" height="80" />
+        <dc:Bounds x="410" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0cj0mkc_di" bpmnElement="Activity_0gsj5pa">
-        <dc:Bounds x="480" y="80" width="100" height="80" />
+        <dc:Bounds x="570" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0s1xd96_di" bpmnElement="Event_0s1xd96">
+        <dc:Bounds x="732" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="744" y="145" width="12" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

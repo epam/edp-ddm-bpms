@@ -1,5 +1,6 @@
 package com.epam.digital.data.platform.bpms.delegate.connector;
 
+import com.epam.digital.data.platform.bpms.delegate.ceph.CephKeyProvider;
 import com.epam.digital.data.platform.bpms.delegate.dto.DataFactoryConnectorResponse;
 import com.epam.digital.data.platform.integration.ceph.service.CephService;
 import com.epam.digital.data.platform.integration.ceph.service.FormDataCephService;
@@ -33,10 +34,11 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelega
   public DataFactoryConnectorBatchCreateDelegate(RestTemplate restTemplate,
       FormDataCephService formDataCephService, CephService cephService,
       DigitalSignatureConnectorDelegate digitalSignatureConnectorDelegate,
+      CephKeyProvider cephKeyProvider,
       @Value("${spring.application.name}") String springAppName,
       @Value("${ceph.bucket}") String cephBucketName,
       @Value("${camunda.system-variables.const_dataFactoryBaseUrl}") String dataFactoryBaseUrl) {
-    super(restTemplate, formDataCephService, springAppName);
+    super(restTemplate, formDataCephService, springAppName,cephKeyProvider);
     this.dataFactoryBaseUrl = dataFactoryBaseUrl;
     this.digitalSignatureConnectorDelegate = digitalSignatureConnectorDelegate;
     this.cephService = cephService;

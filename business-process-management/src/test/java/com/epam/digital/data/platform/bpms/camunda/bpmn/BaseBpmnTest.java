@@ -87,17 +87,17 @@ public abstract class BaseBpmnTest {
     var putContentToCephDelegate = new PutContentToCephDelegate(cephBucketName, cephService);
 
     var dataFactoryConnectorSearchDelegate = new DataFactoryConnectorSearchDelegate(restTemplate,
-        formDataCephService, springAppName, dataFactoryUrl);
+        formDataCephService, cephKeyProvider, springAppName, dataFactoryUrl);
     var dataFactoryConnectorCreateDelegate = new DataFactoryConnectorCreateDelegate(restTemplate,
-        formDataCephService, springAppName, dataFactoryUrl);
+        formDataCephService, cephKeyProvider, springAppName, dataFactoryUrl);
     var dataFactoryConnectorReadDelegate = new DataFactoryConnectorReadDelegate(restTemplate,
-        formDataCephService, springAppName, dataFactoryUrl);
+        formDataCephService, cephKeyProvider, springAppName, dataFactoryUrl);
 
     var digitalSignatureConnectorDelegate = new DigitalSignatureConnectorDelegate(restTemplate,
-        formDataCephService, springAppName, digitalSignatureUrl);
+        formDataCephService, cephKeyProvider, springAppName, digitalSignatureUrl);
 
     var dataFactoryConnectorBatchCreateDelegate = new DataFactoryConnectorBatchCreateDelegate(
-        restTemplate, formDataCephService, cephService, digitalSignatureConnectorDelegate,
+        restTemplate, formDataCephService, cephService, digitalSignatureConnectorDelegate, cephKeyProvider,
         springAppName, cephBucketName, dataFactoryUrl);
 
     var userDataValidationErrorDelegate = new UserDataValidationErrorDelegate(objectMapper);
@@ -120,8 +120,8 @@ public abstract class BaseBpmnTest {
     Mocks.register("userDataValidationErrorDelegate", userDataValidationErrorDelegate);
 
     Mocks.register("dataFactoryConnectorBatchReadDelegate",
-        new DataFactoryConnectorBatchReadDelegate(restTemplate, formDataCephService, springAppName,
-            dataFactoryUrl));
+        new DataFactoryConnectorBatchReadDelegate(restTemplate, formDataCephService, cephKeyProvider,
+            springAppName, dataFactoryUrl));
   }
 
   protected void completeTask(String taskDefinitionKey, String formData,
