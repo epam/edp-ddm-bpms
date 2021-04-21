@@ -1,0 +1,81 @@
+= Автентификація та авторизація в сервісі
+== Автентификація у сервісі
+
+Автентифікація у сервісі відбувається на базі JWT. Сервіс використовує об'єкт аутентифікації з Spring контексту (який потрапляє туди за допомогою ddm-security-starter) та на його базі (ім'я користувача та список ролей) створює об'єкт автентифікації Camunda.
+Після чого Camunda надає доступ до ресурсів у відповідності з ролями або ім'ям користувача.
+
+== Стартові групи користувачів
+
+.Перед стартом сервісу виконується створення таких груп у Camunda (1 група на кожну системну роль):
+- officer
+- citizen
+
+Ці групи мають наступний доступ.
+
+|====
+| Ресурс | Доступ
+
+| PROCESS-DEFINITION (бізнес-процеси)
+| READ (доступ до списку процесів регламенту), CREATE-INSTANCE (старт бізнес процесу)
+
+| PROCESS-INSTANCE (екземпляр бізнес-процесу)
+| CREATE (створення екземпляру для старту бізнес-процесу)
+
+|====
+
+Також Camunda надає повний доступ для `*camunda-admin*`.
+
+== Надавання доступу до бізнес-процессів
+
+Для всіх екземплярів бізнес-процесів перед стартом виконується AuthorizationStartEventListener
+
+[plantuml,process-instance-access,svg]
+----
+@startuml
+participant AuthorizationStartEventListener as listener order 10
+participant "Camunda auth" as auth order 20
+
+-> listener : старт бізнес-процесу
+activate listener
+
+listener -> auth : отримати поточний об'єкт автентифікації
+note right
+нехай поточний об'єкт автентифікації
+буде для користувача з ім'ям user
+end note
+activate auth
+listener <-- auth : поточний об'єкт автентифікації
+deactivate auth
+
+listener -> auth : заавтетифікуватися від імені адміну
+activate auth
+note right
+користувач адмін конфігурується окремо
+camunda.admin-user-id - ідентифікатор адміна
+camunda.admin-group-id - группа адміна яка повинна
+мати права на зміну прав користувачів
+end note
+
+listener <-- auth : заавтетифіковано
+deactivate auth
+
+listener -> auth : надати необхідні права користувачу user
+activate auth
+note right
+надати права на читання та оновлення змінних екземпляру процесу
+та на читання історичних даних екземпляру бізнес-процесу
+end note
+listener <-- auth : права надано
+deactivate auth
+
+listener -> auth : заавтетифікувати користувача user
+activate auth
+note right
+заавтетифікувати назад користувача user
+використовуючи об'єкт автентифікації отриманий на початку
+end note
+listener <-- auth : заавтетифіковано
+deactivate auth
+deactivate listener
+@enduml
+----

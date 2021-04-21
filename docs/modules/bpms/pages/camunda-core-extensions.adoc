@@ -1,0 +1,247 @@
+= Розширення ядра Camunda
+
+== Розширення можливостей парсингу bpmn
+
+Для розширення можливостей парсингу bpmn було імплементовано наступну ієрархію класів
+
+[plantuml,config,svg]
+----
+@startuml
+class TransientBpmnParse #back:lightblue;line:green;text:black extends BpmnParse
+
+class BpmnParseFactory {
+  createBpmnParse()
+}
+
+class TransientBpmnParseFactory #back:lightblue;line:green;text:black extends BpmnParseFactory {
+  createBpmnParse()
+}
+
+class SpringProcessEngineConfiguration {
+  BpmnParseFactory bpmnParseFactory
+}
+
+class LowcodeSpringProcessEngineConfiguration #back:lightblue;line:green;text:black extends SpringProcessEngineConfiguration
+class CamundaConfiguration #back:lightblue;line:green;text:black {
+ processEngineConfigurationImpl()
+}
+
+BpmnParse <- BpmnParseFactory : creates
+TransientBpmnParse <- TransientBpmnParseFactory : creates
+BpmnParseFactory -o SpringProcessEngineConfiguration
+LowcodeSpringProcessEngineConfiguration <-- CamundaConfiguration : creates
+@enduml
+----
+
+- `TransientBpmnParse` - є наслідком `BpmnParse` і перевантажує методи парсингу bpmn
+- `TransientBpmnParseFactory` - є наслідком `BpmnParseFactory` та потрібен для створення `TransientBpmnParse` у `SpringProcessEngineConfiguration`
+- `LowcodeSpringProcessEngineConfiguration` - є наслідком `SpringProcessEngineConfiguration` та потрібен для визначення параметрів кастомними значеннями (такими як `bpmnParseFactory`)
+- `CamundaConfiguration` - базовий конфігураційний клас який створює та конфігурує екземпляр класу `LowcodeSpringProcessEngineConfiguration`
+
+=== Заміщення парсингу input/output параметрів
+
+У Camunda визначення input/output параметрів імплементовано з використанням `AbstractVariableScope::setVariableLocal` (який не є transient, тобто створює запис для цього параметру в базі даних) для зберігання параметру у контексті виконнання бізнес-процесу.
+Тому було вирішено замістити `InputParameter` за замовчуванням кастомними `TransientInputParameter`
+
+[plantuml,transient-input-params,svg]
+----
+@startuml
+class BpmnParse {
+  parseActivityInputOutput()
+}
+
+class TransientBpmnParse #back:lightblue;line:green;text:black extends BpmnParse {
+  parseActivityInputOutput()
+}
+
+class InputParameter {
+  execute()
+}
+
+class TransientInputParameter #back:lightblue;line:green;text:black extends InputParameter {
+  execute()
+}
+
+BpmnParse .> InputParameter
+TransientBpmnParse .> TransientInputParameter
+@enduml
+----
+
+- Перевантажений метод `parseActivityOutput` виконує input/output мапинг за замовчуванням, отримує згенеровані input параметри та заміщує їх екземплярами класу `TransientInputParameter`
+- `TransientInputParameter::execute` використовує `AbstractVariableScope::setVariableLocal` для зберігання не transient параметру та `AbstractVariableScope::setVariableLocalTransient` для зберігання transient параметру
+
+=== Заміщення логіки expression language resolver
+
+У Camunda expression language resolver імплементовано так щоб повертати значення визначеної змінної.
+Тобто якщо змінна `variable` має значення `value` то вираз `${variable}` поверне тільки значення `value` типу `String` (навіть якщо змінна є transient).
+Через що викорістання таких виразів не є захищеним (expression language resolver передає значення у camunda input parameter та "губить" інформацію про те чи transient ця змінна, а camunda input parameter у свою чергу не отримав інформації про те чи ця змінна transient та кладе цей параметер у контекст виконання бізнес-процесу без ознаки transient, через що ця змінна потрабляє до бази даних Camunda).
+Тому було вирішено додати кастомний `ElResolver` до контексту Camunda.
+
+[plantuml,el-resolving,svg]
+----
+@startuml
+class SpringProcessEngineConfiguration {
+  SpringExpressionManager expressionManager
+}
+
+class LowcodeSpringProcessEngineConfiguration #back:lightblue;line:green;text:black extends SpringProcessEngineConfiguration
+
+class SpringExpressionManager {
+  ElResolver createElResolver()
+}
+
+class CamundaSpringExpressionManager #back:lightblue;line:green;text:black extends SpringExpressionManager{
+  CompositeElResolver createElResolver()
+}
+
+abstract class ElResolver {
+  getValue()
+}
+
+class CompositeElResolver extends ElResolver {
+  getValue()
+}
+
+class TransientVariableScopeElResolver #back:lightblue;line:green;text:black extends ElResolver {
+  getValue()
+}
+
+class CamundaConfiguration #back:lightblue;line:green;text:black {
+  processEngineConfigurationImpl()
+}
+
+SpringProcessEngineConfiguration o- SpringExpressionManager
+SpringExpressionManager -> ElResolver : creates
+LowcodeSpringProcessEngineConfiguration <-- CamundaConfiguration : creates
+CamundaSpringExpressionManager <-- CamundaConfiguration : creates and injects into SpringProcessEngineConfiguration
+CamundaSpringExpressionManager -> CompositeElResolver : creates
+CamundaSpringExpressionManager --> TransientVariableScopeElResolver : creates and injects into CompositeElResolver
+@enduml
+----
+
+- `CamundaConfiguration` створює екземпляр `CamundaSpringExpressionManager` та кладе його у `LowcodeSpringProcessEngineConfiguration`
+- `CamundaSpringExpressionManager` створює екземляр `ElResolver` за замовчуванням та екземляр `TransientVariableScopeElResolver`, комбінує їх в `CompositeElResolver` та повертає його
+- `TransientVariableScopeElResolver::getValue` у випадку якщо змінна не transient повертає значення змінної типу цієї самої змінної, але у випадку якшо змінна transient то повертає екземляр класу `TypedValue` який зберігає ознаку transient.
+
+[CAUTION]
+Ці зміни спричинили зміни у самій expression language.
+Відтепер якщо змінна є transient та потрібно повернути саме значення змінної у виразі то це можна зробіти через `.value`.
+Наприклад `${variable.toString()}` стане `${variable.value.toString()}`
+
+== Можливість додати системні змінні до контесту виконання бізнес-процесу
+
+Щоб можна було змінні з bpms-camunda-global-system-vars config-map додати до контексту виконання бізнес-процесу було імплементовано наступну ієрархію класів.
+
+[plantuml,sys-vars,svg]
+----
+@startuml
+class AbstractProcessEnginePlugin {
+  preInit()
+}
+
+class CamundaSystemVariablesSupportListenerPlugin #back:lightblue;line:green;text:black extends AbstractProcessEnginePlugin {
+  preInit()
+}
+
+class AbstractBpmnParseListener {
+  parseStartEvent()
+}
+
+class CamundaSystemVariablesSupportListener #back:lightblue;line:green;text:black extends AbstractBpmnParseListener {
+  parseStartEvent()
+}
+
+class CamundaProperties #back:lightblue;line:green;text:black {
+  Map<String, String> systemVariables
+}
+
+CamundaSystemVariablesSupportListenerPlugin -> CamundaSystemVariablesSupportListener
+CamundaSystemVariablesSupportListener -> CamundaProperties
+@enduml
+----
+
+- `CamundaProperties` містіть список системних змінних
+- `CamundaSystemVariablesSupportListener` містить екзкмпляр класу `CamundaProperties` та у методі parseStartEvent додає системні змінні до контексту виконання бізнес-процесу
+- `CamundaSystemVariablesSupportListenerPlugin` додає екземпляр `CamundaSystemVariablesSupportListener` до загального списку `preParseListeners` у Camunda
+
+== Маппинг виключеннь на HTTP відповідь
+
+У разі виникнення виключної ситуації Camunda мапить це виключення використовуючи `ExceptionMapper`
+
+[plantuml,exception-mapping,svg]
+----
+@startuml
+interface ExceptionMapper<Trowable> {
+  toResponse()
+}
+
+class CamundaSystemExceptionMapper<SystemException> #back:lightblue;line:green;text:black implements ExceptionMapper {
+  toResponse()
+}
+
+class CamundaRestExceptionMapper<RestException> #back:lightblue;line:green;text:black implements ExceptionMapper {
+  toResponse()
+}
+
+class UserDataValidationExceptionMapper<ValidationException> #back:lightblue;line:green;text:black implements ExceptionMapper {
+  toResponse()
+}
+
+class RestException extends Throwable
+class SystemException #back:lightgreen;line:green;text:black extends Throwable
+class ValidationException #back:lightgreen;line:green;text:black extends Throwable
+
+ExceptionMapper .> Throwable
+CamundaRestExceptionMapper .> RestException
+CamundaSystemExceptionMapper .> SystemException
+UserDataValidationExceptionMapper .> ValidationException
+
+CamundaRestExceptionMapper --[hidden]> CamundaSystemExceptionMapper
+CamundaSystemExceptionMapper --[hidden]> UserDataValidationExceptionMapper
+@enduml
+----
+
+- `ExceptionMapper<Throwable>` інтерфейс який містить метод `toResponse`
+- `CamundaRestExceptionMapper<RestException>` класс який маппить `RestException` на HTTP відповідь з HTTP статусом який міститься у `RestException` з тілом яке має наступну структуру
+
+[source,json]
+----
+{
+  "traceId" : "traceId",
+  "code" : "code",
+  "message" : "message",
+  "localizedMessage" : "localizedMessage"
+}
+----
+
+- `CamundaSystemExceptionMapper<SystemException>` - мапить `SystemException` на HTTP відповідь зі статусом 500 з тілом яке має наступну структуру
+
+[source,json]
+----
+{
+  "traceId" : "traceId",
+  "code" : "code",
+  "message" : "message",
+  "localizedMessage" : "localizedMessage"
+}
+----
+
+- `UserDataValidationExceptionMapper<ValidationException>` - мапить `ValidationException` на HTTP відповідь зі статусом 422 з тілом яке має наступну структуру
+
+[source,json]
+----
+{
+  "traceId" : "traceId",
+  "code" : "code",
+  "message" : "message",
+  "details" : {
+    "errors": [
+      {
+        "field": "fieldName",
+        "value": "fieldValue",
+        "message": "localizedMessage"
+      }
+    ]
+  }
+}
+----

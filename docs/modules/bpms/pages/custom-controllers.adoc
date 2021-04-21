@@ -1,0 +1,38 @@
+= Кастомні контроллери
+
+== TaskPropertyController
+
+Контроллер для отримання доступу до розширених властивостей задачі
+
+=== Отримати список розширених властивостей задачі
+
+[plantuml,getTaskProperty,svg]
+----
+@startuml
+participant "BPMS Клієнт" as client  order 10
+participant "Сервіс виконання бізнес-процесів" as bpms order 20
+participant "Camunda Task Service" as taskService  order 30
+participant "Camunda Repository Service" as repositoryService order 40
+skinparam responseMessageBelowArrow true
+
+title Отримати список розширених властивостей задачі
+  client -> bpms : Отримати список розширених\nвластивостей за ідентефікатором задачі
+  activate bpms
+  bpms -> taskService : Отримати задачу за ідентефікатором
+  activate taskService
+  alt Задачу не знайдено
+  bpms <-- taskService : задачу не знайдено
+  client <-- bpms : Пустий список розширених властивостей\nзадачі, 200 OK
+  end
+  bpms <-- taskService : Задачу знайдено
+  deactivate taskService
+  bpms -> bpms : Отримати ідентефікатор\nбізнес-процесу зі знайденої задачі
+  bpms -> repositoryService : Отримати опис бізнес-процесу за ідентефікатором
+  activate repositoryService
+  bpms <- repositoryService : знайдений опис бізнес-процесу
+  deactivate repositoryService
+  bpms -> bpms : Отримати опис задачі з бізнес-процесу за ідентефікатором задачі
+  bpms -> bpms : Отримати список розширених властивостей задачі з опису задачі
+  return : Cписок розширених властивостей задачі, 200 OK
+@enduml
+----
