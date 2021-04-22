@@ -2,6 +2,7 @@ package com.epam.digital.data.platform.bpms.client;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
@@ -20,6 +21,7 @@ import com.epam.digital.data.platform.starter.errorhandling.dto.ValidationErrorD
 import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.assertj.core.util.Lists;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
@@ -244,5 +246,34 @@ public class CamundaTaskRestClientIT extends BaseIT {
         .isEqualTo("key1");
     assertThat(exception.getDetails().getErrors().get(0).getValue())
         .isEqualTo("val1");
+  }
+
+  @Test
+  public void shouldReturnTasksByOrQueries() throws JsonProcessingException {
+    String expectedBody = "{\"orQueries\":[{\"assignee\": \"testuser\",\"unassigned\": true}]}";
+
+    var requestDto = TaskQueryDto.builder()
+        .orQueries(Lists.newArrayList(TaskQueryDto.builder()
+            .assignee("testuser")
+            .unassigned(true)
+            .build()))
+        .build();
+
+    var task = new TaskEntity();
+    task.setId("testId");
+    restClientWireMock.addStubMapping(
+        stubFor(post(urlPathEqualTo("/api/task"))
+            .withRequestBody(equalToJson(expectedBody))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withStatus(200)
+                .withBody((objectMapper.writeValueAsString(Lists.newArrayList(TaskDto.fromEntity(task)))))
+        )
+    ));
+
+    List<TaskDto> tasks = camundaTaskRestClient.getTasksByParams(requestDto);
+
+    assertThat(tasks).isNotEmpty();
+    assertThat(tasks.get(0).getId()).isEqualTo("testId");
   }
 }

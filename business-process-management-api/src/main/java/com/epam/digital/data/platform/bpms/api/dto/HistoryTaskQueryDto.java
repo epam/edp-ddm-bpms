@@ -10,6 +10,6 @@ import lombok.Data;
 @Builder
 public class HistoryTaskQueryDto {
 
-  private String assignee;
+  private String taskAssignee;
   private boolean finished;
 }
