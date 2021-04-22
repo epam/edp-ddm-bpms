@@ -1,6 +1,5 @@
 package com.epam.digital.data.platform.bpms.delegate.ceph;
 
-import com.epam.digital.data.platform.bpms.delegate.constants.CamundaDelegateConstants;
 import org.springframework.stereotype.Component;
 
 /**
@@ -8,6 +7,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class CephKeyProvider {
+
+  private static final String TASK_FORM_DATA_STRING_FORMAT = "secure-sys-var-ref-task-form-data-%s";
+  private static final String TASK_FORM_DATA_VALUE_FORMAT = "lowcode-%s-%s";
 
   /**
    * Method for generating the ceph key, uses task definition key and process instance identifier to
@@ -18,9 +20,7 @@ public class CephKeyProvider {
    * @return generated ceph key
    */
   public String generateKey(String taskDefinitionKey, String processInstanceId) {
-    var taskFormDataVariableName = String.format(
-        CamundaDelegateConstants.TASK_FORM_DATA_STRING_FORMAT, taskDefinitionKey);
-    return String.format(CamundaDelegateConstants.TASK_FORM_DATA_VALUE_FORMAT,
-        processInstanceId, taskFormDataVariableName);
+    var taskFormDataVariableName = String.format(TASK_FORM_DATA_STRING_FORMAT, taskDefinitionKey);
+    return String.format(TASK_FORM_DATA_VALUE_FORMAT, processInstanceId, taskFormDataVariableName);
   }
 }

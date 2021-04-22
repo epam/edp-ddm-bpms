@@ -3,7 +3,6 @@ package com.epam.digital.data.platform.bpms.camunda.bpmn;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.complete;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
-import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -83,7 +82,7 @@ public abstract class BaseBpmnTest {
 
     var getFormDataFromCephDelegate = new GetFormDataFromCephDelegate(formDataCephService, cephKeyProvider);
     var putFormDataToCephDelegate = new PutFormDataToCephDelegate(formDataCephService,
-        objectMapper);
+        objectMapper, cephKeyProvider);
     var putContentToCephDelegate = new PutContentToCephDelegate(cephBucketName, cephService);
 
     var dataFactoryConnectorSearchDelegate = new DataFactoryConnectorSearchDelegate(restTemplate,
@@ -126,10 +125,9 @@ public abstract class BaseBpmnTest {
 
   protected void completeTask(String taskDefinitionKey, String formData,
       String processInstanceId) throws IOException {
-    var variableName = TestUtils.formDataVariableName(taskDefinitionKey);
-    var variableValue = TestUtils.formDataVariableValue(processInstanceId, variableName);
-    formDataCephService.putFormData(variableValue, deserializeFormData(TestUtils.getContent(formData)));
-    complete(task(taskDefinitionKey), withVariables(variableName, variableValue));
+    var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, processInstanceId);
+    formDataCephService.putFormData(cephKey, deserializeFormData(TestUtils.getContent(formData)));
+    complete(task(taskDefinitionKey));
   }
 
   protected void mockDataFactoryGet(StubData stubData) throws IOException {
@@ -196,10 +194,8 @@ public abstract class BaseBpmnTest {
 
   protected void addExpectedCephContent(String processInstanceId, String taskDefinitionKey,
       String cephContent) throws IOException {
-    var refVarName = TestUtils.formDataVariableName(taskDefinitionKey);
-    var cephKey = TestUtils.formDataVariableValue(processInstanceId, refVarName);
+    var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, processInstanceId);
 
-    expectedVariablesMap.put(refVarName, cephKey);
     expectedCephStorage.put(cephKey, deserializeFormData(TestUtils.getContent(cephContent)));
   }
 

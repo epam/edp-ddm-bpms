@@ -14,7 +14,7 @@
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1bqihyv</bpmn:incoming>
-      <bpmn:outgoing>Flow_0pi7b3c</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0c8mzmo</bpmn:outgoing>
       <bpmn:property id="Property_0d7jdtc" name="__targetRef_placeholder" />
       <bpmn:dataInputAssociation id="DataInputAssociation_0oe039l">
         <bpmn:sourceRef>DataStoreReference_1f6h4dq</bpmn:sourceRef>
@@ -43,16 +43,13 @@
       <bpmn:outgoing>Flow_1kqecau</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:dataStoreReference id="DataStoreReference_1f6h4dq" name="Ceph" />
-    <bpmn:sequenceFlow id="Flow_05b47qy" sourceRef="putSystemSignatureToCephActivity" targetRef="updateLabInDataFactoryActivity" />
     <bpmn:sequenceFlow id="Flow_0e9rgw0" sourceRef="Event_15d2rb2" targetRef="Gateway_1xtqt2s" />
-    <bpmn:sequenceFlow id="Flow_1auh68h" sourceRef="readKoatuuFromDataFactoryActivity" targetRef="convertLabDataToFormDataFormatActivity" />
     <bpmn:sequenceFlow id="Flow_1p0bwms" sourceRef="convertLabDataToFormDataFormatActivity" targetRef="prepopulateViewLabDataFormActivity" />
     <bpmn:sequenceFlow id="Flow_0rij4r5" sourceRef="Event_15jex7p" targetRef="Gateway_1xtqt2s" />
     <bpmn:sequenceFlow id="Flow_0y1vjwv" sourceRef="Gateway_1m8e5ns" targetRef="signLabFormActivity" />
     <bpmn:sequenceFlow id="Flow_1kqecau" sourceRef="Gateway_1xtqt2s" targetRef="searchLabFormActivity" />
     <bpmn:sequenceFlow id="Flow_0fbq9ir" sourceRef="prepopulateUpdateLabFormActivity" targetRef="Gateway_0poyko1" />
     <bpmn:sequenceFlow id="Flow_0tmmbv3" sourceRef="updateLabFormActivity" targetRef="Activity_07nscgh" />
-    <bpmn:sequenceFlow id="Flow_1rlrmog" sourceRef="convertSignFormDataToDataFactoryFormatActivity" targetRef="signFormDataWithDsoActivity" />
     <bpmn:sequenceFlow id="Flow_0npdrft" sourceRef="readSignLabFormFromCephActivity" targetRef="convertSignFormDataToDataFactoryFormatActivity" />
     <bpmn:sequenceFlow id="Flow_1gea1y9" sourceRef="signLabFormActivity" targetRef="readSignLabFormFromCephActivity" />
     <bpmn:sequenceFlow id="Flow_0o5fdsc" sourceRef="viewLabDataFormActivity" targetRef="readViewLabDataFormFromCephActivity" />
@@ -64,9 +61,7 @@
     <bpmn:sequenceFlow id="Flow_0d01pf1" sourceRef="readUpdateLabFormFromCephActivity" targetRef="extractNameAndEdrpouFromUpdateLabFormActivity" />
     <bpmn:sequenceFlow id="Flow_14ndt40" sourceRef="prepopulateSignLabFormActivity" targetRef="Gateway_1m8e5ns" />
     <bpmn:sequenceFlow id="Flow_1t8c6oe" sourceRef="Event_1x8mg0g" targetRef="Gateway_1m8e5ns" />
-    <bpmn:sequenceFlow id="Flow_1tic316" sourceRef="updateLabInDataFactoryActivity" targetRef="defineBusinessProcessStatusActivity" />
     <bpmn:sequenceFlow id="Flow_0hz7hdv" sourceRef="extractNameAndEdrpouFromUpdateLabFormActivity" targetRef="Gateway_038bgls" />
-    <bpmn:sequenceFlow id="Flow_1syjz24" sourceRef="searchForLabByNameAndEdrpouActivity" targetRef="Gateway_1qa6te9" />
     <bpmn:sequenceFlow id="Flow_1ut6pfw" name="ні" sourceRef="Gateway_1qa6te9" targetRef="Gateway_0gqiwsr">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${response.responseBody.elements().isEmpty()}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
@@ -84,29 +79,6 @@
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_09rm3a8" sourceRef="Gateway_0gqiwsr" targetRef="prepopulateSignLabFormActivity" />
     <bpmn:sequenceFlow id="Flow_1wrgqdi" sourceRef="extractSignatureAndDataActivity" targetRef="putSystemSignatureToCephActivity" />
-    <bpmn:sequenceFlow id="Flow_1cbzh7c" sourceRef="signFormDataWithDsoActivity" targetRef="extractSignatureAndDataActivity" />
-    <bpmn:sequenceFlow id="Flow_0pi7b3c" sourceRef="readSearchLabFormFromCephActivity" targetRef="readLabFromDataFactoryActivity" />
-    <bpmn:serviceTask id="readLabFromDataFactoryActivity" name="Запит даних про лабораторію" camunda:modelerTemplate="dataFactoryConnectorReadDelegate" camunda:delegateExpression="${dataFactoryConnectorReadDelegate}">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="resource">laboratory</camunda:inputParameter>
-          <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-searchLabFormActivity")}</camunda:inputParameter>
-          <camunda:inputParameter name="id">${formData.value.prop('laboratoryId').value()}</camunda:inputParameter>
-          <camunda:outputParameter name="labResponse">${ response }</camunda:outputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0pi7b3c</bpmn:incoming>
-      <bpmn:outgoing>Flow_0hve2wf</bpmn:outgoing>
-      <bpmn:dataOutputAssociation id="DataOutputAssociation_0yrre6m">
-        <bpmn:targetRef>DataStoreReference_1avq00l</bpmn:targetRef>
-      </bpmn:dataOutputAssociation>
-    </bpmn:serviceTask>
-    <bpmn:dataStoreReference id="DataStoreReference_1avq00l" name="Дата фабрика" />
-    <bpmn:boundaryEvent id="Event_15jex7p" attachedToRef="readLabFromDataFactoryActivity">
-      <bpmn:outgoing>Flow_0rij4r5</bpmn:outgoing>
-      <bpmn:errorEventDefinition id="ErrorEventDefinition_059wq51" />
-    </bpmn:boundaryEvent>
-    <bpmn:sequenceFlow id="Flow_0hve2wf" sourceRef="readLabFromDataFactoryActivity" targetRef="readKoatuuFromDataFactoryActivity" />
     <bpmn:serviceTask id="prepopulateViewLabDataFormActivity" name="Запис документа форми" camunda:modelerTemplate="putFormDataToCephDelegate" camunda:delegateExpression="${putFormDataToCephDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -171,7 +143,7 @@
       </bpmn:dataOutputAssociation>
     </bpmn:serviceTask>
     <bpmn:scriptTask id="convertLabDataToFormDataFormatActivity" name="Підготовка даних для запису (transient var)" scriptFormat="groovy">
-      <bpmn:incoming>Flow_1auh68h</bpmn:incoming>
+      <bpmn:incoming>Flow_1xgp065</bpmn:incoming>
       <bpmn:outgoing>Flow_1p0bwms</bpmn:outgoing>
       <bpmn:dataOutputAssociation id="DataOutputAssociation_05obhyx">
         <bpmn:targetRef>DataObjectReference_0v906yu</bpmn:targetRef>
@@ -188,26 +160,10 @@ execution.setVariableLocalTransient('payload', S(cephObj, 'application/json'))
 
 execution.setVariable('laboratoryId', labResponse.responseBody.prop('laboratoryId').value())</bpmn:script>
     </bpmn:scriptTask>
-    <bpmn:serviceTask id="readKoatuuFromDataFactoryActivity" name="Запит даних про код області" camunda:modelerTemplate="dataFactoryConnectorReadDelegate" camunda:delegateExpression="${dataFactoryConnectorReadDelegate}">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="resource">koatuu</camunda:inputParameter>
-          <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-searchLabFormActivity")}</camunda:inputParameter>
-          <camunda:inputParameter name="id">${labResponse.value.responseBody.prop('koatuuId').value()}</camunda:inputParameter>
-          <camunda:outputParameter name="oblResponse">${ response }</camunda:outputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0hve2wf</bpmn:incoming>
-      <bpmn:outgoing>Flow_1auh68h</bpmn:outgoing>
-      <bpmn:dataOutputAssociation id="DataOutputAssociation_01if104">
-        <bpmn:targetRef>DataStoreReference_1897i2u</bpmn:targetRef>
-      </bpmn:dataOutputAssociation>
-    </bpmn:serviceTask>
     <bpmn:dataStoreReference id="DataStoreReference_1kgthb4" name="Ceph" />
     <bpmn:dataStoreReference id="DataStoreReference_12baxm6" name="Ceph" />
     <bpmn:dataObjectReference id="DataObjectReference_0v906yu" dataObjectRef="DataObject_10fo6kh" />
     <bpmn:dataObject id="DataObject_10fo6kh" />
-    <bpmn:dataStoreReference id="DataStoreReference_1897i2u" name="Дата фабрика" />
     <bpmn:userTask id="updateLabFormActivity" name="Оновити дані про лабораторію" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="update-lab-bp-change-lab-data" camunda:assignee="${initiator}">
       <bpmn:extensionElements>
         <camunda:properties>
@@ -272,34 +228,13 @@ execution.setVariableLocalTransient('oldName', oldName)</bpmn:script>
       <bpmn:incoming>Flow_0tmmbv3</bpmn:incoming>
       <bpmn:outgoing>Flow_0z4nbr8</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="searchForLabByNameAndEdrpouActivity" name="Пошук даних про лабораторію" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="resource">laboratory-equal-edrpou-name-count</camunda:inputParameter>
-          <camunda:inputParameter name="searchConditions">
-            <camunda:map>
-              <camunda:entry key="name">${name.value}</camunda:entry>
-              <camunda:entry key="edrpou">${edrpou.value}</camunda:entry>
-            </camunda:map>
-          </camunda:inputParameter>
-          <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-updateLabFormActivity")}</camunda:inputParameter>
-          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_16st9e6</bpmn:incoming>
-      <bpmn:outgoing>Flow_1syjz24</bpmn:outgoing>
-    </bpmn:serviceTask>
     <bpmn:exclusiveGateway id="Gateway_038bgls" name="Назву лабораторії змінено?">
       <bpmn:incoming>Flow_0hz7hdv</bpmn:incoming>
       <bpmn:outgoing>Flow_16st9e6</bpmn:outgoing>
       <bpmn:outgoing>Flow_0qe6tpr</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:boundaryEvent id="Event_15d2rb2" attachedToRef="readKoatuuFromDataFactoryActivity">
-      <bpmn:outgoing>Flow_0e9rgw0</bpmn:outgoing>
-      <bpmn:errorEventDefinition id="ErrorEventDefinition_0w26d67" />
-    </bpmn:boundaryEvent>
     <bpmn:exclusiveGateway id="Gateway_1qa6te9" name="Дані присутні?">
-      <bpmn:incoming>Flow_1syjz24</bpmn:incoming>
+      <bpmn:incoming>Flow_11sdmag</bpmn:incoming>
       <bpmn:outgoing>Flow_1ut6pfw</bpmn:outgoing>
       <bpmn:outgoing>Flow_08wtjup</bpmn:outgoing>
     </bpmn:exclusiveGateway>
@@ -350,7 +285,7 @@ execution.setVariableLocalTransient('oldName', oldName)</bpmn:script>
     </bpmn:serviceTask>
     <bpmn:scriptTask id="convertSignFormDataToDataFactoryFormatActivity" name="Підготовка даних для запису (transient var)" scriptFormat="groovy">
       <bpmn:incoming>Flow_0npdrft</bpmn:incoming>
-      <bpmn:outgoing>Flow_1rlrmog</bpmn:outgoing>
+      <bpmn:outgoing>Flow_17bwjm7</bpmn:outgoing>
       <bpmn:dataOutputAssociation id="DataOutputAssociation_0hjhmrk">
         <bpmn:targetRef>DataObjectReference_1burbk6</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
@@ -370,60 +305,18 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
       <bpmn:incoming>Flow_1t8c6oe</bpmn:incoming>
       <bpmn:outgoing>Flow_0y1vjwv</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:serviceTask id="updateLabInDataFactoryActivity" name="Зберегти дані в Дата фабрику" camunda:modelerTemplate="dataFactoryConnectorUpdateDelegate" camunda:delegateExpression="${dataFactoryConnectorUpdateDelegate}">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="resource">laboratory</camunda:inputParameter>
-          <camunda:inputParameter name="id">${laboratoryId}</camunda:inputParameter>
-          <camunda:inputParameter name="payload">${dataPayload}</camunda:inputParameter>
-          <camunda:inputParameter name="x_digital_signature_derived_ceph_key">${system_signature_ceph_key}</camunda:inputParameter>
-          <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable('secure-sys-var-ref-task-form-data-signLabFormActivity')}</camunda:inputParameter>
-          <camunda:inputParameter name="x_digital_signature_ceph_key">${execution.getVariable('secure-sys-var-ref-task-form-data-signLabFormActivity')}</camunda:inputParameter>
-          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_05b47qy</bpmn:incoming>
-      <bpmn:outgoing>Flow_1tic316</bpmn:outgoing>
-      <bpmn:property id="Property_1solcsd" name="__targetRef_placeholder" />
-      <bpmn:dataInputAssociation id="DataInputAssociation_0hb4jz5">
-        <bpmn:sourceRef>DataObjectReference_1burbk6</bpmn:sourceRef>
-        <bpmn:targetRef>Property_1solcsd</bpmn:targetRef>
-      </bpmn:dataInputAssociation>
-      <bpmn:dataOutputAssociation id="DataOutputAssociation_17cxr0k">
-        <bpmn:targetRef>DataStoreReference_0ftohld</bpmn:targetRef>
-      </bpmn:dataOutputAssociation>
-    </bpmn:serviceTask>
     <bpmn:serviceTask id="defineBusinessProcessStatusActivity" name="Результат виконання &#34;Дані про лабораторію оновлені&#34;" camunda:modelerTemplate="defineBusinessProcessStatusDelegate" camunda:delegateExpression="${defineBusinessProcessStatusDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="status">Дані про лабораторію оновлені</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1tic316</bpmn:incoming>
+      <bpmn:incoming>Flow_1gi368p</bpmn:incoming>
       <bpmn:outgoing>Flow_041kh82</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:endEvent id="Event_0xw0ca1" name="Дані оновлені">
       <bpmn:incoming>Flow_041kh82</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:serviceTask id="signFormDataWithDsoActivity" name="Підписати дані системним ключем" camunda:modelerTemplate="digitalSignatureConnectorDelegate" camunda:delegateExpression="${digitalSignatureConnectorDelegate}">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="payload">${dataKeyPayload}</camunda:inputParameter>
-          <camunda:inputParameter name="x_access_token_ceph_key">${execution.getVariable('secure-sys-var-ref-task-form-data-signLabFormActivity')}</camunda:inputParameter>
-          <camunda:outputParameter name="systemSignatureResponse">${ response }</camunda:outputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1rlrmog</bpmn:incoming>
-      <bpmn:outgoing>Flow_1cbzh7c</bpmn:outgoing>
-      <bpmn:property id="Property_0zx9qls" name="__targetRef_placeholder" />
-      <bpmn:dataInputAssociation id="DataInputAssociation_0pjm8q0">
-        <bpmn:sourceRef>DataObjectReference_1burbk6</bpmn:sourceRef>
-        <bpmn:targetRef>Property_0zx9qls</bpmn:targetRef>
-      </bpmn:dataInputAssociation>
-      <bpmn:dataOutputAssociation id="DataOutputAssociation_0fb4ndy">
-        <bpmn:targetRef>DataStoreReference_0l4000z</bpmn:targetRef>
-      </bpmn:dataOutputAssociation>
-    </bpmn:serviceTask>
     <bpmn:serviceTask id="putSystemSignatureToCephActivity" name="Запис системного підпису" camunda:modelerTemplate="putContentToCephDelegate" camunda:delegateExpression="${putContentToCephDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -432,7 +325,7 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1wrgqdi</bpmn:incoming>
-      <bpmn:outgoing>Flow_05b47qy</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1qpbub1</bpmn:outgoing>
       <bpmn:property id="Property_0dzhkdj" name="__targetRef_placeholder" />
       <bpmn:dataInputAssociation id="DataInputAssociation_1bmszqy">
         <bpmn:sourceRef>DataObjectReference_1q0yhin</bpmn:sourceRef>
@@ -457,7 +350,7 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
       <bpmn:outgoing>Flow_09rm3a8</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:scriptTask id="extractSignatureAndDataActivity" name="Підготовка даних для запису системного підпису" scriptFormat="groovy" camunda:resultVariable="systemSignaturePayload">
-      <bpmn:incoming>Flow_1cbzh7c</bpmn:incoming>
+      <bpmn:incoming>Flow_1gnz16m</bpmn:incoming>
       <bpmn:outgoing>Flow_1wrgqdi</bpmn:outgoing>
       <bpmn:property id="Property_07s9moi" name="__targetRef_placeholder" />
       <bpmn:dataInputAssociation id="DataInputAssociation_09joyhi">
@@ -477,10 +370,6 @@ var cephObj = ['data':dataPayload, 'signature':systemSignature]
 execution.removeVariable('systemSignaturePayload')
 execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'application/json').toString())</bpmn:script>
     </bpmn:scriptTask>
-    <bpmn:boundaryEvent id="Event_1x8mg0g" attachedToRef="updateLabInDataFactoryActivity">
-      <bpmn:outgoing>Flow_1t8c6oe</bpmn:outgoing>
-      <bpmn:errorEventDefinition id="ErrorEventDefinition_0w47876" />
-    </bpmn:boundaryEvent>
     <bpmn:serviceTask id="Activity_00w3djy" name="Формування валідаційної помилки" camunda:modelerTemplate="userDataValidationErrorDelegate" camunda:delegateExpression="${userDataValidationErrorDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -495,16 +384,123 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
       <bpmn:incoming>Flow_08wtjup</bpmn:incoming>
       <bpmn:outgoing>Flow_1oda6vs</bpmn:outgoing>
     </bpmn:serviceTask>
+    <bpmn:serviceTask id="readLabFromDataFactoryActivity" name="Запит даних про лабораторію" camunda:modelerTemplate="dataFactoryConnectorReadDelegate" camunda:delegateExpression="${dataFactoryConnectorReadDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="resource">laboratory</camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token_task_definition_key">searchLabFormActivity</camunda:inputParameter>
+          <camunda:inputParameter name="id">${formData.value.prop('laboratoryId').value()}</camunda:inputParameter>
+          <camunda:outputParameter name="labResponse">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0c8mzmo</bpmn:incoming>
+      <bpmn:outgoing>Flow_1hwvmuc</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_0mpuhe1">
+        <bpmn:targetRef>DataStoreReference_1avq00l</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:dataStoreReference id="DataStoreReference_1avq00l" name="Дата фабрика" />
+    <bpmn:sequenceFlow id="Flow_0c8mzmo" sourceRef="readSearchLabFormFromCephActivity" targetRef="readLabFromDataFactoryActivity" />
+    <bpmn:serviceTask id="readKoatuuFromDataFactoryActivity" name="Запит даних про код області" camunda:modelerTemplate="dataFactoryConnectorReadDelegate" camunda:delegateExpression="${dataFactoryConnectorReadDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="resource">koatuu</camunda:inputParameter>
+          <camunda:inputParameter name="id">${labResponse.value.responseBody.prop('koatuuId').value()}</camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token_task_definition_key">searchLabFormActivity</camunda:inputParameter>
+          <camunda:outputParameter name="oblResponse">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1hwvmuc</bpmn:incoming>
+      <bpmn:outgoing>Flow_1xgp065</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_08fq6zc">
+        <bpmn:targetRef>DataStoreReference_1897i2u</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:dataStoreReference id="DataStoreReference_1897i2u" name="Дата фабрика" />
+    <bpmn:sequenceFlow id="Flow_1xgp065" sourceRef="readKoatuuFromDataFactoryActivity" targetRef="convertLabDataToFormDataFormatActivity" />
+    <bpmn:sequenceFlow id="Flow_1hwvmuc" sourceRef="readLabFromDataFactoryActivity" targetRef="readKoatuuFromDataFactoryActivity" />
+    <bpmn:boundaryEvent id="Event_15d2rb2" attachedToRef="readKoatuuFromDataFactoryActivity">
+      <bpmn:outgoing>Flow_0e9rgw0</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_0w26d67" />
+    </bpmn:boundaryEvent>
+    <bpmn:boundaryEvent id="Event_15jex7p" attachedToRef="readLabFromDataFactoryActivity">
+      <bpmn:outgoing>Flow_0rij4r5</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_059wq51" />
+    </bpmn:boundaryEvent>
+    <bpmn:serviceTask id="searchForLabByNameAndEdrpouActivity" name="Пошук даних про лабораторію" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="resource">laboratory-equal-edrpou-name-count</camunda:inputParameter>
+          <camunda:inputParameter name="searchConditions">
+            <camunda:map>
+              <camunda:entry key="name">${name.value}</camunda:entry>
+              <camunda:entry key="edrpou">${edrpou.value}</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token_task_definition_key">updateLabFormActivity</camunda:inputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_16st9e6</bpmn:incoming>
+      <bpmn:outgoing>Flow_11sdmag</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_11sdmag" sourceRef="searchForLabByNameAndEdrpouActivity" targetRef="Gateway_1qa6te9" />
+    <bpmn:serviceTask id="signFormDataWithDsoActivity" name="Підписати дані системним ключем" camunda:modelerTemplate="digitalSignatureConnectorDelegate" camunda:delegateExpression="${digitalSignatureConnectorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="x_access_token_task_definition_key">signLabFormActivity</camunda:inputParameter>
+          <camunda:inputParameter name="payload">${dataKeyPayload}</camunda:inputParameter>
+          <camunda:outputParameter name="systemSignatureResponse">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_17bwjm7</bpmn:incoming>
+      <bpmn:outgoing>Flow_1gnz16m</bpmn:outgoing>
+      <bpmn:property id="Property_13mrksa" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DataInputAssociation_18a65dn">
+        <bpmn:sourceRef>DataObjectReference_1burbk6</bpmn:sourceRef>
+        <bpmn:targetRef>Property_13mrksa</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_06bma82">
+        <bpmn:targetRef>DataStoreReference_0l4000z</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1gnz16m" sourceRef="signFormDataWithDsoActivity" targetRef="extractSignatureAndDataActivity" />
+    <bpmn:sequenceFlow id="Flow_17bwjm7" sourceRef="convertSignFormDataToDataFactoryFormatActivity" targetRef="signFormDataWithDsoActivity" />
+    <bpmn:serviceTask id="updateLabInDataFactoryActivity" name="Зберегти дані в Дата фабрику" camunda:modelerTemplate="dataFactoryConnectorUpdateDelegate" camunda:delegateExpression="${dataFactoryConnectorUpdateDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="resource">laboratory</camunda:inputParameter>
+          <camunda:inputParameter name="id">${laboratoryId}</camunda:inputParameter>
+          <camunda:inputParameter name="payload">${dataPayload}</camunda:inputParameter>
+          <camunda:inputParameter name="x_digital_signature_derived_ceph_key">${system_signature_ceph_key}</camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token_task_definition_key">signLabFormActivity</camunda:inputParameter>
+          <camunda:inputParameter name="x_digital_signature_task_definition_key">signLabFormActivity</camunda:inputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1qpbub1</bpmn:incoming>
+      <bpmn:outgoing>Flow_1gi368p</bpmn:outgoing>
+      <bpmn:property id="Property_1yhcr0r" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DataInputAssociation_13xox6h">
+        <bpmn:sourceRef>DataObjectReference_1burbk6</bpmn:sourceRef>
+        <bpmn:targetRef>Property_1yhcr0r</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_11hrn0l">
+        <bpmn:targetRef>DataStoreReference_0ftohld</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:boundaryEvent id="Event_1x8mg0g" attachedToRef="updateLabInDataFactoryActivity">
+      <bpmn:outgoing>Flow_1t8c6oe</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_0w47876" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_1gi368p" sourceRef="updateLabInDataFactoryActivity" targetRef="defineBusinessProcessStatusActivity" />
+    <bpmn:sequenceFlow id="Flow_1qpbub1" sourceRef="putSystemSignatureToCephActivity" targetRef="updateLabInDataFactoryActivity" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_076bpic">
       <bpmndi:BPMNShape id="Participant_16k8tsd_di" bpmnElement="Participant_16k8tsd" isHorizontal="true">
         <dc:Bounds x="160" y="80" width="4000" height="390" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_1cbzh7c_di" bpmnElement="Flow_1cbzh7c">
-        <di:waypoint x="3500" y="270" />
-        <di:waypoint x="3530" y="270" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1wrgqdi_di" bpmnElement="Flow_1wrgqdi">
         <di:waypoint x="3630" y="270" />
         <di:waypoint x="3660" y="270" />
@@ -526,7 +522,7 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
         <di:waypoint x="2355" y="270" />
         <di:waypoint x="2410" y="270" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="2375" y="252" width="16" height="14" />
+          <dc:Bounds x="2369" y="252" width="16" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0z4nbr8_di" bpmnElement="Flow_0z4nbr8">
@@ -557,17 +553,9 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
           <dc:Bounds x="2610" y="252" width="9" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1syjz24_di" bpmnElement="Flow_1syjz24">
-        <di:waypoint x="2510" y="270" />
-        <di:waypoint x="2555" y="270" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0hz7hdv_di" bpmnElement="Flow_0hz7hdv">
         <di:waypoint x="2260" y="270" />
         <di:waypoint x="2305" y="270" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1tic316_di" bpmnElement="Flow_1tic316">
-        <di:waypoint x="3890" y="270" />
-        <di:waypoint x="3930" y="270" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1t8c6oe_di" bpmnElement="Flow_1t8c6oe">
         <di:waypoint x="3840" y="212" />
@@ -615,10 +603,6 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
         <di:waypoint x="3210" y="270" />
         <di:waypoint x="3260" y="270" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1rlrmog_di" bpmnElement="Flow_1rlrmog">
-        <di:waypoint x="3360" y="270" />
-        <di:waypoint x="3400" y="270" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0tmmbv3_di" bpmnElement="Flow_0tmmbv3">
         <di:waypoint x="1820" y="270" />
         <di:waypoint x="1860" y="270" />
@@ -636,8 +620,8 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
         <di:waypoint x="2970" y="270" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0rij4r5_di" bpmnElement="Flow_0rij4r5">
-        <di:waypoint x="650" y="212" />
-        <di:waypoint x="650" y="190" />
+        <di:waypoint x="660" y="212" />
+        <di:waypoint x="660" y="190" />
         <di:waypoint x="300" y="190" />
         <di:waypoint x="300" y="245" />
       </bpmndi:BPMNEdge>
@@ -645,27 +629,43 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
         <di:waypoint x="990" y="270" />
         <di:waypoint x="1030" y="270" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1auh68h_di" bpmnElement="Flow_1auh68h">
-        <di:waypoint x="850" y="270" />
-        <di:waypoint x="890" y="270" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0e9rgw0_di" bpmnElement="Flow_0e9rgw0">
         <di:waypoint x="800" y="212" />
         <di:waypoint x="800" y="190" />
         <di:waypoint x="300" y="190" />
         <di:waypoint x="300" y="245" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_05b47qy_di" bpmnElement="Flow_05b47qy">
+      <bpmndi:BPMNEdge id="Flow_0c8mzmo_di" bpmnElement="Flow_0c8mzmo">
+        <di:waypoint x="570" y="270" />
+        <di:waypoint x="610" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1xgp065_di" bpmnElement="Flow_1xgp065">
+        <di:waypoint x="850" y="270" />
+        <di:waypoint x="890" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1hwvmuc_di" bpmnElement="Flow_1hwvmuc">
+        <di:waypoint x="710" y="270" />
+        <di:waypoint x="750" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11sdmag_di" bpmnElement="Flow_11sdmag">
+        <di:waypoint x="2510" y="270" />
+        <di:waypoint x="2555" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1gnz16m_di" bpmnElement="Flow_1gnz16m">
+        <di:waypoint x="3500" y="270" />
+        <di:waypoint x="3530" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17bwjm7_di" bpmnElement="Flow_17bwjm7">
+        <di:waypoint x="3360" y="270" />
+        <di:waypoint x="3400" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1gi368p_di" bpmnElement="Flow_1gi368p">
+        <di:waypoint x="3890" y="270" />
+        <di:waypoint x="3930" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1qpbub1_di" bpmnElement="Flow_1qpbub1">
         <di:waypoint x="3760" y="270" />
         <di:waypoint x="3790" y="270" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0pi7b3c_di" bpmnElement="Flow_0pi7b3c">
-        <di:waypoint x="570" y="270" />
-        <di:waypoint x="600" y="270" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0hve2wf_di" bpmnElement="Flow_0hve2wf">
-        <di:waypoint x="700" y="270" />
-        <di:waypoint x="750" y="270" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_0uo8361_di" bpmnElement="readSearchLabFormFromCephActivity">
         <dc:Bounds x="470" y="230" width="100" height="80" />
@@ -688,15 +688,6 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
           <dc:Bounds x="507" y="422" width="27" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1f4x8ec_di" bpmnElement="readLabFromDataFactoryActivity">
-        <dc:Bounds x="600" y="230" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="DataStoreReference_1avq00l_di" bpmnElement="DataStoreReference_1avq00l">
-        <dc:Bounds x="625" y="365" width="50" height="50" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="614" y="422" width="72" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1cbmv5p_di" bpmnElement="prepopulateViewLabDataFormActivity">
         <dc:Bounds x="1030" y="230" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -712,9 +703,6 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
       <bpmndi:BPMNShape id="Activity_1kcv02r_di" bpmnElement="convertLabDataToFormDataFormatActivity">
         <dc:Bounds x="890" y="230" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0su240n_di" bpmnElement="readKoatuuFromDataFactoryActivity">
-        <dc:Bounds x="750" y="230" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="DataStoreReference_1kgthb4_di" bpmnElement="DataStoreReference_1kgthb4">
         <dc:Bounds x="1355" y="365" width="50" height="50" />
         <bpmndi:BPMNLabel>
@@ -729,12 +717,6 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="DataObjectReference_0v906yu_di" bpmnElement="DataObjectReference_0v906yu">
         <dc:Bounds x="922" y="365" width="36" height="50" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="DataStoreReference_1897i2u_di" bpmnElement="DataStoreReference_1897i2u">
-        <dc:Bounds x="795" y="365" width="50" height="50" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="784" y="422" width="72" height="14" />
-        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1n8mv84_di" bpmnElement="updateLabFormActivity">
         <dc:Bounds x="1720" y="230" width="100" height="80" />
@@ -763,9 +745,6 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
       <bpmndi:BPMNShape id="Activity_1y0jsm4_di" bpmnElement="Activity_07nscgh">
         <dc:Bounds x="1860" y="230" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_10mghn8_di" bpmnElement="searchForLabByNameAndEdrpouActivity">
-        <dc:Bounds x="2410" y="230" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_038bgls_di" bpmnElement="Gateway_038bgls" isMarkerVisible="true">
         <dc:Bounds x="2305" y="245" width="50" height="50" />
         <bpmndi:BPMNLabel>
@@ -793,9 +772,6 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
       <bpmndi:BPMNShape id="Gateway_08hp357_di" bpmnElement="Gateway_1m8e5ns" isMarkerVisible="true">
         <dc:Bounds x="2875" y="245" width="50" height="50" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0ub24sx_di" bpmnElement="updateLabInDataFactoryActivity">
-        <dc:Bounds x="3790" y="230" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0ze90pn_di" bpmnElement="defineBusinessProcessStatusActivity">
         <dc:Bounds x="3930" y="230" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -804,9 +780,6 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
         <bpmndi:BPMNLabel>
           <dc:Bounds x="4076" y="295" width="70" height="14" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0owslgv_di" bpmnElement="signFormDataWithDsoActivity">
-        <dc:Bounds x="3400" y="230" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0j8eq6m_di" bpmnElement="putSystemSignatureToCephActivity">
         <dc:Bounds x="3660" y="230" width="100" height="80" />
@@ -856,11 +829,38 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
       <bpmndi:BPMNShape id="Activity_0nmo4bv_di" bpmnElement="Activity_00w3djy">
         <dc:Bounds x="2410" y="120" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0rj1y5c_di" bpmnElement="Event_15jex7p">
-        <dc:Bounds x="632" y="212" width="36" height="36" />
+      <bpmndi:BPMNShape id="Activity_0x9qe46_di" bpmnElement="readLabFromDataFactoryActivity">
+        <dc:Bounds x="610" y="230" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataStoreReference_1avq00l_di" bpmnElement="DataStoreReference_1avq00l">
+        <dc:Bounds x="635" y="365" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="624" y="422" width="72" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0h31bdp_di" bpmnElement="readKoatuuFromDataFactoryActivity">
+        <dc:Bounds x="750" y="230" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataStoreReference_1897i2u_di" bpmnElement="DataStoreReference_1897i2u">
+        <dc:Bounds x="775" y="365" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="764" y="422" width="72" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0nyix8c_di" bpmnElement="searchForLabByNameAndEdrpouActivity">
+        <dc:Bounds x="2410" y="230" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0htgdm6_di" bpmnElement="signFormDataWithDsoActivity">
+        <dc:Bounds x="3400" y="230" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1932ou8_di" bpmnElement="updateLabInDataFactoryActivity">
+        <dc:Bounds x="3790" y="230" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_14h51ij_di" bpmnElement="Event_15d2rb2">
         <dc:Bounds x="782" y="212" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0rj1y5c_di" bpmnElement="Event_15jex7p">
+        <dc:Bounds x="642" y="212" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_14m2vl5_di" bpmnElement="Event_1x8mg0g">
         <dc:Bounds x="3822" y="212" width="36" height="36" />
@@ -873,10 +873,6 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
         <di:waypoint x="400" y="310" />
         <di:waypoint x="400" y="395" />
         <di:waypoint x="495" y="395" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="DataOutputAssociation_0yrre6m_di" bpmnElement="DataOutputAssociation_0yrre6m">
-        <di:waypoint x="650" y="310" />
-        <di:waypoint x="650" y="365" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="DataInputAssociation_03l89g0_di" bpmnElement="DataInputAssociation_03l89g0">
         <di:waypoint x="958" y="390" />
@@ -909,10 +905,6 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
       <bpmndi:BPMNEdge id="DataOutputAssociation_05obhyx_di" bpmnElement="DataOutputAssociation_05obhyx">
         <di:waypoint x="941" y="310" />
         <di:waypoint x="942" y="365" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="DataOutputAssociation_01if104_di" bpmnElement="DataOutputAssociation_01if104">
-        <di:waypoint x="820" y="310" />
-        <di:waypoint x="820" y="365" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="DataInputAssociation_1koql6t_di" bpmnElement="DataInputAssociation_1koql6t">
         <di:waypoint x="1750" y="365" />
@@ -949,25 +941,6 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
         <di:waypoint x="3309" y="310" />
         <di:waypoint x="3308" y="405" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="DataInputAssociation_0hb4jz5_di" bpmnElement="DataInputAssociation_0hb4jz5">
-        <di:waypoint x="3328" y="440" />
-        <di:waypoint x="3810" y="440" />
-        <di:waypoint x="3810" y="310" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="DataOutputAssociation_17cxr0k_di" bpmnElement="DataOutputAssociation_17cxr0k">
-        <di:waypoint x="3870" y="310" />
-        <di:waypoint x="3870" y="365" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="DataInputAssociation_0pjm8q0_di" bpmnElement="DataInputAssociation_0pjm8q0">
-        <di:waypoint x="3330" y="430" />
-        <di:waypoint x="3330" y="430" />
-        <di:waypoint x="3410" y="430" />
-        <di:waypoint x="3410" y="310" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="DataOutputAssociation_0fb4ndy_di" bpmnElement="DataOutputAssociation_0fb4ndy">
-        <di:waypoint x="3450" y="310" />
-        <di:waypoint x="3450" y="365" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="DataInputAssociation_1bmszqy_di" bpmnElement="DataInputAssociation_1bmszqy">
         <di:waypoint x="3598" y="390" />
         <di:waypoint x="3670" y="390" />
@@ -985,6 +958,32 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
       <bpmndi:BPMNEdge id="DataOutputAssociation_184cnbn_di" bpmnElement="DataOutputAssociation_184cnbn">
         <di:waypoint x="3581" y="310" />
         <di:waypoint x="3582" y="365" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_0mpuhe1_di" bpmnElement="DataOutputAssociation_0mpuhe1">
+        <di:waypoint x="660" y="310" />
+        <di:waypoint x="660" y="365" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_08fq6zc_di" bpmnElement="DataOutputAssociation_08fq6zc">
+        <di:waypoint x="800" y="310" />
+        <di:waypoint x="800" y="365" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_06bma82_di" bpmnElement="DataOutputAssociation_06bma82">
+        <di:waypoint x="3450" y="310" />
+        <di:waypoint x="3450" y="365" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataInputAssociation_18a65dn_di" bpmnElement="DataInputAssociation_18a65dn">
+        <di:waypoint x="3328" y="430" />
+        <di:waypoint x="3410" y="430" />
+        <di:waypoint x="3410" y="310" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_11hrn0l_di" bpmnElement="DataOutputAssociation_11hrn0l">
+        <di:waypoint x="3875" y="310" />
+        <di:waypoint x="3875" y="365" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataInputAssociation_13xox6h_di" bpmnElement="DataInputAssociation_13xox6h">
+        <di:waypoint x="3328" y="440" />
+        <di:waypoint x="3820" y="440" />
+        <di:waypoint x="3820" y="310" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

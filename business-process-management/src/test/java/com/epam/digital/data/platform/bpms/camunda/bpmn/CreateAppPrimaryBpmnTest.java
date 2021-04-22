@@ -182,7 +182,7 @@ public class CreateAppPrimaryBpmnTest extends BaseBpmnTest {
     Assertions.assertThat(signatureMap).isEqualTo(expectedSignatureMap);
 
     assertThat(processInstance).isEnded();
-    assertThat(processInstance).variables().hasSize(22).containsAllEntriesOf(expectedVariablesMap);
+    assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
     assertCephContent();
 
     mockServer.verify();
@@ -352,7 +352,7 @@ public class CreateAppPrimaryBpmnTest extends BaseBpmnTest {
     Assertions.assertThat(signatureMap).isEqualTo(expectedSignatureMap);
 
     assertThat(processInstance).isEnded();
-    assertThat(processInstance).variables().hasSize(22).containsAllEntriesOf(expectedVariablesMap);
+    assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
     assertCephContent();
 
     mockServer.verify();

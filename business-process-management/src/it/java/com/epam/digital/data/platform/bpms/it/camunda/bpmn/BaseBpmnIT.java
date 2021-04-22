@@ -11,6 +11,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
 
+import com.epam.digital.data.platform.bpms.delegate.ceph.CephKeyProvider;
 import com.epam.digital.data.platform.bpms.it.BaseIT;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
 import com.epam.digital.data.platform.bpms.it.util.TestUtils;
@@ -25,7 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
-import org.assertj.core.util.Maps;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -48,6 +48,8 @@ public abstract class BaseBpmnIT extends BaseIT {
 
   @Inject
   protected ObjectMapper objectMapper;
+  @Inject
+  protected CephKeyProvider cephKeyProvider;
 
   protected final Map<String, Object> expectedVariablesMap = new HashMap<>();
   private final Map<String, Object> expectedCephStorage = new HashMap<>();
@@ -65,11 +67,10 @@ public abstract class BaseBpmnIT extends BaseIT {
 
   protected void completeTask(String taskId, String processInstanceId, String formData)
       throws IOException {
-    var variableName = String.format(TestUtils.VARIABLE_NAME, taskId);
-    var variableValue = String.format(TestUtils.VARIABLE_VALUE, processInstanceId, variableName);
-    formDataCephService.putFormData(variableValue, deserializeFormData(TestUtils.getContent(formData)));
+    var cephKey = cephKeyProvider.generateKey(taskId, processInstanceId);
+    formDataCephService.putFormData(cephKey, deserializeFormData(TestUtils.getContent(formData)));
     String id = taskService.createTaskQuery().taskDefinitionKey(taskId).singleResult().getId();
-    taskService.complete(id, Maps.newHashMap(variableName, variableValue));
+    taskService.complete(id);
   }
 
   protected void stubDataFactorySearch(StubData data) throws IOException {
@@ -156,10 +157,8 @@ public abstract class BaseBpmnIT extends BaseIT {
 
   protected void addExpectedCephContent(String processInstanceId, String taskDefinitionKey,
       String cephContent) throws IOException {
-    var refVarName = TestUtils.formDataVariableName(taskDefinitionKey);
-    var cephKey = TestUtils.formDataVariableValue(processInstanceId, refVarName);
+    var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, processInstanceId);
 
-    expectedVariablesMap.put(refVarName, cephKey);
     expectedCephStorage.put(cephKey, deserializeFormData(TestUtils.getContent(cephContent)));
   }
 

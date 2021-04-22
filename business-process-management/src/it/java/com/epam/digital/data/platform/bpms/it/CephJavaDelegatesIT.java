@@ -107,9 +107,7 @@ public class CephJavaDelegatesIT extends BaseIT {
 
     var expectedCephKey = "lowcode-" + processInstance.getProcessInstanceId()
         + "-secure-sys-var-ref-task-form-data-userTask";
-    assertThat(resultVariables)
-        .containsEntry("secure-sys-var-ref-task-form-data-userTask", expectedCephKey)
-        .doesNotContainKey("formDataOutput");
+    assertThat(resultVariables).doesNotContainKey("formDataOutput");
 
     var data = formDataCephService.getFormData(expectedCephKey);
     assertThat(data).isNotNull();

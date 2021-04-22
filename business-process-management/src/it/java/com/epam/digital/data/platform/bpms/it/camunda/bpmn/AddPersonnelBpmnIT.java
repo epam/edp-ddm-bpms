@@ -120,7 +120,7 @@ public class AddPersonnelBpmnIT extends BaseBpmnIT {
     Assertions.assertThat(signatureMap).isEqualTo(expectedSignatureMap);
 
     assertThat(processInstance).isEnded();
-    assertThat(processInstance).variables().hasSize(15).containsAllEntriesOf(expectedVariablesMap);
+    assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
     assertCephContent();
   }
 }

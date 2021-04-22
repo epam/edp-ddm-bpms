@@ -1,6 +1,5 @@
 package com.epam.digital.data.platform.bpms.delegate.ceph;
 
-import com.epam.digital.data.platform.bpms.delegate.constants.CamundaDelegateConstants;
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.epam.digital.data.platform.integration.ceph.service.FormDataCephService;
 import com.epam.digital.data.platform.starter.logger.annotation.Logging;
@@ -26,20 +25,17 @@ public class PutFormDataToCephDelegate implements JavaDelegate {
 
   private final FormDataCephService cephService;
   private final ObjectMapper objectMapper;
+  private final CephKeyProvider cephKeyProvider;
 
   @Override
   public void execute(DelegateExecution delegateExecution) {
     var taskDefinitionKey = (String) delegateExecution.getVariable("taskDefinitionKey");
-    var taskFormDataVariableName = String.format(
-        CamundaDelegateConstants.TASK_FORM_DATA_STRING_FORMAT, taskDefinitionKey);
-
     var processInstanceId = delegateExecution.getProcessInstanceId();
-    var cephKey = String.format(CamundaDelegateConstants.TASK_FORM_DATA_VALUE_FORMAT,
-        processInstanceId, taskFormDataVariableName);
+
+    var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, processInstanceId);
     var formData = (SpinJsonNode) delegateExecution.getVariable("formData");
 
     cephService.putFormData(cephKey, toFormDataDto(formData));
-    delegateExecution.setVariable(taskFormDataVariableName, cephKey);
   }
 
   /**
