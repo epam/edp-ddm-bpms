@@ -2,20 +2,20 @@
 
 == Ієрархія клієнтів
 
-Feign клієнти використовуются для простого доступу до ендпоітів камунди -
+Feign клієнти використовуются для простого доступу до ендпоінтів камунди -
 https://docs.camunda.org/manual/latest/reference/rest/[Camunda REST API]
 
 [plantuml,feign-client,svg]
 ----
 @startuml
-class BaseFeignClient  #back:lightblue;line:green;text:black
-class CamundaTaskRestClient #back:lightblue;line:green;text:black
-class HistoryTaskRestClient  #back:lightblue;line:green;text:black extends BaseFeignClient
-class HistoryVariableInstanceClient  #back:lightblue;line:green;text:black extends BaseFeignClient
-class ProcessInstanceHistoryRestClient  #back:lightblue;line:green;text:black extends BaseFeignClient
-class ProcessDefinitionRestClient  #back:lightblue;line:green;text:black extends BaseFeignClient
-class ProcessInstanceRestClient  #back:lightblue;line:green;text:black extends BaseFeignClient
-class TaskPropertyRestClient  #back:lightblue;line:green;text:black
+interface BaseFeignClient  #back:lightblue;line:green;text:black
+interface CamundaTaskRestClient #back:lightblue;line:green;text:black
+interface HistoryTaskRestClient  #back:lightblue;line:green;text:black extends BaseFeignClient
+interface HistoryVariableInstanceClient  #back:lightblue;line:green;text:black extends BaseFeignClient
+interface ProcessInstanceHistoryRestClient  #back:lightblue;line:green;text:black extends BaseFeignClient
+interface ProcessDefinitionRestClient  #back:lightblue;line:green;text:black extends BaseFeignClient
+interface ProcessInstanceRestClient  #back:lightblue;line:green;text:black extends BaseFeignClient
+interface TaskPropertyRestClient  #back:lightblue;line:green;text:black
 
 CamundaTaskRestClient -|> BaseFeignClient
 BaseFeignClient <|- TaskPropertyRestClient
