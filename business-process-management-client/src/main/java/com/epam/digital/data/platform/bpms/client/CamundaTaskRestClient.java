@@ -1,5 +1,6 @@
 package com.epam.digital.data.platform.bpms.client;
 
+import com.epam.digital.data.platform.bpms.api.dto.ClaimTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.TaskQueryDto;
 import com.epam.digital.data.platform.bpms.client.exception.ClientValidationException;
 import com.epam.digital.data.platform.bpms.client.exception.TaskNotFoundException;
@@ -69,4 +70,8 @@ public interface CamundaTaskRestClient extends BaseFeignClient {
   })
   Map<String, VariableValueDto> completeTaskById(@PathVariable("id") String taskId,
       @RequestBody CompleteTaskDto completeTaskDto);
+
+  @PostMapping("/{id}/claim")
+  @ErrorHandling
+  void claimTaskById(@PathVariable("id") String taskId, @RequestBody ClaimTaskDto claimTaskDto);
 }

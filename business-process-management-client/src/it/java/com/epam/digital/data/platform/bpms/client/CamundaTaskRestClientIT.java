@@ -8,9 +8,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static com.github.tomakehurst.wiremock.matching.RequestPatternBuilder.newRequestPattern;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 
+import com.epam.digital.data.platform.bpms.api.dto.ClaimTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.TaskQueryDto;
 import com.epam.digital.data.platform.bpms.client.exception.AuthorizationException;
 import com.epam.digital.data.platform.bpms.client.exception.TaskNotFoundException;
@@ -20,6 +22,8 @@ import com.epam.digital.data.platform.starter.errorhandling.dto.SystemErrorDto;
 import com.epam.digital.data.platform.starter.errorhandling.dto.ValidationErrorDto;
 import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.tomakehurst.wiremock.http.RequestMethod;
+import com.github.tomakehurst.wiremock.matching.UrlPathPattern;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -253,7 +257,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
     String expectedBody = "{\"orQueries\":[{\"assignee\": \"testuser\",\"unassigned\": true}]}";
 
     var requestDto = TaskQueryDto.builder()
-        .orQueries(Lists.newArrayList(TaskQueryDto.builder()
+        .orQueries(List.of(TaskQueryDto.builder()
             .assignee("testuser")
             .unassigned(true)
             .build()))
@@ -267,13 +271,23 @@ public class CamundaTaskRestClientIT extends BaseIT {
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(200)
-                .withBody((objectMapper.writeValueAsString(Lists.newArrayList(TaskDto.fromEntity(task)))))
-        )
-    ));
+                .withBody((objectMapper.writeValueAsString(List.of(TaskDto.fromEntity(task))))))));
 
     List<TaskDto> tasks = camundaTaskRestClient.getTasksByParams(requestDto);
 
     assertThat(tasks).isNotEmpty();
     assertThat(tasks.get(0).getId()).isEqualTo("testId");
+  }
+
+  @Test
+  public void shouldClaimTaskByIdSuccessfulWhenHttpStatus204() throws JsonProcessingException {
+    var claimTaskDto = ClaimTaskDto.builder().userId("userId").build();
+    var stubMapping = stubFor(post(urlEqualTo("/api/task/testId204/claim"))
+        .withRequestBody(equalTo(objectMapper.writeValueAsString(claimTaskDto)))
+        .willReturn(aResponse().withStatus(204)));
+    restClientWireMock.addStubMapping(stubMapping);
+    camundaTaskRestClient.claimTaskById("testId204", claimTaskDto);
+    restClientWireMock.verify(newRequestPattern(RequestMethod.POST,
+        new UrlPathPattern(equalTo("/api/task/testId204/claim"), false)));
   }
 }
