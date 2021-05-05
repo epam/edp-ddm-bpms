@@ -103,6 +103,12 @@
       <version>${ddm-starter-security.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>29.0-jre</version>
+    </dependency>
+
     <!--Camunda dependencies-->
     <dependency>
       <groupId>org.camunda.bpm.springboot</groupId>

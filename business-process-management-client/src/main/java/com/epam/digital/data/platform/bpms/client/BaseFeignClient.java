@@ -4,6 +4,7 @@ import com.epam.digital.data.platform.bpms.client.exception.AuthenticationExcept
 import com.epam.digital.data.platform.bpms.client.exception.AuthorizationException;
 import com.epam.digital.data.platform.bpms.client.exception.BadRequestException;
 import com.epam.digital.data.platform.bpms.client.exception.CamundaCommunicationException;
+import com.epam.digital.data.platform.bpms.client.exception.ConflictException;
 import com.epam.digital.data.platform.bpms.client.exception.InternalServerErrorException;
 import com.epam.digital.data.platform.bpms.client.exception.NotFoundException;
 import feign.error.ErrorCodes;
@@ -18,6 +19,7 @@ import feign.error.ErrorHandling;
     @ErrorCodes(codes = {401}, generate = AuthenticationException.class),
     @ErrorCodes(codes = {403}, generate = AuthorizationException.class),
     @ErrorCodes(codes = {404}, generate = NotFoundException.class),
+    @ErrorCodes(codes = {409}, generate = ConflictException.class),
     @ErrorCodes(codes = {500}, generate = InternalServerErrorException.class),
     @ErrorCodes(codes = {502, 503, 504}, generate = CamundaCommunicationException.class)
 })
