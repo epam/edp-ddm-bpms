@@ -1,21 +1,31 @@
 package com.epam.digital.data.platform.bpms.it;
 
+import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
+
 import com.epam.digital.data.platform.bpms.delegate.ceph.CephKeyProvider;
 import com.epam.digital.data.platform.bpms.it.config.TestCephServiceImpl;
 import com.epam.digital.data.platform.bpms.it.config.TestFormDataCephServiceImpl;
+import com.epam.digital.data.platform.starter.security.SystemRole;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.ByteStreams;
 import java.io.IOException;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
+import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.glassfish.jersey.client.JerseyClientBuilder;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,6 +33,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.CollectionUtils;
 
 @ActiveProfiles("test")
 @RunWith(SpringRunner.class)
@@ -47,6 +58,8 @@ public abstract class BaseIT {
   protected TestFormDataCephServiceImpl formDataCephService;
   @Inject
   protected CephKeyProvider cephKeyProvider;
+  @Inject
+  private AuthorizationService authorizationService;
 
   @LocalServerPort
   protected int port;
@@ -58,6 +71,11 @@ public abstract class BaseIT {
   public static void setup() throws IOException {
     validAccessToken = new String(ByteStreams
         .toByteArray(BaseIT.class.getResourceAsStream("/json/testuserAccessToken.json")));
+  }
+
+  @Before
+  public void setAuthorization() {
+    Stream.of(SystemRole.getRoleNames()).forEach(this::createAuthorizationsIfNotExists);
   }
 
   protected <T> T getForObject(String url, Class<T> targetClass) throws IOException {
@@ -87,5 +105,25 @@ public abstract class BaseIT {
         .post(Entity.entity(body, MediaType.APPLICATION_JSON))
         .readEntity(String.class);
     return objectMapper.readValue(jsonResponse, targetClass);
+  }
+
+  private void createAuthorizationsIfNotExists(String groupId) {
+    if (CollectionUtils.isEmpty(authorizationService.createAuthorizationQuery().groupIdIn(groupId).list())) {
+      createAuthorization(Resources.PROCESS_DEFINITION,
+          new Permission[]{ProcessDefinitionPermissions.CREATE_INSTANCE,
+              ProcessDefinitionPermissions.READ}, groupId);
+      createAuthorization(Resources.PROCESS_INSTANCE, new Permission[]{Permissions.CREATE},
+          groupId);
+    }
+  }
+
+  private void createAuthorization(Resources resources, Permission[] permissions, String groupId) {
+    var authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    authorization.setResource(resources);
+    authorization.setResourceId("*");
+    authorization.setPermissions(permissions);
+    authorization.setUserId(null);
+    authorization.setGroupId(groupId);
+    authorizationService.saveAuthorization(authorization);
   }
 }
