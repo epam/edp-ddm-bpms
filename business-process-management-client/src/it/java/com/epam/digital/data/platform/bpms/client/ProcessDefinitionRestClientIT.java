@@ -10,8 +10,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 
-import com.epam.digital.data.platform.bpms.api.dto.enums.SortOrder;
 import com.epam.digital.data.platform.bpms.api.dto.ProcessDefinitionQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.enums.SortOrder;
 import com.epam.digital.data.platform.bpms.client.exception.ProcessDefinitionNotFoundException;
 import com.epam.digital.data.platform.starter.errorhandling.dto.SystemErrorDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
+import org.camunda.bpm.engine.rest.dto.task.FormDto;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -160,5 +161,23 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
 
     assertThat(processDefinitions.size()).isOne();
     assertThat(processDefinitions.get(0).getId()).isEqualTo("testId");
+  }
+
+  @Test
+  public void shouldReturnStartForm() throws JsonProcessingException {
+    var formDto = new FormDto();
+    formDto.setKey("testStartFormKey");
+    restClientWireMock.addStubMapping(
+        stubFor(get(urlPathEqualTo("/api/process-definition/testId/startForm"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withStatus(200)
+                .withBody(objectMapper.writeValueAsString(formDto)))
+        )
+    );
+
+    var result = processDefinitionRestClient.getStartForm("testId");
+
+    assertThat(result.getKey()).isEqualTo(formDto.getKey());
   }
 }

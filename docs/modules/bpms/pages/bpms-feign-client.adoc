@@ -16,6 +16,7 @@ interface ProcessInstanceHistoryRestClient  #back:lightblue;line:green;text:blac
 interface ProcessDefinitionRestClient  #back:lightblue;line:green;text:black extends BaseFeignClient
 interface ProcessInstanceRestClient  #back:lightblue;line:green;text:black extends BaseFeignClient
 interface TaskPropertyRestClient  #back:lightblue;line:green;text:black
+interface StartFormRestClient #back:lightblue;line:green;text:black extends BaseFeignClient
 
 CamundaTaskRestClient -|> BaseFeignClient
 BaseFeignClient <|- TaskPropertyRestClient
@@ -32,6 +33,7 @@ HistoryTaskRestClient  --[hidden]> HistoryVariableInstanceClient
 - `ProcessInstanceHistoryRestClient` - клієнт який надає доступ до ресурсу `/api/history/process-instance` (історія про виконані екземпляри бізнес-процесу)
 - `ProcessInstanceRestClient` - клієнт який надає доступ до ресурсу `/api/process-instance` (екземпляри бізнес-процесу)
 - `TaskPropertyRestClient` - клієнт який надає доступ до ресурсу `/api/extended/task` (розширені властивості задач користувача)
+- `StartFormRestClient` - клієнт який надає доступ до ресурсу `/api/extended/start-form` (стартові форми бізнес-процесів)
 
 == Декодинг помилок
 

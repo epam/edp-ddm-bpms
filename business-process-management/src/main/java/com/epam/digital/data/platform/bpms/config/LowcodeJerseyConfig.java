@@ -1,5 +1,6 @@
 package com.epam.digital.data.platform.bpms.config;
 
+import com.epam.digital.data.platform.bpms.controller.StartFormController;
 import com.epam.digital.data.platform.bpms.controller.TaskPropertyController;
 import com.epam.digital.data.platform.bpms.exception.mapper.CamundaRestExceptionMapper;
 import com.epam.digital.data.platform.bpms.exception.mapper.CamundaSystemExceptionMapper;
@@ -18,6 +19,7 @@ public class LowcodeJerseyConfig extends CamundaJerseyResourceConfig {
   @Override
   protected void registerAdditionalResources() {
     register(TaskPropertyController.class);
+    register(StartFormController.class);
 
     register(UserDataValidationExceptionMapper.class);
     register(CamundaSystemExceptionMapper.class);

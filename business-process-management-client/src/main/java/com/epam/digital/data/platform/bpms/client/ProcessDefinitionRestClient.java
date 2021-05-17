@@ -9,6 +9,7 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
+import org.camunda.bpm.engine.rest.dto.task.FormDto;
 import org.springframework.cloud.openfeign.CollectionFormat;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
@@ -71,4 +72,8 @@ public interface ProcessDefinitionRestClient extends BaseFeignClient {
   @ErrorHandling
   ProcessInstanceDto startProcessInstance(@PathVariable("id") String id,
       @RequestBody StartProcessInstanceDto startProcessInstanceDto);
+
+  @GetMapping("/{id}/startForm")
+  @ErrorHandling
+  FormDto getStartForm(@PathVariable("id") String id);
 }

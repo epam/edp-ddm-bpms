@@ -12,13 +12,6 @@ import org.springframework.context.annotation.Configuration;
 public class WireMockConfig {
 
   @Bean(destroyMethod = "stop")
-  @Qualifier("cephWireMockServer")
-  public WireMockServer restClientWireMock(@Value("${ceph.http-endpoint}") String urlStr)
-      throws MalformedURLException {
-    return WireMockUtil.createAndStartMockServerForUrl(urlStr);
-  }
-
-  @Bean(destroyMethod = "stop")
   @Qualifier("dataFactoryMockServer")
   public WireMockServer dataFactoryWireMock(
       @Value("${camunda.system-variables.const_dataFactoryBaseUrl}") String urlStr)

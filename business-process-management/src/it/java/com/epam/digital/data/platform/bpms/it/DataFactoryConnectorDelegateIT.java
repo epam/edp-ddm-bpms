@@ -24,23 +24,15 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 
 public class DataFactoryConnectorDelegateIT extends BaseIT {
 
-  private static final String CONTENT = "{\"x-access-token\":\"token\"}";
-
-  @Inject
-  @Qualifier("cephWireMockServer")
-  private WireMockServer cephWireMockServer;
   @Inject
   @Qualifier("dataFactoryMockServer")
   private WireMockServer dataFactoryMockServer;
   @Inject
   @Qualifier("digitalSignatureMockServer")
   private WireMockServer digitalSignatureMockServer;
-  @Value("${ceph.bucket}")
-  private String cephBucketName;
 
   @Test
   @Deployment(resources = {"bpmn/connector/testDataFactoryConnectorReadDelegate.bpmn"})
@@ -155,14 +147,6 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
   @Test
   @Deployment(resources = {"bpmn/connector/testDataFactoryConnectorUpdateDelegate.bpmn"})
   public void testDataFactoryConnectorUpdateDelegate() {
-    cephWireMockServer.addStubMapping(
-        stubFor(get(urlPathEqualTo("/")).willReturn(
-            aResponse()
-                .withStatus(200)
-                .withBody("<?xml version=\"1.0\" encoding=\"UTF-8\"?><ListAllMyBucketsResult>"
-                    + "<Buckets><Bucket><Name>" + cephBucketName + "</Name></Bucket></Buckets>"
-                    + "</ListAllMyBucketsResult>"))));
-
     formDataCephService.putFormData("cephKey", FormDataDto.builder()
         .accessToken("token").build());
 

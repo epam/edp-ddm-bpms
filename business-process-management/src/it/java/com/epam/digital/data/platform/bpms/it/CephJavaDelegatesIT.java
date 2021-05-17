@@ -1,58 +1,34 @@
 package com.epam.digital.data.platform.bpms.it;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.put;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+import com.epam.digital.data.platform.bpms.api.constant.Constants;
+import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.epam.digital.data.platform.integration.ceph.exception.MisconfigurationException;
-import com.github.tomakehurst.wiremock.WireMockServer;
 import com.google.common.collect.ImmutableMap;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import javax.inject.Inject;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.spin.Spin;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 
 public class CephJavaDelegatesIT extends BaseIT {
 
-  @Inject
-  @Qualifier("cephWireMockServer")
-  private WireMockServer cephWireMockServer;
   @Value("${ceph.bucket}")
   private String cephBucketName;
 
   @Before
-  public void init() {
-    cephWireMockServer.addStubMapping(
-        stubFor(put(urlPathEqualTo("/" + cephBucketName + "/testKey"))
-            .willReturn(aResponse()
-                .withStatus(200))));
-    cephWireMockServer.addStubMapping(
-        stubFor(get(urlPathEqualTo("/" + cephBucketName + "/testKey"))
-            .willReturn(aResponse()
-                .withStatus(200)
-                .withHeader("Content-Length", "36")
-                .withBody("{ \"var1\":\"value1\", \"var2\":\"value2\" }"))));
-  }
-
-  @After
-  public void tearDown() {
-    cephWireMockServer.resetRequests();
+  public void setUp() {
     cephService.setCephBucketName(cephBucketName);
   }
 
@@ -128,5 +104,22 @@ public class CephJavaDelegatesIT extends BaseIT {
         .collect(toMap(HistoricVariableInstance::getName, HistoricVariableInstance::getValue,
             (o1, o2) -> o1));
     assertThat(resultVariables).containsEntry("sys-var-process-completion-result", status);
+  }
+
+  @Test
+  @Deployment(resources = {"bpmn/testStartFormKey.bpmn"})
+  public void shouldReadStartFormData() {
+    Map<String, Object> vars = ImmutableMap.of(
+        Constants.BPMS_START_FORM_CEPH_KEY_VARIABLE_NAME, "cephKey");
+
+    var data = new LinkedHashMap<String, Object>();
+    data.put("prop1", "value1");
+
+    formDataCephService.putFormData("cephKey", FormDataDto.builder().data(data).build());
+
+    var processInstance = runtimeService
+        .startProcessInstanceByKey("testStartFormKey", "key", vars);
+
+    assertTrue(processInstance.isEnded());
   }
 }
