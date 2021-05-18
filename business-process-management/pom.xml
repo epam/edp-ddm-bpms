@@ -132,7 +132,7 @@
     </dependency>
     <dependency>
       <groupId>com.epam.digital.data.platform</groupId>
-      <artifactId>platform-ceph-client</artifactId>
+      <artifactId>ddm-ceph-client</artifactId>
       <version>${ddm-ceph-client.version}</version>
     </dependency>
 
