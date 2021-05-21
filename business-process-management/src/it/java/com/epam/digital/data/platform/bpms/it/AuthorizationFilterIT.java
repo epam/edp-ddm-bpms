@@ -91,14 +91,16 @@ public class AuthorizationFilterIT extends BaseIT {
     ProcessDefinitionDto processDefinition = Stream.of(processDefinitionDtos)
         .filter(pd -> "testInitSystemVariablesProcess_key".equals(pd.getKey())).findFirst().get();
     //create process instance
-    postForObject("api/process-definition/" + processDefinition.getId() + "/start", "{}",
+    ProcessInstanceDto processInstance = postForObject(
+        "api/process-definition/" + processDefinition.getId() + "/start", "{}",
         ProcessInstanceDto.class);
 
     //get user tasks by another user
     String testuser2Token = new String(ByteStreams
         .toByteArray(BaseIT.class.getResourceAsStream("/json/testuser2AccessToken.json")));
     HistoricTaskInstanceEntity[] historyProcessInstanceDtos = getForObject(
-        "api/history/task", HistoricTaskInstanceEntity[].class, testuser2Token);
+        String.format("api/history/task?processInstanceId=%s", processInstance.getId()),
+        HistoricTaskInstanceEntity[].class, testuser2Token);
 
     assertThat(historyProcessInstanceDtos).isEmpty();
   }
@@ -110,16 +112,15 @@ public class AuthorizationFilterIT extends BaseIT {
     ProcessDefinitionDto processDefinition = Stream.of(processDefinitionDtos)
         .filter(pd -> "testInitSystemVariablesProcess_key".equals(pd.getKey())).findFirst().get();
 
-    postForObject("api/process-definition/" + processDefinition.getId() + "/start", "{}",
+    ProcessInstanceDto processInstance = postForObject(
+        "api/process-definition/" + processDefinition.getId() + "/start", "{}",
         ProcessInstanceDto.class);
 
-    TaskDto[] historyProcessInstanceDtos = getForObject(
-        "api/task", TaskDto[].class);
+    TaskDto[] tasks = getForObject(
+        String.format("api/task?processInstanceId=%s", processInstance.getId()), TaskDto[].class);
 
-    assertThat(historyProcessInstanceDtos).isNotEmpty();
-    Stream.of(historyProcessInstanceDtos).forEach(historyTask -> {
-      assertThat(historyTask.getAssignee()).isEqualTo("testuser");
-    });
+    assertThat(tasks).isNotEmpty();
+    Stream.of(tasks).forEach(task -> assertThat(task.getAssignee()).isEqualTo("testuser"));
   }
 
   @Test
@@ -149,22 +150,28 @@ public class AuthorizationFilterIT extends BaseIT {
         .filter(pd -> "testInitSystemVariablesProcess_key".equals(pd.getKey())).findFirst().get();
 
     //testuser
-    postForObject("api/process-definition/" + processDefinition.getId() + "/start", "{}",
+    ProcessInstanceDto testUserProcessInstance = postForObject(
+        "api/process-definition/" + processDefinition.getId() + "/start", "{}",
         ProcessInstanceDto.class);
 
     //testuser2
     String testuser2Token = new String(ByteStreams
         .toByteArray(BaseIT.class.getResourceAsStream("/json/testuser2AccessToken.json")));
-    postForObject("api/process-definition/" + processDefinition.getId() + "/start", "{}",
+    ProcessInstanceDto testUser2ProcessInstance = postForObject(
+        "api/process-definition/" + processDefinition.getId() + "/start", "{}",
         ProcessInstanceDto.class);
 
-    TaskDto[] testuserTasks = getForObject("api/task", TaskDto[].class);
+    TaskDto[] testuserTasks = getForObject(
+        String.format("api/task?processInstanceId=%s", testUserProcessInstance.getId()),
+        TaskDto[].class);
     assertThat(testuserTasks).isNotEmpty();
     Stream.of(testuserTasks).forEach(historyTask -> {
       assertThat(historyTask.getAssignee()).isEqualTo("testuser");
     });
 
-    TaskDto[] testuser2Tasks = getForObject("api/task", TaskDto[].class, testuser2Token);
+    TaskDto[] testuser2Tasks = getForObject(
+        String.format("api/task?processInstanceId=%s", testUser2ProcessInstance.getId()),
+        TaskDto[].class, testuser2Token);
     assertThat(testuserTasks).isNotEmpty();
     Stream.of(testuser2Tasks).forEach(historyTask -> {
       assertThat(historyTask.getAssignee()).isEqualTo("testuser2");
