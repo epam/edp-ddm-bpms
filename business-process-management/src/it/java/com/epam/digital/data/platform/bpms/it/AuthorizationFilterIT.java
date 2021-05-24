@@ -72,11 +72,13 @@ public class AuthorizationFilterIT extends BaseIT {
     ProcessDefinitionDto processDefinition = Stream.of(processDefinitionDtos)
         .filter(pd -> "testInitSystemVariablesProcess_key".equals(pd.getKey())).findFirst().get();
 
-    postForObject("api/process-definition/" + processDefinition.getId() + "/start", "{}",
+    ProcessInstanceDto processInstance = postForObject(
+        "api/process-definition/" + processDefinition.getId() + "/start", "{}",
         ProcessInstanceDto.class);
 
     HistoricTaskInstanceEntity[] historyProcessInstanceDtos = getForObject(
-        "api/history/task", HistoricTaskInstanceEntity[].class);
+        String.format("api/history/task?processInstanceId=%s", processInstance.getId()),
+        HistoricTaskInstanceEntity[].class);
 
     assertThat(historyProcessInstanceDtos).isNotEmpty();
     Stream.of(historyProcessInstanceDtos).forEach(historyTask -> {
