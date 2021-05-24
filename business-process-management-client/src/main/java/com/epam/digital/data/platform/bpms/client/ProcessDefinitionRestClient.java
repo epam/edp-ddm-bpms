@@ -1,6 +1,7 @@
 package com.epam.digital.data.platform.bpms.client;
 
 import com.epam.digital.data.platform.bpms.api.dto.ProcessDefinitionQueryDto;
+import com.epam.digital.data.platform.bpms.client.exception.ClientValidationException;
 import com.epam.digital.data.platform.bpms.client.exception.ProcessDefinitionNotFoundException;
 import feign.error.ErrorCodes;
 import feign.error.ErrorHandling;
@@ -69,7 +70,9 @@ public interface ProcessDefinitionRestClient extends BaseFeignClient {
    * @return a started process instance
    */
   @PostMapping("/{id}/start")
-  @ErrorHandling
+  @ErrorHandling(codeSpecific = {
+      @ErrorCodes(codes = {422}, generate = ClientValidationException.class)
+  })
   ProcessInstanceDto startProcessInstance(@PathVariable("id") String id,
       @RequestBody StartProcessInstanceDto startProcessInstanceDto);
 
