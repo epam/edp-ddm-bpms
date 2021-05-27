@@ -187,17 +187,28 @@ class UserDataValidationExceptionMapper<ValidationException> #back:lightblue;lin
   toResponse()
 }
 
+
+class TaskAlreadyInCompletionExceptionMapper<TaskAlreadyInCompletionException> #back:lightblue;line:green;text:black implements ExceptionMapper {
+  toResponse()
+}
+
 class RestException extends Throwable
 class SystemException #back:lightgreen;line:green;text:black extends Throwable
 class ValidationException #back:lightgreen;line:green;text:black extends Throwable
+class TaskAlreadyInCompletionException #back:lightblue;line:green;text:black extends Throwable
 
 ExceptionMapper .> Throwable
 CamundaRestExceptionMapper .> RestException
 CamundaSystemExceptionMapper .> SystemException
 UserDataValidationExceptionMapper .> ValidationException
+TaskAlreadyInCompletionExceptionMapper .> TaskAlreadyInCompletionException
 
 CamundaRestExceptionMapper --[hidden]> CamundaSystemExceptionMapper
 CamundaSystemExceptionMapper --[hidden]> UserDataValidationExceptionMapper
+UserDataValidationExceptionMapper --[hidden]> TaskAlreadyInCompletionExceptionMapper
+RestException --[hidden]> SystemException
+SystemException --[hidden]> ValidationException
+ValidationException --[hidden]> TaskAlreadyInCompletionException
 @enduml
 ----
 
@@ -245,3 +256,77 @@ CamundaSystemExceptionMapper --[hidden]> UserDataValidationExceptionMapper
   }
 }
 ----
+
+- `TaskAlreadyInCompletionExceptionMapper<TaskAlreadyInCompletionException>` - мапить `TaskAlreadyInCompletionException` на HTTP відповідь зі статусом 409 з тілом яке має наступну структуру
+
+[source,json]
+----
+{
+  "traceId" : "traceId",
+  "code" : "code",
+  "message" : "message",
+  "localizedMessage" : "localizedMessage"
+}
+----
+
+== Синхронізоване виконання задачі
+
+Для того, щоб не можна було виконати одну й ту ж задачу кілька разів, була реалізована можливість синхронізації по бізнес-ключу.
+Таким чином, наприклад, буде можливість виконувати декілька задач одразу, хоча не буде можливості виконувати одну й ту ж задачу в декілька потоків.
+
+[plantuml,sychronization-by-id,svg]
+----
+@startuml
+class SpringProcessEngineConfiguration {
+  TaskService taskService
+}
+
+class LowcodeSpringProcessEngineConfiguration #back:lightblue;line:green;text:black extends SpringProcessEngineConfiguration
+
+interface TaskService {
+  void complete()
+  void completeWithVariablesInReturn()
+}
+
+class TaskServiceImpl implements TaskService
+
+class SynchronizedTaskServiceImpl #back:lightblue;line:green;text:black extends TaskServiceImpl {
+  SynchronizationService synchronizationService
+  void complete()
+  void completeWithVariablesInReturn()
+}
+
+class SynchronizationService #back:lightblue;line:green; {
+  Cache<Object, ReentrantLock> lockCache
+
+  ReentrantLock getLock(Object key)
+  void execute(Object key, Runnable runnable)
+  R evaluate(Object key, Supplier<R> supplier)
+  void executeOrThrow(Object key, Runnable runnable, Supplier<T extends Throwable> exceptionSupplier)
+  R evaluateOrThrow(Object key, Supplier<R> supplier, Supplier<T extends Throwable> exceptionSupplier)
+}
+
+class CamundaConfiguration #back:lightblue;line:green;text:black {
+  processEngineConfigurationImpl()
+}
+
+SpringProcessEngineConfiguration o- TaskService
+LowcodeSpringProcessEngineConfiguration <-- CamundaConfiguration : creates
+CamundaConfiguration o- SynchronizedTaskServiceImpl : injects into SpringProcessEngineConfiguration
+SynchronizedTaskServiceImpl o- SynchronizationService
+@enduml
+----
+
+Було реалізовано SynchronizationService який у собі має кеш локів з weak-reference ключами, де ключем є будь-який бізнес-ключ (наприклад `taskId`) а значенням є `ReentrantLock` пов'язаний з цим бізнес ключем. Таким чином, якщо 2 потоки будуть використовувати лок отриманий з кешу по одному й тому ж ключу водночас вони будуть синхронізовані, хоча будь-які інші потоки з іншими ключами будуть використовувати вже інші локи тому й не будуть заблоковані між собою.
+
+.`SynchronizationService` надає наступні можливості:
+- `ReentrantLock getLock(Object key)` -- повертає лок пов'язаний з бізнес-ключем `key` для самостійного використання
+- `void execute(Object key, Runnable runnable)` -- бере лок пов'язаний з бізнес-ключем `key`, по ньому синхронізується, виконує `runnable.run()` та відпускає лок
+- `R evaluate(Object key, Supplier<R> supplier)` -- бере лок пов'язаний з бізнес-ключем `key`, по ньому синхронізується, повертає результат `supplier.get()` та відпускає лок
+- `void executeOrThrow(Object key, Runnable runnable, Supplier<T extends Throwable> exceptionSupplier)` -- бере лок пов'язаний з бізнес-ключем `key`, та намагається його заблокувати, якщо виходить заблокувати лок, то виконує `runnable.run()` та відпускає лок, інакше -- кидає виключення яке береться з `exceptionSupplier`
+- `R evaluateOrThrow(Object key, Supplier<R> supplier, Supplier<T extends Throwable> exceptionSupplier)` -- бере лок пов'язаний з бізнес-ключем `key`, та намагається його заблокувати, якщо виходить заблокувати лок, то повертає результат отриманій з `supplier.get()` та відпускає лок, інакше -- кидає виключення яке береться з `exceptionSupplier`
+
+[NOTE]
+Таким чином пара методів `execute` та `evaluate` по одному й тому ж ключу буде виконувати `runnable.run()`/`supplier.get()` по черзі, а `executeOrThrow` та `evaluateOrThrow` "відказуються" їх виконувати якщо щось вже заблокувало потрібній лок.
+
+Також було реалізовано `SynchronizedTaskServiceImpl` який розширює стандартний `TaskServiceImpl` та перевантажує методи `complete` та `completeWithVariablesInReturn` додаючи синхронізацію за `taskId` за допомогою `SynchronizationService` з використанням `executeOrThrow` та `evaluateOrThrow` відповідно.
