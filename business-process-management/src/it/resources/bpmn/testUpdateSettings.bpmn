@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1sn1jmq" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:process id="update_settings_key" isExecutable="true">
+    <bpmn:startEvent id="Event_1tv9f7u">
+      <bpmn:outgoing>Flow_1cfjszv</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_1rg5svo">
+      <bpmn:incoming>Flow_0yz1e02</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:scriptTask id="Activity_1ys06ix" name="Assert" scriptFormat="groovy">
+      <bpmn:incoming>Flow_13n3mg6</bpmn:incoming>
+      <bpmn:outgoing>Flow_0yz1e02</bpmn:outgoing>
+      <bpmn:script>assert response.statusCode == 200
+
+assert response.responseBody.toString().equals('{"settings_id":"uuid"}')</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:serviceTask id="Activity_1ns1mz3" name="Update Settings" camunda:modelerTemplate="dataFactoryConnectorUpdateDelegate" camunda:delegateExpression="${dataFactoryConnectorUpdateDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="id" />
+          <camunda:inputParameter name="resource">settings</camunda:inputParameter>
+          <camunda:inputParameter name="payload">${dataPayload}</camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token_ceph_key">${x_access_token_task_definition_key}</camunda:inputParameter>
+          <camunda:inputParameter name="x_digital_signature_derived_ceph_key"></camunda:inputParameter>
+          <camunda:inputParameter name="x_digital_signature_ceph_key"></camunda:inputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1e908xw</bpmn:incoming>
+      <bpmn:outgoing>Flow_13n3mg6</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1cfjszv" sourceRef="Event_1tv9f7u" targetRef="Activity_0mmvw19" />
+    <bpmn:sequenceFlow id="Flow_13n3mg6" sourceRef="Activity_1ns1mz3" targetRef="Activity_1ys06ix" />
+    <bpmn:sequenceFlow id="Flow_0yz1e02" sourceRef="Activity_1ys06ix" targetRef="Event_1rg5svo" />
+    <bpmn:sequenceFlow id="Flow_1e908xw" sourceRef="Activity_0mmvw19" targetRef="Activity_1ns1mz3" />
+    <bpmn:userTask id="Activity_0mmvw19" name="Task">
+      <bpmn:incoming>Flow_1cfjszv</bpmn:incoming>
+      <bpmn:outgoing>Flow_1e908xw</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="update_settings_key">
+      <bpmndi:BPMNEdge id="Flow_0yz1e02_di" bpmnElement="Flow_0yz1e02">
+        <di:waypoint x="623" y="120" />
+        <di:waypoint x="685" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13n3mg6_di" bpmnElement="Flow_13n3mg6">
+        <di:waypoint x="463" y="120" />
+        <di:waypoint x="523" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1cfjszv_di" bpmnElement="Flow_1cfjszv">
+        <di:waypoint x="178" y="120" />
+        <di:waypoint x="220" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1e908xw_di" bpmnElement="Flow_1e908xw">
+        <di:waypoint x="320" y="120" />
+        <di:waypoint x="363" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1tv9f7u_di" bpmnElement="Event_1tv9f7u">
+        <dc:Bounds x="142" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1rg5svo_di" bpmnElement="Event_1rg5svo">
+        <dc:Bounds x="685" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ys06ix_di" bpmnElement="Activity_1ys06ix">
+        <dc:Bounds x="523" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ns1mz3_di" bpmnElement="Activity_1ns1mz3">
+        <dc:Bounds x="363" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1clz5aw_di" bpmnElement="Activity_0mmvw19">
+        <dc:Bounds x="220" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -4,6 +4,7 @@ import com.epam.digital.data.platform.bpms.delegate.ceph.CephKeyProvider;
 import com.epam.digital.data.platform.bpms.delegate.dto.DataFactoryConnectorResponse;
 import com.epam.digital.data.platform.integration.ceph.service.FormDataCephService;
 import com.epam.digital.data.platform.starter.logger.annotation.Logging;
+import java.util.Objects;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.spin.json.SpinJsonNode;
@@ -46,9 +47,11 @@ public class DataFactoryConnectorUpdateDelegate extends BaseConnectorDelegate {
 
   private DataFactoryConnectorResponse performPut(DelegateExecution delegateExecution,
       String resourceName, String resourceId, String body) {
-    var uri = UriComponentsBuilder.fromHttpUrl(dataFactoryBaseUrl).pathSegment(resourceName)
-        .pathSegment(resourceId).build().toUri();
+    var uri = UriComponentsBuilder.fromHttpUrl(dataFactoryBaseUrl).pathSegment(resourceName);
+    if (Objects.nonNull(resourceId)) {
+      uri.pathSegment(resourceId);
+    }
 
-    return perform(RequestEntity.put(uri).headers(getHeaders(delegateExecution)).body(body));
+    return perform(RequestEntity.put(uri.build().toUri()).headers(getHeaders(delegateExecution)).body(body));
   }
 }

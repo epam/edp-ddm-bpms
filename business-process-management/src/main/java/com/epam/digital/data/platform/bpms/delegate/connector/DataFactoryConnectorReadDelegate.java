@@ -4,6 +4,7 @@ import com.epam.digital.data.platform.bpms.delegate.ceph.CephKeyProvider;
 import com.epam.digital.data.platform.bpms.delegate.dto.DataFactoryConnectorResponse;
 import com.epam.digital.data.platform.integration.ceph.service.FormDataCephService;
 import com.epam.digital.data.platform.starter.logger.annotation.Logging;
+import java.util.Objects;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +45,11 @@ public class DataFactoryConnectorReadDelegate extends BaseConnectorDelegate {
 
   protected DataFactoryConnectorResponse performGet(DelegateExecution delegateExecution,
       String resourceName, String resourceId) {
-    var uri = UriComponentsBuilder.fromHttpUrl(dataFactoryBaseUrl).pathSegment(resourceName)
-        .pathSegment(resourceId).build().toUri();
+    var uri = UriComponentsBuilder.fromHttpUrl(dataFactoryBaseUrl).pathSegment(resourceName);
+    if (Objects.nonNull(resourceId)) {
+      uri.pathSegment(resourceId);
+    }
 
-    return perform(RequestEntity.get(uri).headers(getHeaders(delegateExecution)).build());
+    return perform(RequestEntity.get(uri.build().toUri()).headers(getHeaders(delegateExecution)).build());
   }
 }
