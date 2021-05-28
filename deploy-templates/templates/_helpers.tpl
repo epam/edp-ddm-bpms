@@ -36,3 +36,16 @@ Create chart name and version as used by the chart label.
 {{- else -}}
 {{- end -}}
 {{- end }}
+
+{{- define "bpms.url" -}}
+{{- printf "%s%s-%s-%s.%s" "https://" (include "bpms.name" .) .Values.cdPipelineName .Values.cdPipelineStageName .Values.dnsWildcard }}
+{{- end }}
+
+{{- define "keycloak.targetRealm" -}}
+{{- printf "%s-%s" .Values.namespace .Values.keycloak.citizenClient.realm }}
+{{- end -}}
+
+{{- define "keycloak.url" -}}
+{{- printf "%s%s" "https://" .Values.keycloak.host }}
+{{- end -}}
+
