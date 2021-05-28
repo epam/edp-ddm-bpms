@@ -1,6 +1,7 @@
 package com.epam.digital.data.platform.bpms.config;
 
 import com.epam.digital.data.platform.bpms.listener.AuthorizationStartEventListener;
+import com.epam.digital.data.platform.bpms.listener.InitiatorTokenStartEventListener;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
@@ -19,6 +20,7 @@ public class CamundaSystemVariablesSupportListener extends AbstractBpmnParseList
 
   private final CamundaProperties systemProperties;
   private final AuthorizationStartEventListener authorizationStartEventListener;
+  private final InitiatorTokenStartEventListener initiatorTokenStartEventListener;
 
   @Override
   public void parseStartEvent(Element startEventElement, ScopeImpl scope,
@@ -28,5 +30,7 @@ public class CamundaSystemVariablesSupportListener extends AbstractBpmnParseList
             systemProperties.getSystemVariables().forEach(execution::setVariable));
     startEventActivity.addListener(ExecutionListener.EVENTNAME_START,
         authorizationStartEventListener);
+    startEventActivity.addListener(ExecutionListener.EVENTNAME_START,
+        initiatorTokenStartEventListener);
   }
 }

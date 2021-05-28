@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import com.epam.digital.data.platform.bpms.config.CamundaProperties;
 import com.epam.digital.data.platform.bpms.config.CamundaSystemVariablesSupportListener;
 import com.epam.digital.data.platform.bpms.listener.AuthorizationStartEventListener;
+import com.epam.digital.data.platform.bpms.listener.InitiatorTokenStartEventListener;
 import java.util.List;
 import org.assertj.core.util.Maps;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -32,13 +33,15 @@ public class CamundaSystemVariablesSupportListenerTest {
   private ActivityImpl startEventActivity;
   @Mock
   private AuthorizationStartEventListener authorizationStartEventListener;
+  @Mock
+  private InitiatorTokenStartEventListener initiatorTokenStartEventListener;
 
   private CamundaSystemVariablesSupportListener camundaSystemVariablesSupportListener;
 
   @Before
   public void init() {
     camundaSystemVariablesSupportListener = new CamundaSystemVariablesSupportListener(
-        camundaProperties, authorizationStartEventListener);
+        camundaProperties, authorizationStartEventListener, initiatorTokenStartEventListener);
   }
 
   @Test
@@ -48,11 +51,12 @@ public class CamundaSystemVariablesSupportListenerTest {
     camundaSystemVariablesSupportListener.parseStartEvent(null, null, startEventActivity);
 
     ArgumentCaptor<ExecutionListener> captor = ArgumentCaptor.forClass(ExecutionListener.class);
-    verify(startEventActivity, times(2))
+    verify(startEventActivity, times(3))
         .addListener(eq(ExecutionListener.EVENTNAME_START), captor.capture());
     List<ExecutionListener> allValues = captor.getAllValues();
     ExecutionListener executionListener = allValues.stream()
-        .filter(listener -> !(listener instanceof AuthorizationStartEventListener)).findFirst()
+        .filter(listener -> !(listener instanceof AuthorizationStartEventListener))
+        .filter(listener -> !(listener instanceof InitiatorTokenStartEventListener)).findFirst()
         .get();
     assertThat(executionListener).isNotNull();
     executionListener.notify(delegateExecution);
