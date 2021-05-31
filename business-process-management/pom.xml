@@ -78,6 +78,12 @@
     </dependency>
 
     <dependency>
+      <artifactId>keycloak-admin-client</artifactId>
+      <groupId>org.keycloak</groupId>
+      <version>13.0.1</version>
+    </dependency>
+
+    <dependency>
       <artifactId>spring-cloud-starter-kubernetes-config</artifactId>
       <groupId>org.springframework.cloud</groupId>
     </dependency>

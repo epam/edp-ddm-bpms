@@ -31,3 +31,9 @@ ceph:
   access-key: access-key
   secret-key: secret-key
   bucket: bucket
+
+keycloak:
+  url: http://localhost:8200/auth
+  realm: realm
+  client-id: clientId
+  client-secret: clientSecret
