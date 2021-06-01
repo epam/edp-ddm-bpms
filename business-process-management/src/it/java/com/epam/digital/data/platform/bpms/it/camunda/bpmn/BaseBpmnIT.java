@@ -36,6 +36,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public abstract class BaseBpmnIT extends BaseIT {
 
   private final String MOCK_SERVER = "/mock-server";
+  private final String SETTINGS_MOCK_SERVER = "/user-settings-mock-server";
 
   @Inject
   @Qualifier("digitalSignatureMockServer")
@@ -43,6 +44,9 @@ public abstract class BaseBpmnIT extends BaseIT {
   @Inject
   @Qualifier("dataFactoryMockServer")
   protected WireMockServer dataFactoryMockServer;
+  @Inject
+  @Qualifier("userSettingsWireMock")
+  protected WireMockServer userSettingsWireMock;
   @Value("${ceph.bucket}")
   protected String cephBucketName;
 
@@ -126,6 +130,27 @@ public abstract class BaseBpmnIT extends BaseIT {
             .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
             .withBody(TestUtils.getContent(stubData.getResponse())));
     dataFactoryMockServer.addStubMapping(stubFor(mappingBuilder));
+  }
+
+  protected void stubUserSettingsRead(StubData stubData) throws IOException {
+    var uri = UriComponentsBuilder.fromPath(SETTINGS_MOCK_SERVER)
+        .pathSegment(stubData.getResource(), stubData.getResourceId()).encode().build().toUri();
+    var mappingBuilder = get(urlPathEqualTo(uri.getPath()))
+        .willReturn(aResponse().withStatus(200)
+            .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+            .withBody(TestUtils.getContent(stubData.getResponse())));
+    userSettingsWireMock.addStubMapping(stubFor(mappingBuilder));
+  }
+
+  protected void stubUserSettingsUpdate(StubData data) throws IOException {
+    var uri = UriComponentsBuilder.fromUri(URI.create(SETTINGS_MOCK_SERVER)).pathSegment(data.getResource())
+        .pathSegment(data.getResourceId()).build().toUri();
+    MappingBuilder mappingBuilder = put(urlPathEqualTo(uri.getPath()))
+        .withRequestBody(equalToJson(TestUtils.getContent(data.getRequestBody())))
+        .willReturn(aResponse().withStatus(200).withBody(TestUtils.getContent(data.getResponse())));
+
+    data.getHeaders().forEach((key, value) -> mappingBuilder.withHeader(key, equalTo(value)));
+    userSettingsWireMock.addStubMapping(stubFor(mappingBuilder));
   }
 
   protected void stubDigitalSignature(StubData data) throws IOException {

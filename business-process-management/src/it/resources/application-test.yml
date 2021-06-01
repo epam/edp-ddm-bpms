@@ -30,6 +30,9 @@ ceph:
   secret-key: secret-key
   bucket: bucket
 
+user-settings-service-api:
+  url: http://localhost:8878/user-settings-mock-server
+
 keycloak:
   url: http://localhost:8082/auth
   realm: test-realm

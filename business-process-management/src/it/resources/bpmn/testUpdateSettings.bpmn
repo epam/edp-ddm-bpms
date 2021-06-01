@@ -14,15 +14,14 @@
 
 assert response.responseBody.toString().equals('{"settings_id":"uuid"}')</bpmn:script>
     </bpmn:scriptTask>
-    <bpmn:serviceTask id="Activity_1ns1mz3" name="Update Settings" camunda:modelerTemplate="dataFactoryConnectorUpdateDelegate" camunda:delegateExpression="${dataFactoryConnectorUpdateDelegate}">
+    <bpmn:serviceTask id="Activity_1ns1mz3" name="Update Settings" camunda:modelerTemplate="userSettingsConnectorUpdateDelegate" camunda:delegateExpression="${userSettingsConnectorUpdateDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="id" />
           <camunda:inputParameter name="resource">settings</camunda:inputParameter>
+          <camunda:inputParameter name="x_digital_signature_task_definition_key" />
+          <camunda:inputParameter name="x_digital_signature_derived_ceph_key" />
           <camunda:inputParameter name="payload">${dataPayload}</camunda:inputParameter>
-          <camunda:inputParameter name="x_access_token_ceph_key">${x_access_token_task_definition_key}</camunda:inputParameter>
-          <camunda:inputParameter name="x_digital_signature_derived_ceph_key"></camunda:inputParameter>
-          <camunda:inputParameter name="x_digital_signature_ceph_key"></camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token_task_definition_key">Activity_0mmvw19</camunda:inputParameter>
           <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
@@ -40,6 +39,10 @@ assert response.responseBody.toString().equals('{"settings_id":"uuid"}')</bpmn:s
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="update_settings_key">
+      <bpmndi:BPMNEdge id="Flow_1e908xw_di" bpmnElement="Flow_1e908xw">
+        <di:waypoint x="320" y="120" />
+        <di:waypoint x="363" y="120" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0yz1e02_di" bpmnElement="Flow_0yz1e02">
         <di:waypoint x="623" y="120" />
         <di:waypoint x="685" y="120" />
@@ -51,10 +54,6 @@ assert response.responseBody.toString().equals('{"settings_id":"uuid"}')</bpmn:s
       <bpmndi:BPMNEdge id="Flow_1cfjszv_di" bpmnElement="Flow_1cfjszv">
         <di:waypoint x="178" y="120" />
         <di:waypoint x="220" y="120" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1e908xw_di" bpmnElement="Flow_1e908xw">
-        <di:waypoint x="320" y="120" />
-        <di:waypoint x="363" y="120" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_1tv9f7u_di" bpmnElement="Event_1tv9f7u">
         <dc:Bounds x="142" y="102" width="36" height="36" />

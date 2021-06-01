@@ -3,8 +3,6 @@ package com.epam.digital.data.platform.bpms.delegate.connector;
 import com.epam.digital.data.platform.bpms.delegate.ceph.CephKeyProvider;
 import com.epam.digital.data.platform.bpms.delegate.dto.DataFactoryConnectorResponse;
 import com.epam.digital.data.platform.integration.ceph.service.FormDataCephService;
-import com.epam.digital.data.platform.starter.logger.annotation.Logging;
-import java.util.Objects;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,38 +13,39 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * The class represents an implementation of {@link BaseConnectorDelegate} that is used to read data
- * from Data Factory
+ * The class represents an implementation of {@link BaseConnectorDelegate} that is used to read user
+ * settings.
  */
-@Component("dataFactoryConnectorReadDelegate")
-@Logging
-public class DataFactoryConnectorReadDelegate extends BaseConnectorDelegate {
+@Component("userSettingsConnectorReadDelegate")
+public class UserSettingsConnectorReadDelegate extends BaseConnectorDelegate {
 
-  private final String dataFactoryBaseUrl;
+  private final String userSettingsBaseUrl;
 
   @Autowired
-  public DataFactoryConnectorReadDelegate(RestTemplate restTemplate,
-      FormDataCephService formDataCephService, CephKeyProvider cephKeyProvider,
+  public UserSettingsConnectorReadDelegate(
+      RestTemplate restTemplate,
+      CephKeyProvider cephKeyProvider,
+      FormDataCephService formDataCephService,
       @Value("${spring.application.name}") String springAppName,
-      @Value("${camunda.system-variables.const_dataFactoryBaseUrl}") String dataFactoryBaseUrl) {
+      @Value("${user-settings-service-api.url}") String userSettingsBaseUrl) {
     super(restTemplate, formDataCephService, springAppName, cephKeyProvider);
-    this.dataFactoryBaseUrl = dataFactoryBaseUrl;
+    this.userSettingsBaseUrl = userSettingsBaseUrl;
   }
 
   @Override
-  public void execute(DelegateExecution execution) {
+  public void execute(DelegateExecution execution) throws Exception {
     var resource = (String) execution.getVariable(RESOURCE_VARIABLE);
-    var id = (String) execution.getVariable(RESOURCE_ID_VARIABLE);
 
-    var response = performGet(execution, resource, id);
+    DataFactoryConnectorResponse response = performGet(execution, resource);
 
     ((AbstractVariableScope) execution).setVariableLocalTransient(RESPONSE_VARIABLE, response);
   }
 
+
   protected DataFactoryConnectorResponse performGet(DelegateExecution delegateExecution,
-      String resourceName, String resourceId) {
-    var uri = UriComponentsBuilder.fromHttpUrl(dataFactoryBaseUrl).pathSegment(resourceName)
-        .pathSegment(resourceId).build().toUri();
+      String resource) {
+    var uri = UriComponentsBuilder.fromHttpUrl(userSettingsBaseUrl).pathSegment(resource).build()
+        .toUri();
 
     return perform(RequestEntity.get(uri).headers(getHeaders(delegateExecution)).build());
   }
