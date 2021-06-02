@@ -1,4 +1,4 @@
-apiVersion: v1
+apiVersion: v2
 description: Chart for deployng bpms with postgres database
 maintainers:
 - email: dmytro_zinchenko1@epam.com
