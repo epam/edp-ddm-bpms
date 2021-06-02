@@ -1,0 +1,214 @@
+= Кастомні JUEL функції
+
+== Розробка JUEL функцій
+
+Для доступу статичних Java функцій в Expression Language та Groovy скриптах бізнес-процесу було імплементовано наступну ієрархію класів
+
+[plantuml,juel,svg]
+--
+@startuml
+interface ApplicationContext
+note left : Spring application context
+
+interface ApplicationContextAware {
+  +void setApplicationContext(ApplicationContext)
+}
+ApplicationContext  <. ApplicationContextAware : uses
+
+abstract class CoreExecution
+note left : Camunda execution context
+ApplicationContext -[hidden]- CoreExecution
+
+abstract class FunctionMapper {
+  + Method resolveFunction(String, String)
+}
+
+package el.juel{
+  abstract class AbstractApplicationContextAwareJuelFunction #back:lightblue;line:green;text:black implements ApplicationContextAware {
+    - {static} ApplicationContext applicationContext
+    --
+    + final void setApplicationContext(ApplicationContext)
+    + Method getJuelFunctionMethod()
+    ..
+    # {static} CoreExecution getExecution()
+    # {static} <T> T getBean(Class<T>)
+  }
+  package mapper {
+    class CompositeApplicationContextAwareJuelFunctionMapper #back:lightblue;line:green;text:black extends FunctionMapper {
+      + Method resolveFunction(String, String)
+    }
+  }
+}
+
+CoreExecution <. AbstractApplicationContextAwareJuelFunction : provides access \nfor child classes
+
+AbstractApplicationContextAwareJuelFunction o- CompositeApplicationContextAwareJuelFunctionMapper
+
+interface ScriptEnvResolver {
+  + String[] resolve(String)
+}
+
+abstract class AbstractProcessEnginePlugin {
+  +void postInit(ProcessEngineConfigurationImpl)
+}
+
+package scripting {
+  package groovy {
+    class StaticJavaFunctionsGroovyScriptEnvResolver #back:lightblue;line:green;text:black implements ScriptEnvResolver {
+      + String[] resolve(String)
+    }
+  }
+  class StaticJavaFunctionsProcessEnginePlugin #back:lightblue;line:green;text:black extends AbstractProcessEnginePlugin {
+    +void postInit(ProcessEngineConfigurationImpl)
+  }
+}
+
+CoreExecution -[hidden]- ScriptEnvResolver
+
+StaticJavaFunctionsGroovyScriptEnvResolver o- StaticJavaFunctionsProcessEnginePlugin : adds to process \nengine configuration
+
+() customGroovyScript #back:lightblue;line:green;text:black
+note left #back:lightblue;line:green;text:black : /groovy/importStaticJavaFunctions.groovy
+customGroovyScript <.. StaticJavaFunctionsGroovyScriptEnvResolver : resolve
+AbstractApplicationContextAwareJuelFunction <.. customGroovyScript  : imports static methods from child classes
+@enduml
+--
+
+* `AbstractApplicationContextAwareJuelFunction` -- Базовий клас для всіх JUEL функцій.
+Імплементує `ApplicationContextAware` для зберігання ініціалізованого Spring контексту у приватній статичній змінній.
+Надає 2 методи для нащадків:
+** `getExecution` -- Повертає поточній camunda execution context для доступу до змінних бізнес-процесу
+** `getBean` -- Повертає бін отриманий зі Spring контексту для виклику методів на ньому
+* `CompositeApplicationContextAwareJuelFunctionMapper` -- нащадок FunctionMapper що маппить статичний Java метод/функцію на JUEL функцію (повертає об'єкт типу `Method` в залежності від імені функції)
+* `/groovy/importStaticJavaFunctions.groovy` -- скрипт що імпортує статичні Java методи (ініціалізує змінні посиланням на статичні Java методи)
+* `StaticJavaFunctionsGroovyScriptEnvResolver` -- клас що повертає скрипт описаний вище для виконання бізнес-процесом перед скриптом самого процесу
+* `StaticJavaFunctionsProcessEnginePlugin` -- плагін що додає `StaticJavaFunctionsGroovyScriptEnvResolver` до Camunda Process Engine
+
+'''
+
+.Щоб додати нову JUEL функцію треба:
+* Створити нащадка `AbstractApplicationContextAwareJuelFunction`
+* У щойно створеному нащадку імплементувати статичний Java метод що відповідає бізнес вимогам задачі
+** для доступу до Camunda Execution Context використовувати `AbstractCustomJuelFunction::getExecution`
+** для доступу до Spring бінів використовувати `AbstractCustomJuelFunction::getBean` замість автовайрингу
+* Додати посилання на функцію до скрипту `/groovy/importStaticJavaFunctions.groovy`, наприклад `foo = foo.bar.FooJuelFunction.&foo`
+* Додати документацію на функцію до цього розділу
+
+[IMPORTANT]
+Доступ до функції у скриптах відбувається через ініціалізацію змінних, тому наявні змінні бізнес-процесу, що мають ті ж імена що й функції будуть доступні тільки через об'єкт `execution`, наприклад `execution.getVariable('foo')`.
+Та навпаки, якщо перевизначити змінну з функцією доступ до неї в цьому самому скрипті буде втрачено (*це стосується тільки скриптів, expression language має доступ і до змінних і до функцій, навіть якщо вони мають однакове ім'я*)
+
+== Доступні JUEL функції
+
+=== initiator()
+
+Діаграма класів:
+
+[plantuml,initiator-class,svg]
+--
+@startuml
+package el {
+  package juel {
+    abstract class AbstractCustomJuelFunction
+    class InitiatorJuelFunction #back:lightblue;line:green;text:black extends AbstractCustomJuelFunction {
+      + {static} UserDto initiator()
+    }
+  }
+  package dto {
+    class UserDto #back:lightblue;line:green;text:black {
+      - String userName
+      - String accessToken
+      - JwtClaimsDto claims
+      --
+      + String getUserName()
+      + String getAccessToken()
+      + String getFullName()
+      + String getDrfo()
+      + String getEdrpou()
+    }
+  }
+  AbstractCustomJuelFunction ..[hidden]> UserDto
+  InitiatorJuelFunction .> UserDto : returns
+}
+UserDto .o JwtClaimsDto
+@enduml
+--
+
+* `InitiatorJuelFunction` -- наслідує `AbstractApplicationContextAwareJuelFunction` та надає функцію `initiator()` що:
+
+[plantuml,initiator-sequence,svg]
+--
+@startuml
+  skinparam responseMessageBelowArrow true
+
+  participant "initiator()" as initiator order 10
+  participant "Camunda Execution Context" as camunda order 20
+  participant "Spring Application Context" as spring order 30
+  participant TokenParser as parser order 40
+
+  -> initiator
+  activate initiator
+
+  initiator -> camunda : Отримати існуючий UserDto об'єкт ініціатора
+  activate camunda
+
+  alt об'єкт ініціатора знайдено
+    initiator <-- camunda : знайдений UserDto об'єкт ініціатора
+    <-- initiator : UserDto
+  else об'єкт ініціатора не знайдено
+    initiator <-- camunda : null
+    deactivate camunda
+
+    initiator -> camunda : Отримати ім'я ініціатора з відповідної змінної
+    activate camunda
+
+    initiator <-- camunda : Ім'я ініціатора
+    deactivate camunda
+
+    initiator -> camunda : Отримати токен ініціатора з відповідної змінної
+    activate camunda
+    alt токен ініціатора не наявний у Camunda контексті
+      initiator <-- camunda : null
+      initiator -> initiator : збудувати UserDto використовуючи \nтільки ім'я ініціатора
+    else токен ініціатора наявний у Camunda контексті
+      initiator <-- camunda : токен ініціатора
+      deactivate camunda
+
+      initiator -> spring : Отримати бін типу TokenParser
+      activate spring
+
+      initiator <-- spring : бін типу TokenParser
+      deactivate spring
+
+      initiator -> parser : Розпарсити токен ініціатора у об'єкт JwtClaimsDto
+      activate parser
+
+      initiator <-- parser : згенерований JwtClaimsDto
+      deactivate parser
+
+      initiator -> initiator : збудувати UserDto використовуючи \n ім'я та токен ініціатора та згенерований JwtClaimsDto
+    end
+
+    initiator -> camunda : зберегти збудований UserDto у контексті \nу якості transient змінної
+    activate camunda
+
+    initiator <-- camunda : збережено
+    deactivate camunda
+
+    <-- initiator : UserDto
+    deactivate initiator
+  end
+@enduml
+--
+
+* `UserDto` -- клас що являє собою обгортку даних користувача (в цьому випадку ініціатора).
+Завжди містить у собі userName та токен і JwtClaimsDto до першої задачі користувача.
+Надає методи:
+** getUserName() -- повертає ім'я користувача, що можна використовувати в Assignee та Candidate Users полях задач користувача
+** getAccessToken() -- повертає токен користувача, що можна використовувати в інтеграційних конекторах для інтеграції від імені користувача
+** getDrfo() -- делегує виклик на JwtClaimsDto та повертає Keycloak атрибут 'drfo' користувача
+** getEdrpou() -- делегує виклик на JwtClaimsDto та повертає Keycloak атрибут 'edrpou' користувача
+** getFullName() -- делегує виклик на JwtClaimsDto та повертає Keycloak атрибут 'fullName' користувача
+
+[IMPORTANT]
+Токен ініціатора, а разом з ним і всі Keycloak атрибути, будуть доступні тільки до першої "User task" у бізнес-процесі

@@ -1,4 +1,4 @@
-package com.epam.digital.data.platform.bpms.config.el;
+package com.epam.digital.data.platform.bpms.el;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;

@@ -1,5 +1,6 @@
 package com.epam.digital.data.platform.bpms.config.el;
 
+import com.epam.digital.data.platform.bpms.el.TransientVariableScopeElResolver;
 import java.util.Map;
 import org.camunda.bpm.engine.impl.javax.el.CompositeELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;

@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class InitiatorTokenStartEventListener implements ExecutionListener {
 
-  private static final String INITIATOR_TOKEN_VAR_NAME = "initiator_access_token";
+  public static final String INITIATOR_TOKEN_VAR_NAME = "initiator_access_token";
 
   @Override
   public void notify(DelegateExecution execution) {

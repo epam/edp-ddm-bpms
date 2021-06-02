@@ -1,5 +1,6 @@
 package com.epam.digital.data.platform.bpms.config.el;
 
+import com.epam.digital.data.platform.bpms.el.juel.mapper.CompositeApplicationContextAwareJuelFunctionMapper;
 import com.epam.digital.data.platform.bpms.service.SynchronizedTaskServiceImpl;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class CamundaConfiguration {
   private final ApplicationContext appContext;
   private final LowcodeSpringProcessEngineConfiguration configuration;
   private final SynchronizedTaskServiceImpl synchronizedTaskService;
+  private final CompositeApplicationContextAwareJuelFunctionMapper compositeApplicationContextAwareJuelFunctionMapper;
 
   @Bean
   public ProcessEngineConfigurationImpl processEngineConfigurationImpl(
@@ -33,6 +35,7 @@ public class CamundaConfiguration {
 
     var expressionManager = new CamundaSpringExpressionManager(appContext,
         configuration.getBeans());
+    expressionManager.addFunctionMapper(compositeApplicationContextAwareJuelFunctionMapper);
     configuration.setExpressionManager(expressionManager);
     configuration.setTaskService(synchronizedTaskService);
     return configuration;
