@@ -105,7 +105,7 @@ AbstractApplicationContextAwareJuelFunction <.. customGroovyScript  : imports st
 Діаграма класів:
 
 [plantuml,initiator-class,svg]
---
+----
 @startuml
 package el {
   package juel {
@@ -132,7 +132,7 @@ package el {
 }
 UserDto .o JwtClaimsDto
 @enduml
---
+----
 
 * `InitiatorJuelFunction` -- наслідує `AbstractApplicationContextAwareJuelFunction` та надає функцію `initiator()` що:
 
