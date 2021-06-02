@@ -5,7 +5,7 @@
 Для доступу статичних Java функцій в Expression Language та Groovy скриптах бізнес-процесу було імплементовано наступну ієрархію класів
 
 [plantuml,juel,svg]
---
+----
 @startuml
 interface ApplicationContext
 note left : Spring application context
@@ -72,7 +72,7 @@ note left #back:lightblue;line:green;text:black : /groovy/importStaticJavaFuncti
 customGroovyScript <.. StaticJavaFunctionsGroovyScriptEnvResolver : resolve
 AbstractApplicationContextAwareJuelFunction <.. customGroovyScript  : imports static methods from child classes
 @enduml
---
+----
 
 * `AbstractApplicationContextAwareJuelFunction` -- Базовий клас для всіх JUEL функцій.
 Імплементує `ApplicationContextAware` для зберігання ініціалізованого Spring контексту у приватній статичній змінній.
@@ -137,7 +137,7 @@ UserDto .o JwtClaimsDto
 * `InitiatorJuelFunction` -- наслідує `AbstractApplicationContextAwareJuelFunction` та надає функцію `initiator()` що:
 
 [plantuml,initiator-sequence,svg]
---
+----
 @startuml
   skinparam responseMessageBelowArrow true
 
@@ -199,7 +199,7 @@ UserDto .o JwtClaimsDto
     deactivate initiator
   end
 @enduml
---
+----
 
 * `UserDto` -- клас що являє собою обгортку даних користувача (в цьому випадку ініціатора).
 Завжди містить у собі userName та токен і JwtClaimsDto до першої задачі користувача.
