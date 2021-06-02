@@ -1,26 +1,24 @@
-package com.epam.digital.data.platform.bpms.delegate.connector;
+package com.epam.digital.data.platform.bpms.delegate.connector.keycloak;
 
 import com.epam.digital.data.platform.bpms.exception.KeycloakNotFoundException;
-import com.epam.digital.data.platform.starter.logger.annotation.Logging;
 import java.util.Collections;
+import java.util.List;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.RoleScopeResource;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 /**
- * The class represents an implementation of {@link JavaDelegate} that is used to add a new role to
- * the keycloak user.
+ * The class represents an implementation of {@link JavaDelegate} that is used to provide common
+ * logic for working with the keycloak client to perform operations with user role
  */
-@Component("keycloakAddRoleConnectorDelegate")
-@Logging
-public class KeycloakAddRoleConnectorDelegate implements JavaDelegate {
+public abstract class BaseKeycloakRoleConnectorDelegate implements JavaDelegate {
 
   @Value("${keycloak.url}")
   private String serverUrl;
@@ -50,8 +48,12 @@ public class KeycloakAddRoleConnectorDelegate implements JavaDelegate {
     var roleRepresentation = getRoleRepresentation(realmResource, role);
     var userId = userRepresentation.getId();
     var userResource = realmResource.users().get(userId);
-    userResource.roles().realmLevel().add(Collections.singletonList(roleRepresentation));
+    var roleScopeResource = userResource.roles().realmLevel();
+    performOperationWithRole(roleScopeResource, Collections.singletonList(roleRepresentation));
   }
+
+  protected abstract void performOperationWithRole(RoleScopeResource roleScopeResource,
+      List<RoleRepresentation> roleRepresentationList);
 
   private RoleRepresentation getRoleRepresentation(RealmResource realmResource, String role) {
     try {

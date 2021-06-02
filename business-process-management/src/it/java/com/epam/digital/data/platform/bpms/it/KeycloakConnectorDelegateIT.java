@@ -1,6 +1,8 @@
 package com.epam.digital.data.platform.bpms.it;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.delete;
+import static com.github.tomakehurst.wiremock.client.WireMock.deleteRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
@@ -22,7 +24,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-public class KeycloakAddRoleConnectorDelegateIT extends BaseIT {
+public class KeycloakConnectorDelegateIT extends BaseIT {
 
   @Inject
   @Qualifier("keycloakMockServer")
@@ -51,6 +53,25 @@ public class KeycloakAddRoleConnectorDelegateIT extends BaseIT {
 
     keycloakMockServer.verify(1,
         postRequestedFor(urlEqualTo(roleMappingsUrl)).withRequestBody(equalTo(requestBodyRoles)));
+
+    BpmnAwareTests.assertThat(processInstance).isEnded();
+  }
+
+  @Test
+  @Deployment(resources = {"bpmn/testRemoveRoleKeycloak.bpmn"})
+  public void shouldRemoveRealmRoleFromKeycloak() throws Exception {
+    var roleMappingsUrl = "/auth/admin/realms/test-realm/users/7004ebde-68cf-4e25-bb76-b1642a3814e5/role-mappings/realm";
+    var requestBodyRoles = convertJsonToString("/json/keycloak/keycloakRequestBodyRoles.json");
+    mockConnectToKeycloak();
+    mockKeycloakGetUsers(responseBodyUsers);
+    mockKeycloakGetRole(responseBodyRole, 200);
+    keycloakMockServer.addStubMapping(
+        stubFor(delete(urlPathEqualTo(roleMappingsUrl)).withRequestBody(equalTo(requestBodyRoles))));
+
+    var processInstance = runtimeService.startProcessInstanceByKey("testRemoveKeycloakRoleKey", "");
+
+    keycloakMockServer.verify(1,
+        deleteRequestedFor(urlEqualTo(roleMappingsUrl)).withRequestBody(equalTo(requestBodyRoles)));
 
     BpmnAwareTests.assertThat(processInstance).isEnded();
   }
