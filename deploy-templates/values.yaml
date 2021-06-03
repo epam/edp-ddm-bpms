@@ -41,3 +41,19 @@ keycloak:
       clientRoles:
       - clientId: realm-management
         roles: ["realm-admin"]
+
+trembitaExchangeGateway:
+  id: 'MDTUDDM'
+  protocol-version: '4.0'
+  url: 'http://trembita.mdtu-ddm.projects.epam.com'
+  client:
+    x-road-instance: 'SEVDEIR-TEST'
+    member-class: 'GOV'
+    member-code: '43395033'
+    subsystem-code: 'IDGOV_TEST_01'
+  registries:
+    edr-registry:
+      x-road-instance: 'SEVDEIR-TEST'
+      member-class: 'GOV'
+      member-code: '00015622'
+      subsystem-code: '2_MJU_EDR_prod'

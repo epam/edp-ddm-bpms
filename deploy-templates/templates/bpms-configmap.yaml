@@ -14,3 +14,4 @@ data:
     keycloak.realm: {{ template "keycloak.targetRealm" . }}
     keycloak.url: {{ template "keycloak.url" . }}/auth
     keycloak.client-id: {{ .Values.keycloak.citizenClient.clientName }}
+    trembita-exchange-gateway: {{ toYaml .Values.trembitaExchangeGateway | nindent 6 }}
