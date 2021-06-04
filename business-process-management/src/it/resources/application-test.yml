@@ -38,3 +38,19 @@ keycloak:
   realm: test-realm
   client-id:  client-id
   client-secret: client-secret
+
+trembita-exchange-gateway:
+  id: MDTUDDM
+  protocol-version: 4.0
+  url: http://localhost:7788/trembita-mock-server
+  client:
+    x-road-instance: CLIENT-TEST
+    member-class: GOV
+    member-code: 666777666
+    subsystem-code: GOV_TEST
+  registries:
+    edr-registry:
+      x-road-instance: EDR-TEST
+      member-class: GOV
+      member-code: 11115888
+      subsystem-code: EDR_test

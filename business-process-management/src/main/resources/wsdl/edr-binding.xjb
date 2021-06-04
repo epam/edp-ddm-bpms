@@ -1,0 +1,10 @@
+<jaxb:bindings
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  xmlns:s="http://www.w3.org/2001/XMLSchema"
+  version="1.0">
+
+  <jaxb:bindings schemaLocation="file:edr-registry.wsdl" node=".//s:element[@name='parts']">
+    <jaxb:factoryMethod name="_parts"/>
+  </jaxb:bindings>
+
+</jaxb:bindings>

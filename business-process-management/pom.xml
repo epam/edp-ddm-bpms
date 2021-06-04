@@ -13,6 +13,11 @@
 
   <properties>
     <camunda.bpm.assert.version>7.0.0</camunda.bpm.assert.version>
+
+    <sonar.coverage.exclusions>
+      **/com/epam/digital/data/platform/bpms/client/dto/**/*,
+      **/com/epam/digital/data/platform/bpms/util/**/*
+    </sonar.coverage.exclusions>
   </properties>
 
   <dependencies>
@@ -86,6 +91,11 @@
     <dependency>
       <artifactId>spring-cloud-starter-kubernetes-config</artifactId>
       <groupId>org.springframework.cloud</groupId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web-services</artifactId>
     </dependency>
 
     <dependency>
@@ -191,7 +201,56 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <configuration>
+              <sources>
+                <source>target/generated-sources</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>${lombok.version}</version>
+            </path>
+            <path>
+              <groupId>org.mapstruct</groupId>
+              <artifactId>mapstruct-processor</artifactId>
+              <version>${mapstruct.version}</version>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.jvnet.jaxb2.maven2</groupId>
+        <artifactId>maven-jaxb2-plugin</artifactId>
+        <version>0.14.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <schemaLanguage>WSDL</schemaLanguage>
+          <addCompileSourceRoot>true</addCompileSourceRoot>
+          <generatePackage>com.epam.digital.data.platform.bpms.generated.ws.registry.edr</generatePackage>
+          <schemaDirectory>${project.basedir}/src/main/resources/wsdl</schemaDirectory>
+          <schemaIncludes>
+            <include>edr-registry.wsdl</include>
+          </schemaIncludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>
