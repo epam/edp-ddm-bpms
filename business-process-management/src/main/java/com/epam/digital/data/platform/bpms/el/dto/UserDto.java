@@ -1,6 +1,8 @@
 package com.epam.digital.data.platform.bpms.el.dto;
 
 import com.epam.digital.data.platform.starter.security.dto.JwtClaimsDto;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -43,5 +45,18 @@ public class UserDto {
 
   public String getFullName() {
     return jwtClaimsDto == null ? null : jwtClaimsDto.getFullName();
+  }
+
+  public List<String> getRoles() {
+    return jwtClaimsDto == null ? Collections.emptyList() : jwtClaimsDto.getRoles();
+  }
+
+  public String getSubjectType() {
+    return jwtClaimsDto == null || jwtClaimsDto.getSubjectType() == null ? null
+        : jwtClaimsDto.getSubjectType().name();
+  }
+
+  public Boolean isRepresentative() {
+    return jwtClaimsDto == null ? null : jwtClaimsDto.isRepresentative();
   }
 }

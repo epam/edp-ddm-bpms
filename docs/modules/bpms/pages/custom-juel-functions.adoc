@@ -89,8 +89,8 @@ AbstractApplicationContextAwareJuelFunction <.. customGroovyScript  : imports st
 .Щоб додати нову JUEL функцію треба:
 * Створити нащадка `AbstractApplicationContextAwareJuelFunction`
 * У щойно створеному нащадку імплементувати статичний Java метод що відповідає бізнес вимогам задачі
-** для доступу до Camunda Execution Context використовувати `AbstractCustomJuelFunction::getExecution`
-** для доступу до Spring бінів використовувати `AbstractCustomJuelFunction::getBean` замість автовайрингу
+** для доступу до Camunda Execution Context використовувати `AbstractApplicationContextAwareJuelFunction::getExecution`
+** для доступу до Spring бінів використовувати `AbstractApplicationContextAwareJuelFunction::getBean` замість автовайрингу
 * Додати посилання на функцію до скрипту `/groovy/importStaticJavaFunctions.groovy`, наприклад `foo = foo.bar.FooJuelFunction.&foo`
 * Додати документацію на функцію до цього розділу
 
@@ -109,8 +109,8 @@ AbstractApplicationContextAwareJuelFunction <.. customGroovyScript  : imports st
 @startuml
 package el {
   package juel {
-    abstract class AbstractCustomJuelFunction
-    class InitiatorJuelFunction #back:lightblue;line:green;text:black extends AbstractCustomJuelFunction {
+    abstract class AbstractApplicationContextAwareJuelFunction
+    class InitiatorJuelFunction #back:lightblue;line:green;text:black extends AbstractApplicationContextAwareJuelFunction {
       + {static} UserDto initiator()
     }
   }
@@ -127,7 +127,7 @@ package el {
       + String getEdrpou()
     }
   }
-  AbstractCustomJuelFunction ..[hidden]> UserDto
+  AbstractApplicationContextAwareJuelFunction ..[hidden]> UserDto
   InitiatorJuelFunction .> UserDto : returns
 }
 UserDto .o JwtClaimsDto
