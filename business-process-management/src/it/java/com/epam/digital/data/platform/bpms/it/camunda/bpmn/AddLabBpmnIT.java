@@ -8,13 +8,15 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.junit.Test;
+import org.springframework.http.HttpMethod;
 
 public class AddLabBpmnIT extends BaseBpmnIT {
 
   @Test
   @Deployment(resources = {"bpmn/add-lab.bpmn"})
   public void test() throws IOException {
-    stubDataFactorySearch(StubData.builder()
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
         .resource("laboratory-equal-edrpou-name-count")
         .queryParams(Maps.of("name", "labName", "edrpou", "11111111"))
         .response("[]")

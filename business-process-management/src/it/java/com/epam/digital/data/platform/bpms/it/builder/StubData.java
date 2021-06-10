@@ -4,11 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.http.HttpMethod;
 
 @Getter
 @Builder
 public class StubData {
 
+  private HttpMethod httpMethod;
   private String resource;
   private String resourceId;
   private String requestBody;

@@ -21,6 +21,8 @@ public class InitiatorTokenStartEventListenerTest {
 
   @Test
   public void testNotAuthenticated() {
+    SecurityContextHolder.getContext().setAuthentication(null);
+
     initiatorTokenStartEventListener.notify(execution);
 
     verify(execution).setVariableLocalTransient("initiator_access_token", null);

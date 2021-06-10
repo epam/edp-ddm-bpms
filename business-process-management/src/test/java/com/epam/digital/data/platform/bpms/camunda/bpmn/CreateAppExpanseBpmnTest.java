@@ -1,7 +1,6 @@
 package com.epam.digital.data.platform.bpms.camunda.bpmn;
 
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
-import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
 import static org.junit.Assert.assertThrows;
 
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
@@ -13,6 +12,7 @@ import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
+import org.springframework.http.HttpMethod;
 
 public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
 
@@ -32,157 +32,145 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
     var addLetterDataActivityDefinitionKey = "Activity_shared-add-letter-data";
     var signAppIncludeActivityDefinitionKey = "Activity_shared-sign-app-include";
 
-    mockDataFactoryGet(StubData.builder()
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
         .resource("laboratory")
         .resourceId(labId)
         .response("/json/create-app/data-factory/findLaboratoryResponse.json")
         .build());
 
-    mockDataFactoryGet(StubData.builder()
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
         .resource("solution-type-equal-constant-code")
         .queryParams(Map.of("constantCode", "ADD"))
         .response("/json/create-app/data-factory/solutionTypeAddResponse.json")
         .build());
 
-    mockDataFactoryGet(StubData.builder()
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
         .resource("application-type-equal-constant-code")
         .queryParams(Map.of("constantCode", "EXPANSE"))
         .response("/json/create-app/data-factory/applicationTypeExpanseResponse.json")
         .build());
 
     mockDigitalSignatureSign(StubData.builder()
+        .httpMethod(HttpMethod.POST)
         .requestBody("/json/create-app/dso/expanseIncludeSystemSignatureRequest.json")
         .response("{\"signature\": \"test\"}")
         .build());
 
-    mockDataFactoryCreate(StubData.builder()
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.POST)
         .resource("registration")
         .requestBody("/json/create-app/data-factory/createApplicationExpanseRequest.json")
         .response("{}")
         .build());
 
-    var processInstance = runtimeService().startProcessInstanceByKey(PROCESS_DEFINITION_ID);
-    assertThat(processInstance).isStarted();
+    startProcessInstance(PROCESS_DEFINITION_ID);
 
-    var processInstanceId = processInstance.getId();
-    String initiator = null;
-
-    expectedVariablesMap.put("initiator", initiator);
+    addExpectedVariable("initiator", null);
 
     // search lab
-    assertWaitingActivity(processInstance, searchLabFormActivityDefinitionKey, "shared-search-lab");
+    assertWaitingActivity(searchLabFormActivityDefinitionKey, "shared-search-lab");
 
     completeTask(searchLabFormActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-search-lab.json", processInstanceId);
-
-    addExpectedCephContent(processInstanceId, addApplicationActivityDefinitionKey,
-        "/json/create-app/form-data/name-edrpou-prepopulation.json");
-    addExpectedCephContent(processInstanceId, searchLabFormActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-search-lab.json");
 
-    expectedVariablesMap.put("laboratoryId", labId);
+    addExpectedCephContent(addApplicationActivityDefinitionKey,
+        "/json/create-app/form-data/name-edrpou-prepopulation.json");
+    addExpectedCephContent(searchLabFormActivityDefinitionKey,
+        "/json/create-app/form-data/Activity_shared-search-lab.json");
+
+    addExpectedVariable("laboratoryId", labId);
 
     // add application
-    assertWaitingActivity(processInstance, addApplicationActivityDefinitionKey,
-        "shared-add-application");
+    assertWaitingActivity(addApplicationActivityDefinitionKey, "shared-add-application");
 
     completeTask(addApplicationActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-add-application.json",
-        processInstanceId);
-
-    addExpectedCephContent(processInstanceId, addApplicationActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-add-application.json");
-    addExpectedCephContent(processInstanceId, addBioPhysLaborFactorsActivityDefinitionKey,
+
+    addExpectedCephContent(addApplicationActivityDefinitionKey,
+        "/json/create-app/form-data/Activity_shared-add-application.json");
+    addExpectedCephContent(addBioPhysLaborFactorsActivityDefinitionKey,
         "/json/create-app/form-data/name-registrationNo-prepopulation.json");
-    addExpectedCephContent(processInstanceId, addChemFactorsActivityDefinitionKey,
+    addExpectedCephContent(addChemFactorsActivityDefinitionKey,
         "/json/create-app/form-data/name-registrationNo-prepopulation.json");
     // add bio phys labor and chem factors
-    assertWaitingActivity(processInstance, addBioPhysLaborFactorsActivityDefinitionKey,
+    assertWaitingActivity(addBioPhysLaborFactorsActivityDefinitionKey,
         "shared-add-bio-phys-labor-factors");
-    assertWaitingActivity(processInstance, addChemFactorsActivityDefinitionKey,
+    assertWaitingActivity(addChemFactorsActivityDefinitionKey,
         "shared-add-chem-factors");
 
     completeTask(addBioPhysLaborFactorsActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-add-bio-phys-labor-factors.json",
-        processInstanceId);
-    completeTask(addChemFactorsActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-add-chem-factors.json",
-        processInstanceId);
-
-    addExpectedCephContent(processInstanceId, addBioPhysLaborFactorsActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-add-bio-phys-labor-factors.json");
-    addExpectedCephContent(processInstanceId, addChemFactorsActivityDefinitionKey,
+    completeTask(addChemFactorsActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-add-chem-factors.json");
-    addExpectedCephContent(processInstanceId, checkComplianceActivityDefinitionKey,
+
+    addExpectedCephContent(addBioPhysLaborFactorsActivityDefinitionKey,
+        "/json/create-app/form-data/Activity_shared-add-bio-phys-labor-factors.json");
+    addExpectedCephContent(addChemFactorsActivityDefinitionKey,
+        "/json/create-app/form-data/Activity_shared-add-chem-factors.json");
+    addExpectedCephContent(checkComplianceActivityDefinitionKey,
         "/json/create-app/form-data/name-registrationNo-prepopulation.json");
 
     // check compliance
-    assertWaitingActivity(processInstance, checkComplianceActivityDefinitionKey,
-        "shared-check-complience");
+    assertWaitingActivity(checkComplianceActivityDefinitionKey, "shared-check-complience");
 
     completeTask(checkComplianceActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-check-compliance_noErrors.json",
-        processInstanceId);
-
-    addExpectedCephContent(processInstanceId, checkComplianceActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-check-compliance_noErrors.json");
-    addExpectedCephContent(processInstanceId, addDecisionIncludeActivityDefinitionKey,
+
+    addExpectedCephContent(checkComplianceActivityDefinitionKey,
+        "/json/create-app/form-data/Activity_shared-check-compliance_noErrors.json");
+    addExpectedCephContent(addDecisionIncludeActivityDefinitionKey,
         "/json/create-app/form-data/name-registrationNo-solution-include-prepopulation.json");
-    expectedVariablesMap.put("solutionTypeId", "ADD=SUCCESS");
+    addExpectedVariable("solutionTypeId", "ADD=SUCCESS");
     // add decision include
-    assertWaitingActivity(processInstance, addDecisionIncludeActivityDefinitionKey,
-        "shared-add-decision-include");
+    assertWaitingActivity(addDecisionIncludeActivityDefinitionKey, "shared-add-decision-include");
 
     completeTask(addDecisionIncludeActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-add-decision-include.json",
-        processInstanceId);
-
-    addExpectedCephContent(processInstanceId, addDecisionIncludeActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-add-decision-include.json");
-    addExpectedCephContent(processInstanceId, addLetterDataActivityDefinitionKey,
+
+    addExpectedCephContent(addDecisionIncludeActivityDefinitionKey,
+        "/json/create-app/form-data/Activity_shared-add-decision-include.json");
+    addExpectedCephContent(addLetterDataActivityDefinitionKey,
         "/json/create-app/form-data/name-registrationNo-solution-include-prepopulation.json");
 
     // add letter data
-    assertWaitingActivity(processInstance, addLetterDataActivityDefinitionKey,
-        "shared-add-letter-data");
+    assertWaitingActivity(addLetterDataActivityDefinitionKey, "shared-add-letter-data");
 
     completeTask(addLetterDataActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-add-letter-data.json",
-        processInstanceId);
-
-    addExpectedCephContent(processInstanceId, addLetterDataActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-add-letter-data.json");
-    addExpectedCephContent(processInstanceId, signAppIncludeActivityDefinitionKey,
+
+    addExpectedCephContent(addLetterDataActivityDefinitionKey,
+        "/json/create-app/form-data/Activity_shared-add-letter-data.json");
+    addExpectedCephContent(signAppIncludeActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-sign-app-include_prepopulation.json");
 
     // sign app include
-    assertWaitingActivity(processInstance, signAppIncludeActivityDefinitionKey,
-        "shared-sign-app-include");
+    assertWaitingActivity(signAppIncludeActivityDefinitionKey, "shared-sign-app-include");
 
     completeTask(signAppIncludeActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-sign-app-include.json",
-        processInstanceId);
+        "/json/create-app/form-data/Activity_shared-sign-app-include.json");
 
-    addExpectedCephContent(processInstanceId, signAppIncludeActivityDefinitionKey,
+    addExpectedCephContent(signAppIncludeActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-sign-app-include.json");
 
     var systemSignatureCephKeyRefVarName = "system_signature_ceph_key";
-    var systemSignatureCephKey = "lowcode_" + processInstanceId + "_" +
+    var systemSignatureCephKey = "lowcode_" + currentProcessInstanceId + "_" +
         systemSignatureCephKeyRefVarName;
 
-    expectedVariablesMap.put("x_digital_signature_derived_ceph_key", systemSignatureCephKey);
-    expectedVariablesMap.put("sys-var-process-completion-result",
+    addExpectedVariable("x_digital_signature_derived_ceph_key", systemSignatureCephKey);
+    addExpectedVariable("sys-var-process-completion-result",
         "Прийнято рішення про розширення факторів");
 
-    String signature = cephService.getContent(cephBucketName, systemSignatureCephKey);
-    Map<String, Object> signatureMap = objectMapper.readerForMapOf(Object.class)
-        .readValue(signature);
-    Map<String, Object> expectedSignatureMap = objectMapper.readerForMapOf(Object.class).readValue(
+    var signature = cephService.getContent(cephBucketName, systemSignatureCephKey);
+    var signatureMap = objectMapper.readerForMapOf(Object.class).readValue(signature);
+    var expectedSignatureMap = objectMapper.readerForMapOf(Object.class).readValue(
         TestUtils.getContent("/json/create-app/dso/expanseIncludeSystemSignatureCephContent.json"));
     Assertions.assertThat(signatureMap).isEqualTo(expectedSignatureMap);
 
-    assertThat(processInstance).isEnded();
-    assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
+    assertThat(currentProcessInstance).isEnded();
+    assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
     assertCephContent();
 
     mockServer.verify();
@@ -202,157 +190,145 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
     var addLetterDataActivityDefinitionKey = "Activity_1eujure";
     var signAppDenyActivityDefinitionKey = "Activity_shared-sign-app-deny";
 
-    mockDataFactoryGet(StubData.builder()
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
         .resource("laboratory")
         .resourceId(labId)
         .response("/json/create-app/data-factory/findLaboratoryResponse.json")
         .build());
 
-    mockDataFactorySearch(StubData.builder()
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
         .resource("solution-type-equal-constant-code")
         .queryParams(Map.of("constantCode", "WO_CONSIDER"))
         .response("/json/create-app/data-factory/solutionTypeWoConsiderResponse.json")
         .build());
 
-    mockDataFactorySearch(StubData.builder()
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
         .resource("application-type-equal-constant-code")
         .queryParams(Map.of("constantCode", "EXPANSE"))
         .response("/json/create-app/data-factory/applicationTypeExpanseResponse.json")
         .build());
 
     mockDigitalSignatureSign(StubData.builder()
+        .httpMethod(HttpMethod.POST)
         .requestBody("/json/create-app/dso/expanseDenySystemSignatureRequest.json")
         .response("{\"signature\": \"test\"}")
         .build());
 
-    mockDataFactoryCreate(StubData.builder()
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.POST)
         .resource("registration")
         .requestBody("/json/create-app/data-factory/createApplicationExpanseDenyRequest.json")
         .response("{}")
         .build());
 
-    var processInstance = runtimeService().startProcessInstanceByKey(PROCESS_DEFINITION_ID);
-    assertThat(processInstance).isStarted();
+    startProcessInstance(PROCESS_DEFINITION_ID);
 
-    var processInstanceId = processInstance.getId();
-    String initiator = null;
-
-    expectedVariablesMap.put("initiator", initiator);
+    addExpectedVariable("initiator", null);
 
     // search lab
-    assertWaitingActivity(processInstance, searchLabFormActivityDefinitionKey, "shared-search-lab");
+    assertWaitingActivity(searchLabFormActivityDefinitionKey, "shared-search-lab");
 
     completeTask(searchLabFormActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-search-lab.json", processInstanceId);
-
-    addExpectedCephContent(processInstanceId, addApplicationActivityDefinitionKey,
-        "/json/create-app/form-data/name-edrpou-prepopulation.json");
-    addExpectedCephContent(processInstanceId, searchLabFormActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-search-lab.json");
 
-    expectedVariablesMap.put("laboratoryId", labId);
+    addExpectedCephContent(addApplicationActivityDefinitionKey,
+        "/json/create-app/form-data/name-edrpou-prepopulation.json");
+    addExpectedCephContent(searchLabFormActivityDefinitionKey,
+        "/json/create-app/form-data/Activity_shared-search-lab.json");
+
+    addExpectedVariable("laboratoryId", labId);
 
     // add application
-    assertWaitingActivity(processInstance, addApplicationActivityDefinitionKey,
-        "shared-add-application");
+    assertWaitingActivity(addApplicationActivityDefinitionKey, "shared-add-application");
 
     completeTask(addApplicationActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-add-application.json",
-        processInstanceId);
-
-    addExpectedCephContent(processInstanceId, addApplicationActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-add-application.json");
-    addExpectedCephContent(processInstanceId, addBioPhysLaborFactorsActivityDefinitionKey,
+
+    addExpectedCephContent(addApplicationActivityDefinitionKey,
+        "/json/create-app/form-data/Activity_shared-add-application.json");
+    addExpectedCephContent(addBioPhysLaborFactorsActivityDefinitionKey,
         "/json/create-app/form-data/name-registrationNo-prepopulation.json");
-    addExpectedCephContent(processInstanceId, addChemFactorsActivityDefinitionKey,
+    addExpectedCephContent(addChemFactorsActivityDefinitionKey,
         "/json/create-app/form-data/name-registrationNo-prepopulation.json");
     // add bio phys labor and chem factors
-    assertWaitingActivity(processInstance, addBioPhysLaborFactorsActivityDefinitionKey,
+    assertWaitingActivity(addBioPhysLaborFactorsActivityDefinitionKey,
         "shared-add-bio-phys-labor-factors");
-    assertWaitingActivity(processInstance, addChemFactorsActivityDefinitionKey,
+    assertWaitingActivity(addChemFactorsActivityDefinitionKey,
         "shared-add-chem-factors");
 
     completeTask(addBioPhysLaborFactorsActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-add-bio-phys-labor-factors.json",
-        processInstanceId);
-    completeTask(addChemFactorsActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-add-chem-factors.json",
-        processInstanceId);
-
-    addExpectedCephContent(processInstanceId, addBioPhysLaborFactorsActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-add-bio-phys-labor-factors.json");
-    addExpectedCephContent(processInstanceId, addChemFactorsActivityDefinitionKey,
+    completeTask(addChemFactorsActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-add-chem-factors.json");
-    addExpectedCephContent(processInstanceId, checkComplianceActivityDefinitionKey,
+
+    addExpectedCephContent(addBioPhysLaborFactorsActivityDefinitionKey,
+        "/json/create-app/form-data/Activity_shared-add-bio-phys-labor-factors.json");
+    addExpectedCephContent(addChemFactorsActivityDefinitionKey,
+        "/json/create-app/form-data/Activity_shared-add-chem-factors.json");
+    addExpectedCephContent(checkComplianceActivityDefinitionKey,
         "/json/create-app/form-data/name-registrationNo-prepopulation.json");
 
     // check compliance
-    assertWaitingActivity(processInstance, checkComplianceActivityDefinitionKey,
-        "shared-check-complience");
+    assertWaitingActivity(checkComplianceActivityDefinitionKey, "shared-check-complience");
 
     completeTask(checkComplianceActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-check-compliance_errors.json",
-        processInstanceId);
-
-    addExpectedCephContent(processInstanceId, checkComplianceActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-check-compliance_errors.json");
-    addExpectedCephContent(processInstanceId, addDecisionDenyActivityDefinitionKey,
+
+    addExpectedCephContent(checkComplianceActivityDefinitionKey,
+        "/json/create-app/form-data/Activity_shared-check-compliance_errors.json");
+    addExpectedCephContent(addDecisionDenyActivityDefinitionKey,
         "/json/create-app/form-data/name-registrationNo-solution-deny-prepopulation.json");
-    expectedVariablesMap.put("solutionTypeId", "woconsider");
+    addExpectedVariable("solutionTypeId", "woconsider");
     // add decision include
-    assertWaitingActivity(processInstance, addDecisionDenyActivityDefinitionKey,
-        "shared-add-decision-deny");
+    assertWaitingActivity(addDecisionDenyActivityDefinitionKey, "shared-add-decision-deny");
 
     completeTask(addDecisionDenyActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-add-decision-deny.json",
-        processInstanceId);
-
-    addExpectedCephContent(processInstanceId, addDecisionDenyActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-add-decision-deny.json");
-    addExpectedCephContent(processInstanceId, addLetterDataActivityDefinitionKey,
+
+    addExpectedCephContent(addDecisionDenyActivityDefinitionKey,
+        "/json/create-app/form-data/Activity_shared-add-decision-deny.json");
+    addExpectedCephContent(addLetterDataActivityDefinitionKey,
         "/json/create-app/form-data/name-registrationNo-solution-deny-prepopulation.json");
 
     // add letter data
-    assertWaitingActivity(processInstance, addLetterDataActivityDefinitionKey,
-        "shared-add-letter-data");
+    assertWaitingActivity(addLetterDataActivityDefinitionKey, "shared-add-letter-data");
 
     completeTask(addLetterDataActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-add-letter-data.json",
-        processInstanceId);
-
-    addExpectedCephContent(processInstanceId, addLetterDataActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-add-letter-data.json");
-    addExpectedCephContent(processInstanceId, signAppDenyActivityDefinitionKey,
+
+    addExpectedCephContent(addLetterDataActivityDefinitionKey,
+        "/json/create-app/form-data/Activity_shared-add-letter-data.json");
+    addExpectedCephContent(signAppDenyActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-sign-app-deny_prepopulation.json");
 
     // sign app deny
-    assertWaitingActivity(processInstance, signAppDenyActivityDefinitionKey,
-        "shared-sign-app-deny");
+    assertWaitingActivity(signAppDenyActivityDefinitionKey, "shared-sign-app-deny");
 
     completeTask(signAppDenyActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-sign-app-deny.json",
-        processInstanceId);
+        "/json/create-app/form-data/Activity_shared-sign-app-deny.json");
 
-    addExpectedCephContent(processInstanceId, signAppDenyActivityDefinitionKey,
+    addExpectedCephContent(signAppDenyActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-sign-app-deny.json");
 
     var systemSignatureCephKeyRefVarName = "system_signature_ceph_key";
-    var systemSignatureCephKey = "lowcode_" + processInstanceId + "_" +
+    var systemSignatureCephKey = "lowcode_" + currentProcessInstanceId + "_" +
         systemSignatureCephKeyRefVarName;
 
-    expectedVariablesMap.put("x_digital_signature_derived_ceph_key", systemSignatureCephKey);
-    expectedVariablesMap.put("sys-var-process-completion-result",
+    addExpectedVariable("x_digital_signature_derived_ceph_key", systemSignatureCephKey);
+    addExpectedVariable("sys-var-process-completion-result",
         "Прийнято рішення про залишення без розгляду");
 
-    String signature = cephService.getContent(cephBucketName, systemSignatureCephKey);
-    Map<String, Object> signatureMap = objectMapper.readerForMapOf(Object.class)
-        .readValue(signature);
-    Map<String, Object> expectedSignatureMap = objectMapper.readerForMapOf(Object.class).readValue(
+    var signature = cephService.getContent(cephBucketName, systemSignatureCephKey);
+    var signatureMap = objectMapper.readerForMapOf(Object.class).readValue(signature);
+    var expectedSignatureMap = objectMapper.readerForMapOf(Object.class).readValue(
         TestUtils.getContent("/json/create-app/dso/expanseDenySystemSignatureCephContent.json"));
     Assertions.assertThat(signatureMap).isEqualTo(expectedSignatureMap);
 
-    assertThat(processInstance).isEnded();
-    assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
+    assertThat(currentProcessInstance).isEnded();
+    assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
     assertCephContent();
 
     mockServer.verify();
@@ -365,34 +341,33 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
 
     var searchLabFormActivityDefinitionKey = "Activity_shared-search-lab";
 
-    mockDataFactoryGet(StubData.builder()
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
         .resource("laboratory")
         .resourceId(labId)
         .response(
             "/json/create-app/data-factory/findLaboratoryWithoutAccreditationResponse.json")
         .build());
 
-    mockDataFactoryGet(StubData.builder()
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
         .resource("staff-equal-laboratory-id-count")
         .queryParams(Map.of("laboratoryId", labId))
         .response("[]")
         .build());
 
-    var processInstance = runtimeService().startProcessInstanceByKey(PROCESS_DEFINITION_ID);
-    assertThat(processInstance).isStarted();
+    startProcessInstance(PROCESS_DEFINITION_ID);
 
-    var processInstanceId = processInstance.getId();
     String initiator = null;
 
-    expectedVariablesMap.put("initiator", initiator);
+    addExpectedVariable("initiator", initiator);
     // search lab
-    assertWaitingActivity(processInstance, searchLabFormActivityDefinitionKey, "shared-search-lab");
+    assertWaitingActivity(searchLabFormActivityDefinitionKey, "shared-search-lab");
 
     var ex = assertThrows(ValidationException.class,
         () -> completeTask(searchLabFormActivityDefinitionKey,
-            "/json/create-app/form-data/Activity_shared-search-lab_without_accreditation.json",
-            processInstanceId));
-    assertWaitingActivity(processInstance, searchLabFormActivityDefinitionKey, "shared-search-lab");
+            "/json/create-app/form-data/Activity_shared-search-lab_without_accreditation.json"));
+    assertWaitingActivity(searchLabFormActivityDefinitionKey, "shared-search-lab");
     Assertions.assertThat(ex.getDetails().getErrors()).hasSize(1);
     Assertions.assertThat(ex.getDetails().getErrors())
         .contains(new ErrorDetailDto("Немає ознаки акредитованості", "id", labId));
@@ -408,41 +383,37 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
     var searchLabFormActivityDefinitionKey = "Activity_shared-search-lab";
     var addApplicationActivityDefinitionKey = "Activity_shared-add-application";
 
-    mockDataFactoryGet(StubData.builder()
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
         .resource("laboratory")
         .resourceId(labId)
         .response(
             "/json/create-app/data-factory/findLaboratoryWithoutAccreditationResponse.json")
         .build());
 
-    mockDataFactoryGet(StubData.builder()
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
         .resource("staff-equal-laboratory-id-count")
         .queryParams(Map.of("laboratoryId", labId))
         .response("[{\"cnt\":1}]")
         .build());
 
-    var processInstance = runtimeService().startProcessInstanceByKey(PROCESS_DEFINITION_ID);
-    assertThat(processInstance).isStarted();
+    startProcessInstance(PROCESS_DEFINITION_ID);
 
-    var processInstanceId = processInstance.getId();
-    String initiator = null;
-
-    expectedVariablesMap.put("initiator", initiator);
+    addExpectedVariable("initiator", null);
     // search lab
-    assertWaitingActivity(processInstance, searchLabFormActivityDefinitionKey, "shared-search-lab");
+    assertWaitingActivity(searchLabFormActivityDefinitionKey, "shared-search-lab");
 
     completeTask(searchLabFormActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-search-lab_without_accreditation.json",
-        processInstanceId);
-
-    expectedVariablesMap.put("laboratoryId", labId);
-    addExpectedCephContent(processInstanceId, searchLabFormActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-search-lab_without_accreditation.json");
-    addExpectedCephContent(processInstanceId, addApplicationActivityDefinitionKey,
+
+    addExpectedVariable("laboratoryId", labId);
+    addExpectedCephContent(searchLabFormActivityDefinitionKey,
+        "/json/create-app/form-data/Activity_shared-search-lab_without_accreditation.json");
+    addExpectedCephContent(addApplicationActivityDefinitionKey,
         "/json/create-app/form-data/name-edrpou-prepopulation.json");
 
-    assertWaitingActivity(processInstance, addApplicationActivityDefinitionKey,
-        "shared-add-application");
+    assertWaitingActivity(addApplicationActivityDefinitionKey, "shared-add-application");
 
     mockServer.verify();
   }

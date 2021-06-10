@@ -13,6 +13,7 @@ import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.http.HttpMethod;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DataFactoryConnectorBatchReadDelegateTest extends BaseBpmnTest {
@@ -23,12 +24,14 @@ public class DataFactoryConnectorBatchReadDelegateTest extends BaseBpmnTest {
     String chemResearchId = "7074945f-e088-446b-8c28-325aca4f423f";
     String physResearchId = "0b3c9f55-ba50-4d87-970a-bfbb8e31adeb";
 
-    mockDataFactoryGet(StubData.builder()
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
         .resource("research")
         .resourceId(chemResearchId)
         .response("/json/researchResponseChem.json")
         .build());
-    mockDataFactoryGet(StubData.builder()
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
         .resource("research")
         .resourceId(physResearchId)
         .response("/json/researchResponsePhys.json")

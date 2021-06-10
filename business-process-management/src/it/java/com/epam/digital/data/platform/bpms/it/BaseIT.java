@@ -1,15 +1,25 @@
 package com.epam.digital.data.platform.bpms.it;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.delete;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
 
 import com.epam.digital.data.platform.bpms.delegate.ceph.CephKeyProvider;
 import com.epam.digital.data.platform.bpms.it.config.TestCephServiceImpl;
-import com.epam.digital.data.platform.bpms.it.config.TestFormDataCephServiceImpl;
+import com.epam.digital.data.platform.bpms.it.util.TestUtils;
 import com.epam.digital.data.platform.starter.security.SystemRole;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.WireMockServer;
 import com.google.common.io.ByteStreams;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.ws.rs.client.Client;
@@ -28,6 +38,7 @@ import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -55,11 +66,12 @@ public abstract class BaseIT {
   @Inject
   protected TestCephServiceImpl cephService;
   @Inject
-  protected TestFormDataCephServiceImpl formDataCephService;
-  @Inject
   protected CephKeyProvider cephKeyProvider;
   @Inject
   private AuthorizationService authorizationService;
+  @Inject
+  @Qualifier("keycloakMockServer")
+  protected WireMockServer keycloakMockServer;
 
   @LocalServerPort
   protected int port;
@@ -69,8 +81,8 @@ public abstract class BaseIT {
 
   @BeforeClass
   public static void setup() throws IOException {
-    validAccessToken = new String(ByteStreams
-        .toByteArray(BaseIT.class.getResourceAsStream("/json/testuserAccessToken.json")));
+    validAccessToken = new String(ByteStreams.toByteArray(Objects
+        .requireNonNull(BaseIT.class.getResourceAsStream("/json/testuserAccessToken.json"))));
   }
 
   @Before
@@ -125,5 +137,54 @@ public abstract class BaseIT {
     authorization.setUserId(null);
     authorization.setGroupId(groupId);
     authorizationService.saveAuthorization(authorization);
+  }
+
+  protected String convertJsonToString(String jsonFilePath) throws IOException {
+    return TestUtils.getContent(jsonFilePath);
+  }
+
+  protected void mockConnectToKeycloak() throws IOException {
+    keycloakMockServer.addStubMapping(
+        stubFor(post(urlPathEqualTo("/auth/realms/test-realm/protocol/openid-connect/token"))
+            .withRequestBody(equalTo("grant_type=client_credentials"))
+            .willReturn(aResponse().withStatus(200)
+                .withHeader("Content-type", "application/json")
+                .withBody(convertJsonToString("/json/keycloak/keycloakConnectResponse.json")))));
+  }
+
+  protected void mockKeycloakGetUsers(String userName, String responseBody) throws IOException {
+    keycloakMockServer.addStubMapping(
+        stubFor(get(urlPathEqualTo("/auth/admin/realms/test-realm/users"))
+            .withQueryParam("username", equalTo(userName))
+            .willReturn(aResponse().withStatus(200)
+                .withHeader("Content-type", "application/json")
+                .withBody(convertJsonToString(responseBody)))));
+  }
+
+  protected void mockKeycloakGetRole(String role, String responseBody, int status)
+      throws IOException {
+    keycloakMockServer.addStubMapping(
+        stubFor(get(urlPathEqualTo("/auth/admin/realms/test-realm/roles/" + role))
+            .willReturn(aResponse().withStatus(status)
+                .withHeader("Content-type", "application/json")
+                .withBody(convertJsonToString(responseBody)))));
+  }
+
+  protected void mockKeycloakAddRole(String userId, String request) throws IOException {
+    var roleMappingsUrl = String
+        .format("/auth/admin/realms/test-realm/users/%s/role-mappings/realm", userId);
+
+    keycloakMockServer.addStubMapping(
+        stubFor(post(urlPathEqualTo(roleMappingsUrl)).withRequestBody(
+            equalToJson(convertJsonToString(request))).willReturn(aResponse().withStatus(200))));
+  }
+
+  protected void mockKeycloakDeleteRole(String userId, String request) throws IOException {
+    var roleMappingsUrl = String
+        .format("/auth/admin/realms/test-realm/users/%s/role-mappings/realm", userId);
+
+    keycloakMockServer.addStubMapping(
+        stubFor(delete(urlPathEqualTo(roleMappingsUrl)).withRequestBody(
+            equalToJson(convertJsonToString(request))).willReturn(aResponse().withStatus(200))));
   }
 }

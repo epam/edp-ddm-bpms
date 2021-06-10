@@ -1,6 +1,7 @@
 package com.epam.digital.data.platform.bpms.it.camunda.bpmn;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -24,12 +25,14 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -61,7 +64,6 @@ public abstract class BaseBpmnIT extends BaseIT {
   @Before
   public void init() {
     cephService.clearStorage();
-    formDataCephService.clearStorage();
     expectedVariablesMap.clear();
     expectedCephStorage.clear();
     runtimeService.createProcessInstanceQuery().list().forEach(
@@ -72,22 +74,64 @@ public abstract class BaseBpmnIT extends BaseIT {
   protected void completeTask(String taskId, String processInstanceId, String formData)
       throws IOException {
     var cephKey = cephKeyProvider.generateKey(taskId, processInstanceId);
-    formDataCephService.putFormData(cephKey, deserializeFormData(TestUtils.getContent(formData)));
+    cephService.putFormData(cephKey, deserializeFormData(TestUtils.getContent(formData)));
     String id = taskService.createTaskQuery().taskDefinitionKey(taskId).singleResult().getId();
     taskService.complete(id);
   }
 
-  protected void stubDataFactorySearch(StubData data) throws IOException {
-    var uri = UriComponentsBuilder.fromPath(MOCK_SERVER).pathSegment(data.getResource()).build()
-        .toUri();
-    MappingBuilder mappingBuilder = get(urlPathEqualTo(uri.getPath()))
-        .willReturn(aResponse().withStatus(200).withBody(TestUtils.getContent(data.getResponse())));
+  protected void stubDataFactoryRequest(StubData data) throws IOException {
+    var uriBuilder = UriComponentsBuilder.fromPath(MOCK_SERVER).pathSegment(data.getResource());
+
+    dataFactoryMockServer.addStubMapping(stubFor(getMappingBuilder(data, uriBuilder)));
+  }
+
+  protected void stubDigitalSignatureRequest(StubData data) throws IOException {
+    var uriBuilder = UriComponentsBuilder.fromPath("/api/eseal/sign");
+
+    digitalSignatureMockServer.addStubMapping(stubFor(getMappingBuilder(data, uriBuilder)));
+  }
+
+  protected void stubSettingsRequest(StubData data) throws IOException {
+    var uriBuilder = UriComponentsBuilder.fromPath(SETTINGS_MOCK_SERVER)
+        .pathSegment(data.getResource());
+
+    userSettingsWireMock.addStubMapping(stubFor(getMappingBuilder(data, uriBuilder)));
+  }
+
+  private MappingBuilder getMappingBuilder(StubData data, UriComponentsBuilder uriBuilder)
+      throws IOException {
+    if (Objects.nonNull(data.getResourceId())) {
+      uriBuilder.pathSegment(data.getResourceId());
+    }
+
+    var mappingBuilder = getMappingBuilderForMethod(data.getHttpMethod(), uriBuilder.toUriString());
+    data.getHeaders().forEach((key, value) -> mappingBuilder.withHeader(key, equalTo(value)));
 
     data.getQueryParams()
         .forEach((key, value) -> mappingBuilder.withQueryParam(key, equalTo(value)));
 
-    data.getHeaders().forEach((key, value) -> mappingBuilder.withHeader(key, equalTo(value)));
-    dataFactoryMockServer.addStubMapping(stubFor(mappingBuilder));
+    if (Objects.nonNull(data.getRequestBody())) {
+      mappingBuilder.withRequestBody(equalToJson(TestUtils.getContent(data.getRequestBody())));
+    }
+
+    mappingBuilder
+        .willReturn(aResponse().withStatus(200).withBody(TestUtils.getContent(data.getResponse())));
+    return mappingBuilder;
+  }
+
+  private MappingBuilder getMappingBuilderForMethod(HttpMethod method, String uri) {
+    switch (method) {
+      case GET:
+        return get(urlPathEqualTo(uri));
+      case POST:
+        return post(urlPathEqualTo(uri));
+      case PUT:
+        return put(urlPathEqualTo(uri));
+      case DELETE:
+        return delete(urlPathEqualTo(uri));
+      default:
+        throw new NullPointerException("Stub method isn't defined");
+    }
   }
 
   protected void stubDataFactoryCreate(StubData data) throws IOException {
@@ -165,7 +209,7 @@ public abstract class BaseBpmnIT extends BaseIT {
 
   protected void assertCephContent() {
     expectedCephStorage.forEach((key, value) -> {
-      var actualMap = formDataCephService.getFormData(key);
+      var actualMap = cephService.getFormData(key);
 
       Assertions.assertThat(actualMap).isEqualTo(value);
     });
@@ -185,6 +229,19 @@ public abstract class BaseBpmnIT extends BaseIT {
     var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, processInstanceId);
 
     expectedCephStorage.put(cephKey, deserializeFormData(TestUtils.getContent(cephContent)));
+  }
+
+  protected void addExpectedVariable(String name, Object value) {
+    expectedVariablesMap.put(name, value);
+  }
+
+  protected String startProcessInstance(String processDefinitionKey, String token)
+      throws JsonProcessingException {
+    var result = postForObject(
+        String.format("api/process-definition/key/%s/start", processDefinitionKey),
+        "{}", Map.class, token);
+
+    return (String) result.get("id");
   }
 
   protected void assertWaitingActivity(ProcessInstance processInstance,

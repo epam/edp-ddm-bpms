@@ -147,7 +147,7 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
   @Test
   @Deployment(resources = {"bpmn/connector/testDataFactoryConnectorUpdateDelegate.bpmn"})
   public void testDataFactoryConnectorUpdateDelegate() {
-    formDataCephService.putFormData("cephKey", FormDataDto.builder()
+    cephService.putFormData("cephKey", FormDataDto.builder()
         .accessToken("token").build());
 
     dataFactoryMockServer.addStubMapping(
@@ -253,7 +253,7 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
 
     var cephKeyToken = cephKeyProvider
         .generateKey("test_token", processInstance.getProcessInstanceId());
-    formDataCephService.putFormData(cephKeyToken, FormDataDto.builder().accessToken("token").build());
+    cephService.putFormData(cephKeyToken, FormDataDto.builder().accessToken("token").build());
 
     String taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionTask").singleResult().getId();
     taskService.complete(taskId);

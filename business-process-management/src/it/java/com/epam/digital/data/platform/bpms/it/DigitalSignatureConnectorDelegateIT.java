@@ -35,7 +35,7 @@ public class DigitalSignatureConnectorDelegateIT extends BaseIT {
 
     var cephKey = cephKeyProvider
         .generateKey("testActivity", processInstance.getProcessInstanceId());
-    formDataCephService.putFormData(cephKey, FormDataDto.builder().accessToken("token").build());
+    cephService.putFormData(cephKey, FormDataDto.builder().accessToken("token").build());
 
     String taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionTask").singleResult().getId();
     taskService.complete(taskId);

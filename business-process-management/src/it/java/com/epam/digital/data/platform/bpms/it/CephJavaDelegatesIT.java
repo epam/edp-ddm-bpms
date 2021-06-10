@@ -85,7 +85,7 @@ public class CephJavaDelegatesIT extends BaseIT {
         + "-secure-sys-var-ref-task-form-data-userTask";
     assertThat(resultVariables).doesNotContainKey("formDataOutput");
 
-    var data = formDataCephService.getFormData(expectedCephKey);
+    var data = cephService.getFormData(expectedCephKey);
     assertThat(data).isNotNull();
     assertThat(data.getData().get("name")).isEqualTo("value ek");
   }
@@ -115,7 +115,7 @@ public class CephJavaDelegatesIT extends BaseIT {
     var data = new LinkedHashMap<String, Object>();
     data.put("prop1", "value1");
 
-    formDataCephService.putFormData("cephKey", FormDataDto.builder().data(data).build());
+    cephService.putFormData("cephKey", FormDataDto.builder().data(data).build());
 
     var processInstance = runtimeService
         .startProcessInstanceByKey("testStartFormKey", "key", vars);

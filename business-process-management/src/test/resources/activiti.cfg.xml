@@ -21,11 +21,28 @@
       <list>
         <bean class="org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin"/>
         <bean class="org.camunda.spin.plugin.impl.SpinProcessEnginePlugin"/>
+        <bean
+          class="com.epam.digital.data.platform.bpms.scripting.StaticJavaFunctionsProcessEnginePlugin">
+          <constructor-arg index="0">
+            <bean
+              class="com.epam.digital.data.platform.bpms.scripting.groovy.StaticJavaFunctionsGroovyScriptEnvResolver"/>
+          </constructor-arg>
+        </bean>
       </list>
     </property>
 
     <property name="expressionManager">
-      <bean class="com.epam.digital.data.platform.bpms.camunda.bpmn.config.TestExpresionManager"/>
+      <bean class="com.epam.digital.data.platform.bpms.camunda.bpmn.config.TestExpressionManager"/>
+    </property>
+    <property name="preParseListeners">
+      <list>
+        <bean class="com.epam.digital.data.platform.bpms.camunda.bpmn.config.TestBpmnParseListener">
+          <constructor-arg>
+            <bean
+              class="com.epam.digital.data.platform.bpms.listener.InitiatorTokenStartEventListener"/>
+          </constructor-arg>
+        </bean>
+      </list>
     </property>
   </bean>
 

@@ -8,6 +8,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.junit.Test;
+import org.springframework.http.HttpMethod;
 
 public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
 
@@ -21,13 +22,15 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
         .response("/json/create-app-exclude/laboratoryByIdResponse.json")
         .build());
 
-    stubDataFactorySearch(StubData.builder()
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
         .resource("solution-type-equal-constant-code")
         .queryParams(Maps.of("constantCode", "EXCLUDE"))
         .response("/json/create-app-exclude/solutionTypeEqualConstantCodeResponse.json")
         .build());
 
-    stubDataFactorySearch(StubData.builder()
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
         .resource("application-type-equal-constant-code")
         .queryParams(Maps.of("constantCode", "EXCLUDE"))
         .response("/json/create-app-exclude/applicationTypeEqualConstantCodeResponse.json")
@@ -89,13 +92,15 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
         .response("/json/create-app-exclude/laboratoryByIdResponse.json")
         .build());
 
-    stubDataFactorySearch(StubData.builder()
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
         .resource("solution-type-equal-constant-code")
         .queryParams(Maps.of("constantCode", "WO_CONSIDER"))
         .response("/json/create-app-exclude/solutionTypeEqualConstantCodeWoConsiderResponse.json")
         .build());
 
-    stubDataFactorySearch(StubData.builder()
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
         .resource("application-type-equal-constant-code")
         .queryParams(Maps.of("constantCode", "EXCLUDE"))
         .response("/json/create-app-exclude/applicationTypeEqualConstantCodeResponse.json")

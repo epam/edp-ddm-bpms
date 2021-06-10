@@ -8,13 +8,15 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.junit.Test;
+import org.springframework.http.HttpMethod;
 
 @Deployment(resources = {"bpmn/update-dict.bpmn"})
 public class UpdateDictBpmnIT extends BaseBpmnIT {
 
   @Test
   public void testHappyPath() throws IOException {
-    stubDataFactorySearch(StubData.builder()
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
         .resource("factor-equal-factor-type-name-count")
         .queryParams(Map.of("name", "testName"))
         .response("[]")
