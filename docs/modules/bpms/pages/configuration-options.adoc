@@ -62,4 +62,9 @@
 |required
 |Группа адміна (повинна мати доступ на зміну прав доступу)
 
+|user-settings-service-api.url
+|string
+|required
+|Адреса сервісу Settings API для роботи з налаштуваннями користувача
+
 |===
