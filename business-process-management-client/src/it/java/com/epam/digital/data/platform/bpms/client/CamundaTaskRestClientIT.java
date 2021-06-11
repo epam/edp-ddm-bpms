@@ -290,4 +290,31 @@ public class CamundaTaskRestClientIT extends BaseIT {
     restClientWireMock.verify(newRequestPattern(RequestMethod.POST,
         new UrlPathPattern(equalTo("/api/task/testId204/claim"), false)));
   }
+
+  @Test
+  public void shouldReturnTaskVariables() throws JsonProcessingException {
+    var taskId = "taskId";
+    var variableValue = "variableValue";
+    var type = "String";
+    var varValueDto = new VariableValueDto();
+    varValueDto.setType(type);
+    varValueDto.setValue(variableValue);
+    Map<String, VariableValueDto> expectedVariables = new HashMap<>();
+    expectedVariables.put(variableValue, varValueDto);
+
+    restClientWireMock.addStubMapping(
+        stubFor(get(urlEqualTo(String.format("/api/task/%s/variables", taskId)))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withStatus(200)
+                .withBody(objectMapper.writeValueAsString(expectedVariables)))
+        )
+    );
+
+    var result = camundaTaskRestClient.getTaskVariables(taskId);
+
+    var resultVariables = result.get(variableValue);
+    assertThat(resultVariables.getValue()).isEqualTo(variableValue);
+    assertThat(resultVariables.getType()).isEqualTo(type);
+  }
 }

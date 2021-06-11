@@ -74,4 +74,14 @@ public interface CamundaTaskRestClient extends BaseFeignClient {
   @PostMapping("/{id}/claim")
   @ErrorHandling
   void claimTaskById(@PathVariable("id") String taskId, @RequestBody ClaimTaskDto claimTaskDto);
+
+  /**
+   * Returns a map containing task variables
+   *
+   * @param taskId task identifier
+   * @return a map containing the {@link VariableValueDto} entities
+   */
+  @GetMapping("/{taskId}/variables")
+  @ErrorHandling
+  Map<String, VariableValueDto> getTaskVariables(@PathVariable("taskId") String taskId);
 }
