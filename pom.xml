@@ -28,6 +28,7 @@
     <ddm-starter-localization.version>1.2.0-SNAPSHOT</ddm-starter-localization.version>
     <ddm-starter-logging.version>1.2.1-SNAPSHOT</ddm-starter-logging.version>
     <ddm-starter-security.version>1.2.1-SNAPSHOT</ddm-starter-security.version>
+    <ddm-starter-trembita-integration.version>0.0.1-SNAPSHOT</ddm-starter-trembita-integration.version>
 
     <deployable.module>business-process-management</deployable.module>
 

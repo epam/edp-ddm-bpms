@@ -1,49 +1,49 @@
 package com.epam.digital.data.platform.bpms.delegate.connector.registry;
 
 import com.epam.digital.data.platform.bpms.delegate.dto.EdrRegistryConnectorResponse;
-import com.epam.digital.data.platform.starter.trembita.integration.dto.SubjectInfoDto;
+import com.epam.digital.data.platform.starter.trembita.integration.dto.SubjectDetailDataDto;
 import com.epam.digital.data.platform.starter.trembita.integration.service.EdrRemoteService;
-import java.util.List;
+import java.math.BigInteger;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.spin.Spin;
-import org.springframework.util.CollectionUtils;
 
 /**
- * The class represents an implementation of {@link JavaDelegate} that is used to search subjects in
- * EDR registry.
+ * The class represents an implementation of {@link JavaDelegate} that is used to search subject
+ * details in EDR registry.
  */
 @Slf4j
 @RequiredArgsConstructor
-public class SearchSubjectsEdrRegistryConnectorDelegate implements JavaDelegate {
+public class SubjectDetailEdrRegistryConnectorDelegate implements JavaDelegate {
 
-  protected static final String EDR_CODE_VARIABLE = "code";
-  protected static final String RESPONSE_VARIABLE = "response";
-  protected static final String AUTHORIZATION_TOKEN_VARIABLE = "authorizationToken";
+  private static final String ID_VARIABLE = "id";
+  private static final String RESPONSE_VARIABLE = "response";
+  private static final String AUTHORIZATION_TOKEN_VARIABLE = "authorizationToken";
 
   private final EdrRemoteService edrRemoteService;
 
   @Override
   public void execute(DelegateExecution execution) throws Exception {
-    var code = (String) execution.getVariable(EDR_CODE_VARIABLE);
     var authorizationToken = (String) execution.getVariable(AUTHORIZATION_TOKEN_VARIABLE);
+    var id = (String) execution.getVariable(ID_VARIABLE);
 
-    var response = edrRemoteService.searchSubjects(code, authorizationToken);
+    var response = edrRemoteService.getSubjectDetail(new BigInteger(id), authorizationToken);
     var connectorResponse = prepareConnectorResponse(response);
-    log.debug("Edr Registry Search Subjects response: {}", connectorResponse);
+    log.debug("Edr Registry Subject Detail response: {}", connectorResponse);
 
     ((AbstractVariableScope) execution)
         .setVariableLocalTransient(RESPONSE_VARIABLE, connectorResponse);
   }
 
-  private EdrRegistryConnectorResponse prepareConnectorResponse(List<SubjectInfoDto> response) {
+  private EdrRegistryConnectorResponse prepareConnectorResponse(SubjectDetailDataDto response) {
+    var spin = Objects.isNull(response) ? null : Spin.JSON(response);
     return EdrRegistryConnectorResponse.builder()
-        .responseBody(Spin.JSON(response))
-        .statusCode(CollectionUtils.isEmpty(response) ? 404 : 200)
+        .responseBody(spin)
+        .statusCode(Objects.isNull(spin) ? 404 : 200)
         .build();
   }
 }
-
