@@ -1,10 +1,12 @@
 {
-  "regRefusalReasonId":"regRefusalReasonId1",
-  "factorRefusalReasonId":"factorRefusalReasonId1",
-  "zvtRefusalReasonId":"zvtRefusalReasonId1",
-  "staffRefusalReasonId":"staffRefusalReasonId1",
-  "reagentRefusalReasonId":"reagentRefusalReasonId1",
-  "facilityRefusalReasonId":"facilityRefusalReasonId1",
+  "refusalReasons": [
+    "regRefusalReasonId1",
+    "factorRefusalReasonId1",
+    "zvtRefusalReasonId1",
+    "staffRefusalReasonId1",
+    "reagentRefusalReasonId1",
+    "facilityRefusalReasonId1"
+  ],
   "name":"labName",
   "edrpou":"11111111",
   "registrationSource":"держпраці",

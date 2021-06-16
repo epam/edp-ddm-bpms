@@ -63,7 +63,7 @@
       <bpmn:dataOutputAssociation id="DataOutputAssociation_03uts4u">
         <bpmn:targetRef>DataObjectReference_1x4nsvj</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
-      <bpmn:script>searchLabFormData.prop('laboratoryId').value()</bpmn:script>
+      <bpmn:script>searchLabFormData.prop('laboratory').prop('laboratoryId').value()</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataObjectReference id="DataObjectReference_1x4nsvj" name="DOC" dataObjectRef="DataObject_04ip4hr" />
     <bpmn:dataObject id="DataObject_04ip4hr" />
@@ -112,12 +112,12 @@
         <bpmn:targetRef>DataObjectReference_0334p0g</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
       <bpmn:script>var cephData = [:]
-['name', 'edrpou'].each {
-  cephData[it] = labResponse.responseBody.prop(it).value()
-}
+        ['name', 'edrpou'].each {
+        cephData[it] = labResponse.responseBody.prop(it).value()
+        }
 
-execution.removeVariable('addApplicationFormPayload')
-execution.setVariableLocalTransient('addApplicationFormPayload', S(cephData, 'application/json'))</bpmn:script>
+        execution.removeVariable('addApplicationFormPayload')
+        execution.setVariableLocalTransient('addApplicationFormPayload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataObjectReference id="DataObjectReference_0334p0g" dataObjectRef="DataObject_0wgzepu" />
     <bpmn:dataObject id="DataObject_0wgzepu" />
@@ -226,19 +226,19 @@ execution.setVariableLocalTransient('addApplicationFormPayload', S(cephData, 'ap
       </bpmn:dataOutputAssociation>
       <bpmn:script>def cephData = [:]
 
-['name', 'registrationNo'].each {
-  cephData[it] = checkComplienceFormData.prop(it).value()
-}
+        ['name', 'registrationNo'].each {
+        cephData[it] = checkComplienceFormData.prop(it).value()
+        }
 
-var solutionResponseObj = solutionResponse.responseBody.elements()[0]
-var solutionName = solutionResponseObj.prop('name').value()
+        var solutionResponseObj = solutionResponse.responseBody.elements()[0]
+        var solutionName = solutionResponseObj.prop('name').value()
 
-cephData['solutionName'] = solutionName
+        cephData['solutionName'] = solutionName
 
-execution.removeVariable('addDecisionDenyFormData')
-execution.setVariableLocalTransient('addDecisionDenyFormData', S(cephData, 'application/json'))
+        execution.removeVariable('addDecisionDenyFormData')
+        execution.setVariableLocalTransient('addDecisionDenyFormData', S(cephData, 'application/json'))
 
-execution.setVariable('solutionTypeId', solutionResponseObj.prop('solutionTypeId').value())</bpmn:script>
+        execution.setVariable('solutionTypeId', solutionResponseObj.prop('solutionTypeId').value())</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataObjectReference id="DataObjectReference_1pv4cgs" dataObjectRef="DataObject_1htx1a4" />
     <bpmn:dataObject id="DataObject_1htx1a4" />
@@ -265,19 +265,19 @@ execution.setVariable('solutionTypeId', solutionResponseObj.prop('solutionTypeId
       </bpmn:dataOutputAssociation>
       <bpmn:script>def cephData = [:]
 
-['name', 'registrationNo'].each {
-  cephData[it] = checkComplienceFormData.prop(it).value()
-}
+        ['name', 'registrationNo'].each {
+        cephData[it] = checkComplienceFormData.prop(it).value()
+        }
 
-var solutionResponseObj = solutionResponse.responseBody.elements()[0]
-var solutionName = solutionResponseObj.prop('name').value()
+        var solutionResponseObj = solutionResponse.responseBody.elements()[0]
+        var solutionName = solutionResponseObj.prop('name').value()
 
-cephData['solutionName'] = solutionName
+        cephData['solutionName'] = solutionName
 
-execution.removeVariable('addDecisionExcludeFormData')
-execution.setVariableLocalTransient('addDecisionExcludeFormData', S(cephData, 'application/json'))
+        execution.removeVariable('addDecisionExcludeFormData')
+        execution.setVariableLocalTransient('addDecisionExcludeFormData', S(cephData, 'application/json'))
 
-execution.setVariable('solutionTypeId', solutionResponseObj.prop('solutionTypeId').value())</bpmn:script>
+        execution.setVariable('solutionTypeId', solutionResponseObj.prop('solutionTypeId').value())</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataObjectReference id="DataObjectReference_05volo6" dataObjectRef="DataObject_152ygki" />
     <bpmn:dataObject id="DataObject_152ygki" />
@@ -306,8 +306,8 @@ execution.setVariable('solutionTypeId', solutionResponseObj.prop('solutionTypeId
       <bpmn:incoming>Flow_1ganry9</bpmn:incoming>
       <bpmn:outgoing>Flow_1umse39</bpmn:outgoing>
       <bpmn:script>['errorCheckFlag', 'initiated'].each {
-  execution.setVariable(it, checkComplienceFormData.prop(it).value())
-}</bpmn:script>
+        execution.setVariable(it, checkComplienceFormData.prop(it).value())
+        }</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:sequenceFlow id="Flow_1il1rk2" sourceRef="signAppExcludeFormActivity" targetRef="readSignAppExcludeFormActivity" />
     <bpmn:sequenceFlow id="Flow_0hdem9w" sourceRef="readAddDecisionExcludeForExclusionFormActivity" targetRef="readCheckComplianceForExclusionFormActivity" />
@@ -338,12 +338,12 @@ execution.setVariable('solutionTypeId', solutionResponseObj.prop('solutionTypeId
       </bpmn:dataOutputAssociation>
       <bpmn:script>def cephData = [:]
 
-['name', 'registrationNo', 'solutionName'].each {
-  cephData[it] = addDecisionExcludeFormData.prop(it).value()
-}
+        ['name', 'registrationNo', 'solutionName'].each {
+        cephData[it] = addDecisionExcludeFormData.prop(it).value()
+        }
 
-execution.removeVariable('addLetterDataFormDataForExclusion')
-execution.setVariableLocalTransient('addLetterDataFormDataForExclusion', S(cephData, 'application/json'))</bpmn:script>
+        execution.removeVariable('addLetterDataFormDataForExclusion')
+        execution.setVariableLocalTransient('addLetterDataFormDataForExclusion', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataObjectReference id="DataObjectReference_0wtzo87" dataObjectRef="DataObject_1impntl" />
     <bpmn:dataObject id="DataObject_1impntl" />
@@ -355,12 +355,12 @@ execution.setVariableLocalTransient('addLetterDataFormDataForExclusion', S(cephD
       </bpmn:dataOutputAssociation>
       <bpmn:script>def cephData = [:]
 
-['name', 'registrationNo', 'solutionName'].each {
-  cephData[it] = addDecisionDenyFormData.prop(it).value()
-}
+        ['name', 'registrationNo', 'solutionName'].each {
+        cephData[it] = addDecisionDenyFormData.prop(it).value()
+        }
 
-execution.removeVariable('addLetterDataFormDataForDeny')
-execution.setVariableLocalTransient('addLetterDataFormDataForDeny', S(cephData, 'application/json'))</bpmn:script>
+        execution.removeVariable('addLetterDataFormDataForDeny')
+        execution.setVariableLocalTransient('addLetterDataFormDataForDeny', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataObjectReference id="DataObjectReference_19qo55m" dataObjectRef="DataObject_11u4u66" />
     <bpmn:dataObject id="DataObject_11u4u66" />
@@ -553,31 +553,31 @@ execution.setVariableLocalTransient('addLetterDataFormDataForDeny', S(cephData, 
         <bpmn:targetRef>DataObjectReference_0yh7yjl</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
       <bpmn:script>import groovy.json.JsonSlurper
-var cephData = [:]
+        var cephData = [:]
 
-var formDataOutput = ['addLetterDataFormDataForDeny', 'addDecisionDenyFormData','checkComplianceFormData', 'addAppFormData']
+        var formDataOutput = ['addLetterDataFormDataForDeny', 'addDecisionDenyFormData','checkComplianceFormData', 'addAppFormData']
 
-if(checkComplianceFormData.hasProp("regRefusalReason")){
-cephData["regRefusalReason"] = [new JsonSlurper().parseText(checkComplianceFormData.prop("regRefusalReason").toString())]
-}
+        if(checkComplianceFormData.hasProp("regRefusalReason")){
+        cephData["regRefusalReason"] = [new JsonSlurper().parseText(checkComplianceFormData.prop("regRefusalReason").toString())]
+        }
 
-if(checkComplianceFormData.hasProp("healthMinistryLetterComplianceReason")){
-cephData["healthMinistryLetterComplianceReason"] = [new JsonSlurper().parseText(checkComplianceFormData.prop("healthMinistryLetterComplianceReason").toString())]
-}
+        if(checkComplianceFormData.hasProp("healthMinistryLetterComplianceReason")){
+        cephData["healthMinistryLetterComplianceReason"] = [new JsonSlurper().parseText(checkComplianceFormData.prop("healthMinistryLetterComplianceReason").toString())]
+        }
 
-var refusalReasons = ["regRefusalReason", "healthMinistryLetterComplianceReason"]
+        var refusalReasons = ["regRefusalReason", "healthMinistryLetterComplianceReason"]
 
-formDataOutput.stream()
+        formDataOutput.stream()
         .map(execution::getVariable)
         .filter(Objects::nonNull)
         .forEach(data -&gt;
-            data.fieldNames().findAll(f -&gt; !refusalReasons.contains(f)).each {
-            cephData[it] = data.prop(it).value()
+        data.fieldNames().findAll(f -&gt; !refusalReasons.contains(f)).each {
+        cephData[it] = data.prop(it).value()
         }
-)
+        )
 
-execution.removeVariable('signAppDenyFormData')
-execution.setVariableLocalTransient('signAppDenyFormData', S(cephData, 'application/json'))</bpmn:script>
+        execution.removeVariable('signAppDenyFormData')
+        execution.setVariableLocalTransient('signAppDenyFormData', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataObjectReference id="DataObjectReference_0yh7yjl" dataObjectRef="DataObject_0idi6wc" />
     <bpmn:dataObject id="DataObject_0idi6wc" />
@@ -589,17 +589,17 @@ execution.setVariableLocalTransient('signAppDenyFormData', S(cephData, 'applicat
       </bpmn:dataOutputAssociation>
       <bpmn:script>var cephData = [:]
 
-var formDataOutput = ['addLetterDataFormDataForExclusion', 'addDecisionExcludeFormData','checkComplianceFormData', 'addAppFormData']
+        var formDataOutput = ['addLetterDataFormDataForExclusion', 'addDecisionExcludeFormData','checkComplianceFormData', 'addAppFormData']
 
-formDataOutput.stream()
-  .map(execution::getVariable)
-  .filter(Objects::nonNull)
-  .forEach(data -&gt; data.fieldNames().each {
-    cephData[it] = data.prop(it).value()
-  })
+        formDataOutput.stream()
+        .map(execution::getVariable)
+        .filter(Objects::nonNull)
+        .forEach(data -&gt; data.fieldNames().each {
+        cephData[it] = data.prop(it).value()
+        })
 
-execution.removeVariable('signAppExcludeFormData')
-execution.setVariableLocalTransient('signAppExcludeFormData', S(cephData, 'application/json'))</bpmn:script>
+        execution.removeVariable('signAppExcludeFormData')
+        execution.setVariableLocalTransient('signAppExcludeFormData', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataObjectReference id="DataObjectReference_1vbykj3" dataObjectRef="DataObject_14x8q8s" />
     <bpmn:dataObject id="DataObject_14x8q8s" />
@@ -640,7 +640,7 @@ execution.setVariableLocalTransient('signAppExcludeFormData', S(cephData, 'appli
       </bpmn:dataOutputAssociation>
     </bpmn:serviceTask>
     <bpmn:dataStoreReference id="DataStoreReference_1xvo7xe" name="Ceph" />
-    <bpmn:userTask id="signAppDenyFormActivity" name="Підписати КЕП" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="create-app-exclude-bp-sign-app-deny" camunda:assignee="${initiator}">
+    <bpmn:userTask id="signAppDenyFormActivity" name="Підписати КЕП" camunda:modelerTemplate="officerSignTaskTemplate" camunda:formKey="create-app-exclude-bp-sign-app-deny" camunda:assignee="${initiator}">
       <bpmn:extensionElements>
         <camunda:properties>
           <camunda:property name="eSign" value="true" />
@@ -658,7 +658,7 @@ execution.setVariableLocalTransient('signAppExcludeFormData', S(cephData, 'appli
       </bpmn:dataOutputAssociation>
     </bpmn:userTask>
     <bpmn:dataStoreReference id="DataStoreReference_1f0uvch" name="Ceph" />
-    <bpmn:userTask id="signAppExcludeFormActivity" name="Підписати КЕП" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="create-app-exclude-bp-sign-app-exclude" camunda:assignee="${initiator}">
+    <bpmn:userTask id="signAppExcludeFormActivity" name="Підписати КЕП" camunda:modelerTemplate="officerSignTaskTemplate" camunda:formKey="create-app-exclude-bp-sign-app-exclude" camunda:assignee="${initiator}">
       <bpmn:extensionElements>
         <camunda:properties>
           <camunda:property name="eSign" value="true" />
@@ -706,14 +706,14 @@ execution.setVariableLocalTransient('signAppExcludeFormData', S(cephData, 'appli
       <bpmn:incoming>Flow_0ewnmuo</bpmn:incoming>
       <bpmn:outgoing>Flow_0fodut9</bpmn:outgoing>
       <bpmn:script>var processInstanceId = execution.getProcessInstanceId()
-execution.setVariable('system_signature_ceph_key', "lowcode_${processInstanceId}_system_signature_ceph_key".toString())
+        execution.setVariable('system_signature_ceph_key', "lowcode_${processInstanceId}_system_signature_ceph_key".toString())
 
-var systemSignature = systemSignatureResponse.prop('signature').value()
+        var systemSignature = systemSignatureResponse.prop('signature').value()
 
-var cephObj = ['data':dataPayload.toString(), 'signature':systemSignature]
+        var cephObj = ['data':dataPayload.toString(), 'signature':systemSignature]
 
-execution.removeVariable('systemSignaturePayload')
-execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'application/json').toString())</bpmn:script>
+        execution.removeVariable('systemSignaturePayload')
+        execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'application/json').toString())</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="putSystemSignatureForExclusionToCephActivity" name="Запис системного підпису" camunda:modelerTemplate="putContentToCephDelegate" camunda:delegateExpression="${putContentToCephDelegate}">
       <bpmn:extensionElements>
@@ -745,23 +745,23 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
       <bpmn:outgoing>Flow_1frzegu</bpmn:outgoing>
       <bpmn:script>var requestMap = [:]
 
-signAppExcludeFormData.fieldNames().each {
-  requestMap[it] = signAppExcludeFormData.prop(it).value()
-}
+        signAppExcludeFormData.fieldNames().each {
+        requestMap[it] = signAppExcludeFormData.prop(it).value()
+        }
 
-def appType = applicationTypeResponse.responseBody.elements()[0]
-requestMap['applicationTypeId']=appType.prop('applicationTypeId').value()
+        def appType = applicationTypeResponse.responseBody.elements()[0]
+        requestMap['applicationTypeId']=appType.prop('applicationTypeId').value()
 
-requestMap['laboratoryId']=laboratoryId
-requestMap['solutionTypeId'] = solutionTypeId
+        requestMap['laboratoryId']=laboratoryId
+        requestMap['solutionTypeId'] = solutionTypeId
 
-var dataPayload = S(requestMap, 'application/json')
-execution.removeVariable('dataPayload')
-execution.setVariableLocalTransient('dataPayload', dataPayload)
+        var dataPayload = S(requestMap, 'application/json')
+        execution.removeVariable('dataPayload')
+        execution.setVariableLocalTransient('dataPayload', dataPayload)
 
-var keyObj = ['data':dataPayload.toString()]
-execution.removeVariable('dataKeyPayload')
-execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/json'))</bpmn:script>
+        var keyObj = ['data':dataPayload.toString()]
+        execution.removeVariable('dataKeyPayload')
+        execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataStoreReference id="DataStoreReference_0daeyy4" name="Дата Фабрика" />
     <bpmn:dataStoreReference id="DataStoreReference_1gia57d" name="Дата фабрика" />
@@ -791,14 +791,14 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
       <bpmn:incoming>Flow_1dgxdk8</bpmn:incoming>
       <bpmn:outgoing>Flow_1fm0isw</bpmn:outgoing>
       <bpmn:script>var processInstanceId = execution.getProcessInstanceId()
-execution.setVariable('system_signature_ceph_key', "lowcode_${processInstanceId}_system_signature_ceph_key".toString())
+        execution.setVariable('system_signature_ceph_key', "lowcode_${processInstanceId}_system_signature_ceph_key".toString())
 
-var systemSignature = systemSignatureResponse.prop('signature').value()
+        var systemSignature = systemSignatureResponse.prop('signature').value()
 
-var cephObj = ['data':dataPayload.toString(), "signature":systemSignature]
+        var cephObj = ['data':dataPayload.toString(), "signature":systemSignature]
 
-execution.removeVariable('systemSignaturePayload')
-execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'application/json').toString())</bpmn:script>
+        execution.removeVariable('systemSignaturePayload')
+        execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'application/json').toString())</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:sequenceFlow id="Flow_0yrwhm9" sourceRef="defineBusinessProcessStatusForDenyActivity" targetRef="Event_15ha5z9" />
     <bpmn:sequenceFlow id="Flow_1fm0isw" sourceRef="extractSignatureAndDataForDenyActivity" targetRef="putSystemSignatureForDenyToCephActivity" />
@@ -806,41 +806,40 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
     <bpmn:scriptTask id="convertSignFormDataForDenyToDataFactoryFormatActivity" name="Підготовка даних для запису (transient var)" scriptFormat="groovy">
       <bpmn:incoming>Flow_1bxrr8b</bpmn:incoming>
       <bpmn:outgoing>Flow_1578idm</bpmn:outgoing>
-      <bpmn:script>import groovy.json.JsonSlurper
+      <bpmn:script>def refusalReasons = []
+        ['regRefusalReason','healthMinistryLetterComplianceReason'].each {
+        println it
+        println signAppDenyFormData.hasProp(it)
+        println signAppDenyFormData.prop(it)
+        println signAppDenyFormData.prop(it).elements()
+        if (signAppDenyFormData.hasProp it) {
+        signAppDenyFormData.prop(it).elements().each { reason -&gt;
+        refusalReasons &lt;&lt; reason.prop('refusalReasonId').value()
+        }
+        signAppDenyFormData.deleteProp it
+        }
+        }
 
-if (signAppDenyFormData.hasProp("regRefusalReason")) {
-var regRefusalReasonObj = new JsonSlurper().parseText(signAppDenyFormData.prop("regRefusalReason").toString()).get(0)
+        var requestMap = [:]
 
-signAppDenyFormData.prop("regRefusalReasonId", regRefusalReasonObj.refusalReasonId)
-signAppDenyFormData.deleteProp("regRefusalReason")
-}
+        signAppDenyFormData.fieldNames().each {
+        requestMap[it] = signAppDenyFormData.prop(it).value()
+        }
 
-if (signAppDenyFormData.hasProp("healthMinistryLetterComplianceReason")) {
-var healthMinistryLetterComplianceReasonObj = new JsonSlurper().parseText(signAppDenyFormData.prop("healthMinistryLetterComplianceReason").toString()).get(0)
+        def appType = applicationTypeResponse.responseBody.elements()[0]
+        requestMap['applicationTypeId']=appType.prop('applicationTypeId').value()
 
-signAppDenyFormData.prop("healthMinistryLetterComplianceReasonId", healthMinistryLetterComplianceReasonObj.refusalReasonId)
-signAppDenyFormData.deleteProp("healthMinistryLetterComplianceReason")
-}
+        requestMap['laboratoryId'] = laboratoryId
+        requestMap['solutionTypeId'] = solutionTypeId
+        requestMap['refusalReasons'] = refusalReasons
 
-var requestMap = [:]
+        var dataPayload = S(requestMap, 'application/json')
+        execution.removeVariable('dataPayload')
+        execution.setVariableLocalTransient('dataPayload', dataPayload)
 
-signAppDenyFormData.fieldNames().each {
-    requestMap[it] = signAppDenyFormData.prop(it).value()
-}
-
-def appType = applicationTypeResponse.responseBody.elements()[0]
-requestMap['applicationTypeId']=appType.prop('applicationTypeId').value()
-
-requestMap['laboratoryId']=laboratoryId
-requestMap['solutionTypeId'] = solutionTypeId
-
-var dataPayload = S(requestMap, 'application/json')
-execution.removeVariable('dataPayload')
-execution.setVariableLocalTransient('dataPayload', dataPayload)
-
-var keyObj = ['data':dataPayload.toString()]
-execution.removeVariable('dataKeyPayload')
-execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/json'))</bpmn:script>
+        var keyObj = ['data':dataPayload.toString()]
+        execution.removeVariable('dataKeyPayload')
+        execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="prepopulateAddDecisionDenyFormActivity" name="Запис документа форми" camunda:modelerTemplate="putFormDataToCephDelegate" camunda:delegateExpression="${putFormDataToCephDelegate}">
       <bpmn:extensionElements>
@@ -1752,14 +1751,14 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
       <bpmndi:BPMNShape id="Activity_038k4vv_di" bpmnElement="createRegistrationForDenyActivity">
         <dc:Bounds x="5290" y="599" width="100" height="80" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_10wg2d5_di" bpmnElement="Event_0qoakjy">
+        <dc:Bounds x="762" y="222" width="36" height="36" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_00nk0jw_di" bpmnElement="Event_0tpo6ct">
         <dc:Bounds x="5322" y="581" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0m9oxlz_di" bpmnElement="Event_1d3528m">
         <dc:Bounds x="5322" y="222" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_10wg2d5_di" bpmnElement="Event_0qoakjy">
-        <dc:Bounds x="762" y="222" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="DataOutputAssociation_1au2wqw_di" bpmnElement="DataOutputAssociation_1au2wqw">
         <di:waypoint x="373" y="320" />

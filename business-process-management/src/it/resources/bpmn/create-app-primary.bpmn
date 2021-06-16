@@ -12,7 +12,7 @@
     <bpmn:exclusiveGateway id="Gateway_190i54z">
       <bpmn:incoming>Flow_09oeymr</bpmn:incoming>
       <bpmn:incoming>Flow_19xjxh9</bpmn:incoming>
-      <bpmn:incoming>Flow_0g1vem5</bpmn:incoming>
+      <bpmn:incoming>Flow_09lgvds</bpmn:incoming>
       <bpmn:outgoing>Flow_0allotm</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:startEvent id="Event_02id5t3" name="початок процесу" camunda:initiator="initiator">
@@ -87,7 +87,6 @@
     <bpmn:sequenceFlow id="Flow_00h2je0" sourceRef="Activity_shared-sign-app-include" targetRef="Activity_0k46i3w" />
     <bpmn:sequenceFlow id="Flow_1w16yvk" sourceRef="Activity_0x6b8u8" targetRef="Activity_16htuuh" />
     <bpmn:sequenceFlow id="Flow_0lb2mjr" sourceRef="Activity_0n7e1l8" targetRef="Event_0r6lc1n" />
-    <bpmn:sequenceFlow id="Flow_0g1vem5" sourceRef="Event_1n5bhse" targetRef="Gateway_190i54z" />
     <bpmn:userTask id="Activity_shared-search-lab" name="Внести ідентификатор лабораторії" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="shared-search-lab" camunda:assignee="${initiator}">
       <bpmn:extensionElements>
         <camunda:properties>
@@ -109,7 +108,7 @@
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1ltqeqf</bpmn:incoming>
-      <bpmn:outgoing>Flow_0l3q6yx</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0kth1mt</bpmn:outgoing>
       <bpmn:property id="Property_0nizec5" name="__targetRef_placeholder" />
       <bpmn:dataInputAssociation id="DataInputAssociation_0pz2jbk">
         <bpmn:sourceRef>DataStoreReference_1veshpt</bpmn:sourceRef>
@@ -122,9 +121,9 @@
     <bpmn:sequenceFlow id="Flow_1m5okfm" sourceRef="Gateway_0rx0fec" targetRef="Activity_1h0f0du" />
     <bpmn:dataStoreReference id="DataStoreReference_14dlre1" name="Дата Фабрика" />
     <bpmn:exclusiveGateway id="Gateway_01wk2q7" name="Є ознака акредитованості?">
-      <bpmn:incoming>Flow_0awuhu1</bpmn:incoming>
+      <bpmn:incoming>Flow_0la4nly</bpmn:incoming>
       <bpmn:outgoing>Flow_0fkrtc2</bpmn:outgoing>
-      <bpmn:outgoing>Flow_0q03uxf</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0oxcrj3</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:dataStoreReference id="DataStoreReference_1j4lba4" name="Дата Фабрика" />
     <bpmn:exclusiveGateway id="Gateway_0rx0fec">
@@ -141,10 +140,10 @@
       <bpmn:incoming>Flow_1cn73cl</bpmn:incoming>
       <bpmn:outgoing>Flow_1l2hixa</bpmn:outgoing>
       <bpmn:script>def cephData = [:]
-['name', 'registrationNo'].each { cephData[it] = formData.prop(it).value() }
+        ['name', 'registrationNo'].each { cephData[it] = formData.prop(it).value() }
 
-execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+        execution.removeVariable('payload')
+        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="Activity_1v25ik1" name="Читання документа за ключем" camunda:modelerTemplate="getFormDataFromCephDelegate" camunda:delegateExpression="${getFormDataFromCephDelegate}">
       <bpmn:extensionElements>
@@ -161,10 +160,10 @@ execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))<
       <bpmn:incoming>Flow_0nhszsd</bpmn:incoming>
       <bpmn:outgoing>Flow_0l7mjsy</bpmn:outgoing>
       <bpmn:script>def cephData = [:]
-['name', 'registrationNo'].each { cephData[it] = formData.prop(it).value() }
+        ['name', 'registrationNo'].each { cephData[it] = formData.prop(it).value() }
 
-execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+        execution.removeVariable('payload')
+        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="Activity_0wn10o6" name="Читання документа за ключем" camunda:modelerTemplate="getFormDataFromCephDelegate" camunda:delegateExpression="${getFormDataFromCephDelegate}">
       <bpmn:extensionElements>
@@ -324,40 +323,40 @@ execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))<
         <bpmn:targetRef>DataObjectReference_0jq9gy6</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
       <bpmn:script>def cephData = [:]
-['name', 'edrpou'].each { cephData[it] = response.responseBody.prop(it).value() }
-execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))
+        ['name', 'edrpou'].each { cephData[it] = response.responseBody.prop(it).value() }
+        execution.removeVariable('payload')
+        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))
 
-execution.setVariable('laboratoryId', response.responseBody.prop('laboratoryId').stringValue())</bpmn:script>
+        execution.setVariable('laboratoryId', response.responseBody.prop('laboratoryId').stringValue())</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataObjectReference id="DataObjectReference_0jq9gy6" dataObjectRef="DataObject_0q2vdue" />
     <bpmn:dataObject id="DataObject_0q2vdue" />
     <bpmn:exclusiveGateway id="Gateway_0wa0mxl" name="Є дані?&#10;">
-      <bpmn:incoming>Flow_0el9cnh</bpmn:incoming>
+      <bpmn:incoming>Flow_1aw986f</bpmn:incoming>
       <bpmn:outgoing>Flow_0bjjwl5</bpmn:outgoing>
       <bpmn:outgoing>Flow_1ifee32</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:exclusiveGateway id="Gateway_04pw09i" name="Помилки є?">
       <bpmn:incoming>Flow_0l0h4k2</bpmn:incoming>
       <bpmn:outgoing>Flow_1vs5ys0</bpmn:outgoing>
-      <bpmn:outgoing>Flow_0prajnm</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1q7buia</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:scriptTask id="Activity_01n89u4" name="Підготовка даних документа для показу" scriptFormat="groovy">
-      <bpmn:incoming>Flow_1n7mmud</bpmn:incoming>
+      <bpmn:incoming>Flow_1xk4q2l</bpmn:incoming>
       <bpmn:outgoing>Flow_1i5tfi5</bpmn:outgoing>
       <bpmn:dataOutputAssociation id="DataOutputAssociation_1kuu4h5">
         <bpmn:targetRef>DataObjectReference_1clqi6b</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
       <bpmn:script>def cephData = [:]
-['name', 'registrationNo'].each { cephData[it] = formData.prop(it).value() }
+        ['name', 'registrationNo'].each { cephData[it] = formData.prop(it).value() }
 
-def solution = solutionResponse.responseBody.elements()[0]
-cephData['solutionName'] = solution.prop('name').stringValue()
+        def solution = solutionResponse.responseBody.elements()[0]
+        cephData['solutionName'] = solution.prop('name').stringValue()
 
-execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))
+        execution.removeVariable('payload')
+        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))
 
-execution.setVariable('solutionTypeId', solution.prop('solutionTypeId').stringValue())</bpmn:script>
+        execution.setVariable('solutionTypeId', solution.prop('solutionTypeId').stringValue())</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataObjectReference id="DataObjectReference_1clqi6b" dataObjectRef="DataObject_1rl1cio" />
     <bpmn:dataObject id="DataObject_1rl1cio" />
@@ -381,21 +380,21 @@ execution.setVariable('solutionTypeId', solution.prop('solutionTypeId').stringVa
     </bpmn:serviceTask>
     <bpmn:dataStoreReference id="DataStoreReference_0zf3r6k" name="Ceph" />
     <bpmn:scriptTask id="Activity_1e08895" name="Підготовка даних документа для показу" scriptFormat="groovy">
-      <bpmn:incoming>Flow_1af2s2x</bpmn:incoming>
+      <bpmn:incoming>Flow_0v2f87f</bpmn:incoming>
       <bpmn:outgoing>Flow_0iju57t</bpmn:outgoing>
       <bpmn:dataOutputAssociation id="DataOutputAssociation_0noz5fx">
         <bpmn:targetRef>DataObjectReference_1f331jk</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
       <bpmn:script>def cephData = [:]
-['name', 'registrationNo'].each { cephData[it] = formData.prop(it).value() }
+        ['name', 'registrationNo'].each { cephData[it] = formData.prop(it).value() }
 
-def solution = solutionResponse.responseBody.elements()[0]
-cephData['solutionName'] = solution.prop('name').stringValue()
+        def solution = solutionResponse.responseBody.elements()[0]
+        cephData['solutionName'] = solution.prop('name').stringValue()
 
-execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))
+        execution.removeVariable('payload')
+        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))
 
-execution.setVariable('solutionTypeId', solution.prop('solutionTypeId').stringValue())</bpmn:script>
+        execution.setVariable('solutionTypeId', solution.prop('solutionTypeId').stringValue())</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataObjectReference id="DataObjectReference_1f331jk" dataObjectRef="DataObject_17qkxqv" />
     <bpmn:dataObject id="DataObject_17qkxqv" />
@@ -489,7 +488,7 @@ execution.setVariable('solutionTypeId', solution.prop('solutionTypeId').stringVa
       <bpmn:incoming>Flow_0x4xnnh</bpmn:incoming>
       <bpmn:outgoing>Flow_1m26089</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:userTask id="Activity_shared-sign-app-deny" name="Підписати КЕП" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="shared-sign-app-deny" camunda:assignee="${initiator}">
+    <bpmn:userTask id="Activity_shared-sign-app-deny" name="Підписати КЕП" camunda:modelerTemplate="officerSignTaskTemplate" camunda:formKey="shared-sign-app-deny" camunda:assignee="${initiator}">
       <bpmn:extensionElements>
         <camunda:properties>
           <camunda:property name="eSign" value="true" />
@@ -537,12 +536,12 @@ execution.setVariable('solutionTypeId', solution.prop('solutionTypeId').stringVa
       <bpmn:incoming>Flow_18xeyzp</bpmn:incoming>
       <bpmn:outgoing>Flow_13vt6x6</bpmn:outgoing>
       <bpmn:script>def cephData = [:]
-['name', 'registrationNo', 'solutionName'].each {
-  cephData[it] = formData.prop(it).value()
-}
+        ['name', 'registrationNo', 'solutionName'].each {
+        cephData[it] = formData.prop(it).value()
+        }
 
-execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+        execution.removeVariable('payload')
+        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataStoreReference id="DataStoreReference_04ahhnb" name="Ceph" />
     <bpmn:serviceTask id="Activity_1kfzjvb" name="Читання документа за ключем" camunda:modelerTemplate="getFormDataFromCephDelegate" camunda:delegateExpression="${getFormDataFromCephDelegate}">
@@ -593,39 +592,39 @@ execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))<
       <bpmn:incoming>Flow_03dnc52</bpmn:incoming>
       <bpmn:outgoing>Flow_002ddyj</bpmn:outgoing>
       <bpmn:script>def cephData = [:]
-['name', 'edrpou', 'registrationSource', 'registrationNo', 'createdDate', 'acceptedBy'].each {
-    cephData[it] = addAppFormData.prop(it).stringValue()
-}
+        ['name', 'edrpou', 'registrationSource', 'registrationNo', 'createdDate', 'acceptedBy'].each {
+        cephData[it] = addAppFormData.prop(it).stringValue()
+        }
 
-['chemfactgost', 'chemfacthyge', 'chemfactobrv', 'chemfactodovilni'].each {
-    cephData[it] = addChemFactorsFormData.prop(it).elements().stream().map(elem -&gt; {
+        ['chemfactgost', 'chemfacthyge', 'chemfactobrv', 'chemfactodovilni'].each {
+        cephData[it] = addChemFactorsFormData.prop(it).elements().stream().map(elem -&gt; {
         return ["factorId": elem.prop("factorId").value(), "name": elem.prop("name").value()]
-    }).collect()
-}
-
-['FactorsPhys', 'laborfact', 'biofactors'].each {
-    cephData[it] = addBioPhysLaborFactorsFormData.prop(it).elements().stream().map(elem -&gt; {
-        return ["factorId": elem.prop("factorId").value(), "name": elem.prop("name").value()]
-    }).collect()
-}
-
-['solutionName', 'solutionDate', 'letterNo', 'letterDate'].each { cephData[it] = addDecisionDenyFormData.prop(it).stringValue() }
-
-['receivedBy', 'certifiedBy', 'notes'].each { cephData[it] = addLetterDataFormData.prop(it).stringValue() }
-
-//refusal reasons
-['errorCheckFlag', 'regComplianceFlag', 'factorComplianceFlag', 'zvtComplianceFlag', 'staffComplianceFlag', 'reagentComplianceFlag', 'facilityComplianceFlag'].each { cephData[it] = checkComplianceFormData.prop(it).boolValue() }
-
-['regRefusalReason', 'factorRefusalReason', 'zvtRefusalReason', 'staffRefusalReason', 'reagentRefusalReason', 'facilityRefusalReason'].each {
-    if (checkComplianceFormData.hasProp(it)) {
-        cephData[it] = checkComplianceFormData.prop(it).elements().stream().map(elem -&gt; {
-            return ["refusalReasonId": elem.prop("refusalReasonId").value(), "name": elem.prop("name").value()]
         }).collect()
-    }
-}
+        }
 
-execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+        ['FactorsPhys', 'laborfact', 'biofactors'].each {
+        cephData[it] = addBioPhysLaborFactorsFormData.prop(it).elements().stream().map(elem -&gt; {
+        return ["factorId": elem.prop("factorId").value(), "name": elem.prop("name").value()]
+        }).collect()
+        }
+
+        ['solutionName', 'solutionDate', 'letterNo', 'letterDate'].each { cephData[it] = addDecisionDenyFormData.prop(it).stringValue() }
+
+        ['receivedBy', 'certifiedBy', 'notes'].each { cephData[it] = addLetterDataFormData.prop(it).stringValue() }
+
+        //refusal reasons
+        ['errorCheckFlag', 'regComplianceFlag', 'factorComplianceFlag', 'zvtComplianceFlag', 'staffComplianceFlag', 'reagentComplianceFlag', 'facilityComplianceFlag'].each { cephData[it] = checkComplianceFormData.prop(it).boolValue() }
+
+        ['regRefusalReason', 'factorRefusalReason', 'zvtRefusalReason', 'staffRefusalReason', 'reagentRefusalReason', 'facilityRefusalReason'].each {
+        if (checkComplianceFormData.hasProp(it)) {
+        cephData[it] = checkComplianceFormData.prop(it).elements().stream().map(elem -&gt; {
+        return ["refusalReasonId": elem.prop("refusalReasonId").value(), "name": elem.prop("name").value()]
+        }).collect()
+        }
+        }
+
+        execution.removeVariable('payload')
+        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:userTask id="Activity_1eujure" name="Внести дані про отримання листа з рішенням (Дата, ПІБ, №)" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="shared-add-letter-data" camunda:assignee="${initiator}">
       <bpmn:extensionElements>
@@ -659,10 +658,10 @@ execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))<
       <bpmn:incoming>Flow_16ivyhk</bpmn:incoming>
       <bpmn:outgoing>Flow_1h0vxfq</bpmn:outgoing>
       <bpmn:script>def cephData = [:]
-['name', 'registrationNo', 'solutionName'].each { cephData[it] = formData.prop(it).value() }
+        ['name', 'registrationNo', 'solutionName'].each { cephData[it] = formData.prop(it).value() }
 
-execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+        execution.removeVariable('payload')
+        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="Activity_1c8viyf" name="Читання документа за ключем" camunda:modelerTemplate="getFormDataFromCephDelegate" camunda:delegateExpression="${getFormDataFromCephDelegate}">
       <bpmn:extensionElements>
@@ -710,26 +709,26 @@ execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))<
       <bpmn:outgoing>Flow_00sxavd</bpmn:outgoing>
       <bpmn:script>def cephData = [:]
 
-['name', 'edrpou', 'registrationSource', 'registrationNo', 'createdDate', 'acceptedBy'].each { cephData[it] = addAppFormData.prop(it).stringValue() }
+        ['name', 'edrpou', 'registrationSource', 'registrationNo', 'createdDate', 'acceptedBy'].each { cephData[it] = addAppFormData.prop(it).stringValue() }
 
-['chemfactgost', 'chemfacthyge', 'chemfactobrv', 'chemfactodovilni'].each {
-    cephData[it] = addChemFactorsFormData.prop(it).elements().stream().map(elem -&gt; {
+        ['chemfactgost', 'chemfacthyge', 'chemfactobrv', 'chemfactodovilni'].each {
+        cephData[it] = addChemFactorsFormData.prop(it).elements().stream().map(elem -&gt; {
         return ["factorId": elem.prop('factorId').value(), "name": elem.prop("name").value()]
-    }).collect()
-}
+        }).collect()
+        }
 
-['FactorsPhys', 'laborfact', 'biofactors'].each {
-    cephData[it] = addBioPhysLaborFactorsFormData.prop(it).elements().stream().map(elem -&gt; {
+        ['FactorsPhys', 'laborfact', 'biofactors'].each {
+        cephData[it] = addBioPhysLaborFactorsFormData.prop(it).elements().stream().map(elem -&gt; {
         return ["factorId": elem.prop("factorId").value(), "name": elem.prop("name").value()]
-    }).collect()
-}
+        }).collect()
+        }
 
-['solutionName', 'solutionDate', 'letterNo', 'letterDate'].each { cephData[it] = addDecisionIncludeFormData.prop(it).stringValue() }
+        ['solutionName', 'solutionDate', 'letterNo', 'letterDate'].each { cephData[it] = addDecisionIncludeFormData.prop(it).stringValue() }
 
-['receivedBy', 'certifiedBy', 'notes'].each { cephData[it] = addLetterDataFormData.prop(it).stringValue() }
+        ['receivedBy', 'certifiedBy', 'notes'].each { cephData[it] = addLetterDataFormData.prop(it).stringValue() }
 
-execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+        execution.removeVariable('payload')
+        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="Activity_0u9rf0k" name="Читання документа за ключем" camunda:modelerTemplate="getFormDataFromCephDelegate" camunda:delegateExpression="${getFormDataFromCephDelegate}">
       <bpmn:extensionElements>
@@ -788,18 +787,18 @@ execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))<
     </bpmn:serviceTask>
     <bpmn:dataStoreReference id="DataStoreReference_01y84zw" name="Ceph" />
     <bpmn:scriptTask id="Activity_07jiq37" name="Підготовка даних для запису системного підпису" scriptFormat="groovy">
-      <bpmn:incoming>Flow_066p5xj</bpmn:incoming>
+      <bpmn:incoming>Flow_1a26f5q</bpmn:incoming>
       <bpmn:outgoing>Flow_0ug0udh</bpmn:outgoing>
       <bpmn:property id="Property_1hb1ddv" name="__targetRef_placeholder" />
       <bpmn:script>var processInstanceId = execution.getProcessInstanceId()
-execution.setVariable('system_signature_ceph_key', "lowcode_${processInstanceId}_system_signature_ceph_key".toString())
+        execution.setVariable('system_signature_ceph_key', "lowcode_${processInstanceId}_system_signature_ceph_key".toString())
 
-var systemSignature = systemSignatureResponse.prop("signature").value()
+        var systemSignature = systemSignatureResponse.prop("signature").value()
 
-var cephObj = ['data':payload.toString(), 'signature':systemSignature]
+        var cephObj = ['data':payload.toString(), 'signature':systemSignature]
 
-execution.removeVariable('systemSignaturePayload')
-execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'application/json').toString())</bpmn:script>
+        execution.removeVariable('systemSignaturePayload')
+        execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'application/json').toString())</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="Activity_0owfnpd" name="Запис системного підпису" camunda:modelerTemplate="putContentToCephDelegate" camunda:delegateExpression="${putContentToCephDelegate}">
       <bpmn:extensionElements>
@@ -809,39 +808,44 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0ug0udh</bpmn:incoming>
-      <bpmn:outgoing>Flow_1w32nis</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1gn3vlo</bpmn:outgoing>
       <bpmn:property id="Property_1v4zro7" name="__targetRef_placeholder" />
     </bpmn:serviceTask>
     <bpmn:scriptTask id="Activity_1183rrp" name="Підготовка даних для запису (transient var)" scriptFormat="groovy">
-      <bpmn:incoming>Flow_07gojrd</bpmn:incoming>
-      <bpmn:outgoing>Flow_05g1gor</bpmn:outgoing>
+      <bpmn:incoming>Flow_1kzp2h9</bpmn:incoming>
+      <bpmn:outgoing>Flow_0vm29cs</bpmn:outgoing>
       <bpmn:script>def requestMap = [:]
-def factors = []
-def factorNames = ['FactorsPhys', 'laborfact', 'biofactors', 'chemfactgost', 'chemfacthyge', 'chemfactobrv', 'chemfactodovilni']
-factorNames.each { factors.addAll(signedFormData.prop(it).elements().collect { it.prop("factorId").stringValue() }) }
+        def factors = []
+        def factorNames = ['FactorsPhys', 'laborfact', 'biofactors', 'chemfactgost', 'chemfacthyge', 'chemfactobrv', 'chemfactodovilni']
+        factorNames.each { factors.addAll(signedFormData.prop(it).elements().collect { it.prop("factorId").stringValue() }) }
 
-//reasonIds
-def reasonIds = ['regRefusalReason', 'factorRefusalReason', 'zvtRefusalReason', 'staffRefusalReason', 'reagentRefusalReason', 'facilityRefusalReason']
-reasonIds.each {
-    if (signedFormData.hasProp(it) &amp;&amp; signedFormData.prop(it).elements().size() &gt; 0) {
-        requestMap[it + 'Id'] = signedFormData.prop(it).elements().get(0).prop("refusalReasonId").stringValue()
-    }
-}
+        //reasonIds
+        def refusalReasons = []
+        def reasonIds = ['regRefusalReason', 'factorRefusalReason', 'zvtRefusalReason', 'staffRefusalReason', 'reagentRefusalReason', 'facilityRefusalReason']
+        reasonIds.each {
+        if (signedFormData.hasProp(it) &amp;&amp; signedFormData.prop(it).elements().size() &gt; 0) {
+        signedFormData.prop(it).elements().each { reason -&gt;
+        refusalReasons &lt;&lt; reason.prop("refusalReasonId").value()
+        }
+        }
+        }
 
-signedFormData.fieldNames().findAll { fieldName -&gt; !factorNames.contains(fieldName) &amp;&amp; !reasonIds.contains(fieldName) }.each { requestMap[it] = signedFormData.prop(it).value() }
+        requestMap['refusalReasons'] = refusalReasons
 
-requestMap['factors'] = factors
-requestMap.put('applicationTypeId', applicationTypeResponse.responseBody.elements()[0].prop('applicationTypeId').stringValue())
-requestMap['laboratoryId'] = laboratoryId
-requestMap['solutionTypeId'] = solutionTypeId
+        signedFormData.fieldNames().findAll { fieldName -&gt; !factorNames.contains(fieldName) &amp;&amp; !reasonIds.contains(fieldName) }.each { requestMap[it] = signedFormData.prop(it).value() }
 
-var payload = S(requestMap, 'application/json')
-execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', payload)
+        requestMap['factors'] = factors
+        requestMap.put('applicationTypeId', applicationTypeResponse.responseBody.elements()[0].prop('applicationTypeId').stringValue())
+        requestMap['laboratoryId'] = laboratoryId
+        requestMap['solutionTypeId'] = solutionTypeId
 
-var keyObj = ['data': payload.toString()]
-execution.removeVariable('dataKeyPayload')
-execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/json'))</bpmn:script>
+        var payload = S(requestMap, 'application/json')
+        execution.removeVariable('payload')
+        execution.setVariableLocalTransient('payload', payload)
+
+        var keyObj = ['data': payload.toString()]
+        execution.removeVariable('dataKeyPayload')
+        execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="Activity_01jhion" name="Читання документа форми за ключем (transient var)" camunda:modelerTemplate="getFormDataFromCephDelegate" camunda:delegateExpression="${getFormDataFromCephDelegate}">
       <bpmn:extensionElements>
@@ -851,7 +855,7 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1kxv40d</bpmn:incoming>
-      <bpmn:outgoing>Flow_1it560e</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0xguaxh</bpmn:outgoing>
       <bpmn:property id="Property_0z3pa0f" name="__targetRef_placeholder" />
       <bpmn:dataInputAssociation id="DataInputAssociation_00hczb0">
         <bpmn:sourceRef>DataStoreReference_01y84zw</bpmn:sourceRef>
@@ -868,14 +872,14 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_00h2je0</bpmn:incoming>
-      <bpmn:outgoing>Flow_1m79gmm</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0zsi1mw</bpmn:outgoing>
       <bpmn:property id="Property_0cdmux9" name="__targetRef_placeholder" />
       <bpmn:dataInputAssociation id="DataInputAssociation_05d2bpj">
         <bpmn:sourceRef>DataStoreReference_08afw2l</bpmn:sourceRef>
         <bpmn:targetRef>Property_0cdmux9</bpmn:targetRef>
       </bpmn:dataInputAssociation>
     </bpmn:serviceTask>
-    <bpmn:userTask id="Activity_shared-sign-app-include" name="Підписати КЕП" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="shared-sign-app-include" camunda:assignee="${initiator}">
+    <bpmn:userTask id="Activity_shared-sign-app-include" name="Підписати КЕП" camunda:modelerTemplate="officerSignTaskTemplate" camunda:formKey="shared-sign-app-include" camunda:assignee="${initiator}">
       <bpmn:extensionElements>
         <camunda:properties>
           <camunda:property name="eSign" value="true" />
@@ -893,28 +897,28 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
       </bpmn:dataOutputAssociation>
     </bpmn:userTask>
     <bpmn:scriptTask id="Activity_0xtdm1d" name="Підготовка даних для запису (transient var)" scriptFormat="groovy">
-      <bpmn:incoming>Flow_04ixta2</bpmn:incoming>
-      <bpmn:outgoing>Flow_0mx64bm</bpmn:outgoing>
+      <bpmn:incoming>Flow_1bs2gx4</bpmn:incoming>
+      <bpmn:outgoing>Flow_1qkcqju</bpmn:outgoing>
       <bpmn:script>def requestMap = [:]
-def factors = []
+        def factors = []
 
-factorNames = ['FactorsPhys', 'laborfact', 'biofactors', 'chemfactgost', 'chemfacthyge', 'chemfactobrv', 'chemfactodovilni']
-factorNames.each { factors.addAll(signedFormData.prop(it).elements().collect { it.prop('factorId').stringValue() }) }
+        factorNames = ['FactorsPhys', 'laborfact', 'biofactors', 'chemfactgost', 'chemfacthyge', 'chemfactobrv', 'chemfactodovilni']
+        factorNames.each { factors.addAll(signedFormData.prop(it).elements().collect { it.prop('factorId').stringValue() }) }
 
-signedFormData.fieldNames().findAll { fieldName -&gt; !factorNames.contains(fieldName) }.each { requestMap[it] = signedFormData.prop(it).value() }
+        signedFormData.fieldNames().findAll { fieldName -&gt; !factorNames.contains(fieldName) }.each { requestMap[it] = signedFormData.prop(it).value() }
 
-requestMap['factors'] = factors
-requestMap['applicationTypeId'] = applicationTypeResponse.responseBody.elements()[0].prop('applicationTypeId').stringValue()
-requestMap['laboratoryId'] = laboratoryId
-requestMap['solutionTypeId'] = solutionTypeId
+        requestMap['factors'] = factors
+        requestMap['applicationTypeId'] = applicationTypeResponse.responseBody.elements()[0].prop('applicationTypeId').stringValue()
+        requestMap['laboratoryId'] = laboratoryId
+        requestMap['solutionTypeId'] = solutionTypeId
 
-var payload = S(requestMap, 'application/json')
-execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', payload)
+        var payload = S(requestMap, 'application/json')
+        execution.removeVariable('payload')
+        execution.setVariableLocalTransient('payload', payload)
 
-var keyObj = ['data': payload.toString()]
-execution.removeVariable('dataKeyPayload')
-execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/json'))</bpmn:script>
+        var keyObj = ['data': payload.toString()]
+        execution.removeVariable('dataKeyPayload')
+        execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="Activity_16htuuh" name="Запис системного підпису" camunda:modelerTemplate="putContentToCephDelegate" camunda:delegateExpression="${putContentToCephDelegate}">
       <bpmn:extensionElements>
@@ -924,21 +928,21 @@ execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/jso
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1w16yvk</bpmn:incoming>
-      <bpmn:outgoing>Flow_0mltb5p</bpmn:outgoing>
+      <bpmn:outgoing>Flow_11l5l9g</bpmn:outgoing>
       <bpmn:property id="Property_1di7rzv" name="__targetRef_placeholder" />
     </bpmn:serviceTask>
     <bpmn:scriptTask id="Activity_0x6b8u8" name="Підготовка даних для запису системного підпису" scriptFormat="groovy">
-      <bpmn:incoming>Flow_0vwoiyg</bpmn:incoming>
+      <bpmn:incoming>Flow_1f11qzf</bpmn:incoming>
       <bpmn:outgoing>Flow_1w16yvk</bpmn:outgoing>
       <bpmn:property id="Property_0sa59gl" name="__targetRef_placeholder" />
       <bpmn:script>var processInstanceId = execution.getProcessInstanceId()
-execution.setVariable('system_signature_ceph_key', "lowcode_${processInstanceId}_system_signature_ceph_key".toString())
+        execution.setVariable('system_signature_ceph_key', "lowcode_${processInstanceId}_system_signature_ceph_key".toString())
 
-var systemSignature = systemSignatureResponse.prop('signature').value()
+        var systemSignature = systemSignatureResponse.prop('signature').value()
 
-var cephObj = ['data':payload.toString(), 'signature':systemSignature]
-execution.removeVariable('systemSignaturePayload')
-execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'application/json').toString())</bpmn:script>
+        var cephObj = ['data':payload.toString(), 'signature':systemSignature]
+        execution.removeVariable('systemSignaturePayload')
+        execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'application/json').toString())</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataStoreReference id="DataStoreReference_0wjrt5t" name="Дата Фабрика" />
     <bpmn:serviceTask id="Activity_0n7e1l8" name="Формування результату розгляду" camunda:modelerTemplate="defineBusinessProcessStatusDelegate" camunda:delegateExpression="${defineBusinessProcessStatusDelegate}">
@@ -947,7 +951,7 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
           <camunda:inputParameter name="status">Прийнято рішення про внесення лабораторії до переліку</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0evqnkm</bpmn:incoming>
+      <bpmn:incoming>Flow_143sree</bpmn:incoming>
       <bpmn:outgoing>Flow_0lb2mjr</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:endEvent id="Event_0r6lc1n" name="Прийнято рішення про внесення лабораторії до переліку">
@@ -963,7 +967,7 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
           <camunda:inputParameter name="status">Прийнято рішення про залишення без розгляду</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0xdq0uv</bpmn:incoming>
+      <bpmn:incoming>Flow_1x25drf</bpmn:incoming>
       <bpmn:outgoing>Flow_1to9ju6</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:serviceTask id="Activity_1p9drdd" name="Формування помилки" camunda:modelerTemplate="userDataValidationErrorDelegate" camunda:delegateExpression="${userDataValidationErrorDelegate}">
@@ -989,18 +993,19 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
           <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0l3q6yx</bpmn:incoming>
-      <bpmn:outgoing>Flow_0awuhu1</bpmn:outgoing>
-      <bpmn:dataOutputAssociation id="DataOutputAssociation_0qe11mb">
+      <bpmn:incoming>Flow_0kth1mt</bpmn:incoming>
+      <bpmn:outgoing>Flow_0la4nly</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_1582q1m">
         <bpmn:targetRef>DataStoreReference_14dlre1</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_0awuhu1" sourceRef="Activity_0a7412g" targetRef="Gateway_01wk2q7" />
-    <bpmn:sequenceFlow id="Flow_0l3q6yx" sourceRef="Activity_0umrlie" targetRef="Activity_0a7412g" />
+    <bpmn:sequenceFlow id="Flow_0kth1mt" sourceRef="Activity_0umrlie" targetRef="Activity_0a7412g" />
+    <bpmn:sequenceFlow id="Flow_0la4nly" sourceRef="Activity_0a7412g" targetRef="Gateway_01wk2q7" />
     <bpmn:boundaryEvent id="Event_1n5bhse" attachedToRef="Activity_0a7412g">
-      <bpmn:outgoing>Flow_0g1vem5</bpmn:outgoing>
+      <bpmn:outgoing>Flow_09lgvds</bpmn:outgoing>
       <bpmn:errorEventDefinition id="ErrorEventDefinition_0vdcm14" />
     </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_09lgvds" sourceRef="Event_1n5bhse" targetRef="Gateway_190i54z" />
     <bpmn:serviceTask id="Activity_0g747qa" name="Перевірка наявності кадрів" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -1014,16 +1019,16 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
           <camunda:outputParameter name="staffResponse">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0q03uxf</bpmn:incoming>
-      <bpmn:outgoing>Flow_0el9cnh</bpmn:outgoing>
-      <bpmn:dataOutputAssociation id="DataOutputAssociation_0nsma7a">
+      <bpmn:incoming>Flow_0oxcrj3</bpmn:incoming>
+      <bpmn:outgoing>Flow_1aw986f</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_0py2xut">
         <bpmn:targetRef>DataStoreReference_1j4lba4</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_0el9cnh" sourceRef="Activity_0g747qa" targetRef="Gateway_0wa0mxl" />
-    <bpmn:sequenceFlow id="Flow_0q03uxf" name="ні" sourceRef="Gateway_01wk2q7" targetRef="Activity_0g747qa">
+    <bpmn:sequenceFlow id="Flow_0oxcrj3" name="ні" sourceRef="Gateway_01wk2q7" targetRef="Activity_0g747qa">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!response.value.responseBody.prop('accreditationFlag').boolValue()}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1aw986f" sourceRef="Activity_0g747qa" targetRef="Gateway_0wa0mxl" />
     <bpmn:serviceTask id="Activity_0wnn70u" name="Отримання результату з дата фабрики" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -1038,12 +1043,12 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1vs5ys0</bpmn:incoming>
-      <bpmn:outgoing>Flow_1af2s2x</bpmn:outgoing>
-      <bpmn:dataOutputAssociation id="DataOutputAssociation_0omcdes">
+      <bpmn:outgoing>Flow_0v2f87f</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_03xds8y">
         <bpmn:targetRef>DataStoreReference_1g4u9ze</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_1af2s2x" sourceRef="Activity_0wnn70u" targetRef="Activity_1e08895" />
+    <bpmn:sequenceFlow id="Flow_0v2f87f" sourceRef="Activity_0wnn70u" targetRef="Activity_1e08895" />
     <bpmn:serviceTask id="Activity_0qxn3m4" name="Отримання результату з дата фабрики" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -1057,16 +1062,16 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
           <camunda:outputParameter name="solutionResponse">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0prajnm</bpmn:incoming>
-      <bpmn:outgoing>Flow_1n7mmud</bpmn:outgoing>
-      <bpmn:dataOutputAssociation id="DataOutputAssociation_1ivrisk">
+      <bpmn:incoming>Flow_1q7buia</bpmn:incoming>
+      <bpmn:outgoing>Flow_1xk4q2l</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_1x9ls4c">
         <bpmn:targetRef>DataStoreReference_1b3j6vm</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_1n7mmud" sourceRef="Activity_0qxn3m4" targetRef="Activity_01n89u4" />
-    <bpmn:sequenceFlow id="Flow_0prajnm" name="ні" sourceRef="Gateway_04pw09i" targetRef="Activity_0qxn3m4">
+    <bpmn:sequenceFlow id="Flow_1q7buia" name="ні" sourceRef="Gateway_04pw09i" targetRef="Activity_0qxn3m4">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!formData.value.prop('errorCheckFlag').boolValue()}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1xk4q2l" sourceRef="Activity_0qxn3m4" targetRef="Activity_01n89u4" />
     <bpmn:serviceTask id="Activity_0rv1ii2" name="Отримання унікального ідентификатору типу заяви з дата фабрики" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -1080,14 +1085,50 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
           <camunda:outputParameter name="applicationTypeResponse">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1m79gmm</bpmn:incoming>
-      <bpmn:outgoing>Flow_04ixta2</bpmn:outgoing>
-      <bpmn:dataOutputAssociation id="DataOutputAssociation_09ixlxw">
+      <bpmn:incoming>Flow_0zsi1mw</bpmn:incoming>
+      <bpmn:outgoing>Flow_1bs2gx4</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_0zxdvhn">
         <bpmn:targetRef>DataStoreReference_0wjrt5t</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_04ixta2" sourceRef="Activity_0rv1ii2" targetRef="Activity_0xtdm1d" />
-    <bpmn:sequenceFlow id="Flow_1m79gmm" sourceRef="Activity_0k46i3w" targetRef="Activity_0rv1ii2" />
+    <bpmn:sequenceFlow id="Flow_1bs2gx4" sourceRef="Activity_0rv1ii2" targetRef="Activity_0xtdm1d" />
+    <bpmn:sequenceFlow id="Flow_0zsi1mw" sourceRef="Activity_0k46i3w" targetRef="Activity_0rv1ii2" />
+    <bpmn:serviceTask id="Activity_1albuj4" name="Підписати дані системним ключем" camunda:modelerTemplate="digitalSignatureConnectorDelegate" camunda:delegateExpression="${digitalSignatureConnectorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="payload">${dataKeyPayload}</camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token_task_definition_key">Activity_shared-sign-app-include</camunda:inputParameter>
+          <camunda:outputParameter name="systemSignatureResponse">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1qkcqju</bpmn:incoming>
+      <bpmn:outgoing>Flow_1f11qzf</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1f11qzf" sourceRef="Activity_1albuj4" targetRef="Activity_0x6b8u8" />
+    <bpmn:sequenceFlow id="Flow_1qkcqju" sourceRef="Activity_0xtdm1d" targetRef="Activity_1albuj4" />
+    <bpmn:serviceTask id="Activity_1bhrl75" name="Зберегти дані в Дата фабрику" camunda:modelerTemplate="dataFactoryConnectorCreateDelegate" camunda:delegateExpression="${dataFactoryConnectorCreateDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="x_access_token_task_definition_key">Activity_shared-sign-app-include</camunda:inputParameter>
+          <camunda:inputParameter name="x_digital_signature_task_definition_key">Activity_shared-sign-app-include</camunda:inputParameter>
+          <camunda:inputParameter name="x_digital_signature_derived_ceph_key">${system_signature_ceph_key}</camunda:inputParameter>
+          <camunda:inputParameter name="payload">${payload}</camunda:inputParameter>
+          <camunda:inputParameter name="resource">registration</camunda:inputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_11l5l9g</bpmn:incoming>
+      <bpmn:outgoing>Flow_143sree</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_12aklc5">
+        <bpmn:targetRef>DataStoreReference_1qa8swc</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_11l5l9g" sourceRef="Activity_16htuuh" targetRef="Activity_1bhrl75" />
+    <bpmn:sequenceFlow id="Flow_143sree" sourceRef="Activity_1bhrl75" targetRef="Activity_0n7e1l8" />
+    <bpmn:boundaryEvent id="Event_18b7kji" attachedToRef="Activity_1bhrl75">
+      <bpmn:outgoing>Flow_0xgza10</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_1wksufp" />
+    </bpmn:boundaryEvent>
     <bpmn:serviceTask id="Activity_0jfmpcs" name="Отримання унікального ідентификатору типу заяви з дата фабрики" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -1101,27 +1142,14 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
           <camunda:outputParameter name="applicationTypeResponse">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1it560e</bpmn:incoming>
-      <bpmn:outgoing>Flow_07gojrd</bpmn:outgoing>
-      <bpmn:dataOutputAssociation id="DataOutputAssociation_097uvvz">
+      <bpmn:incoming>Flow_0xguaxh</bpmn:incoming>
+      <bpmn:outgoing>Flow_1kzp2h9</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_1sm4p41">
         <bpmn:targetRef>DataStoreReference_11rab8g</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_07gojrd" sourceRef="Activity_0jfmpcs" targetRef="Activity_1183rrp" />
-    <bpmn:sequenceFlow id="Flow_1it560e" sourceRef="Activity_01jhion" targetRef="Activity_0jfmpcs" />
-    <bpmn:serviceTask id="Activity_1albuj4" name="Підписати дані системним ключем" camunda:modelerTemplate="digitalSignatureConnectorDelegate" camunda:delegateExpression="${digitalSignatureConnectorDelegate}">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="payload">${dataKeyPayload}</camunda:inputParameter>
-          <camunda:inputParameter name="x_access_token_task_definition_key">Activity_shared-sign-app-include</camunda:inputParameter>
-          <camunda:outputParameter name="systemSignatureResponse">${ response }</camunda:outputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0mx64bm</bpmn:incoming>
-      <bpmn:outgoing>Flow_0vwoiyg</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_0vwoiyg" sourceRef="Activity_1albuj4" targetRef="Activity_0x6b8u8" />
-    <bpmn:sequenceFlow id="Flow_0mx64bm" sourceRef="Activity_0xtdm1d" targetRef="Activity_1albuj4" />
+    <bpmn:sequenceFlow id="Flow_0xguaxh" sourceRef="Activity_01jhion" targetRef="Activity_0jfmpcs" />
+    <bpmn:sequenceFlow id="Flow_1kzp2h9" sourceRef="Activity_0jfmpcs" targetRef="Activity_1183rrp" />
     <bpmn:serviceTask id="Activity_09pj6r4" name="Підписати дані системним ключем" camunda:modelerTemplate="digitalSignatureConnectorDelegate" camunda:delegateExpression="${digitalSignatureConnectorDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -1130,34 +1158,11 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
           <camunda:outputParameter name="systemSignatureResponse">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_05g1gor</bpmn:incoming>
-      <bpmn:outgoing>Flow_066p5xj</bpmn:outgoing>
+      <bpmn:incoming>Flow_0vm29cs</bpmn:incoming>
+      <bpmn:outgoing>Flow_1a26f5q</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_066p5xj" sourceRef="Activity_09pj6r4" targetRef="Activity_07jiq37" />
-    <bpmn:sequenceFlow id="Flow_05g1gor" sourceRef="Activity_1183rrp" targetRef="Activity_09pj6r4" />
-    <bpmn:serviceTask id="Activity_1bhrl75" name="Зберегти дані в Дата фабрику" camunda:modelerTemplate="dataFactoryConnectorCreateDelegate" camunda:delegateExpression="${dataFactoryConnectorCreateDelegate}">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="x_access_token_task_definition_key">Activity_shared-sign-app-include</camunda:inputParameter>
-          <camunda:inputParameter name="x_digital_signature_task_definition_key">Activity_shared-sign-app-include</camunda:inputParameter>
-          <camunda:inputParameter name="x_digital_signature_derived_ceph_key">${system_signature_ceph_key}</camunda:inputParameter>
-          <camunda:inputParameter name="payload">${payload}</camunda:inputParameter>
-          <camunda:inputParameter name="resource">registration</camunda:inputParameter>
-          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0mltb5p</bpmn:incoming>
-      <bpmn:outgoing>Flow_0evqnkm</bpmn:outgoing>
-      <bpmn:dataOutputAssociation id="DataOutputAssociation_16mb141">
-        <bpmn:targetRef>DataStoreReference_1qa8swc</bpmn:targetRef>
-      </bpmn:dataOutputAssociation>
-    </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_0evqnkm" sourceRef="Activity_1bhrl75" targetRef="Activity_0n7e1l8" />
-    <bpmn:sequenceFlow id="Flow_0mltb5p" sourceRef="Activity_16htuuh" targetRef="Activity_1bhrl75" />
-    <bpmn:boundaryEvent id="Event_18b7kji" attachedToRef="Activity_1bhrl75">
-      <bpmn:outgoing>Flow_0xgza10</bpmn:outgoing>
-      <bpmn:errorEventDefinition id="ErrorEventDefinition_1wksufp" />
-    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_0vm29cs" sourceRef="Activity_1183rrp" targetRef="Activity_09pj6r4" />
+    <bpmn:sequenceFlow id="Flow_1a26f5q" sourceRef="Activity_09pj6r4" targetRef="Activity_07jiq37" />
     <bpmn:serviceTask id="Activity_0y8ayeb" name="Зберегти дані в Дата фабрику" camunda:modelerTemplate="dataFactoryConnectorCreateDelegate" camunda:delegateExpression="${dataFactoryConnectorCreateDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -1169,14 +1174,14 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
           <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1w32nis</bpmn:incoming>
-      <bpmn:outgoing>Flow_0xdq0uv</bpmn:outgoing>
-      <bpmn:dataOutputAssociation id="DataOutputAssociation_11823ih">
+      <bpmn:incoming>Flow_1gn3vlo</bpmn:incoming>
+      <bpmn:outgoing>Flow_1x25drf</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_1a25a9i">
         <bpmn:targetRef>DataStoreReference_1ifrfot</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_0xdq0uv" sourceRef="Activity_0y8ayeb" targetRef="Activity_0p7g3oq" />
-    <bpmn:sequenceFlow id="Flow_1w32nis" sourceRef="Activity_0owfnpd" targetRef="Activity_0y8ayeb" />
+    <bpmn:sequenceFlow id="Flow_1x25drf" sourceRef="Activity_0y8ayeb" targetRef="Activity_0p7g3oq" />
+    <bpmn:sequenceFlow id="Flow_1gn3vlo" sourceRef="Activity_0owfnpd" targetRef="Activity_0y8ayeb" />
     <bpmn:boundaryEvent id="Event_0u00wib" attachedToRef="Activity_0y8ayeb">
       <bpmn:outgoing>Flow_0x4xnnh</bpmn:outgoing>
       <bpmn:errorEventDefinition id="ErrorEventDefinition_1h51cqh" />
@@ -1187,22 +1192,22 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
     <bpmn:association id="Association_1oswj4l" sourceRef="Activity_0ln10t6" targetRef="TextAnnotation_00mov38" />
     <bpmn:textAnnotation id="TextAnnotation_0k6pg3n">
       <bpmn:text>Документ Форми:
-Внести дані про отримання листа з рішенням (Дата, ПІБ, №)</bpmn:text>
+        Внести дані про отримання листа з рішенням (Дата, ПІБ, №)</bpmn:text>
     </bpmn:textAnnotation>
     <bpmn:association id="Association_04ue4iz" sourceRef="Activity_0u9rf0k" targetRef="TextAnnotation_0k6pg3n" />
     <bpmn:textAnnotation id="TextAnnotation_1l0klck">
       <bpmn:text>Документ Форми:
-Внести хімічні фактори</bpmn:text>
+        Внести хімічні фактори</bpmn:text>
     </bpmn:textAnnotation>
     <bpmn:association id="Association_1nlh7dg" sourceRef="Activity_1p834hf" targetRef="TextAnnotation_1l0klck" />
     <bpmn:textAnnotation id="TextAnnotation_0dez9ez">
       <bpmn:text>Документ Форми:
-Внести фіз., біо. та ТП фактори</bpmn:text>
+        Внести фіз., біо. та ТП фактори</bpmn:text>
     </bpmn:textAnnotation>
     <bpmn:association id="Association_08wk5ux" sourceRef="Activity_10wmr1i" targetRef="TextAnnotation_0dez9ez" />
     <bpmn:textAnnotation id="TextAnnotation_117oq3o">
       <bpmn:text>Документ Форми:
-Прийняти рішення про внесення до інформаційного переліку</bpmn:text>
+        Прийняти рішення про внесення до інформаційного переліку</bpmn:text>
     </bpmn:textAnnotation>
     <bpmn:association id="Association_1knreg2" sourceRef="Activity_1itu7h0" targetRef="TextAnnotation_117oq3o" />
     <bpmn:textAnnotation id="TextAnnotation_1xhu25f">
@@ -1211,22 +1216,22 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
     <bpmn:association id="Association_07q2ihf" sourceRef="Activity_1c8viyf" targetRef="TextAnnotation_1xhu25f" />
     <bpmn:textAnnotation id="TextAnnotation_0wg8u1a">
       <bpmn:text>Документ Форми:
-Внести хімічні фактори</bpmn:text>
+        Внести хімічні фактори</bpmn:text>
     </bpmn:textAnnotation>
     <bpmn:association id="Association_1c1yr4t" sourceRef="Activity_1kfzjvb" targetRef="TextAnnotation_0wg8u1a" />
     <bpmn:textAnnotation id="TextAnnotation_1jrpreq">
       <bpmn:text>Документ Форми:
-Внести фіз., біо. та ТП фактори</bpmn:text>
+        Внести фіз., біо. та ТП фактори</bpmn:text>
     </bpmn:textAnnotation>
     <bpmn:association id="Association_1cfv75d" sourceRef="Activity_1u11imx" targetRef="TextAnnotation_1jrpreq" />
     <bpmn:textAnnotation id="TextAnnotation_0wtlfsj">
       <bpmn:text>Документ Форми:
-Прийняти рішення про внесення до інформаційного переліку</bpmn:text>
+        Прийняти рішення про внесення до інформаційного переліку</bpmn:text>
     </bpmn:textAnnotation>
     <bpmn:association id="Association_11atj5a" sourceRef="Activity_18iofo9" targetRef="TextAnnotation_0wtlfsj" />
     <bpmn:textAnnotation id="TextAnnotation_12w473y">
       <bpmn:text>Документ Форми:
-Внести дані про отримання листа з рішенням (Дата, ПІБ, №)</bpmn:text>
+        Внести дані про отримання листа з рішенням (Дата, ПІБ, №)</bpmn:text>
     </bpmn:textAnnotation>
     <bpmn:association id="Association_0gopr3t" sourceRef="Activity_117r8i0" targetRef="TextAnnotation_12w473y" />
     <bpmn:textAnnotation id="TextAnnotation_07v39t0">
@@ -1240,6 +1245,94 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
       <bpmndi:BPMNShape id="Participant_11d2pgr_di" bpmnElement="Participant_11d2pgr" isHorizontal="true">
         <dc:Bounds x="180" y="80" width="6820" height="770" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1gn3vlo_di" bpmnElement="Flow_1gn3vlo">
+        <di:waypoint x="6570" y="670" />
+        <di:waypoint x="6610" y="670" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1x25drf_di" bpmnElement="Flow_1x25drf">
+        <di:waypoint x="6710" y="670" />
+        <di:waypoint x="6750" y="670" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1a26f5q_di" bpmnElement="Flow_1a26f5q">
+        <di:waypoint x="6290" y="670" />
+        <di:waypoint x="6330" y="670" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0vm29cs_di" bpmnElement="Flow_0vm29cs">
+        <di:waypoint x="6150" y="670" />
+        <di:waypoint x="6190" y="670" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1kzp2h9_di" bpmnElement="Flow_1kzp2h9">
+        <di:waypoint x="6000" y="670" />
+        <di:waypoint x="6050" y="670" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xguaxh_di" bpmnElement="Flow_0xguaxh">
+        <di:waypoint x="5860" y="670" />
+        <di:waypoint x="5900" y="670" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_143sree_di" bpmnElement="Flow_143sree">
+        <di:waypoint x="6640" y="260" />
+        <di:waypoint x="6690" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11l5l9g_di" bpmnElement="Flow_11l5l9g">
+        <di:waypoint x="6500" y="260" />
+        <di:waypoint x="6540" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1qkcqju_di" bpmnElement="Flow_1qkcqju">
+        <di:waypoint x="6080" y="260" />
+        <di:waypoint x="6120" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1f11qzf_di" bpmnElement="Flow_1f11qzf">
+        <di:waypoint x="6220" y="260" />
+        <di:waypoint x="6270" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0zsi1mw_di" bpmnElement="Flow_0zsi1mw">
+        <di:waypoint x="5760" y="260" />
+        <di:waypoint x="5820" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1bs2gx4_di" bpmnElement="Flow_1bs2gx4">
+        <di:waypoint x="5920" y="260" />
+        <di:waypoint x="5980" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1xk4q2l_di" bpmnElement="Flow_1xk4q2l">
+        <di:waypoint x="3380" y="260" />
+        <di:waypoint x="3420" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1q7buia_di" bpmnElement="Flow_1q7buia">
+        <di:waypoint x="3215" y="260" />
+        <di:waypoint x="3280" y="260" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3243" y="242" width="9" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0v2f87f_di" bpmnElement="Flow_0v2f87f">
+        <di:waypoint x="3380" y="670" />
+        <di:waypoint x="3420" y="670" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1aw986f_di" bpmnElement="Flow_1aw986f">
+        <di:waypoint x="1050" y="260" />
+        <di:waypoint x="1095" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0oxcrj3_di" bpmnElement="Flow_0oxcrj3">
+        <di:waypoint x="895" y="260" />
+        <di:waypoint x="950" y="260" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="918" y="242" width="9" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_09lgvds_di" bpmnElement="Flow_09lgvds">
+        <di:waypoint x="760" y="202" />
+        <di:waypoint x="760" y="182" />
+        <di:waypoint x="350" y="182" />
+        <di:waypoint x="350" y="235" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0la4nly_di" bpmnElement="Flow_0la4nly">
+        <di:waypoint x="808" y="260" />
+        <di:waypoint x="845" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kth1mt_di" bpmnElement="Flow_0kth1mt">
+        <di:waypoint x="662" y="260" />
+        <di:waypoint x="708" y="260" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1m5okfm_di" bpmnElement="Flow_1m5okfm">
         <di:waypoint x="1235" y="260" />
         <di:waypoint x="1260" y="260" />
@@ -1257,12 +1350,6 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
       <bpmndi:BPMNEdge id="Flow_1ltqeqf_di" bpmnElement="Flow_1ltqeqf">
         <di:waypoint x="535" y="260" />
         <di:waypoint x="562" y="260" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0g1vem5_di" bpmnElement="Flow_0g1vem5">
-        <di:waypoint x="760" y="202" />
-        <di:waypoint x="760" y="180" />
-        <di:waypoint x="350" y="180" />
-        <di:waypoint x="350" y="235" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0lb2mjr_di" bpmnElement="Flow_0lb2mjr">
         <di:waypoint x="6790" y="260" />
@@ -1527,88 +1614,6 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
         <bpmndi:BPMNLabel>
           <dc:Bounds x="3197" y="476" width="16" height="14" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0awuhu1_di" bpmnElement="Flow_0awuhu1">
-        <di:waypoint x="808" y="260" />
-        <di:waypoint x="845" y="260" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0l3q6yx_di" bpmnElement="Flow_0l3q6yx">
-        <di:waypoint x="662" y="260" />
-        <di:waypoint x="708" y="260" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0el9cnh_di" bpmnElement="Flow_0el9cnh">
-        <di:waypoint x="1050" y="260" />
-        <di:waypoint x="1095" y="260" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0q03uxf_di" bpmnElement="Flow_0q03uxf">
-        <di:waypoint x="895" y="260" />
-        <di:waypoint x="950" y="260" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="918" y="242" width="9" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1af2s2x_di" bpmnElement="Flow_1af2s2x">
-        <di:waypoint x="3380" y="670" />
-        <di:waypoint x="3420" y="670" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1n7mmud_di" bpmnElement="Flow_1n7mmud">
-        <di:waypoint x="3380" y="260" />
-        <di:waypoint x="3420" y="260" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0prajnm_di" bpmnElement="Flow_0prajnm">
-        <di:waypoint x="3215" y="260" />
-        <di:waypoint x="3280" y="260" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="3243" y="242" width="9" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_04ixta2_di" bpmnElement="Flow_04ixta2">
-        <di:waypoint x="5920" y="260" />
-        <di:waypoint x="5980" y="260" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1m79gmm_di" bpmnElement="Flow_1m79gmm">
-        <di:waypoint x="5760" y="260" />
-        <di:waypoint x="5820" y="260" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_07gojrd_di" bpmnElement="Flow_07gojrd">
-        <di:waypoint x="6000" y="670" />
-        <di:waypoint x="6050" y="670" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1it560e_di" bpmnElement="Flow_1it560e">
-        <di:waypoint x="5860" y="670" />
-        <di:waypoint x="5900" y="670" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0vwoiyg_di" bpmnElement="Flow_0vwoiyg">
-        <di:waypoint x="6220" y="260" />
-        <di:waypoint x="6270" y="260" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0mx64bm_di" bpmnElement="Flow_0mx64bm">
-        <di:waypoint x="6080" y="260" />
-        <di:waypoint x="6120" y="260" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_066p5xj_di" bpmnElement="Flow_066p5xj">
-        <di:waypoint x="6290" y="670" />
-        <di:waypoint x="6330" y="670" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_05g1gor_di" bpmnElement="Flow_05g1gor">
-        <di:waypoint x="6150" y="670" />
-        <di:waypoint x="6190" y="670" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0evqnkm_di" bpmnElement="Flow_0evqnkm">
-        <di:waypoint x="6640" y="260" />
-        <di:waypoint x="6690" y="260" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0mltb5p_di" bpmnElement="Flow_0mltb5p">
-        <di:waypoint x="6500" y="260" />
-        <di:waypoint x="6540" y="260" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0xdq0uv_di" bpmnElement="Flow_0xdq0uv">
-        <di:waypoint x="6710" y="670" />
-        <di:waypoint x="6750" y="670" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1w32nis_di" bpmnElement="Flow_1w32nis">
-        <di:waypoint x="6570" y="670" />
-        <di:waypoint x="6610" y="670" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Gateway_190i54z_di" bpmnElement="Gateway_190i54z" isMarkerVisible="true">
         <dc:Bounds x="325" y="235" width="50" height="50" />
@@ -1976,6 +1981,36 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
           <dc:Bounds x="5627" y="402" width="27" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_17q95nd_di" bpmnElement="Activity_0a7412g">
+        <dc:Bounds x="708" y="220" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1wlgtgc_di" bpmnElement="Activity_0g747qa">
+        <dc:Bounds x="950" y="220" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0pmeulo_di" bpmnElement="Activity_0wnn70u">
+        <dc:Bounds x="3280" y="630" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1880gkx_di" bpmnElement="Activity_0qxn3m4">
+        <dc:Bounds x="3280" y="220" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0rkrj8y_di" bpmnElement="Activity_0rv1ii2">
+        <dc:Bounds x="5820" y="220" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1l10ns6_di" bpmnElement="Activity_1albuj4">
+        <dc:Bounds x="6120" y="220" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_17366ra_di" bpmnElement="Activity_1bhrl75">
+        <dc:Bounds x="6540" y="220" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_19xwzcx_di" bpmnElement="Activity_0jfmpcs">
+        <dc:Bounds x="5900" y="630" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_13qp72b_di" bpmnElement="Activity_09pj6r4">
+        <dc:Bounds x="6190" y="630" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1i186lr_di" bpmnElement="Activity_0y8ayeb">
+        <dc:Bounds x="6610" y="630" width="100" height="80" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="TextAnnotation_00mov38_di" bpmnElement="TextAnnotation_00mov38">
         <dc:Bounds x="4361" y="111" width="137" height="58" />
       </bpmndi:BPMNShape>
@@ -2009,35 +2044,14 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
       <bpmndi:BPMNShape id="TextAnnotation_07v39t0_di" bpmnElement="TextAnnotation_07v39t0">
         <dc:Bounds x="4330" y="521" width="137" height="58" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_11mnrhx_di" bpmnElement="Activity_0a7412g">
-        <dc:Bounds x="708" y="220" width="100" height="80" />
+      <bpmndi:BPMNShape id="Event_0u00wib_di" bpmnElement="Event_0u00wib">
+        <dc:Bounds x="6642" y="612" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0mt2wkm_di" bpmnElement="Activity_0g747qa">
-        <dc:Bounds x="950" y="220" width="100" height="80" />
+      <bpmndi:BPMNShape id="Event_18b7kji_di" bpmnElement="Event_18b7kji">
+        <dc:Bounds x="6572" y="202" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1yyafcp_di" bpmnElement="Activity_0wnn70u">
-        <dc:Bounds x="3280" y="630" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0xjwl7v_di" bpmnElement="Activity_0qxn3m4">
-        <dc:Bounds x="3280" y="220" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1drzarh_di" bpmnElement="Activity_0rv1ii2">
-        <dc:Bounds x="5820" y="220" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_00cyc9c_di" bpmnElement="Activity_0jfmpcs">
-        <dc:Bounds x="5900" y="630" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_12ey4oe_di" bpmnElement="Activity_1albuj4">
-        <dc:Bounds x="6120" y="220" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0rbfobm_di" bpmnElement="Activity_09pj6r4">
-        <dc:Bounds x="6190" y="630" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0f6iq1t_di" bpmnElement="Activity_1bhrl75">
-        <dc:Bounds x="6540" y="220" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_01bljvh_di" bpmnElement="Activity_0y8ayeb">
-        <dc:Bounds x="6610" y="630" width="100" height="80" />
+      <bpmndi:BPMNShape id="Event_1n5bhse_di" bpmnElement="Event_1n5bhse">
+        <dc:Bounds x="742" y="202" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Association_1oswj4l_di" bpmnElement="Association_1oswj4l">
         <di:waypoint x="4430" y="220" />
@@ -2083,15 +2097,6 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
         <di:waypoint x="4410" y="630" />
         <di:waypoint x="4410" y="579" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Event_1n5bhse_di" bpmnElement="Event_1n5bhse">
-        <dc:Bounds x="742" y="202" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_18b7kji_di" bpmnElement="Event_18b7kji">
-        <dc:Bounds x="6572" y="202" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0u00wib_di" bpmnElement="Event_0u00wib">
-        <dc:Bounds x="6642" y="612" width="36" height="36" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="DataOutputAssociation_02wzpn3_di" bpmnElement="DataOutputAssociation_02wzpn3">
         <di:waypoint x="485" y="300" />
         <di:waypoint x="485" y="395" />
@@ -2244,35 +2249,35 @@ execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'applic
         <di:waypoint x="5580" y="375" />
         <di:waypoint x="5615" y="375" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="DataOutputAssociation_0qe11mb_di" bpmnElement="DataOutputAssociation_0qe11mb">
-        <di:waypoint x="759" y="300" />
-        <di:waypoint x="760" y="365" />
+      <bpmndi:BPMNEdge id="DataOutputAssociation_1582q1m_di" bpmnElement="DataOutputAssociation_1582q1m">
+        <di:waypoint x="758" y="300" />
+        <di:waypoint x="758" y="360" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="DataOutputAssociation_0nsma7a_di" bpmnElement="DataOutputAssociation_0nsma7a">
+      <bpmndi:BPMNEdge id="DataOutputAssociation_0py2xut_di" bpmnElement="DataOutputAssociation_0py2xut">
         <di:waypoint x="1000" y="300" />
         <di:waypoint x="1000" y="365" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="DataOutputAssociation_0omcdes_di" bpmnElement="DataOutputAssociation_0omcdes">
+      <bpmndi:BPMNEdge id="DataOutputAssociation_03xds8y_di" bpmnElement="DataOutputAssociation_03xds8y">
         <di:waypoint x="3330" y="710" />
         <di:waypoint x="3330" y="775" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="DataOutputAssociation_1ivrisk_di" bpmnElement="DataOutputAssociation_1ivrisk">
+      <bpmndi:BPMNEdge id="DataOutputAssociation_1x9ls4c_di" bpmnElement="DataOutputAssociation_1x9ls4c">
         <di:waypoint x="3330" y="300" />
         <di:waypoint x="3330" y="365" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="DataOutputAssociation_09ixlxw_di" bpmnElement="DataOutputAssociation_09ixlxw">
+      <bpmndi:BPMNEdge id="DataOutputAssociation_0zxdvhn_di" bpmnElement="DataOutputAssociation_0zxdvhn">
         <di:waypoint x="5870" y="300" />
         <di:waypoint x="5870" y="372" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="DataOutputAssociation_097uvvz_di" bpmnElement="DataOutputAssociation_097uvvz">
-        <di:waypoint x="5950" y="710" />
-        <di:waypoint x="5950" y="765" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="DataOutputAssociation_16mb141_di" bpmnElement="DataOutputAssociation_16mb141">
+      <bpmndi:BPMNEdge id="DataOutputAssociation_12aklc5_di" bpmnElement="DataOutputAssociation_12aklc5">
         <di:waypoint x="6590" y="300" />
         <di:waypoint x="6590" y="335" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="DataOutputAssociation_11823ih_di" bpmnElement="DataOutputAssociation_11823ih">
+      <bpmndi:BPMNEdge id="DataOutputAssociation_1sm4p41_di" bpmnElement="DataOutputAssociation_1sm4p41">
+        <di:waypoint x="5950" y="710" />
+        <di:waypoint x="5950" y="765" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_1a25a9i_di" bpmnElement="DataOutputAssociation_1a25a9i">
         <di:waypoint x="6660" y="710" />
         <di:waypoint x="6660" y="765" />
       </bpmndi:BPMNEdge>
