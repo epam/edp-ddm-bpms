@@ -5,13 +5,12 @@ import java.util.Collections;
 import java.util.List;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.RoleScopeResource;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 /**
@@ -20,27 +19,15 @@ import org.springframework.beans.factory.annotation.Value;
  */
 public abstract class BaseKeycloakRoleConnectorDelegate implements JavaDelegate {
 
-  @Value("${keycloak.url}")
-  private String serverUrl;
   @Value("${keycloak.realm}")
   private String realm;
-  @Value("${keycloak.client-id}")
-  private String clientId;
-  @Value("${keycloak.client-secret}")
-  private String clientSecret;
+  @Autowired
+  private Keycloak keycloak;
 
   @Override
-  public void execute(DelegateExecution execution) throws Exception {
+  public void execute(DelegateExecution execution) {
     var userName = (String) execution.getVariable("user_name");
     var role = (String) execution.getVariable("role");
-
-    var keycloak = KeycloakBuilder.builder()
-        .serverUrl(serverUrl)
-        .realm(realm)
-        .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-        .clientId(clientId)
-        .clientSecret(clientSecret)
-        .build();
 
     var userRepresentation = getUserRepresentation(keycloak, userName);
 

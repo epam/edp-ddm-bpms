@@ -35,6 +35,12 @@ public class TestCephServiceImpl implements CephService, FormDataCephService {
     storage.put(key, content);
   }
 
+  @Override
+  public void deleteContent(String cephBucketName, String key) {
+    verifyBucketName(cephBucketName);
+    storage.remove(key);
+  }
+
   @SneakyThrows
   @Override
   public FormDataDto getFormData(String key) {

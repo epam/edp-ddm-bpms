@@ -1,9 +1,14 @@
 package com.epam.digital.data.platform.bpms.it;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.deleteRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 
@@ -80,5 +85,23 @@ public class KeycloakConnectorDelegateIT extends BaseIT {
 
     assertThat(ex).isNotNull();
     assertThat(ex.getMessage()).isEqualTo("Keycloak user not found!");
+  }
+
+  @Test
+  @Deployment(resources = {"bpmn/testGetRolesKeycloak.bpmn"})
+  public void shouldGetRegulationsRolesFromKeycloak() throws Exception {
+    var getRolesUrl = "/auth/admin/realms/test-realm/roles";
+    mockConnectToKeycloak();
+
+    keycloakMockServer.addStubMapping(
+        stubFor(get(urlPathEqualTo(getRolesUrl))
+            .willReturn(aResponse().withStatus(200)
+                .withHeader("Content-type", "application/json")
+                .withBody(convertJsonToString("/json/keycloak/keycloakRolesResponse.json")))));
+
+    var processInstance = runtimeService.startProcessInstanceByKey("testGetKeycloakRoles_key", "");
+
+    keycloakMockServer.verify(1, getRequestedFor(urlEqualTo(getRolesUrl)));
+    BpmnAwareTests.assertThat(processInstance).isEnded();
   }
 }
