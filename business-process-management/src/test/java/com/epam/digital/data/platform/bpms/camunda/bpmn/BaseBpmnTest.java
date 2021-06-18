@@ -266,6 +266,7 @@ public abstract class BaseBpmnTest {
 
     @Override
     public void describeTo(Description description) {
+      description.appendText(expected.toString());
     }
   }
 }

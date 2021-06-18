@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
+import lombok.SneakyThrows;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -139,11 +140,12 @@ public abstract class BaseIT {
     authorizationService.saveAuthorization(authorization);
   }
 
-  protected String convertJsonToString(String jsonFilePath) throws IOException {
+  @SneakyThrows
+  protected String convertJsonToString(String jsonFilePath) {
     return TestUtils.getContent(jsonFilePath);
   }
 
-  protected void mockConnectToKeycloak() throws IOException {
+  protected void mockConnectToKeycloak() {
     keycloakMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo("/auth/realms/test-realm/protocol/openid-connect/token"))
             .withRequestBody(equalTo("grant_type=client_credentials"))
@@ -152,7 +154,7 @@ public abstract class BaseIT {
                 .withBody(convertJsonToString("/json/keycloak/keycloakConnectResponse.json")))));
   }
 
-  protected void mockKeycloakGetUsers(String userName, String responseBody) throws IOException {
+  protected void mockKeycloakGetUsers(String userName, String responseBody) {
     keycloakMockServer.addStubMapping(
         stubFor(get(urlPathEqualTo("/auth/admin/realms/test-realm/users"))
             .withQueryParam("username", equalTo(userName))
@@ -161,8 +163,7 @@ public abstract class BaseIT {
                 .withBody(convertJsonToString(responseBody)))));
   }
 
-  protected void mockKeycloakGetRole(String role, String responseBody, int status)
-      throws IOException {
+  protected void mockKeycloakGetRole(String role, String responseBody, int status) {
     keycloakMockServer.addStubMapping(
         stubFor(get(urlPathEqualTo("/auth/admin/realms/test-realm/roles/" + role))
             .willReturn(aResponse().withStatus(status)
@@ -170,7 +171,7 @@ public abstract class BaseIT {
                 .withBody(convertJsonToString(responseBody)))));
   }
 
-  protected void mockKeycloakAddRole(String userId, String request) throws IOException {
+  protected void mockKeycloakAddRole(String userId, String request) {
     var roleMappingsUrl = String
         .format("/auth/admin/realms/test-realm/users/%s/role-mappings/realm", userId);
 
@@ -179,7 +180,7 @@ public abstract class BaseIT {
             equalToJson(convertJsonToString(request))).willReturn(aResponse().withStatus(200))));
   }
 
-  protected void mockKeycloakDeleteRole(String userId, String request) throws IOException {
+  protected void mockKeycloakDeleteRole(String userId, String request) {
     var roleMappingsUrl = String
         .format("/auth/admin/realms/test-realm/users/%s/role-mappings/realm", userId);
 

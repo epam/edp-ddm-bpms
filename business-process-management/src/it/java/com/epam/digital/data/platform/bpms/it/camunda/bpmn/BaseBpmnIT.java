@@ -29,6 +29,7 @@ import java.util.Objects;
 import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.junit.After;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,6 +70,14 @@ public abstract class BaseBpmnIT extends BaseIT {
     runtimeService.createProcessInstanceQuery().list().forEach(
         processInstance -> runtimeService
             .deleteProcessInstance(processInstance.getId(), "test clear"));
+  }
+
+  @After
+  public void destroy() {
+    digitalSignatureMockServer.resetAll();
+    dataFactoryMockServer.resetAll();
+    userSettingsWireMock.resetAll();
+    keycloakMockServer.resetAll();
   }
 
   protected void completeTask(String taskId, String processInstanceId, String formData)
