@@ -4,9 +4,9 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 
 import com.epam.digital.data.platform.bpms.el.TransientVariableScopeElResolver;
-import com.epam.digital.data.platform.bpms.el.juel.AbstractApplicationContextAwareJuelFunction;
-import com.epam.digital.data.platform.bpms.el.juel.InitiatorJuelFunction;
-import com.epam.digital.data.platform.bpms.el.juel.mapper.CompositeApplicationContextAwareJuelFunctionMapper;
+import com.epam.digital.data.platform.el.juel.AbstractApplicationContextAwareJuelFunction;
+import com.epam.digital.data.platform.el.juel.InitiatorJuelFunction;
+import com.epam.digital.data.platform.el.juel.mapper.CompositeApplicationContextAwareJuelFunctionMapper;
 import com.epam.digital.data.platform.starter.security.jwt.TokenParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;

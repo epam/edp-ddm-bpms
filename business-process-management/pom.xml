@@ -56,6 +56,11 @@
       <version>${ddm-starter-actuator.version}</version>
     </dependency>
     <dependency>
+      <groupId>com.epam.digital.data.platform</groupId>
+      <artifactId>ddm-starter-juel-function</artifactId>
+      <version>${ddm-starter-juel-function.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-sleuth</artifactId>
     </dependency>
