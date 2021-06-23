@@ -2,11 +2,13 @@ package com.epam.digital.data.platform.bpms.it;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.junit.Test;
 
 public class JuelFunctionsIT extends BaseIT {
@@ -28,4 +30,23 @@ public class JuelFunctionsIT extends BaseIT {
         .hasSize(3)
         .contains("initiator", "const_dataFactoryBaseUrl", "elInitiator");
   }
+
+  @Test
+  @Deployment(resources = "bpmn/completer_juel_function.bpmn")
+  public void testCompleterFunction() {
+    var taskDefinitionKey = "waitConditionTaskKey";
+    var processDefinitionKey = "testCompleterKey";
+
+    var processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
+
+    var cephKey = cephKeyProvider
+        .generateKey(taskDefinitionKey, processInstance.getId());
+    cephService.putFormData(cephKey, FormDataDto.builder().accessToken(validAccessToken).build());
+
+    String taskId = taskService.createTaskQuery().taskDefinitionKey(taskDefinitionKey).singleResult().getId();
+    taskService.complete(taskId);
+
+    BpmnAwareTests.assertThat(processInstance).isEnded();
+  }
+
 }

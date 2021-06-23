@@ -212,3 +212,138 @@ UserDto .o JwtClaimsDto
 
 [IMPORTANT]
 Токен ініціатора, а разом з ним і всі Keycloak атрибути, будуть доступні тільки до першої "User task" у бізнес-процесі
+
+=== completer(<task_id>)
+
+Діаграма класів:
+
+[plantuml,completer-class,svg]
+----
+@startuml
+package el {
+  package juel {
+    abstract class AbstractApplicationContextAwareJuelFunction
+    class CompleterJuelFunction #back:lightblue;line:green;text:black extends AbstractApplicationContextAwareJuelFunction {
+      + {static} UserDto completer(String taskDefinitionKey)
+    }
+  }
+  package dto {
+    class UserDto #back:lightblue;line:green;text:black {
+      - String userName
+      - String accessToken
+      - JwtClaimsDto claims
+      --
+      + String getUserName()
+      + String getAccessToken()
+      + String getFullName()
+      + String getDrfo()
+      + String getEdrpou()
+    }
+  }
+  AbstractApplicationContextAwareJuelFunction ..[hidden]> UserDto
+  CompleterJuelFunction .> UserDto : returns
+}
+UserDto .o JwtClaimsDto
+@enduml
+----
+
+* `CompleterJuelFunction` -- наслідує `AbstractApplicationContextAwareJuelFunction` та надає функцію `completer(<task_id>)` що:
+
+[plantuml,completer-sequence,svg]
+----
+@startuml
+  skinparam responseMessageBelowArrow true
+
+  participant "completer(<task_id>)" as completer order 10
+  participant "Camunda Execution Context" as camunda order 20
+  participant "Spring Application Context" as spring order 30
+  participant "CephKeyProvider" as ceph_key_provider order 40
+  participant "Ceph" as ceph order 50
+  participant "TokenParser" as parser order 60
+
+  -> completer
+  activate completer
+
+  completer -> camunda : Отримати існуючий UserDto об'єкт комплітера
+  activate camunda
+
+  alt Об'єкт комплітера знайдено
+    completer <-- camunda : Знайдений UserDto об'єкт комплітера
+    <-- completer : UserDto
+
+  else Об'єкт комплітера не знайдено
+    completer <-- camunda : null
+    deactivate camunda
+
+  completer -> camunda : Отримати ім'я комплітера з відповідної змінної
+    activate camunda
+
+    completer <-- camunda : Ім'я комплітера
+    deactivate camunda
+
+  completer -> camunda : Отримати токен комплітера з відповідної змінної
+    activate camunda
+    alt Токен комплітера не наявний у Camunda контексті
+      completer <-- camunda : null
+      completer -> spring : Отримати бін типу CephKeyProvider
+        activate spring
+
+      completer <-- spring : Бін типу CephKeyProvider
+        deactivate spring
+
+      completer -> ceph_key_provider : Згенерувати цеф ключ
+        activate ceph_key_provider
+
+      completer <-- ceph_key_provider : Згенерований цеф ключ
+        deactivate ceph_key_provider
+
+      completer -> spring : Отримати бін типу FormDataCephService
+        activate spring
+
+      completer <-- spring : Бін типу FormDataCephService
+      deactivate spring
+
+      completer -> ceph : Отримати цеф документ, який містить токен комплітера з цефу за згенерованим ключем
+      activate ceph
+
+      completer <-- ceph : Цеф документ, який містить токен комплітера
+      deactivate ceph
+
+      completer -> completer : Отримати токен з цеф документа
+
+    else Токен комплітера наявний у Camunda контексті
+      completer <-- camunda : Токен комплітера
+      deactivate camunda
+    end
+
+  completer -> spring : Отримати бін типу TokenParser
+      activate spring
+
+      completer <-- spring : Бін типу TokenParser
+      deactivate spring
+
+      completer -> parser : Розпарсити токен комплітера у об'єкт JwtClaimsDto
+      activate parser
+
+      completer <-- parser : Згенерований JwtClaimsDto
+      deactivate parser
+
+  completer -> completer : Збудувати UserDto використовуючи \n ім'я та токен комплітера, згенерований JwtClaimsDto
+
+  completer -> camunda : Зберегти збудований UserDto у контексті \nу якості transient змінної
+    activate camunda
+
+    completer <-- camunda : Збережено
+    deactivate camunda
+
+    <-- completer : UserDto
+    deactivate completer
+  end
+@enduml
+----
+
+* `UserDto` -- клас що являє собою обгортку даних користувача (в цьому випадку комплітера).
+Використовується такий самий об'єкт як і для функції ініціатора.
+
+[IMPORTANT]
+Функція комплітера доступна для використання після успішного завершення користувацької задачі.
