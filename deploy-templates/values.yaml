@@ -10,7 +10,8 @@ appConfigMountPath: "/app/config/main"
 camundaVarsMountPath: "/app/config/camunda"
 appSecretsMountPath: "/app/secrets/main"
 cephSecretMountPath: "/app/secrets/ceph"
-citizenKeycloakClientSecretsMountPath: "/app/secrets/realm-admin-client"
+citizenKeycloakClientSecretsMountPath: "/app/secrets/citizen-realm-admin-client"
+officerKeycloakClientSecretsMountPath: "/app/secrets/officer-realm-admin-client"
 prometheusScrapePath: "/actuator/prometheus"
 readinessPath: "/actuator/health/readiness"
 livenessPath: "/actuator/health/liveness"
@@ -37,6 +38,16 @@ keycloak:
     clientName: realm-admin
     realm: citizen-portal
     public: false
+    secretName: keycloak-realm-admin-citizen-client-secret
+    serviceAccount:
+      clientRoles:
+      - clientId: realm-management
+        roles: ["realm-admin"]
+  officerClient:
+    clientName: realm-admin
+    realm: officer-portal
+    public: false
+    secretName: keycloak-realm-admin-officer-client-secret
     serviceAccount:
       clientRoles:
       - clientId: realm-management

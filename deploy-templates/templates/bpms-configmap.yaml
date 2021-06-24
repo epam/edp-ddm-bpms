@@ -11,7 +11,9 @@ data:
     camunda.bpm.database.schema-update: true
     dso.url: http://digital-signature-ops:8080
     ceph.http-endpoint: https://s3-openshift-storage.{{ .Values.dnsWildcard }}
-    keycloak.realm: {{ template "keycloak.targetRealm" . }}
     keycloak.url: {{ template "keycloak.url" . }}/auth
-    keycloak.client-id: {{ .Values.keycloak.citizenClient.clientName }}
+    keycloak.citizen.realm: {{ template "keycloak.citizenTargetRealm" . }}
+    keycloak.citizen.client-id: {{ .Values.keycloak.citizenClient.clientName }}
+    keycloak.officer.realm: {{ template "keycloak.officerTargetRealm" . }}
+    keycloak.officer.client-id: {{ .Values.keycloak.officerClient.clientName }}
     trembita-exchange-gateway: {{ toYaml .Values.trembitaExchangeGateway | nindent 6 }}

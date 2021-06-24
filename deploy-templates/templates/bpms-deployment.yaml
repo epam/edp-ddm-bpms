@@ -102,8 +102,10 @@ spec:
             mountPath: {{ .Values.camundaVarsMountPath }}
           - name: {{ .Chart.Name }}-ceph-bucket-credentials
             mountPath: {{ .Values.cephSecretMountPath }}
-          - name: keycloak-client-{{ template "bpms.name" . }}-{{ .Values.keycloak.citizenClient.clientName }}-secret
+          - name: {{ .Values.keycloak.citizenClient.secretName }}
             mountPath: {{ .Values.citizenKeycloakClientSecretsMountPath }}
+          - name: {{ .Values.keycloak.officerClient.secretName }}
+            mountPath: {{ .Values.officerKeycloakClientSecretsMountPath }}
       serviceAccountName: {{ .Chart.Name }}
       {{- if .Values.nodeSelector }}
       nodeSelector: {{ toYaml .Values.nodeSelector | nindent 8 }}
@@ -134,9 +136,15 @@ spec:
         - name: {{ .Chart.Name }}-camunda-global-system-vars
           configMap:
             name: {{ .Chart.Name }}-camunda-global-system-vars
-        - name: keycloak-client-{{ template "bpms.name" . }}-{{ .Values.keycloak.citizenClient.clientName }}-secret
+        - name: {{ .Values.keycloak.citizenClient.secretName }}
           secret:
-            secretName: keycloak-client-{{ template "bpms.name" . }}-{{ .Values.keycloak.citizenClient.clientName }}-secret
+            secretName: {{ .Values.keycloak.citizenClient.secretName }}
             items:
             - key: clientSecret
-              path: keycloak.client-secret
+              path: keycloak.citizen.client-secret
+        - name: {{ .Values.keycloak.officerClient.secretName }}
+          secret:
+            secretName: {{ .Values.keycloak.officerClient.secretName }}
+            items:
+            - key: clientSecret
+              path: keycloak.officer.client-secret

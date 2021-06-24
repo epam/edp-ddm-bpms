@@ -3,7 +3,7 @@ kind: KeycloakClient
 metadata:
   annotations:
     helm.sh/resource-policy: keep
-  name: {{ template "bpms.name" . }}-{{ .Values.keycloak.citizenClient.clientName }}
+  name: {{ template "bpms.name" . }}-{{ .Values.keycloak.citizenClient.clientName }}-{{ .Values.keycloak.citizenClient.realm }}
   namespace: {{ .Values.namespace }}
 spec:
   clientId: {{ .Values.keycloak.citizenClient.clientName }}
@@ -13,9 +13,11 @@ spec:
   serviceAccount:
     enabled: true
     clientRoles: {{ .Values.keycloak.citizenClient.serviceAccount.clientRoles | toYaml | nindent 4 }}
+  secret: {{ .Values.keycloak.citizenClient.secretName }}
   {{- else }}
   serviceAccount:
     enabled: false
+  secret: ''
   {{- end }}
   directAccess: false
   audRequired: false
@@ -31,5 +33,5 @@ spec:
   {{- if .Values.keycloak.citizenClient.protocolMappers }}
   protocolMappers: {{ .Values.keycloak.citizenClient.protocolMappers | toYaml | nindent 4 }}
   {{- end }}
-  targetRealm: {{ template "keycloak.targetRealm" . }}
+  targetRealm: {{ template "keycloak.citizenTargetRealm" . }}
   webUrl: {{ template "bpms.url" . }}
