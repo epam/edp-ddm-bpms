@@ -18,11 +18,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.assertj.core.util.Lists;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesImpl;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceWithVariablesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
+import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -114,6 +117,36 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
     assertThat(exception.getCode()).isEqualTo("type");
     assertThat(exception.getMessage()).isEqualTo("error");
     assertThat(exception.getLocalizedMessage()).isEqualTo("testLocalizedMsg");
+  }
+
+  @Test
+  public void shouldReturnProcessInstanceWithVariablesOnStartProcessDefinitionByKey()
+      throws JsonProcessingException {
+    var executionEntity = new ExecutionEntity();
+    executionEntity.setId("testInstanceId");
+    executionEntity.setProcessDefinitionId("testId");
+
+    var variableMap = new VariableMapImpl();
+    variableMap.put("var1", "value1");
+
+    var processInstanceWithVariables = new ProcessInstanceWithVariablesImpl(executionEntity,
+        variableMap);
+    var processInstanceWithVariablesDto = ProcessInstanceWithVariablesDto
+        .fromProcessInstance(processInstanceWithVariables);
+    restClientWireMock.addStubMapping(
+        stubFor(post(urlEqualTo("/api/process-definition/key/testId/start"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody(objectMapper.writeValueAsString(processInstanceWithVariablesDto))))
+    );
+
+    var resultDto = processDefinitionRestClient
+        .startProcessInstanceByKey("testId", new StartProcessInstanceDto());
+
+    assertThat(resultDto.getId()).isEqualTo("testInstanceId");
+    assertThat(resultDto.getDefinitionId()).isEqualTo("testId");
+    assertThat(resultDto.getVariables().get("var1").getValue()).isEqualTo("value1");
   }
 
   @Test

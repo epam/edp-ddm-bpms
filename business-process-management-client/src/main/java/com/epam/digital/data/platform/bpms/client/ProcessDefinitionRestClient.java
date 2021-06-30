@@ -9,6 +9,7 @@ import java.util.List;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceWithVariablesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
 import org.springframework.cloud.openfeign.CollectionFormat;
@@ -74,6 +75,21 @@ public interface ProcessDefinitionRestClient extends BaseFeignClient {
       @ErrorCodes(codes = {422}, generate = ClientValidationException.class)
   })
   ProcessInstanceDto startProcessInstance(@PathVariable("id") String id,
+      @RequestBody StartProcessInstanceDto startProcessInstanceDto);
+
+  /**
+   * Method for starting process instance by process definition key
+   *
+   * @param key                     process definition key
+   * @param startProcessInstanceDto {@link StartProcessInstanceDto} entity
+   * @return a started process instance with variables
+   */
+  @PostMapping("key/{key}/start")
+  @ErrorHandling(codeSpecific = {
+      @ErrorCodes(codes = {422}, generate = ClientValidationException.class)
+  })
+  ProcessInstanceWithVariablesDto startProcessInstanceByKey(
+      @PathVariable("key") String key,
       @RequestBody StartProcessInstanceDto startProcessInstanceDto);
 
   @GetMapping("/{id}/startForm")
