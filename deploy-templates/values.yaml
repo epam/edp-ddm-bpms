@@ -54,7 +54,7 @@ keycloak:
         roles: ["realm-admin"]
 
 trembitaExchangeGateway:
-  id: 'MDTUDDM'
+  userId: 'MDTUDDM'
   protocol-version: '4.0'
   url: 'http://trembita.mdtu-ddm.projects.epam.com'
   client:

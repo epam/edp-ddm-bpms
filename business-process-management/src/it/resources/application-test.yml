@@ -45,7 +45,7 @@ keycloak:
     client-secret: officer-client-secret
 
 trembita-exchange-gateway:
-  id: MDTUDDM
+  userId: MDTUDDM
   protocol-version: 4.0
   url: http://localhost:7788/trembita-mock-server
   client:
