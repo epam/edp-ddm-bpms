@@ -39,7 +39,7 @@ scrape_configs:
 ##### Running the tests:
 
 * Tests could be run via maven command:
-    * `mvn verify` OR using appropriate functions of your IDE.
+    * `mvn verify -P local` OR using appropriate functions of your IDE.
 
 ### Local development:
 
