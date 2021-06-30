@@ -10,6 +10,7 @@ import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -21,9 +22,10 @@ import org.springframework.stereotype.Component;
 @Logging
 public class KeycloakGetRolesConnectorDelegate implements JavaDelegate {
 
-  @Value("${keycloak.realm}")
+  @Value("${keycloak.citizen.realm}")
   private String realm;
   @Autowired
+  @Qualifier("citizen-keycloak-client")
   private Keycloak keycloak;
 
   @Override

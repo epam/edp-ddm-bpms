@@ -21,7 +21,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
 
   @Before
   public void setUp() {
-    mockConnectToKeycloak();
+    mockConnectToKeycloak(citizenRealm);
     mockKeycloakGetUsers(TEST_USER_NAME, "/json/citizen-onboarding/keycloak/usersResponse.json");
     mockKeycloakGetRole("unregistered-individual",
         "/json/citizen-onboarding/keycloak/unregistered-individual.json", 200);

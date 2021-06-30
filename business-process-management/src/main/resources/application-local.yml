@@ -34,6 +34,11 @@ ceph:
 
 keycloak:
   url: http://localhost:8200/auth
-  realm: realm
-  client-id: clientId
-  client-secret: clientSecret
+  citizen:
+    realm: citizenRealm
+    client-id: citizenClientId
+    client-secret: citizenClientSecret
+  officer:
+    realm: officerRealm
+    client-id: officerClientId
+    client-secret: officerClientSecret

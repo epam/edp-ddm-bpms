@@ -17,21 +17,39 @@ public class KeycloakClientConfig {
 
   @Value("${keycloak.url}")
   private String serverUrl;
-  @Value("${keycloak.realm}")
-  private String realm;
-  @Value("${keycloak.client-id}")
-  private String clientId;
-  @Value("${keycloak.client-secret}")
-  private String clientSecret;
+  @Value("${keycloak.citizen.realm}")
+  private String citizenRealm;
+  @Value("${keycloak.citizen.client-id}")
+  private String citizenClientId;
+  @Value("${keycloak.citizen.client-secret}")
+  private String citizenClientSecret;
+  @Value("${keycloak.officer.realm}")
+  private String officerRealm;
+  @Value("${keycloak.officer.client-id}")
+  private String officerClientId;
+  @Value("${keycloak.officer.client-secret}")
+  private String officerClientSecret;
 
-  @Bean
-  public Keycloak keycloak() {
+
+  @Bean("citizen-keycloak-client")
+  public Keycloak citizenKeycloak() {
     return KeycloakBuilder.builder()
         .serverUrl(serverUrl)
-        .realm(realm)
+        .realm(citizenRealm)
         .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-        .clientId(clientId)
-        .clientSecret(clientSecret)
+        .clientId(citizenClientId)
+        .clientSecret(citizenClientSecret)
+        .build();
+  }
+
+  @Bean("officer-keycloak-client")
+  public Keycloak officerKeycloak() {
+    return KeycloakBuilder.builder()
+        .serverUrl(serverUrl)
+        .realm(officerRealm)
+        .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
+        .clientId(officerClientId)
+        .clientSecret(officerClientSecret)
         .build();
   }
 }

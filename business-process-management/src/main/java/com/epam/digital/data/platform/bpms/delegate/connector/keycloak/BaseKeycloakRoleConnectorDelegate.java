@@ -11,6 +11,7 @@ import org.keycloak.admin.client.resource.RoleScopeResource;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 
 /**
@@ -19,9 +20,10 @@ import org.springframework.beans.factory.annotation.Value;
  */
 public abstract class BaseKeycloakRoleConnectorDelegate implements JavaDelegate {
 
-  @Value("${keycloak.realm}")
+  @Value("${keycloak.citizen.realm}")
   private String realm;
   @Autowired
+  @Qualifier("citizen-keycloak-client")
   private Keycloak keycloak;
 
   @Override

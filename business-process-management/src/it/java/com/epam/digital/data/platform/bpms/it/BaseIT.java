@@ -40,6 +40,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -73,6 +74,10 @@ public abstract class BaseIT {
   @Inject
   @Qualifier("keycloakMockServer")
   protected WireMockServer keycloakMockServer;
+  @Value("${keycloak.citizen.realm}")
+  protected String citizenRealm;
+  @Value("${keycloak.officer.realm}")
+  protected String officerRealm;
 
   @LocalServerPort
   protected int port;
@@ -145,9 +150,9 @@ public abstract class BaseIT {
     return TestUtils.getContent(jsonFilePath);
   }
 
-  protected void mockConnectToKeycloak() {
+  protected void mockConnectToKeycloak(String realmName) {
     keycloakMockServer.addStubMapping(
-        stubFor(post(urlPathEqualTo("/auth/realms/test-realm/protocol/openid-connect/token"))
+        stubFor(post(urlPathEqualTo("/auth/realms/" + realmName + "/protocol/openid-connect/token"))
             .withRequestBody(equalTo("grant_type=client_credentials"))
             .willReturn(aResponse().withStatus(200)
                 .withHeader("Content-type", "application/json")
@@ -156,7 +161,7 @@ public abstract class BaseIT {
 
   protected void mockKeycloakGetUsers(String userName, String responseBody) {
     keycloakMockServer.addStubMapping(
-        stubFor(get(urlPathEqualTo("/auth/admin/realms/test-realm/users"))
+        stubFor(get(urlPathEqualTo("/auth/admin/realms/citizen-realm/users"))
             .withQueryParam("username", equalTo(userName))
             .willReturn(aResponse().withStatus(200)
                 .withHeader("Content-type", "application/json")
@@ -165,7 +170,7 @@ public abstract class BaseIT {
 
   protected void mockKeycloakGetRole(String role, String responseBody, int status) {
     keycloakMockServer.addStubMapping(
-        stubFor(get(urlPathEqualTo("/auth/admin/realms/test-realm/roles/" + role))
+        stubFor(get(urlPathEqualTo("/auth/admin/realms/citizen-realm/roles/" + role))
             .willReturn(aResponse().withStatus(status)
                 .withHeader("Content-type", "application/json")
                 .withBody(convertJsonToString(responseBody)))));
@@ -173,7 +178,7 @@ public abstract class BaseIT {
 
   protected void mockKeycloakAddRole(String userId, String request) {
     var roleMappingsUrl = String
-        .format("/auth/admin/realms/test-realm/users/%s/role-mappings/realm", userId);
+        .format("/auth/admin/realms/citizen-realm/users/%s/role-mappings/realm", userId);
 
     keycloakMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo(roleMappingsUrl)).withRequestBody(
@@ -182,7 +187,7 @@ public abstract class BaseIT {
 
   protected void mockKeycloakDeleteRole(String userId, String request) {
     var roleMappingsUrl = String
-        .format("/auth/admin/realms/test-realm/users/%s/role-mappings/realm", userId);
+        .format("/auth/admin/realms/citizen-realm/users/%s/role-mappings/realm", userId);
 
     keycloakMockServer.addStubMapping(
         stubFor(delete(urlPathEqualTo(roleMappingsUrl)).withRequestBody(
