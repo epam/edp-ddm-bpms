@@ -54,6 +54,7 @@ public class KeycloakGetUsersConnectorDelegate implements JavaDelegate {
   }
 
   private boolean hasFullNameAttribute(UserRepresentation user) {
-    return Objects.nonNull(user.getAttributes().get(ATTRIBUTE_NAME));
+    var attribute = user.getAttributes();
+    return Objects.nonNull(attribute) && Objects.nonNull(attribute.get(ATTRIBUTE_NAME));
   }
 }
