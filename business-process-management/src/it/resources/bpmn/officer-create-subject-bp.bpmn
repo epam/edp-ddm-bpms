@@ -1,0 +1,589 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" id="Definitions_17xz5yw" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:collaboration id="Collaboration_1uuz5au">
+    <bpmn:participant id="Participant_0k3cbqn" name="Створення суб&#39;єкта Чинновником" processRef="officer-create-subject-bp" />
+  </bpmn:collaboration>
+  <bpmn:process id="officer-create-subject-bp" name="officer-create-subject" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="початок" camunda:formKey="create-subject-officer-create-subject-bp" camunda:initiator="initiator">
+      <bpmn:outgoing>Flow_1cvco7f</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:exclusiveGateway id="Gateway_0kozmjv">
+      <bpmn:incoming>Flow_1cvco7f</bpmn:incoming>
+      <bpmn:incoming>Flow_1xzg63f</bpmn:incoming>
+      <bpmn:incoming>Flow_1glhqui</bpmn:incoming>
+      <bpmn:outgoing>Flow_1n4ucwo</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1cvco7f" sourceRef="StartEvent_1" targetRef="Gateway_0kozmjv" />
+    <bpmn:sequenceFlow id="Flow_1c2v9mf" name="ні" sourceRef="Gateway_0u7wftv" targetRef="Gateway_12iufx9">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${response.value.responseBody.elements().size() == 0}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0wkqilk" sourceRef="Activity_1s9rsug" targetRef="Activity_19gclnl" />
+    <bpmn:sequenceFlow id="Flow_11skmjt" name="так" sourceRef="Gateway_0u7wftv" targetRef="Activity_1k5jkn3">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${response.value.responseBody.elements().size() != 0}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1uec02m" sourceRef="Activity_0gm3yp3" targetRef="Activity_1ru7ahi" />
+    <bpmn:sequenceFlow id="Flow_0iv2j3n" sourceRef="Activity_0kfakhl" targetRef="Activity_0kzgq5s" />
+    <bpmn:sequenceFlow id="Flow_1940u36" sourceRef="sign_subject_officer_create_subject_task" targetRef="Activity_0gm3yp3" />
+    <bpmn:sequenceFlow id="Flow_1u9fwfd" sourceRef="Gateway_09k16ro" targetRef="sign_subject_officer_create_subject_task" />
+    <bpmn:sequenceFlow id="Flow_1opp6ie" sourceRef="Event_04li2v4" targetRef="Gateway_09k16ro" />
+    <bpmn:sequenceFlow id="Flow_04cwq16" sourceRef="Activity_0kzgq5s" targetRef="Event_0e3d1bg" />
+    <bpmn:sequenceFlow id="Flow_1n4ucwo" sourceRef="Gateway_0kozmjv" targetRef="Activity_11dwana" />
+    <bpmn:sequenceFlow id="Flow_0rbgsm1" sourceRef="Activity_0ze5pt5" targetRef="Gateway_1d6ypqa" />
+    <bpmn:sequenceFlow id="Flow_1b0cfsn" sourceRef="Activity_05s8r0u" targetRef="Activity_1frfgmk" />
+    <bpmn:sequenceFlow id="Flow_03terb1" sourceRef="Activity_1ru7ahi" targetRef="Activity_1bdempp" />
+    <bpmn:sequenceFlow id="Flow_0e3fm59" sourceRef="Activity_1bdempp" targetRef="Activity_00f5qc1" />
+    <bpmn:sequenceFlow id="Flow_0e5c99l" sourceRef="Activity_00f5qc1" targetRef="Activity_1wbex75" />
+    <bpmn:sequenceFlow id="Flow_0z9h7qq" sourceRef="Activity_1wbex75" targetRef="Activity_0kfakhl" />
+    <bpmn:sequenceFlow id="Flow_0mcm3ui" name="так" sourceRef="Gateway_1d6ypqa" targetRef="Gateway_06nwlx6">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!responseEdr.value.responseBody.elements().get(0).prop('state').value().equals('SUSPENDED') &amp;&amp; !responseEdr.value.responseBody.elements().get(0).prop('state').value().equals('CANCELED')}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1xzg63f" sourceRef="Activity_1k5jkn3" targetRef="Gateway_0kozmjv" />
+    <bpmn:sequenceFlow id="Flow_0c6c3z6" name="ні" sourceRef="Gateway_1d6ypqa" targetRef="Activity_1fb5jql">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${responseEdr.value.responseBody.elements().get(0).prop('state').value().equals('SUSPENDED') || responseEdr.responseBody.elements().get(0).prop('state').value().equals('CANCELED')}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1glhqui" sourceRef="Activity_1fb5jql" targetRef="Gateway_0kozmjv" />
+    <bpmn:sequenceFlow id="Flow_0a7xzhs" name="INDIVIDUAL" sourceRef="Gateway_12iufx9" targetRef="Gateway_06nwlx6">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${subjectType.value.equals('INDIVIDUAL')}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_18i78x2" sourceRef="Gateway_06nwlx6" targetRef="Activity_05s8r0u" />
+    <bpmn:sequenceFlow id="Flow_0yeibnc" name="LEGAL or ENTREPRENEUR" sourceRef="Gateway_12iufx9" targetRef="Activity_0ze5pt5">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${subjectType.value.equals('LEGAL') || subjectType.value.equals('ENTREPRENEUR')}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0ggr62v" sourceRef="Activity_10m5p9w" targetRef="Gateway_0u7wftv" />
+    <bpmn:scriptTask id="Activity_11dwana" name="Читання токену ініціатора" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1n4ucwo</bpmn:incoming>
+      <bpmn:outgoing>Flow_02zgzvd</bpmn:outgoing>
+      <bpmn:script>def token = initiator().accessToken
+
+def cephObj = S(['x-access-token': token], 'application/json').toString()
+
+def cephKey = cephKeyProvider.generateKey('initiator_token_saving', execution.getProcessInstanceId())
+
+execution.removeVariable('payload')
+execution.removeVariable('cephKey')
+execution.setVariableLocalTransient('payload', cephObj)
+execution.setVariableLocalTransient('cephKey', cephKey)</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_02zgzvd" sourceRef="Activity_11dwana" targetRef="Activity_1nnefwa" />
+    <bpmn:serviceTask id="Activity_1nnefwa" name="Збереження токену у цеф" camunda:modelerTemplate="putContentToCephDelegate" camunda:delegateExpression="${putContentToCephDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="key">${cephKey}</camunda:inputParameter>
+          <camunda:inputParameter name="content">${payload}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_02zgzvd</bpmn:incoming>
+      <bpmn:outgoing>Flow_1phzol0</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1phzol0" sourceRef="Activity_1nnefwa" targetRef="Activity_1s9rsug" />
+    <bpmn:serviceTask id="Activity_1k5jkn3" name="Формування валідацйної помилки" camunda:modelerTemplate="userDataValidationErrorDelegate" camunda:delegateExpression="${userDataValidationErrorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="validationErrors">
+            <camunda:list>
+              <camunda:value>{"field": "subjectType", "value": "${subjectType.value}", "message": "Такий суб'єкт вже існує"}</camunda:value>
+              <camunda:value>{"field": "subjectCode", "value": "${subjectCode.value}", "message": "Такий суб'єкт вже існує"}</camunda:value>
+            </camunda:list>
+          </camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_11skmjt</bpmn:incoming>
+      <bpmn:outgoing>Flow_1xzg63f</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_1s9rsug" name="Читання документа за ключем" camunda:modelerTemplate="getStartFormDataFromCephDelegate" camunda:delegateExpression="${getStartFormDataFromCephDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="startFormData">${ formData }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1phzol0</bpmn:incoming>
+      <bpmn:outgoing>Flow_0wkqilk</bpmn:outgoing>
+      <bpmn:property id="Property_0lk5z6g" name="__targetRef_placeholder" />
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_12iufx9" name="SubjectType">
+      <bpmn:incoming>Flow_1c2v9mf</bpmn:incoming>
+      <bpmn:outgoing>Flow_0a7xzhs</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0yeibnc</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="Gateway_0u7wftv" name="Знайдено?">
+      <bpmn:incoming>Flow_0ggr62v</bpmn:incoming>
+      <bpmn:outgoing>Flow_1c2v9mf</bpmn:outgoing>
+      <bpmn:outgoing>Flow_11skmjt</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Activity_10m5p9w" name="Пошук даних про суб&#39;єкт" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="resource">subject-equal-subject-type-equal-subject-code</camunda:inputParameter>
+          <camunda:inputParameter name="searchConditions">
+            <camunda:map>
+              <camunda:entry key="subjectType">${subjectType.value}</camunda:entry>
+              <camunda:entry key="subjectCode">${subjectCode.value}</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token_task_definition_key">initiator_token_saving</camunda:inputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0jygqo6</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ggr62v</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0jygqo6" sourceRef="Activity_19gclnl" targetRef="Activity_10m5p9w" />
+    <bpmn:scriptTask id="Activity_19gclnl" name="Підготувати дані для запросу" scriptFormat="groovy">
+      <bpmn:incoming>Flow_0wkqilk</bpmn:incoming>
+      <bpmn:outgoing>Flow_0jygqo6</bpmn:outgoing>
+      <bpmn:script>def subjectType = startFormData.prop('subjectType').value()
+
+if (subjectType.equals('INDIVIDUAL') || subjectType.equals('ENTREPRENEUR')) {
+    execution.setVariableLocalTransient('subjectCode', startFormData.prop('rnokppCode').value())
+} else if (subjectType.equals('LEGAL')) {
+    execution.setVariableLocalTransient('subjectCode', startFormData.prop('edrpou').value())
+}
+
+execution.setVariableLocalTransient('subjectType', subjectType)
+
+</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_0zxd11w" sourceRef="Activity_1frfgmk" targetRef="Gateway_09k16ro" />
+    <bpmn:exclusiveGateway id="Gateway_06nwlx6">
+      <bpmn:incoming>Flow_0mcm3ui</bpmn:incoming>
+      <bpmn:incoming>Flow_0a7xzhs</bpmn:incoming>
+      <bpmn:outgoing>Flow_18i78x2</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="sign_subject_officer_create_subject_task" name="Підписати дані по суб&#39;єкту" camunda:modelerTemplate="officerSignTaskTemplate" camunda:formKey="sign-subject-officer-create-subject-bp" camunda:assignee="${initiator}">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="eSign" value="true" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1u9fwfd</bpmn:incoming>
+      <bpmn:outgoing>Flow_1940u36</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Activity_0gm3yp3" name="Читання документа форми за ключем (transient var)" camunda:modelerTemplate="getContentFromCephDelegate" camunda:delegateExpression="${getContentFromCephDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="key">${cephKeyProvider.generateKey('sign_subject_officer_create_subject_task', execution.getProcessInstanceId())}</camunda:inputParameter>
+          <camunda:outputParameter name="content">${ content }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1940u36</bpmn:incoming>
+      <bpmn:outgoing>Flow_1uec02m</bpmn:outgoing>
+      <bpmn:property id="Property_0bl1551" name="__targetRef_placeholder" />
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_0kfakhl" name="Створити суб&#39;єкт Individual Зберегти дані в Дата фабрику" camunda:modelerTemplate="dataFactoryConnectorCreateDelegate" camunda:delegateExpression="${dataFactoryConnectorCreateDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="payload">${payload}</camunda:inputParameter>
+          <camunda:inputParameter name="resource">subject</camunda:inputParameter>
+          <camunda:inputParameter name="x_digital_signature_derived_ceph_key">${subject_system_signature_ceph_key}</camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token_task_definition_key">sign_subject_officer_create_subject_task</camunda:inputParameter>
+          <camunda:inputParameter name="x_digital_signature_task_definition_key">sign_subject_officer_create_subject_task</camunda:inputParameter>
+          <camunda:outputParameter name="postSubjectResponse">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0z9h7qq</bpmn:incoming>
+      <bpmn:outgoing>Flow_0iv2j3n</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_1wbex75" name="Запис системного підпису" camunda:modelerTemplate="putContentToCephDelegate" camunda:delegateExpression="${putContentToCephDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="content">${systemSignaturePayload}</camunda:inputParameter>
+          <camunda:inputParameter name="key">${subject_system_signature_ceph_key}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0e5c99l</bpmn:incoming>
+      <bpmn:outgoing>Flow_0z9h7qq</bpmn:outgoing>
+      <bpmn:property id="Property_01xvgt4" name="__targetRef_placeholder" />
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Activity_00f5qc1" name="Підготовка даних для запису системного підпису" scriptFormat="groovy">
+      <bpmn:incoming>Flow_0e3fm59</bpmn:incoming>
+      <bpmn:outgoing>Flow_0e5c99l</bpmn:outgoing>
+      <bpmn:property id="Property_0xg0yfq" name="__targetRef_placeholder" />
+      <bpmn:script>var processInstanceId = execution.getProcessInstanceId()
+execution.setVariable('subject_system_signature_ceph_key', "lowcode_${processInstanceId}_subject_system_signature_ceph_key".toString())
+
+var systemSignature = systemSignatureResponse.prop("signature").value()
+
+var cephObj = ['data':payload.toString(), 'signature':systemSignature]
+
+execution.removeVariable('systemSignaturePayload')
+execution.setVariableLocalTransient('systemSignaturePayload', S(cephObj, 'application/json').toString())</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:serviceTask id="Activity_1bdempp" name="Підписати дані системним ключем" camunda:modelerTemplate="digitalSignatureConnectorDelegate" camunda:delegateExpression="${digitalSignatureConnectorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="payload">${dataKeyPayload}</camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token_task_definition_key">sign_subject_officer_create_subject_task</camunda:inputParameter>
+          <camunda:outputParameter name="systemSignatureResponse">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_03terb1</bpmn:incoming>
+      <bpmn:outgoing>Flow_0e3fm59</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Activity_1ru7ahi" name="Підготовка даних для запису (transient var)" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1uec02m</bpmn:incoming>
+      <bpmn:outgoing>Flow_03terb1</bpmn:outgoing>
+      <bpmn:script>def cephObj = S(content)
+
+def signedFormData = cephObj.prop('data')
+execution.removeVariable('signedFormData')
+execution.setVariableLocalTransient('signedFormData', signedFormData)
+
+def completer_access_token = cephObj.prop('x-access-token').value()
+execution.removeVariable('completer_access_token')
+execution.setVariableLocalTransient('completer_access_token', completer_access_token)
+
+def subject = [:]
+
+subject['subjectName'] = signedFormData.prop('subjectName').value()
+subject['subjectType'] = signedFormData.prop('subjectType').value()
+subject['subjectCode'] = signedFormData.prop('subjectCode').value()
+
+subject['subjectStatus'] = null
+
+def payload = S(subject, 'application/json')
+execution.removeVariable('payload')
+execution.setVariableLocalTransient('payload', payload)
+
+def keyObj = ['data':payload.toString()]
+execution.removeVariable('dataKeyPayload')
+execution.setVariableLocalTransient('dataKeyPayload', S(keyObj, 'application/json'))</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="Event_0e3d1bg" name="Суб&#39;єкт створено">
+      <bpmn:incoming>Flow_04cwq16</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Activity_0kzgq5s" name="Результат виконання &#34;Суб&#39;єкт створено&#34;" camunda:modelerTemplate="defineBusinessProcessStatusDelegate" camunda:delegateExpression="${defineBusinessProcessStatusDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="status">Суб'єкт створено</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0iv2j3n</bpmn:incoming>
+      <bpmn:outgoing>Flow_04cwq16</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_09k16ro">
+      <bpmn:incoming>Flow_1opp6ie</bpmn:incoming>
+      <bpmn:incoming>Flow_0zxd11w</bpmn:incoming>
+      <bpmn:outgoing>Flow_1u9fwfd</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:scriptTask id="Activity_05s8r0u" name="Підготовка даних для запису" scriptFormat="groovy">
+      <bpmn:incoming>Flow_18i78x2</bpmn:incoming>
+      <bpmn:outgoing>Flow_1b0cfsn</bpmn:outgoing>
+      <bpmn:script>def cephData = [:]
+
+if (subjectType.equals('INDIVIDUAL')) {
+    cephData['subjectName'] = startFormData.prop('subjectName').value()
+} else if (subjectType.equals('LEGAL') || subjectType.equals('ENTREPRENEUR')) {
+    cephData['subjectName'] = responseEdr.responseBody.elements().get(0).prop('name').value()
+}
+
+cephData['subjectType'] = startFormData.prop('subjectType').value()
+cephData['subjectCode'] = subjectCode
+
+execution.removeVariable('payload')
+execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:serviceTask id="Activity_1fb5jql" name="Формування валідацйної помилки" camunda:modelerTemplate="userDataValidationErrorDelegate" camunda:delegateExpression="${userDataValidationErrorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="validationErrors">
+            <camunda:list>
+              <camunda:value>{"field": "subjectCode", "value": "${subjectCode.value}", "message": "Статус суб'єкту скасовано або припинено"}</camunda:value>
+            </camunda:list>
+          </camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0c6c3z6</bpmn:incoming>
+      <bpmn:outgoing>Flow_1glhqui</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_1d6ypqa" name="state != - 1 (&#34;скасовано&#34;), 3 (&#34;припинено&#34;)">
+      <bpmn:incoming>Flow_0rbgsm1</bpmn:incoming>
+      <bpmn:outgoing>Flow_0mcm3ui</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0c6c3z6</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Activity_1frfgmk" name="Запис документа форми" camunda:modelerTemplate="putFormDataToCephDelegate" camunda:delegateExpression="${putFormDataToCephDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="formData">${payload}</camunda:inputParameter>
+          <camunda:inputParameter name="taskDefinitionKey">sign_subject_officer_create_subject_task</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1b0cfsn</bpmn:incoming>
+      <bpmn:outgoing>Flow_0zxd11w</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_0ze5pt5" name="Читання даних з ЄДР" camunda:modelerTemplate="searchSubjectsEdrRegistryConnectorDelegate" camunda:delegateExpression="${searchSubjectsEdrRegistryConnectorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="passport" />
+          <camunda:inputParameter name="name" />
+          <camunda:inputParameter name="authorizationToken">1dc9f1f9b1e5be4d37c2b68993af243923ea7620</camunda:inputParameter>
+          <camunda:inputParameter name="code">${subjectCode.value}</camunda:inputParameter>
+          <camunda:outputParameter name="responseEdr">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0yeibnc</bpmn:incoming>
+      <bpmn:outgoing>Flow_0rbgsm1</bpmn:outgoing>
+      <bpmn:property id="Property_13vhdqq" name="__targetRef_placeholder" />
+    </bpmn:serviceTask>
+    <bpmn:boundaryEvent id="Event_04li2v4" attachedToRef="Activity_0kfakhl">
+      <bpmn:outgoing>Flow_1opp6ie</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_04ezjm0" />
+    </bpmn:boundaryEvent>
+    <bpmn:textAnnotation id="TextAnnotation_0pg363i">
+      <bpmn:text>subjectCode
+SubjectType</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1hjk8ef" sourceRef="Activity_10m5p9w" targetRef="TextAnnotation_0pg363i" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1uuz5au">
+      <bpmndi:BPMNShape id="Participant_0k3cbqn_di" bpmnElement="Participant_0k3cbqn" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="3040" height="480" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0zxd11w_di" bpmnElement="Flow_0zxd11w">
+        <di:waypoint x="1950" y="330" />
+        <di:waypoint x="1985" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0jygqo6_di" bpmnElement="Flow_0jygqo6">
+        <di:waypoint x="880" y="330" />
+        <di:waypoint x="930" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1phzol0_di" bpmnElement="Flow_1phzol0">
+        <di:waypoint x="590" y="330" />
+        <di:waypoint x="630" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02zgzvd_di" bpmnElement="Flow_02zgzvd">
+        <di:waypoint x="460" y="330" />
+        <di:waypoint x="490" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ggr62v_di" bpmnElement="Flow_0ggr62v">
+        <di:waypoint x="1030" y="330" />
+        <di:waypoint x="1075" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0yeibnc_di" bpmnElement="Flow_0yeibnc">
+        <di:waypoint x="1225" y="330" />
+        <di:waypoint x="1320" y="330" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1224" y="280" width="84" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18i78x2_di" bpmnElement="Flow_18i78x2">
+        <di:waypoint x="1685" y="330" />
+        <di:waypoint x="1720" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0a7xzhs_di" bpmnElement="Flow_0a7xzhs">
+        <di:waypoint x="1200" y="305" />
+        <di:waypoint x="1200" y="210" />
+        <di:waypoint x="1660" y="210" />
+        <di:waypoint x="1660" y="305" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1308" y="192" width="63" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1glhqui_di" bpmnElement="Flow_1glhqui">
+        <di:waypoint x="1540" y="500" />
+        <di:waypoint x="1540" y="530" />
+        <di:waypoint x="290" y="530" />
+        <di:waypoint x="290" y="355" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0c6c3z6_di" bpmnElement="Flow_0c6c3z6">
+        <di:waypoint x="1540" y="355" />
+        <di:waypoint x="1540" y="420" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1551" y="385" width="10" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1xzg63f_di" bpmnElement="Flow_1xzg63f">
+        <di:waypoint x="720" y="460" />
+        <di:waypoint x="290" y="460" />
+        <di:waypoint x="290" y="355" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0mcm3ui_di" bpmnElement="Flow_0mcm3ui">
+        <di:waypoint x="1565" y="330" />
+        <di:waypoint x="1635" y="330" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1575" y="313" width="17" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0z9h7qq_di" bpmnElement="Flow_0z9h7qq" bioc:stroke="black" bioc:fill="white">
+        <di:waypoint x="2820" y="330" />
+        <di:waypoint x="2860" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0e5c99l_di" bpmnElement="Flow_0e5c99l" bioc:stroke="black" bioc:fill="white">
+        <di:waypoint x="2700" y="330" />
+        <di:waypoint x="2720" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0e3fm59_di" bpmnElement="Flow_0e3fm59" bioc:stroke="black" bioc:fill="white">
+        <di:waypoint x="2570" y="330" />
+        <di:waypoint x="2600" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03terb1_di" bpmnElement="Flow_03terb1" bioc:stroke="black" bioc:fill="white">
+        <di:waypoint x="2440" y="330" />
+        <di:waypoint x="2470" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1b0cfsn_di" bpmnElement="Flow_1b0cfsn">
+        <di:waypoint x="1820" y="330" />
+        <di:waypoint x="1850" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0rbgsm1_di" bpmnElement="Flow_0rbgsm1">
+        <di:waypoint x="1420" y="330" />
+        <di:waypoint x="1515" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1n4ucwo_di" bpmnElement="Flow_1n4ucwo">
+        <di:waypoint x="315" y="330" />
+        <di:waypoint x="360" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_04cwq16_di" bpmnElement="Flow_04cwq16">
+        <di:waypoint x="3100" y="330" />
+        <di:waypoint x="3132" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1opp6ie_di" bpmnElement="Flow_1opp6ie">
+        <di:waypoint x="2910" y="272" />
+        <di:waypoint x="2910" y="252" />
+        <di:waypoint x="2010" y="252" />
+        <di:waypoint x="2010" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1u9fwfd_di" bpmnElement="Flow_1u9fwfd">
+        <di:waypoint x="2035" y="330" />
+        <di:waypoint x="2060" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1940u36_di" bpmnElement="Flow_1940u36">
+        <di:waypoint x="2160" y="330" />
+        <di:waypoint x="2200" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0iv2j3n_di" bpmnElement="Flow_0iv2j3n">
+        <di:waypoint x="2960" y="330" />
+        <di:waypoint x="3000" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1uec02m_di" bpmnElement="Flow_1uec02m">
+        <di:waypoint x="2300" y="330" />
+        <di:waypoint x="2340" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11skmjt_di" bpmnElement="Flow_11skmjt">
+        <di:waypoint x="1100" y="355" />
+        <di:waypoint x="1100" y="460" />
+        <di:waypoint x="820" y="460" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1071" y="423" width="17" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0wkqilk_di" bpmnElement="Flow_0wkqilk">
+        <di:waypoint x="730" y="330" />
+        <di:waypoint x="780" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1c2v9mf_di" bpmnElement="Flow_1c2v9mf">
+        <di:waypoint x="1125" y="330" />
+        <di:waypoint x="1175" y="330" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1155" y="343" width="10" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1cvco7f_di" bpmnElement="Flow_1cvco7f">
+        <di:waypoint x="246" y="330" />
+        <di:waypoint x="265" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="210" y="312" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="208" y="355" width="40" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0kozmjv_di" bpmnElement="Gateway_0kozmjv" isMarkerVisible="true">
+        <dc:Bounds x="265" y="305" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_11dwana_di" bpmnElement="Activity_11dwana">
+        <dc:Bounds x="360" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1nnefwa_di" bpmnElement="Activity_1nnefwa">
+        <dc:Bounds x="490" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0m87jtf_di" bpmnElement="Activity_1k5jkn3">
+        <dc:Bounds x="720" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1s9rsug_di" bpmnElement="Activity_1s9rsug">
+        <dc:Bounds x="630" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_12iufx9_di" bpmnElement="Gateway_12iufx9" isMarkerVisible="true">
+        <dc:Bounds x="1175" y="305" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1170" y="362" width="61" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0u7wftv_di" bpmnElement="Gateway_0u7wftv" isMarkerVisible="true">
+        <dc:Bounds x="1075" y="305" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1072" y="273" width="56" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_10m5p9w_di" bpmnElement="Activity_10m5p9w">
+        <dc:Bounds x="930" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1p4pud5_di" bpmnElement="Activity_19gclnl">
+        <dc:Bounds x="780" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0pg363i_di" bpmnElement="TextAnnotation_0pg363i">
+        <dc:Bounds x="920" y="220" width="100" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_06nwlx6_di" bpmnElement="Gateway_06nwlx6" isMarkerVisible="true">
+        <dc:Bounds x="1635" y="305" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1l86qg5_di" bpmnElement="sign_subject_officer_create_subject_task">
+        <dc:Bounds x="2060" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0gm3yp3_di" bpmnElement="Activity_0gm3yp3" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="2200" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0kfakhl_di" bpmnElement="Activity_0kfakhl" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="2860" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1wbex75_di" bpmnElement="Activity_1wbex75" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="2720" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_00f5qc1_di" bpmnElement="Activity_00f5qc1" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="2600" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1bdempp_di" bpmnElement="Activity_1bdempp" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="2470" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ru7ahi_di" bpmnElement="Activity_1ru7ahi" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="2340" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0e3d1bg_di" bpmnElement="Event_0e3d1bg">
+        <dc:Bounds x="3132" y="312" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3106" y="355" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0kzgq5s_di" bpmnElement="Activity_0kzgq5s">
+        <dc:Bounds x="3000" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_09k16ro_di" bpmnElement="Gateway_09k16ro" isMarkerVisible="true">
+        <dc:Bounds x="1985" y="305" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_05s8r0u_di" bpmnElement="Activity_05s8r0u">
+        <dc:Bounds x="1720" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0i2134y_di" bpmnElement="Activity_1fb5jql">
+        <dc:Bounds x="1490" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1d6ypqa_di" bpmnElement="Gateway_1d6ypqa" isMarkerVisible="true">
+        <dc:Bounds x="1515" y="305" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1498" y="250" width="86" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1na9nr7_di" bpmnElement="Activity_1frfgmk">
+        <dc:Bounds x="1850" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ze5pt5_di" bpmnElement="Activity_0ze5pt5">
+        <dc:Bounds x="1320" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1hjk8ef_di" bpmnElement="Association_1hjk8ef">
+        <di:waypoint x="976" y="290" />
+        <di:waypoint x="973" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_04li2v4_di" bpmnElement="Event_04li2v4" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="2892" y="272" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
