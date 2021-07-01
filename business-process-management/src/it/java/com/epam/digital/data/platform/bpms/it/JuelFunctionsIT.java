@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
@@ -39,8 +40,7 @@ public class JuelFunctionsIT extends BaseIT {
 
     var processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
 
-    var cephKey = cephKeyProvider
-        .generateKey(taskDefinitionKey, processInstance.getId());
+    var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, processInstance.getId());
     cephService.putFormData(cephKey, FormDataDto.builder().accessToken(validAccessToken).build());
 
     String taskId = taskService.createTaskQuery().taskDefinitionKey(taskDefinitionKey).singleResult().getId();
@@ -49,4 +49,25 @@ public class JuelFunctionsIT extends BaseIT {
     BpmnAwareTests.assertThat(processInstance).isEnded();
   }
 
+  @Test
+  @Deployment(resources = "bpmn/submission_juel_function.bpmn")
+  public void testSubmissionFunction() {
+    var startFormCephKey = "testKey";
+    var taskDefinitionKey = "waitConditionTaskKey";
+    var processDefinitionKey = "testSubmissionKey";
+    var formData = new LinkedHashMap<String, Object>();
+    formData.put("userName", "testuser");
+    Map<String, Object> vars = Map.of("start_form_ceph_key", "testKey");
+
+    var processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey, vars);
+
+    var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, processInstance.getId());
+    cephService.putFormData(cephKey, FormDataDto.builder().data(formData).build());
+    cephService.putFormData(startFormCephKey, FormDataDto.builder().data(formData).build());
+
+    String taskId = taskService.createTaskQuery().taskDefinitionKey(taskDefinitionKey).singleResult().getId();
+    taskService.complete(taskId);
+
+    BpmnAwareTests.assertThat(processInstance).isEnded();
+  }
 }

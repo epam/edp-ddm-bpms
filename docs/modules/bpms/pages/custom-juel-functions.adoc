@@ -347,3 +347,106 @@ UserDto .o JwtClaimsDto
 
 [IMPORTANT]
 Функція комплітера доступна для використання після успішного завершення користувацької задачі.
+
+=== submission(<activity_id|event_id>)
+
+Діаграма класів:
+
+[plantuml,submission-class,svg]
+----
+@startuml
+package el {
+  package juel {
+    abstract class AbstractApplicationContextAwareJuelFunction
+    class SubmissionJuelFunction #back:lightblue;line:green;text:black extends AbstractApplicationContextAwareJuelFunction {
+      + {static} UserFormDataDto submission(String <activity_id|event_id>)
+    }
+  }
+  package dto {
+    class UserFormDataDto #back:lightblue;line:green;text:black {
+      - SpinJsonNode formData
+    }
+  }
+  AbstractApplicationContextAwareJuelFunction ..[hidden]> UserFormDataDto
+  SubmissionJuelFunction .> UserFormDataDto : returns
+}
+@enduml
+----
+
+* `SubmissionJuelFunction` -- наслідує `AbstractApplicationContextAwareJuelFunction` та надає функцію `submission(<activity_id|event_id>)` що:
+
+[plantuml,submission-sequence,svg]
+----
+@startuml
+  skinparam responseMessageBelowArrow true
+
+  participant "submission(<activity_id|event_id>)" as submission order 10
+  participant "Camunda Execution Context" as camunda order 20
+  participant "Spring Application Context" as spring order 30
+  participant "CephKeyProvider" as ceph_key_provider order 40
+  participant "Ceph" as ceph order 50
+
+  -> submission
+  activate submission
+
+  submission -> camunda : Отримати існуючий UserFormDataDto об'єкт
+  activate camunda
+
+  alt Об'єкт UserFormDataDto знайдено
+    submission <-- camunda : Знайдений об'єкт UserFormDataDto
+    <-- submission : UserFormDataDto
+
+  else Об'єкт UserFormDataDto не знайдено
+    submission <-- camunda : null
+    deactivate camunda
+
+    submission -> camunda : Отримати ідентифікатор стартової форми
+      activate camunda
+      submission <-- camunda : Ідентифікатор
+      deactivate camunda
+
+    submission -> submission : Визначити тип елемента бізнес-процесу
+    alt Елемент - стартова форма
+      submission -> camunda : Отримати цеф ключ з відповідної змінної
+      activate camunda
+      submission <-- camunda : Цеф ключ
+      deactivate camunda
+    else Елемент - користувацька задача
+      submission -> spring : Отримати бін типу CephKeyProvider
+      activate spring
+      submission <-- spring : Бін типу CephKeyProvider
+      deactivate spring
+
+      submission -> ceph_key_provider : Згенерувати цеф ключ
+      activate ceph_key_provider
+      submission <-- ceph_key_provider : Згенерований цеф ключ
+      deactivate ceph_key_provider
+    end
+
+    submission -> spring : Отримати бін типу FormDataCephService
+      activate spring
+      submission <-- spring : Бін типу FormDataCephService
+      deactivate spring
+
+    submission -> ceph : Отримати цеф документ, який містить дані форми з цефу за отриманим ключем
+      activate ceph
+      submission <-- ceph : Цеф документ, який містить дані форми
+      deactivate ceph
+
+    submission -> submission : Отримати дані форми з цеф документа
+
+    submission -> camunda : Зберегти UserFormDataDto об'єкт у контексті \nу якості transient змінної
+      activate camunda
+      submission <-- camunda : Збережено
+      deactivate camunda
+
+      <-- submission : UserFormDataDto
+      deactivate submission
+  end
+@enduml
+----
+
+* `UserFormDataDto` -- клас що являє собою обгортку даних форми користувача.
+
+[IMPORTANT]
+Функія `submission(<activity_id|event_id>)` доступна для використання після успішного завершення користувацької задачі або стартової форми.
