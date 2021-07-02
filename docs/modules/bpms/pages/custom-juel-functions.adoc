@@ -450,3 +450,110 @@ package el {
 
 [IMPORTANT]
 Функія `submission(<activity_id|event_id>)` доступна для використання після успішного завершення користувацької задачі або стартової форми.
+
+=== sign_submission(<activity_id|event_id>)
+
+Діаграма класів:
+
+[plantuml,sign_submission-class,svg]
+----
+@startuml
+package el {
+  package juel {
+    abstract class AbstractApplicationContextAwareJuelFunction
+    class SignSubmissionJuelFunction #back:lightblue;line:green;text:black extends AbstractApplicationContextAwareJuelFunction {
+      + {static} SignUserFormDataDto sign_submission(String <activity_id|event_id>)
+    }
+  }
+  package dto {
+    class SignUserFormDataDto #back:lightblue;line:green;text:black {
+      - SpinJsonNode formData
+      - String signature
+      - String signatureDocumentId
+    }
+  }
+  AbstractApplicationContextAwareJuelFunction ..[hidden]> SignUserFormDataDto
+  SignSubmissionJuelFunction .> SignUserFormDataDto : returns
+}
+@enduml
+----
+
+* `SignSubmissionJuelFunction` -- наслідує `AbstractApplicationContextAwareJuelFunction` та надає функцію `sign_submission(<activity_id|event_id>)` що:
+
+[plantuml,sign_submission-sequence,svg]
+----
+@startuml
+  skinparam responseMessageBelowArrow true
+
+  participant "sign_submission(<activity_id|event_id>)" as sign_submission order 10
+  participant "Camunda Execution Context" as camunda order 20
+  participant "Spring Application Context" as spring order 30
+  participant "CephKeyProvider" as ceph_key_provider order 40
+  participant "Ceph" as ceph order 50
+
+  -> sign_submission
+  activate sign_submission
+
+  sign_submission -> camunda : Отримати існуючий SignUserFormDataDto об'єкт
+  activate camunda
+
+  alt Об'єкт SignUserFormDataDto знайдено
+    sign_submission <-- camunda : Знайдений об'єкт SignUserFormDataDto
+    <-- sign_submission : SignUserFormDataDto
+
+  else Об'єкт SignUserFormDataDto не знайдено
+    sign_submission <-- camunda : null
+    deactivate camunda
+
+    sign_submission -> camunda : Отримати ідентифікатор стартової форми
+      activate camunda
+      sign_submission <-- camunda : Ідентифікатор
+      deactivate camunda
+
+    sign_submission -> sign_submission : Визначити тип елемента бізнес-процесу
+    alt Елемент - стартова форма
+      sign_submission -> camunda : Отримати цеф ключ з відповідної змінної
+      activate camunda
+      sign_submission <-- camunda : Цеф ключ
+      deactivate camunda
+    else Елемент - користувацька задача
+      sign_submission -> spring : Отримати бін типу CephKeyProvider
+      activate spring
+      sign_submission <-- spring : Бін типу CephKeyProvider
+      deactivate spring
+
+      sign_submission -> ceph_key_provider : Згенерувати цеф ключ
+      activate ceph_key_provider
+      sign_submission <-- ceph_key_provider : Згенерований цеф ключ
+      deactivate ceph_key_provider
+    end
+
+    sign_submission -> spring : Отримати бін типу FormDataCephService
+      activate spring
+      sign_submission <-- spring : Бін типу FormDataCephService
+      deactivate spring
+
+    sign_submission -> ceph : Отримати цеф документ, який містить дані форми з цефу за отриманим ключем
+      activate ceph
+      sign_submission <-- ceph : Цеф документ, який містить дані форми
+      deactivate ceph
+
+    sign_submission -> sign_submission : Отримати дані форми з цеф документа
+    sign_submission -> sign_submission : Отримати підпис з цеф документа
+    sign_submission -> sign_submission : Збудувати об'єкт SignUserFormDataDto
+
+    sign_submission -> camunda : Зберегти SignUserFormDataDto об'єкт у контексті \nу якості transient змінної
+      activate camunda
+      sign_submission <-- camunda : Збережено
+      deactivate camunda
+
+      <-- sign_submission : SignUserFormDataDto
+      deactivate sign_submission
+  end
+@enduml
+----
+
+* `SignUserFormDataDto` -- клас що являє собою обгортку для даних форми користувача, підпису та ключа цеф документа де зберігається підпис.
+
+[IMPORTANT]
+Функія `sign_submission(<activity_id|event_id>)` доступна для використання після успішного завершення підписуючої користувацької задачі або стартової форми.

@@ -70,4 +70,27 @@ public class JuelFunctionsIT extends BaseIT {
 
     BpmnAwareTests.assertThat(processInstance).isEnded();
   }
+
+  @Test
+  @Deployment(resources = "bpmn/sign_submission_juel_function.bpmn")
+  public void testSignSubmissionFunction() {
+    var startFormCephKey = "testKey";
+    var taskDefinitionKey = "waitConditionSignTaskKey";
+    var processDefinitionKey = "testSignSubmissionKey";
+    var signature = "test signature";
+    var data = new LinkedHashMap<String, Object>();
+    data.put("userName", "testuser");
+    Map<String, Object> vars = Map.of("start_form_ceph_key", "testKey");
+
+    var processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey, vars);
+
+    var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, processInstance.getId());
+    cephService.putFormData(cephKey, FormDataDto.builder().data(data).signature(signature).build());
+    cephService.putFormData(startFormCephKey, FormDataDto.builder().data(data).signature(signature).build());
+
+    String taskId = taskService.createTaskQuery().taskDefinitionKey(taskDefinitionKey).singleResult().getId();
+    taskService.complete(taskId);
+
+    BpmnAwareTests.assertThat(processInstance).isEnded();
+  }
 }
