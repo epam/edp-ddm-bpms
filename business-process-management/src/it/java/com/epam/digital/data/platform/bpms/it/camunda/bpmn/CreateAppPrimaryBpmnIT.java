@@ -80,6 +80,7 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
     completeTask(searchLabFormActivityDefinitionKey, processInstanceId,
         "/json/create-app/form-data/Activity_shared-search-lab.json");
 
+    addCompleterUsernameVariable(searchLabFormActivityDefinitionKey, null);
     addExpectedCephContent(processInstanceId, addApplicationActivityDefinitionKey,
         "/json/create-app/form-data/name-edrpou-prepopulation.json");
     addExpectedCephContent(processInstanceId, searchLabFormActivityDefinitionKey,
@@ -94,6 +95,7 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
     completeTask(addApplicationActivityDefinitionKey, processInstanceId,
         "/json/create-app/form-data/Activity_shared-add-application.json");
 
+    addCompleterUsernameVariable(addApplicationActivityDefinitionKey, null);
     addExpectedCephContent(processInstanceId, addApplicationActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-add-application.json");
     addExpectedCephContent(processInstanceId, addBioPhysLaborFactorsActivityDefinitionKey,
@@ -111,6 +113,8 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
     completeTask(addChemFactorsActivityDefinitionKey, processInstanceId,
         "/json/create-app/form-data/Activity_shared-add-chem-factors.json");
 
+    addCompleterUsernameVariable(addBioPhysLaborFactorsActivityDefinitionKey, null);
+    addCompleterUsernameVariable(addChemFactorsActivityDefinitionKey, null);
     addExpectedCephContent(processInstanceId, addBioPhysLaborFactorsActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-add-bio-phys-labor-factors.json");
     addExpectedCephContent(processInstanceId, addChemFactorsActivityDefinitionKey,
@@ -125,6 +129,7 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
     completeTask(checkComplianceActivityDefinitionKey, processInstanceId,
         "/json/create-app/form-data/Activity_shared-check-compliance_noErrors.json");
 
+    addCompleterUsernameVariable(checkComplianceActivityDefinitionKey, null);
     addExpectedCephContent(processInstanceId, checkComplianceActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-check-compliance_noErrors.json");
     addExpectedCephContent(processInstanceId, addDecisionIncludeActivityDefinitionKey,
@@ -137,6 +142,7 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
     completeTask(addDecisionIncludeActivityDefinitionKey, processInstanceId,
         "/json/create-app/form-data/Activity_shared-add-decision-include.json");
 
+    addCompleterUsernameVariable(addDecisionIncludeActivityDefinitionKey, null);
     addExpectedCephContent(processInstanceId, addDecisionIncludeActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-add-decision-include.json");
     addExpectedCephContent(processInstanceId, addLetterDataActivityDefinitionKey,
@@ -149,6 +155,7 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
     completeTask(addLetterDataActivityDefinitionKey, processInstanceId,
         "/json/create-app/form-data/Activity_shared-add-letter-data.json");
 
+    addCompleterUsernameVariable(addLetterDataActivityDefinitionKey, null);
     addExpectedCephContent(processInstanceId, addLetterDataActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-add-letter-data.json");
     addExpectedCephContent(processInstanceId, signAppIncludeActivityDefinitionKey,
@@ -161,6 +168,7 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
     completeTask(signAppIncludeActivityDefinitionKey, processInstanceId,
         "/json/create-app/form-data/Activity_shared-sign-app-include.json");
 
+    addCompleterUsernameVariable(signAppIncludeActivityDefinitionKey, null);
     addExpectedCephContent(processInstanceId, signAppIncludeActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-sign-app-include.json");
 
@@ -242,6 +250,7 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
     completeTask(searchLabFormActivityDefinitionKey, processInstanceId,
         "/json/create-app/form-data/Activity_shared-search-lab.json");
 
+    addCompleterUsernameVariable(searchLabFormActivityDefinitionKey, null);
     addExpectedCephContent(processInstanceId, addApplicationActivityDefinitionKey,
         "/json/create-app/form-data/name-edrpou-prepopulation.json");
     addExpectedCephContent(processInstanceId, searchLabFormActivityDefinitionKey,
@@ -256,6 +265,7 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
     completeTask(addApplicationActivityDefinitionKey, processInstanceId,
         "/json/create-app/form-data/Activity_shared-add-application.json");
 
+    addCompleterUsernameVariable(addApplicationActivityDefinitionKey, null);
     addExpectedCephContent(processInstanceId, addApplicationActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-add-application.json");
     addExpectedCephContent(processInstanceId, addBioPhysLaborFactorsActivityDefinitionKey,
@@ -273,6 +283,8 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
     completeTask(addChemFactorsActivityDefinitionKey, processInstanceId,
         "/json/create-app/form-data/Activity_shared-add-chem-factors.json");
 
+    addCompleterUsernameVariable(addBioPhysLaborFactorsActivityDefinitionKey, null);
+    addCompleterUsernameVariable(addChemFactorsActivityDefinitionKey, null);
     addExpectedCephContent(processInstanceId, addBioPhysLaborFactorsActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-add-bio-phys-labor-factors.json");
     addExpectedCephContent(processInstanceId, addChemFactorsActivityDefinitionKey,
@@ -287,6 +299,7 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
     completeTask(checkComplianceActivityDefinitionKey, processInstanceId,
         "/json/create-app/form-data/Activity_shared-check-compliance_errors.json");
 
+    addCompleterUsernameVariable(checkComplianceActivityDefinitionKey, null);
     addExpectedCephContent(processInstanceId, checkComplianceActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-check-compliance_errors.json");
     addExpectedCephContent(processInstanceId, addDecisionDenyActivityDefinitionKey,
@@ -299,6 +312,7 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
     completeTask(addDecisionDenyActivityDefinitionKey, processInstanceId,
         "/json/create-app/form-data/Activity_shared-add-decision-deny.json");
 
+    addCompleterUsernameVariable(addDecisionDenyActivityDefinitionKey, null);
     addExpectedCephContent(processInstanceId, addDecisionDenyActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-add-decision-deny.json");
     addExpectedCephContent(processInstanceId, addLetterDataActivityDefinitionKey,
@@ -311,6 +325,7 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
     completeTask(addLetterDataActivityDefinitionKey, processInstanceId,
         "/json/create-app/form-data/Activity_shared-add-letter-data.json");
 
+    addCompleterUsernameVariable(addLetterDataActivityDefinitionKey, null);
     addExpectedCephContent(processInstanceId, addLetterDataActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-add-letter-data.json");
     addExpectedCephContent(processInstanceId, signAppDenyActivityDefinitionKey,
@@ -323,6 +338,7 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
     completeTask(signAppDenyActivityDefinitionKey, processInstanceId,
         "/json/create-app/form-data/Activity_shared-sign-app-deny.json");
 
+    addCompleterUsernameVariable(signAppDenyActivityDefinitionKey, null);
     addExpectedCephContent(processInstanceId, signAppDenyActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-sign-app-deny.json");
 
@@ -421,6 +437,7 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
     completeTask(searchLabFormActivityDefinitionKey, processInstanceId,
         "/json/create-app/form-data/Activity_shared-search-lab_without_accreditation.json");
 
+    addCompleterUsernameVariable(searchLabFormActivityDefinitionKey, null);
     expectedVariablesMap.put("laboratoryId", labId);
     addExpectedCephContent(processInstanceId, searchLabFormActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-search-lab_without_accreditation.json");

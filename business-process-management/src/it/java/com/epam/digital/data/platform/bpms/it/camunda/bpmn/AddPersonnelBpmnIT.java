@@ -70,6 +70,7 @@ public class AddPersonnelBpmnIT extends BaseBpmnIT {
         "/json/add-personnel/form-data/searchLabFormActivity.json");
 
     expectedVariablesMap.put("laboratoryId", labId);
+    addCompleterUsernameVariable(searchLabFormActivityDefinitionKey, null);
 
     addExpectedCephContent(processInstanceId, searchLabFormActivityDefinitionKey,
         "/json/add-personnel/form-data/searchLabFormActivity.json");
@@ -83,6 +84,8 @@ public class AddPersonnelBpmnIT extends BaseBpmnIT {
     completeTask(viewLabDataFormActivityDefinitionKey, processInstanceId,
         "/json/add-personnel/form-data/viewLabDataFormActivity.json");
 
+    addCompleterUsernameVariable(viewLabDataFormActivityDefinitionKey, null);
+
     addExpectedCephContent(processInstanceId, viewLabDataFormActivityDefinitionKey,
         "/json/add-personnel/form-data/viewLabDataFormActivity.json");
     addExpectedCephContent(processInstanceId, addPersonnelFormActivityDefinitionKey,
@@ -93,6 +96,8 @@ public class AddPersonnelBpmnIT extends BaseBpmnIT {
 
     completeTask(addPersonnelFormActivityDefinitionKey, processInstanceId,
         "/json/add-personnel/form-data/addPersonnelFormActivity.json");
+
+    addCompleterUsernameVariable(addPersonnelFormActivityDefinitionKey, null);
 
     addExpectedCephContent(processInstanceId, addPersonnelFormActivityDefinitionKey,
         "/json/add-personnel/form-data/addPersonnelFormActivity.json");
@@ -108,6 +113,7 @@ public class AddPersonnelBpmnIT extends BaseBpmnIT {
     expectedVariablesMap.put("x_digital_signature_derived_ceph_key", systemSignatureCephKey);
     expectedVariablesMap
         .put("sys-var-process-completion-result", "Дані про кадровий склад внесені");
+    addCompleterUsernameVariable(signPersonnelFormActivityDefinitionKey, null);
 
     addExpectedCephContent(processInstanceId, signPersonnelFormActivityDefinitionKey,
         "/json/add-personnel/form-data/signPersonnelFormActivity.json");

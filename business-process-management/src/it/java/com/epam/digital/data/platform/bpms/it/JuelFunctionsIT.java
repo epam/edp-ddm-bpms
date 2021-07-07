@@ -11,6 +11,8 @@ import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.junit.Test;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 public class JuelFunctionsIT extends BaseIT {
 
@@ -37,6 +39,8 @@ public class JuelFunctionsIT extends BaseIT {
   public void testCompleterFunction() {
     var taskDefinitionKey = "waitConditionTaskKey";
     var processDefinitionKey = "testCompleterKey";
+    var auth = new UsernamePasswordAuthenticationToken("testuser", null);
+    SecurityContextHolder.getContext().setAuthentication(auth);
 
     var processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
 

@@ -70,6 +70,8 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
 
     completeTask(signSubjectTaskDefinitionKey, processInstanceId,
         "/json/officer-create-subject/ceph/sign-subject-officer-create-task.json");
+
+    addCompleterUsernameVariable(signSubjectTaskDefinitionKey, null);
     addExpectedCephContent(processInstanceId, signSubjectTaskDefinitionKey,
         "/json/officer-create-subject/ceph/sign-subject-officer-create-task.json");
 
@@ -149,6 +151,7 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
     completeTask(signSubjectTaskDefinitionKey, processInstanceId,
         "/json/officer-create-subject/ceph/individual/sign-subject-officer-create-task.json");
 
+    addCompleterUsernameVariable(signSubjectTaskDefinitionKey, null);
     addExpectedCephContent(processInstanceId, signSubjectTaskDefinitionKey,
         "/json/officer-create-subject/ceph/individual/sign-subject-officer-create-task.json");
 

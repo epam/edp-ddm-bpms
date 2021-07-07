@@ -274,6 +274,10 @@ public abstract class BaseBpmnIT extends BaseIT {
     expectedVariablesMap.put(name, value);
   }
 
+  protected void addCompleterUsernameVariable(String taskDefinitionId, Object value){
+    expectedVariablesMap.put(String.format("%s_completer", taskDefinitionId), value);
+  }
+
   protected String startProcessInstance(String processDefinitionKey, String token)
       throws JsonProcessingException {
     var result = postForObject(

@@ -9,12 +9,16 @@ import static org.mockito.Mockito.when;
 import com.epam.digital.data.platform.bpms.config.CamundaProperties;
 import com.epam.digital.data.platform.bpms.config.CamundaSystemVariablesSupportListener;
 import com.epam.digital.data.platform.bpms.listener.AuthorizationStartEventListener;
+import com.epam.digital.data.platform.bpms.listener.CompleterTaskEventListener;
 import com.epam.digital.data.platform.bpms.listener.InitiatorTokenStartEventListener;
 import java.util.List;
 import org.assertj.core.util.Maps;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,28 +34,35 @@ public class CamundaSystemVariablesSupportListenerTest {
   @Mock
   private DelegateExecution delegateExecution;
   @Mock
-  private ActivityImpl startEventActivity;
+  private ActivityImpl activity;
   @Mock
   private AuthorizationStartEventListener authorizationStartEventListener;
   @Mock
   private InitiatorTokenStartEventListener initiatorTokenStartEventListener;
+  @Mock
+  private CompleterTaskEventListener completerTaskEventListener;
+  @Mock
+  private UserTaskActivityBehavior userTaskActivityBehavior;
+  @Mock
+  private TaskDefinition taskDefinition;
 
   private CamundaSystemVariablesSupportListener camundaSystemVariablesSupportListener;
 
   @Before
   public void init() {
     camundaSystemVariablesSupportListener = new CamundaSystemVariablesSupportListener(
-        camundaProperties, authorizationStartEventListener, initiatorTokenStartEventListener);
+        camundaProperties, authorizationStartEventListener, initiatorTokenStartEventListener,
+        completerTaskEventListener);
   }
 
   @Test
   public void shouldAddListenerThatAddsCamundaSystemPropertiesToBpmn() throws Exception {
     when(camundaProperties.getSystemVariables()).thenReturn(Maps.newHashMap("var1", "value1"));
 
-    camundaSystemVariablesSupportListener.parseStartEvent(null, null, startEventActivity);
+    camundaSystemVariablesSupportListener.parseStartEvent(null, null, activity);
 
     ArgumentCaptor<ExecutionListener> captor = ArgumentCaptor.forClass(ExecutionListener.class);
-    verify(startEventActivity, times(3))
+    verify(activity, times(3))
         .addListener(eq(ExecutionListener.EVENTNAME_START), captor.capture());
     List<ExecutionListener> allValues = captor.getAllValues();
     ExecutionListener executionListener = allValues.stream()
@@ -61,5 +72,17 @@ public class CamundaSystemVariablesSupportListenerTest {
     assertThat(executionListener).isNotNull();
     executionListener.notify(delegateExecution);
     verify(delegateExecution).setVariable("var1", "value1");
+  }
+
+  @Test
+  public void shouldAddTaskListener() {
+    when(activity.getActivityBehavior()).thenReturn(userTaskActivityBehavior);
+    when(userTaskActivityBehavior.getTaskDefinition()).thenReturn(taskDefinition);
+
+    camundaSystemVariablesSupportListener.parseUserTask(null, null, activity);
+
+    ArgumentCaptor<TaskListener> captor = ArgumentCaptor.forClass(TaskListener.class);
+    verify(taskDefinition, times(1))
+        .addTaskListener(eq(TaskListener.EVENTNAME_COMPLETE), captor.capture());
   }
 }

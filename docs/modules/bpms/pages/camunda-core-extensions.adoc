@@ -199,6 +199,41 @@ CamundaSystemVariablesSupportListener o- InitiatorTokenStartEventListener
 Оскільки змінна `initiator_access_token` є transient змінною, то вона буде доступна тільки до наступного wait state (задачі користувача)
 --
 
+== Збереження даних про фактичного виконавця задачі в змінних процесу
+
+Для збереження токену та ім'я користувача фактичного виконавця задачі було імплементовано наступну ієрархію класів.
+
+[plantuml,completer-token,svg]
+----
+@startuml
+class AbstractBpmnParseListener {
+  parseUserTask()
+}
+
+class CamundaSystemVariablesSupportListener #back:lightblue;line:green;text:black extends AbstractBpmnParseListener {
+  parseUserTask()
+}
+
+interface TaskListener {
+  notify(DelegateTask)
+}
+
+class CompleterTaskEventListener #back:lightblue;line:green;text:black implements TaskListener {
+  void notify(DelegateTask)
+}
+
+CamundaSystemVariablesSupportListener o- CompleterTaskEventListener
+@enduml
+----
+
+- `CompleterTaskEventListener` бере об'єкт автентифікації з `SecurityContextHolder` та зберігає данні у контексті Camunda, а саме: ім'я користувача - в якості змінної з ім'ям `<task_id>_completer`, токен користувача - в якості transient змінної з ім'ям `<task_id>_completer_access_token`.
+- `CamundaSystemVariablesSupportListener` містить екземпляр класу `CompleterTaskEventListener` та у методі parseUserTask додає цей об'єкт до загального списку `taskListeners` користувацьких задач.
+
+[IMPORTANT]
+--
+Оскільки змінна `<task_id>_completer_access_token` є transient змінною, то вона буде доступна тільки до наступного wait state (задачі користувача).
+--
+
 == Маппинг виключень на HTTP відповідь
 
 У разі виникнення виключної ситуації Camunda маппить це виключення використовуючи `ExceptionMapper`

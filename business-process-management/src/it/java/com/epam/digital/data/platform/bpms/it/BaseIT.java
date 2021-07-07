@@ -44,6 +44,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.CollectionUtils;
@@ -93,6 +94,7 @@ public abstract class BaseIT {
 
   @Before
   public void setAuthorization() {
+    SecurityContextHolder.getContext().setAuthentication(null);
     Stream.of(SystemRole.getRoleNames()).forEach(this::createAuthorizationsIfNotExists);
   }
 
@@ -123,6 +125,13 @@ public abstract class BaseIT {
         .post(Entity.entity(body, MediaType.APPLICATION_JSON))
         .readEntity(String.class);
     return objectMapper.readValue(jsonResponse, targetClass);
+  }
+
+  protected void postForNoContent(String url, String body){
+    jerseyClient.target(String.format("http://localhost:%d/%s", port, url))
+        .request()
+        .header(TOKEN_HEADER, validAccessToken)
+        .post(Entity.entity(body, MediaType.APPLICATION_JSON));
   }
 
   private void createAuthorizationsIfNotExists(String groupId) {

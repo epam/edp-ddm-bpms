@@ -86,6 +86,8 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     completeTask(createSubjectTaskDefinitionKey, processInstanceId,
         "/json/citizen-onboarding/ceph/create_subject_task_ind.json");
 
+    addCompleterUsernameVariable(createSubjectTaskDefinitionKey, null);
+
     var signSubjectSettingsTaskDefinitionKey = "sign_subject_settings_task";
     addExpectedCephContent(processInstanceId, createSubjectTaskDefinitionKey,
         "/json/citizen-onboarding/ceph/create_subject_task_ind.json");
@@ -139,6 +141,8 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     completeTask(signSubjectSettingsTaskDefinitionKey, processInstanceId,
         "/json/citizen-onboarding/ceph/sign_subject_setting_task_ind.json");
 
+    addCompleterUsernameVariable(signSubjectSettingsTaskDefinitionKey, null);
+
     addExpectedCephContent(processInstanceId, signSubjectSettingsTaskDefinitionKey,
         "/json/citizen-onboarding/ceph/sign_subject_setting_task_ind.json");
 
@@ -172,6 +176,8 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
 
     assertWaitingActivity(processInstance, "end_process_task", "shared-end-process");
     completeTask("end_process_task", processInstanceId, "{}");
+
+    addCompleterUsernameVariable("end_process_task", null);
     addExpectedVariable("sys-var-process-completion-result", "Суб'єкт створено");
 
     assertThat(processInstance).isEnded();
@@ -221,6 +227,8 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     completeTask(createSubjectTaskDefinitionKey, processInstanceId,
         "/json/citizen-onboarding/ceph/create_subject_task_entr.json");
 
+    addCompleterUsernameVariable(createSubjectTaskDefinitionKey, null);
+
     var signSubjectSettingsTaskDefinitionKey = "sign_subject_settings_task";
     addExpectedCephContent(processInstanceId, createSubjectTaskDefinitionKey,
         "/json/citizen-onboarding/ceph/create_subject_task_entr.json");
@@ -261,6 +269,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     completeTask(signSubjectSettingsTaskDefinitionKey, processInstanceId,
         "/json/citizen-onboarding/ceph/sign_subject_setting_task_entr.json");
 
+    addCompleterUsernameVariable(signSubjectSettingsTaskDefinitionKey, null);
     addExpectedCephContent(processInstanceId, signSubjectSettingsTaskDefinitionKey,
         "/json/citizen-onboarding/ceph/sign_subject_setting_task_entr.json");
 
@@ -284,6 +293,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     assertWaitingActivity(processInstance, "end_process_task", "shared-end-process");
     completeTask("end_process_task", processInstanceId, "{}");
     addExpectedVariable("sys-var-process-completion-result", "Суб'єкт створено");
+    addCompleterUsernameVariable("end_process_task", null);
 
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
@@ -338,6 +348,8 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     completeTask(createSubjectTaskDefinitionKey, processInstanceId,
         "/json/citizen-onboarding/ceph/create_subject_task_legal.json");
 
+    addCompleterUsernameVariable(createSubjectTaskDefinitionKey, null);
+
     var signSubjectSettingsTaskDefinitionKey = "sign_subject_settings_task";
     addExpectedCephContent(processInstanceId, createSubjectTaskDefinitionKey,
         "/json/citizen-onboarding/ceph/create_subject_task_legal.json");
@@ -378,6 +390,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     completeTask(signSubjectSettingsTaskDefinitionKey, processInstanceId,
         "/json/citizen-onboarding/ceph/sign_subject_setting_task_legal.json");
 
+    addCompleterUsernameVariable(signSubjectSettingsTaskDefinitionKey, null);
     addExpectedCephContent(processInstanceId, signSubjectSettingsTaskDefinitionKey,
         "/json/citizen-onboarding/ceph/sign_subject_setting_task_legal.json");
 
@@ -401,6 +414,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     assertWaitingActivity(processInstance, "end_process_task", "shared-end-process");
     completeTask("end_process_task", processInstanceId, "{}");
     addExpectedVariable("sys-var-process-completion-result", "Суб'єкт створено");
+    addCompleterUsernameVariable("end_process_task", null);
 
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
