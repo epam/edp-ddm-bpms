@@ -3,6 +3,7 @@ package com.epam.digital.data.platform.bpms.config;
 import com.epam.digital.data.platform.bpms.listener.AuthorizationStartEventListener;
 import com.epam.digital.data.platform.bpms.listener.CompleterTaskEventListener;
 import com.epam.digital.data.platform.bpms.listener.InitiatorTokenStartEventListener;
+import com.epam.digital.data.platform.bpms.listener.PutFormDataToCephTaskListener;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
@@ -25,6 +26,7 @@ public class CamundaSystemVariablesSupportListener extends AbstractBpmnParseList
   private final AuthorizationStartEventListener authorizationStartEventListener;
   private final InitiatorTokenStartEventListener initiatorTokenStartEventListener;
   private final CompleterTaskEventListener completerTaskEventListener;
+  private final PutFormDataToCephTaskListener putFormDataToCephTaskListener;
 
   @Override
   public void parseStartEvent(Element startEventElement, ScopeImpl scope,
@@ -43,5 +45,6 @@ public class CamundaSystemVariablesSupportListener extends AbstractBpmnParseList
     var userTaskActivityBehavior = ((UserTaskActivityBehavior) activity.getActivityBehavior());
     var taskDefinition = userTaskActivityBehavior.getTaskDefinition();
     taskDefinition.addTaskListener(TaskListener.EVENTNAME_COMPLETE, completerTaskEventListener);
+    taskDefinition.addTaskListener(TaskListener.EVENTNAME_CREATE, putFormDataToCephTaskListener);
   }
 }

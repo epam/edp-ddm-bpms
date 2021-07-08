@@ -11,6 +11,7 @@ import com.epam.digital.data.platform.bpms.config.CamundaSystemVariablesSupportL
 import com.epam.digital.data.platform.bpms.listener.AuthorizationStartEventListener;
 import com.epam.digital.data.platform.bpms.listener.CompleterTaskEventListener;
 import com.epam.digital.data.platform.bpms.listener.InitiatorTokenStartEventListener;
+import com.epam.digital.data.platform.bpms.listener.PutFormDataToCephTaskListener;
 import java.util.List;
 import org.assertj.core.util.Maps;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -40,6 +41,8 @@ public class CamundaSystemVariablesSupportListenerTest {
   @Mock
   private InitiatorTokenStartEventListener initiatorTokenStartEventListener;
   @Mock
+  private PutFormDataToCephTaskListener putFormDataToCephTaskListener;
+  @Mock
   private CompleterTaskEventListener completerTaskEventListener;
   @Mock
   private UserTaskActivityBehavior userTaskActivityBehavior;
@@ -52,7 +55,7 @@ public class CamundaSystemVariablesSupportListenerTest {
   public void init() {
     camundaSystemVariablesSupportListener = new CamundaSystemVariablesSupportListener(
         camundaProperties, authorizationStartEventListener, initiatorTokenStartEventListener,
-        completerTaskEventListener);
+        completerTaskEventListener, putFormDataToCephTaskListener);
   }
 
   @Test
@@ -84,5 +87,7 @@ public class CamundaSystemVariablesSupportListenerTest {
     ArgumentCaptor<TaskListener> captor = ArgumentCaptor.forClass(TaskListener.class);
     verify(taskDefinition, times(1))
         .addTaskListener(eq(TaskListener.EVENTNAME_COMPLETE), captor.capture());
+    verify(taskDefinition, times(1))
+        .addTaskListener(eq(TaskListener.EVENTNAME_CREATE), captor.capture());
   }
 }

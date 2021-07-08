@@ -234,6 +234,41 @@ CamundaSystemVariablesSupportListener o- CompleterTaskEventListener
 Оскільки змінна `<task_id>_completer_access_token` є transient змінною, то вона буде доступна тільки до наступного wait state (задачі користувача).
 --
 
+== Збереження попередніх даних форми користувацьких задач у Ceph
+
+Для Збереження попередніх даних форми користувацьких задач у Ceph було імплементовано наступну ієрархію класів
+
+[plantuml,ceph-saving-listener,svg]
+----
+@startuml
+class AbstractBpmnParseListener {
+  parseUserTask()
+}
+
+class CamundaSystemVariablesSupportListener #back:lightblue;line:green;text:black extends AbstractBpmnParseListener {
+  parseUserTask()
+}
+
+interface TaskListener {
+  notify(DelegateTask)
+}
+
+class PutFormDataToCephTaskListener #back:lightblue;line:green;text:black implements TaskListener {
+  void notify(DelegateTask)
+}
+
+CamundaSystemVariablesSupportListener o- PutFormDataToCephTaskListener
+@enduml
+----
+
+- `PutFormDataToCephTaskListener` бере інпут параметр задачі з ім'ям `userTaskInputFormDataPrepopulate` та зберігає його у Ceph під ключем що має відношення до користувацької задачі
+- `CamundaSystemVariablesSupportListener` містить екземпляр класу `PutFormDataToCephTaskListener` та у методі `parseUserTask` додає цей об'єкт до загального списку `taskListeners` кожної користувацької задачі
+
+[NOTE]
+--
+Якщо інпут параметр `userTaskInputFormDataPrepopulate` буде `null` або іншого від `SpinJsonNode` типу, то `PutFormDataToCephTaskListener` не збереже його у Ceph
+--
+
 == Маппинг виключень на HTTP відповідь
 
 У разі виникнення виключної ситуації Camunda маппить це виключення використовуючи `ExceptionMapper`
