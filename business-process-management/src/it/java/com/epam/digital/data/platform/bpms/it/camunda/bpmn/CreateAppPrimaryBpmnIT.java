@@ -180,7 +180,7 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
     expectedVariablesMap.put("sys-var-process-completion-result",
         "Прийнято рішення про внесення лабораторії до переліку");
 
-    String signature = cephService.getContent(cephBucketName, systemSignatureCephKey);
+    String signature = cephService.getContent(cephBucketName, systemSignatureCephKey).get();
     Map<String, Object> signatureMap = objectMapper.readerForMapOf(Object.class)
         .readValue(signature);
     Map<String, Object> expectedSignatureMap = objectMapper.readerForMapOf(Object.class).readValue(
@@ -350,7 +350,7 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
     expectedVariablesMap.put("sys-var-process-completion-result",
         "Прийнято рішення про залишення без розгляду");
 
-    String signature = cephService.getContent(cephBucketName, systemSignatureCephKey);
+    String signature = cephService.getContent(cephBucketName, systemSignatureCephKey).get();
     Map<String, Object> signatureMap = objectMapper.readerForMapOf(Object.class)
         .readValue(signature);
     Map<String, Object> expectedSignatureMap = objectMapper.readerForMapOf(Object.class).readValue(

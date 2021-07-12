@@ -118,7 +118,7 @@ public class AddPersonnelBpmnIT extends BaseBpmnIT {
     addExpectedCephContent(processInstanceId, signPersonnelFormActivityDefinitionKey,
         "/json/add-personnel/form-data/signPersonnelFormActivity.json");
 
-    String signature = cephService.getContent(cephBucketName, systemSignatureCephKey);
+    String signature = cephService.getContent(cephBucketName, systemSignatureCephKey).get();
     Map<String, Object> signatureMap = objectMapper.readerForMapOf(Object.class)
         .readValue(signature);
     Map<String, Object> expectedSignatureMap = objectMapper.readerForMapOf(Object.class)

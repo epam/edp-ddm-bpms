@@ -80,7 +80,7 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
         subjectSettingsSystemSignatureCephKeyRefVarName;
 
     var subjectSettingsSignature = cephService
-        .getContent(cephBucketName, subjectSettingsSystemSignatureCephKey);
+        .getContent(cephBucketName, subjectSettingsSystemSignatureCephKey).get();
     var subjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
         .readValue(subjectSettingsSignature);
     var expectedSubjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
@@ -160,7 +160,7 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
         subjectSettingsSystemSignatureCephKeyRefVarName;
 
     var subjectSettingsSignature = cephService
-        .getContent(cephBucketName, subjectSettingsSystemSignatureCephKey);
+        .getContent(cephBucketName, subjectSettingsSystemSignatureCephKey).get();
     var subjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
         .readValue(subjectSettingsSignature);
     var expectedSubjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)

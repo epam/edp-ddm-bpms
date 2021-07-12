@@ -24,7 +24,7 @@ public class PutFormDataToCephListenerIT extends BaseIT {
     BpmnAwareTests.assertThat(processInstance).isWaitingAt("user_task");
     var cephKey = cephKeyProvider.generateKey("user_task", processInstance.getProcessInstanceId());
     var formData = testCephService.getFormData(cephKey);
-    assertThat(formData.getData()).hasSize(2).containsEntry("field1", "value1")
+    assertThat(formData.get().getData()).hasSize(2).containsEntry("field1", "value1")
         .containsEntry("field2", "value2");
   }
 }

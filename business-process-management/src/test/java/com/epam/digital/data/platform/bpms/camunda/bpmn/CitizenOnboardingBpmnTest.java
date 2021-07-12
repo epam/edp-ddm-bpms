@@ -125,7 +125,8 @@ public class CitizenOnboardingBpmnTest extends BaseBpmnTest {
     var subjectSystemSignatureCephKey = "lowcode_" + currentProcessInstanceId + "_" +
         subjectSystemSignatureCephKeyRefVarName;
 
-    var subjectSignature = cephService.getContent(cephBucketName, subjectSystemSignatureCephKey);
+    var subjectSignature = cephService.getContent(cephBucketName, subjectSystemSignatureCephKey)
+        .get();
     var signatureMap = objectMapper.readerForMapOf(Object.class).readValue(subjectSignature);
     var expectedSignatureMap = objectMapper.readerForMapOf(Object.class).readValue(TestUtils
         .getContent("/json/citizen-onboarding/dso/indSubjectSignatureCephContent.json"));
@@ -136,7 +137,7 @@ public class CitizenOnboardingBpmnTest extends BaseBpmnTest {
         subjectSettingsSystemSignatureCephKeyRefVarName;
 
     var subjectSettingsSignature = cephService
-        .getContent(cephBucketName, subjectSettingsSystemSignatureCephKey);
+        .getContent(cephBucketName, subjectSettingsSystemSignatureCephKey).get();
     var subjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
         .readValue(subjectSettingsSignature);
     var expectedSubjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
@@ -267,7 +268,8 @@ public class CitizenOnboardingBpmnTest extends BaseBpmnTest {
     var subjectSystemSignatureCephKey = "lowcode_" + currentProcessInstanceId + "_" +
         subjectSystemSignatureCephKeyRefVarName;
 
-    var subjectSignature = cephService.getContent(cephBucketName, subjectSystemSignatureCephKey);
+    var subjectSignature = cephService.getContent(cephBucketName, subjectSystemSignatureCephKey)
+        .get();
     var signatureMap = objectMapper.readerForMapOf(Object.class).readValue(subjectSignature);
     var expectedSignatureMap = objectMapper.readerForMapOf(Object.class).readValue(TestUtils
         .getContent("/json/citizen-onboarding/dso/entrSubjectSignatureCephContent.json"));
@@ -278,7 +280,7 @@ public class CitizenOnboardingBpmnTest extends BaseBpmnTest {
         subjectSettingsSystemSignatureCephKeyRefVarName;
 
     var subjectSettingsSignature = cephService
-        .getContent(cephBucketName, subjectSettingsSystemSignatureCephKey);
+        .getContent(cephBucketName, subjectSettingsSystemSignatureCephKey).get();
     var subjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
         .readValue(subjectSettingsSignature);
     var expectedSubjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
@@ -405,7 +407,7 @@ public class CitizenOnboardingBpmnTest extends BaseBpmnTest {
         subjectSettingsSystemSignatureCephKeyRefVarName;
 
     var subjectSettingsSignature = cephService
-        .getContent(cephBucketName, subjectSettingsSystemSignatureCephKey);
+        .getContent(cephBucketName, subjectSettingsSystemSignatureCephKey).get();
     var subjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
         .readValue(subjectSettingsSignature);
     var expectedSubjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)

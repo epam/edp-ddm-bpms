@@ -101,7 +101,7 @@ public class AddPersonnelBpmnTest extends BaseBpmnTest {
 
     addExpectedCephContent(signPersonnelFormActivityDefinitionKey,
         "/json/add-personnel/form-data/signPersonnelFormActivity.json");
-    var signature = cephService.getContent(cephBucketName, systemSignatureCephKey);
+    var signature = cephService.getContent(cephBucketName, systemSignatureCephKey).get();
     var signatureMap = objectMapper.readerForMapOf(Object.class).readValue(signature);
     var expectedSignatureMap = objectMapper.readerForMapOf(Object.class)
         .readValue(TestUtils.getContent("/json/add-personnel/dso/systemSignatureCephContent.json"));

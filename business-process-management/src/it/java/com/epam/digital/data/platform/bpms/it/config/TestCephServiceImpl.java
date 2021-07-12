@@ -7,6 +7,7 @@ import com.epam.digital.data.platform.integration.ceph.service.FormDataCephServi
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,9 +25,9 @@ public class TestCephServiceImpl implements CephService, FormDataCephService {
   private ObjectMapper objectMapper;
 
   @Override
-  public String getContent(String cephBucketName, String key) {
+  public Optional<String> getContent(String cephBucketName, String key) {
     verifyBucketName(cephBucketName);
-    return storage.get(key);
+    return Optional.ofNullable(storage.get(key));
   }
 
   @Override
@@ -43,12 +44,12 @@ public class TestCephServiceImpl implements CephService, FormDataCephService {
 
   @SneakyThrows
   @Override
-  public FormDataDto getFormData(String key) {
+  public Optional<FormDataDto> getFormData(String key) {
     var content = getContent(cephBucketName, key);
-    if (content == null) {
-      return null;
+    if (content.isEmpty()) {
+      return Optional.empty();
     }
-    return objectMapper.readValue(storage.get(key), FormDataDto.class);
+    return Optional.of(objectMapper.readValue(content.get(), FormDataDto.class));
   }
 
   @Override

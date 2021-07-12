@@ -60,7 +60,7 @@ public class CephJavaDelegatesIT extends BaseIT {
 
     assertTrue(process.isEnded());
 
-    String content = cephService.getContent(cephBucketName, "testKey");
+    String content = cephService.getContent(cephBucketName, "testKey").get();
     assertThat(content).isNotNull()
         .isEqualTo(contentToPut);
   }
@@ -86,8 +86,8 @@ public class CephJavaDelegatesIT extends BaseIT {
     assertThat(resultVariables).doesNotContainKey("formDataOutput");
 
     var data = cephService.getFormData(expectedCephKey);
-    assertThat(data).isNotNull();
-    assertThat(data.getData().get("name")).isEqualTo("value ek");
+    assertThat(data).isNotEmpty();
+    assertThat(data.get().getData().get("name")).isEqualTo("value ek");
   }
 
   @Test

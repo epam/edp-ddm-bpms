@@ -150,7 +150,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     var subjectSystemSignatureCephKey = "lowcode_" + processInstanceId + "_" +
         subjectSystemSignatureCephKeyRefVarName;
 
-    var subjectSignature = cephService.getContent(cephBucketName, subjectSystemSignatureCephKey);
+    var subjectSignature = cephService.getContent(cephBucketName, subjectSystemSignatureCephKey).get();
     var signatureMap = objectMapper.readerForMapOf(Object.class).readValue(subjectSignature);
     var expectedSignatureMap = objectMapper.readerForMapOf(Object.class).readValue(TestUtils
         .getContent("/json/citizen-onboarding/dso/indSubjectSignatureCephContent.json"));
@@ -161,7 +161,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         subjectSettingsSystemSignatureCephKeyRefVarName;
 
     var subjectSettingsSignature = cephService
-        .getContent(cephBucketName, subjectSettingsSystemSignatureCephKey);
+        .getContent(cephBucketName, subjectSettingsSystemSignatureCephKey).get();
     var subjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
         .readValue(subjectSettingsSignature);
     var expectedSubjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
@@ -278,7 +278,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         subjectSettingsSystemSignatureCephKeyRefVarName;
 
     var subjectSettingsSignature = cephService
-        .getContent(cephBucketName, subjectSettingsSystemSignatureCephKey);
+        .getContent(cephBucketName, subjectSettingsSystemSignatureCephKey).get();
     var subjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
         .readValue(subjectSettingsSignature);
     var expectedSubjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
@@ -399,7 +399,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         subjectSettingsSystemSignatureCephKeyRefVarName;
 
     var subjectSettingsSignature = cephService
-        .getContent(cephBucketName, subjectSettingsSystemSignatureCephKey);
+        .getContent(cephBucketName, subjectSettingsSystemSignatureCephKey).get();
     var subjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
         .readValue(subjectSettingsSignature);
     var expectedSubjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)

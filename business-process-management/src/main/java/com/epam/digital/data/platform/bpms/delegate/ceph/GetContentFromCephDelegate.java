@@ -25,7 +25,7 @@ public class GetContentFromCephDelegate implements JavaDelegate {
   @Override
   public void execute(DelegateExecution execution) {
     var key = (String) execution.getVariable("key");
-    var content = cephService.getContent(cephBucketName, key);
+    var content = cephService.getContent(cephBucketName, key).orElse(null);
 
     ((AbstractVariableScope) execution).setVariableLocalTransient("content", content);
   }

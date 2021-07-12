@@ -3,6 +3,7 @@ package com.epam.digital.data.platform.bpms.delegate.connector;
 import com.epam.digital.data.platform.bpms.api.dto.enums.PlatformHttpHeader;
 import com.epam.digital.data.platform.bpms.delegate.ceph.CephKeyProvider;
 import com.epam.digital.data.platform.bpms.delegate.dto.DataFactoryConnectorResponse;
+import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.epam.digital.data.platform.integration.ceph.service.FormDataCephService;
 import java.util.Map;
 import java.util.Objects;
@@ -118,7 +119,7 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
 
     var xAccessTokenCephFromData = formDataCephService.getFormData(xAccessTokenCephKey);
 
-    return Optional.ofNullable(xAccessTokenCephFromData.getAccessToken());
+    return xAccessTokenCephFromData.map(FormDataDto::getAccessToken);
   }
 
   private void logRequest(RequestEntity<?> request) {

@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import com.epam.digital.data.platform.bpms.delegate.ceph.GetContentFromCephDelegate;
 import com.epam.digital.data.platform.integration.ceph.service.CephService;
+import java.util.Optional;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +35,7 @@ public class GetContentFromCephDelegateTest {
   @Test
   public void execute() {
     when(delegateExecution.getVariable("key")).thenReturn("key");
-    when(cephService.getContent(CEPH_BUCKET_NAME, "key")).thenReturn("someContent");
+    when(cephService.getContent(CEPH_BUCKET_NAME, "key")).thenReturn(Optional.of("someContent"));
 
     getContentFromCephDelegate.execute(delegateExecution);
 

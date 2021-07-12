@@ -163,7 +163,7 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
     addExpectedVariable("sys-var-process-completion-result",
         "Прийнято рішення про розширення факторів");
 
-    var signature = cephService.getContent(cephBucketName, systemSignatureCephKey);
+    var signature = cephService.getContent(cephBucketName, systemSignatureCephKey).get();
     var signatureMap = objectMapper.readerForMapOf(Object.class).readValue(signature);
     var expectedSignatureMap = objectMapper.readerForMapOf(Object.class).readValue(
         TestUtils.getContent("/json/create-app/dso/expanseIncludeSystemSignatureCephContent.json"));
@@ -321,7 +321,7 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
     addExpectedVariable("sys-var-process-completion-result",
         "Прийнято рішення про залишення без розгляду");
 
-    var signature = cephService.getContent(cephBucketName, systemSignatureCephKey);
+    var signature = cephService.getContent(cephBucketName, systemSignatureCephKey).get();
     var signatureMap = objectMapper.readerForMapOf(Object.class).readValue(signature);
     var expectedSignatureMap = objectMapper.readerForMapOf(Object.class).readValue(
         TestUtils.getContent("/json/create-app/dso/expanseDenySystemSignatureCephContent.json"));

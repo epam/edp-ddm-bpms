@@ -248,7 +248,7 @@ public abstract class BaseBpmnIT extends BaseIT {
 
   protected void assertCephContent() {
     expectedCephStorage.forEach((key, value) -> {
-      var actualMap = cephService.getFormData(key);
+      var actualMap = cephService.getFormData(key).get();
 
       Assertions.assertThat(actualMap).isEqualTo(value);
     });
