@@ -10,6 +10,7 @@ import lombok.Data;
 @Builder
 public class HistoryProcessInstanceQueryDto {
 
+  private boolean rootProcessInstances;
   private boolean unfinished;
   private boolean finished;
   private String sortBy;

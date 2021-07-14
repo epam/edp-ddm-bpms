@@ -7,8 +7,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.epam.digital.data.platform.bpms.api.dto.enums.SortOrder;
 import com.epam.digital.data.platform.bpms.api.dto.HistoryProcessInstanceQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.enums.SortOrder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Date;
 import org.assertj.core.util.Lists;
@@ -50,6 +50,7 @@ public class ProcessInstanceHistoryRestClientIT extends BaseIT {
     // init list of finished process instance response
     restClientWireMock.addStubMapping(
         stubFor(get(urlPathEqualTo("/api/history/process-instance"))
+            .withQueryParam("rootProcessInstances", equalTo("true"))
             .withQueryParam("finished", equalTo("true"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
@@ -80,7 +81,7 @@ public class ProcessInstanceHistoryRestClientIT extends BaseIT {
   @Test
   public void shouldReturnListOfFinishedHistoryProcessInstances() {
     var processInstances = processInstanceHistoryRestClient.getProcessInstances(
-        HistoryProcessInstanceQueryDto.builder().finished(true).build()
+        HistoryProcessInstanceQueryDto.builder().finished(true).rootProcessInstances(true).build()
     );
 
     assertThat(processInstances.size()).isOne();
