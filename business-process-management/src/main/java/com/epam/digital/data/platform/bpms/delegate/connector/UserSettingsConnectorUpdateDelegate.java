@@ -31,18 +31,16 @@ public class UserSettingsConnectorUpdateDelegate extends BaseConnectorDelegate {
 
   @Override
   public void execute(DelegateExecution execution) throws Exception {
-    var resource = (String) execution.getVariable(RESOURCE_VARIABLE);
     var payload = (SpinJsonNode) execution.getVariable(PAYLOAD_VARIABLE);
 
-    var response = performPut(execution, resource, payload.toString());
+    var response = performPut(execution, payload.toString());
 
     ((AbstractVariableScope) execution).setVariableLocalTransient(RESPONSE_VARIABLE, response);
   }
 
-  private DataFactoryConnectorResponse performPut(DelegateExecution delegateExecution,
-      String resource, String body) {
-    var uri = UriComponentsBuilder.fromHttpUrl(userSettingsBaseUrl).pathSegment(resource).build()
-        .toUri();
+  private DataFactoryConnectorResponse performPut(DelegateExecution delegateExecution, String body) {
+    var uri = UriComponentsBuilder.fromHttpUrl(userSettingsBaseUrl).pathSegment(RESOURCE_SETTINGS)
+        .build().toUri();
 
     return perform(RequestEntity.put(uri).headers(getHeaders(delegateExecution)).body(body));
   }

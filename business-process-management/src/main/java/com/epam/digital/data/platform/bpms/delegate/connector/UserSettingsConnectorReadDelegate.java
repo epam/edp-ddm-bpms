@@ -30,18 +30,15 @@ public class UserSettingsConnectorReadDelegate extends BaseConnectorDelegate {
 
   @Override
   public void execute(DelegateExecution execution) throws Exception {
-    var resource = (String) execution.getVariable(RESOURCE_VARIABLE);
-
-    DataFactoryConnectorResponse response = performGet(execution, resource);
+    var response = performGet(execution);
 
     ((AbstractVariableScope) execution).setVariableLocalTransient(RESPONSE_VARIABLE, response);
   }
 
 
-  protected DataFactoryConnectorResponse performGet(DelegateExecution delegateExecution,
-      String resource) {
-    var uri = UriComponentsBuilder.fromHttpUrl(userSettingsBaseUrl).pathSegment(resource).build()
-        .toUri();
+  protected DataFactoryConnectorResponse performGet(DelegateExecution delegateExecution) {
+    var uri = UriComponentsBuilder.fromHttpUrl(userSettingsBaseUrl).pathSegment(RESOURCE_SETTINGS)
+        .build().toUri();
 
     return perform(RequestEntity.get(uri).headers(getHeaders(delegateExecution)).build());
   }

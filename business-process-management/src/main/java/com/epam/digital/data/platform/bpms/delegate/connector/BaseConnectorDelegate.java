@@ -25,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public abstract class BaseConnectorDelegate implements JavaDelegate {
 
+  protected static final String RESOURCE_SETTINGS = "settings";
   protected static final String RESOURCE_VARIABLE = "resource";
   protected static final String RESOURCE_ID_VARIABLE = "id";
   protected static final String PAYLOAD_VARIABLE = "payload";
