@@ -19,8 +19,8 @@
         <camunda:inputOutput>
           <camunda:inputParameter name="resource">test</camunda:inputParameter>
           <camunda:inputParameter name="payload">${jsonArray}</camunda:inputParameter>
-          <camunda:inputParameter name="x_access_token_task_definition_key">test_token</camunda:inputParameter>
-          <camunda:inputParameter name="x_digital_signature_task_definition_key">test_signature</camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token">${completer('test_token').accessToken}</camunda:inputParameter>
+          <camunda:inputParameter name="x_digital_signature_ceph_key">${sign_submission('test_token').signatureDocumentId}</camunda:inputParameter>
           <camunda:inputParameter name="x_digital_signature_derived_ceph_key">${execution.getVariable("secure-sys-var-ref-task-form-data-test_derived")}</camunda:inputParameter>
           <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
         </camunda:inputOutput>

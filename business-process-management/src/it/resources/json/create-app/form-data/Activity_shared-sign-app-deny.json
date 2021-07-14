@@ -99,6 +99,5 @@
     "certifiedBy": "multipass",
     "notes": "smth noted"
   },
-  "x-access-token": "token",
   "signature": "signature"
 }

@@ -8,6 +8,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.github.tomakehurst.wiremock.WireMockServer;
+import java.util.LinkedHashMap;
 import javax.inject.Inject;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
@@ -26,7 +27,7 @@ public class DigitalSignatureConnectorDelegateIT extends BaseIT {
     digitalSignatureMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo("/api/eseal/sign"))
             .withHeader("Content-Type", equalTo("application/json"))
-            .withHeader("X-Access-Token", equalTo("token"))
+            .withHeader("X-Access-Token", equalTo(validAccessToken))
             .withRequestBody(equalTo("{\"data\":\"data to sign\"}"))
             .willReturn(aResponse().withStatus(200).withBody("{\"signature\": \"test\"}"))));
 
@@ -35,7 +36,8 @@ public class DigitalSignatureConnectorDelegateIT extends BaseIT {
 
     var cephKey = cephKeyProvider
         .generateKey("testActivity", processInstance.getProcessInstanceId());
-    cephService.putFormData(cephKey, FormDataDto.builder().accessToken("token").build());
+    cephService.putFormData(cephKey, FormDataDto.builder().accessToken(validAccessToken)
+        .data(new LinkedHashMap<>()).build());
 
     String taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionTask").singleResult().getId();
     taskService.complete(taskId);

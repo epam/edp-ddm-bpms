@@ -6,6 +6,5 @@
     "receivedBy": "receiver",
     "certifiedBy": "multipass",
     "notes": "smth noted"
-  },
-  "x-access-token": "token"
+  }
 }

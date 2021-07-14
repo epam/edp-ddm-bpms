@@ -9,10 +9,16 @@
         "fullTimeFlag": "основнеМісцеРоботи",
         "fixedTermContractFlag": true,
         "researches": [
-          "research1",
-          "research2"
+          {
+            "researchId": "research1"
+          },
+          {
+            "researchId": "research2"
+          }
         ],
-        "staffStatusId": "12",
+        "staffStatus": {
+          "staffStatusId": "12"
+        },
         "specializationDate": "2021-03-02",
         "specializationEndDate": "2021-03-09",
         "salary": 0.99,
@@ -20,6 +26,5 @@
       }
     ],
     "submit": true
-  },
-  "x-access-token": "token"
+  }
 }

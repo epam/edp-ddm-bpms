@@ -2,9 +2,8 @@ package com.epam.digital.data.platform.bpms.it.camunda.bpmn;
 
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Map;
 import org.apache.groovy.util.Maps;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.junit.Test;
@@ -13,10 +12,12 @@ import org.springframework.http.HttpMethod;
 public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
 
   @Test
-  @Deployment(resources = {"bpmn/create-app-exclude.bpmn"})
+  @Deployment(resources = {"bpmn/create-app-exclude.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void testHappyPath() throws IOException {
 
-    stubDataFactoryRead(StubData.builder()
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .resource("laboratory")
         .resourceId("d2943186-0f1f-4a77-9de9-a5a59c07db02")
         .response("/json/create-app-exclude/laboratoryByIdResponse.json")
@@ -24,6 +25,7 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .resource("solution-type-equal-constant-code")
         .queryParams(Maps.of("constantCode", "EXCLUDE"))
         .response("/json/create-app-exclude/solutionTypeEqualConstantCodeResponse.json")
@@ -31,26 +33,30 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .resource("application-type-equal-constant-code")
         .queryParams(Maps.of("constantCode", "EXCLUDE"))
         .response("/json/create-app-exclude/applicationTypeEqualConstantCodeResponse.json")
         .build());
 
-    stubDataFactoryCreate(StubData.builder()
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.POST)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .resource("registration")
         .requestBody("/json/create-app-exclude/addRegistrationBody.json")
         .response("{}")
         .build());
 
-    stubDigitalSignature(StubData.builder()
+    stubDigitalSignatureRequest(StubData.builder()
+        .httpMethod(HttpMethod.POST)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .requestBody("/json/create-app-exclude/digitalSignatureRequestBody.json")
         .response("{\"signature\": \"test\"}")
         .build());
 
     //start process
-    ProcessInstance processInstance = runtimeService
-        .startProcessInstanceByKey("create-app-exclude", new HashMap<>());
-    String processInstanceId = processInstance.getId();
+    var processInstance = runtimeService.startProcessInstanceByKey("create-app-exclude");
+    var processInstanceId = processInstance.getId();
 
     BpmnAwareTests.assertThat(processInstance).isWaitingAt("searchLabFormActivity");
     completeTask("searchLabFormActivity", processInstanceId,
@@ -82,11 +88,17 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
             "checkComplianceFormActivity", "addDecisionExcludeFormActivity",
             "addLetterDataFormForExclusionActivity", "signAppExcludeFormActivity")
         .isEnded();
+
+    assertSystemSignature(processInstanceId, "system_signature_ceph_key",
+        "/json/create-app-exclude/digitalSignatureCephContent.json");
   }
 
   @Test
+  @Deployment(resources = {"bpmn/create-app-exclude.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void testPathWithMistakes() throws IOException {
-    stubDataFactoryRead(StubData.builder()
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .resource("laboratory")
         .resourceId("d2943186-0f1f-4a77-9de9-a5a59c07db02")
         .response("/json/create-app-exclude/laboratoryByIdResponse.json")
@@ -94,6 +106,7 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .resource("solution-type-equal-constant-code")
         .queryParams(Maps.of("constantCode", "WO_CONSIDER"))
         .response("/json/create-app-exclude/solutionTypeEqualConstantCodeWoConsiderResponse.json")
@@ -101,26 +114,30 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .resource("application-type-equal-constant-code")
         .queryParams(Maps.of("constantCode", "EXCLUDE"))
         .response("/json/create-app-exclude/applicationTypeEqualConstantCodeResponse.json")
         .build());
 
-    stubDataFactoryCreate(StubData.builder()
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.POST)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .resource("registration")
         .requestBody("/json/create-app-exclude/addRegistrationNoConsiderBody.json")
         .response("{}")
         .build());
 
-    stubDigitalSignature(StubData.builder()
+    stubDigitalSignatureRequest(StubData.builder()
+        .httpMethod(HttpMethod.POST)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .requestBody("/json/create-app-exclude/digitalSignatureNoConsiderRequestBody.json")
         .response("{\"signature\": \"test\"}")
         .build());
 
     //start process
-    ProcessInstance processInstance = runtimeService
-        .startProcessInstanceByKey("create-app-exclude", new HashMap<>());
-    String processInstanceId = processInstance.getId();
+    var processInstance = runtimeService.startProcessInstanceByKey("create-app-exclude");
+    var processInstanceId = processInstance.getId();
 
     BpmnAwareTests.assertThat(processInstance).isWaitingAt("searchLabFormActivity");
     completeTask("searchLabFormActivity", processInstanceId,
@@ -152,5 +169,8 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
             "checkComplianceFormActivity", "addDecisionDenyFormActivity",
             "addLetterDataFormForDenyActivity", "signAppDenyFormActivity")
         .isEnded();
+
+    assertSystemSignature(processInstanceId, "system_signature_ceph_key",
+        "/json/create-app-exclude/digitalSignatureNoConsiderCephContent.json");
   }
 }

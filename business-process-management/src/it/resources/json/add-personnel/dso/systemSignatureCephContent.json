@@ -1,4 +1,4 @@
 {
-  "data": "{\"fullName\":\"s\",\"hygienistFlag\":true,\"fullTimeFlag\":\"основнеМісцеРоботи\",\"fixedTermContractFlag\":true,\"researches\":[\"research1\",\"research2\"],\"staffStatusId\":\"12\",\"specializationDate\":\"2021-03-02\",\"specializationEndDate\":\"2021-03-09\",\"salary\":0.99,\"contractEndDate\":\"2021-03-22\",\"laboratoryId\":\"bb652d3f-a36f-465a-b7ba-232a5a1680c5\"}",
+  "data": "{\"fullName\":\"s\",\"hygienistFlag\":true,\"fullTimeFlag\":\"основнеМісцеРоботи\",\"fixedTermContractFlag\":true,\"researches\":[\"research1\",\"research2\"],\"specializationDate\":\"2021-03-02\",\"specializationEndDate\":\"2021-03-09\",\"salary\":0.99,\"contractEndDate\":\"2021-03-22\",\"laboratoryId\":\"bb652d3f-a36f-465a-b7ba-232a5a1680c5\",\"staffStatusId\":\"12\"}",
   "signature": "test"
 }

@@ -2,6 +2,7 @@ package com.epam.digital.data.platform.bpms.camunda.bpmn;
 
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.complete;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.historyService;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
 import static org.mockito.Mockito.mock;
@@ -45,6 +46,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -58,6 +60,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -80,16 +84,15 @@ public abstract class BaseBpmnTest {
       mock(KeycloakAddRoleConnectorDelegate.class);
 
   // init base classes for delegates
-  protected final ObjectMapper objectMapper = new ObjectMapper();
-  protected final TestCephServiceImpl cephService =
-      new TestCephServiceImpl(cephBucketName, objectMapper);
-  protected final CephKeyProvider cephKeyProvider = new CephKeyProvider();
-  protected final ConnectorResponseErrorHandler connectorResponseErrorHandler =
-      new ConnectorResponseErrorHandler(objectMapper, messageResolver);
-  protected final RestTemplate restTemplate =
-      new RestTemplateBuilder().errorHandler(connectorResponseErrorHandler).build();
+  protected ObjectMapper objectMapper;
+  protected TestCephServiceImpl cephService;
+  protected CephKeyProvider cephKeyProvider;
+  protected RestTemplate restTemplate;
 
-  protected MockRestServiceServer mockServer = MockRestServiceServer.createServer(restTemplate);
+  protected MockRestServiceServer mockServer;
+
+  protected String testUserName = "testuser";
+  protected String testUserToken;
 
   @Rule
   public ProcessEngineRule processEngineRule = new ProcessEngineRule();
@@ -101,7 +104,19 @@ public abstract class BaseBpmnTest {
   protected ProcessInstance currentProcessInstance;
 
   @Before
-  public void init() {
+  public void init() throws IOException {
+    var beans = processEngineRule.getProcessEngineConfiguration().getBeans();
+
+    objectMapper = (ObjectMapper) beans.get("objectMapper");
+    cephService = (TestCephServiceImpl) beans.get("cephService");
+    cephKeyProvider = (CephKeyProvider) beans.get("cephKeyProvider");
+
+    var connectorResponseErrorHandler = new ConnectorResponseErrorHandler(objectMapper,
+        messageResolver);
+    restTemplate = new RestTemplateBuilder().errorHandler(connectorResponseErrorHandler).build();
+
+    mockServer = MockRestServiceServer.createServer(restTemplate);
+
     initCephDelegates();
     initConnectorDelegates();
 
@@ -117,6 +132,10 @@ public abstract class BaseBpmnTest {
     // register system beans
     Mocks.register("tokenParser", new TokenParser(objectMapper));
     Mocks.register("cephKeyProvider", cephKeyProvider);
+
+    testUserToken = TestUtils.getContent("/json/testuserAccessToken.json");
+    SecurityContextHolder.getContext().setAuthentication(
+        new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
   }
 
   protected void completeTask(String taskDefinitionKey, String formData) throws IOException {
@@ -225,20 +244,20 @@ public abstract class BaseBpmnTest {
 
   private void initConnectorDelegates() {
     var digitalSignatureConnectorDelegate = new DigitalSignatureConnectorDelegate(restTemplate,
-        cephService, cephKeyProvider, springAppName, digitalSignatureUrl);
+        springAppName, digitalSignatureUrl);
     Mocks.register("digitalSignatureConnectorDelegate", digitalSignatureConnectorDelegate);
 
     var dataFactoryConnectorSearchDelegate = new DataFactoryConnectorSearchDelegate(restTemplate,
-        cephService, cephKeyProvider, springAppName, dataFactoryUrl);
+        springAppName, dataFactoryUrl);
     var dataFactoryConnectorCreateDelegate = new DataFactoryConnectorCreateDelegate(restTemplate,
-        cephService, cephKeyProvider, springAppName, dataFactoryUrl);
+        springAppName, dataFactoryUrl);
     var dataFactoryConnectorReadDelegate = new DataFactoryConnectorReadDelegate(restTemplate,
-        cephService, cephKeyProvider, springAppName, dataFactoryUrl);
+        springAppName, dataFactoryUrl);
     var dataFactoryConnectorBatchCreateDelegate = new DataFactoryConnectorBatchCreateDelegate(
-        restTemplate, cephService, cephService, digitalSignatureConnectorDelegate, cephKeyProvider,
-        springAppName, cephBucketName, dataFactoryUrl);
+        restTemplate, cephService, digitalSignatureConnectorDelegate, springAppName, cephBucketName,
+        dataFactoryUrl);
     var dataFactoryConnectorBatchReadDelegate = new DataFactoryConnectorBatchReadDelegate(
-        restTemplate, cephService, cephKeyProvider, springAppName, dataFactoryUrl);
+        restTemplate, springAppName, dataFactoryUrl);
     Mocks.register("dataFactoryConnectorSearchDelegate", dataFactoryConnectorSearchDelegate);
     Mocks.register("dataFactoryConnectorCreateDelegate", dataFactoryConnectorCreateDelegate);
     Mocks.register("dataFactoryConnectorReadDelegate", dataFactoryConnectorReadDelegate);
@@ -247,11 +266,34 @@ public abstract class BaseBpmnTest {
     Mocks.register("dataFactoryConnectorBatchReadDelegate", dataFactoryConnectorBatchReadDelegate);
 
     var userSettingsConnectorReadDelegate = new UserSettingsConnectorReadDelegate(restTemplate,
-        cephKeyProvider, cephService, springAppName, userSettingsBaseUrl);
+        springAppName, userSettingsBaseUrl);
     var userSettingsConnectorUpdateDelegate = new UserSettingsConnectorUpdateDelegate(restTemplate,
-        cephKeyProvider, cephService, springAppName, userSettingsBaseUrl);
+        springAppName, userSettingsBaseUrl);
     Mocks.register("userSettingsConnectorReadDelegate", userSettingsConnectorReadDelegate);
     Mocks.register("userSettingsConnectorUpdateDelegate", userSettingsConnectorUpdateDelegate);
+  }
+
+  @SneakyThrows
+  protected void assertSystemSignature(String variableName, String cephContent) {
+    var variables = historyService().createHistoricVariableInstanceQuery()
+        .processInstanceId(currentProcessInstanceId).list();
+
+    var signatureCephKeyVar = variables.stream()
+        .filter(variable -> variable.getName().equals(variableName)).findAny();
+    Assertions.assertThat(signatureCephKeyVar).isNotEmpty();
+
+    var signatureCephKey = (String) signatureCephKeyVar.get().getValue();
+    Assertions.assertThat(signatureCephKey)
+        .matches("lowcode_" + currentProcessInstanceId + "_.+_system_signature_ceph_key");
+
+    var cephDoc = cephService.getContent(cephBucketName, signatureCephKey);
+    Assertions.assertThat(cephDoc).isPresent();
+
+    var actual = objectMapper.readerForMapOf(Object.class).readValue(cephDoc.get());
+    var expected = objectMapper.readerForMapOf(Object.class)
+        .readValue(TestUtils.getContent(cephContent));
+
+    Assertions.assertThat(actual).isEqualTo(expected);
   }
 
   @RequiredArgsConstructor

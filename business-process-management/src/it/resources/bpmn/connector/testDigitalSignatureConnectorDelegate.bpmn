@@ -12,7 +12,7 @@
     <bpmn:serviceTask id="Activity_1qxebdp" name="Test sign data" camunda:delegateExpression="${digitalSignatureConnectorDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="x_access_token_task_definition_key">testActivity</camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token">${completer('testActivity').accessToken}</camunda:inputParameter>
           <camunda:inputParameter name="payload">${S('{"data": "data to sign"}')}</camunda:inputParameter>
           <camunda:outputParameter name="response">${response}</camunda:outputParameter>
         </camunda:inputOutput>

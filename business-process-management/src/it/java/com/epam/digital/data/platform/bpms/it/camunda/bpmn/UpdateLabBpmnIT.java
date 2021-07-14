@@ -2,9 +2,8 @@ package com.epam.digital.data.platform.bpms.it.camunda.bpmn;
 
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Map;
 import org.apache.groovy.util.Maps;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.junit.Test;
@@ -13,16 +12,20 @@ import org.springframework.http.HttpMethod;
 public class UpdateLabBpmnIT extends BaseBpmnIT {
 
   @Test
-  @Deployment(resources = {"bpmn/update-lab.bpmn"})
+  @Deployment(resources = {"bpmn/update-lab.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void test() throws IOException {
 
-    stubDataFactoryRead(StubData.builder()
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .resource("laboratory")
         .resourceId("d2943186-0f1f-4a77-9de9-a5a59c07db02")
         .response("/json/update-lab/laboratoryByIdResponse.json")
         .build());
 
-    stubDataFactoryRead(StubData.builder()
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .resource("koatuu")
         .resourceId("92cb1462-ec57-4b87-9e8d-594e0c322996")
         .response("/json/update-lab/koatuuByIdResponse.json")
@@ -30,27 +33,61 @@ public class UpdateLabBpmnIT extends BaseBpmnIT {
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .resource("laboratory-equal-edrpou-name-count")
         .queryParams(Maps.of("name", "labName", "edrpou", "23510933"))
         .response("[]")
         .build());
 
-    stubDataFactoryUpdate(StubData.builder()
+    stubDigitalSignatureRequest(StubData.builder()
+        .httpMethod(HttpMethod.POST)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .requestBody("/json/update-lab/digitalSignatureRequestBody.json")
+        .response("{\"signature\": \"test\"}")
+        .build());
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("koatuu-equal-koatuu-id-name")
+        .queryParams(Map.of("koatuuId", "92cb1462-ec57-4b87-9e8d-594e0c322996"))
+        .response("/json/update-lab/koatuuEqualKoatuuIdName.json")
+        .build());
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("koatuu")
+        .resourceId("92cb1462-ec57-4b87-9e8d-594e0c322997")
+        .response("/json/update-lab/koatuuOblByIdResponse.json")
+        .build());
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("ownership")
+        .resourceId("19aab23b-1e49-4064-8f7e-39735ece4388")
+        .response("/json/update-lab/findOwnershipResponse.json")
+        .build());
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("kopfg")
+        .resourceId("a790eb71-6015-4f40-995b-ad474e8eddca")
+        .response("/json/update-lab/findKopfgResponse.json")
+        .build());
+
+    //start process
+    var processInstance = runtimeService.startProcessInstanceByKey("update-lab");
+    var processInstanceId = processInstance.getId();
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.PUT)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .resource("laboratory")
         .resourceId("d2943186-0f1f-4a77-9de9-a5a59c07db02")
         .requestBody("/json/update-lab/updateLabRequestBody.json")
         .response("{}")
         .build());
-
-    stubDigitalSignature(StubData.builder()
-        .requestBody("/json/update-lab/digitalSignatureRequestBody.json")
-        .response("{\"signature\": \"test\"}")
-        .build());
-
-    //start process
-    ProcessInstance processInstance = runtimeService
-        .startProcessInstanceByKey("update-lab", new HashMap<>());
-    String processInstanceId = processInstance.getId();
 
     BpmnAwareTests.assertThat(processInstance).isWaitingAt("searchLabFormActivity");
     completeTask("searchLabFormActivity", processInstanceId,
@@ -72,5 +109,8 @@ public class UpdateLabBpmnIT extends BaseBpmnIT {
     BpmnAwareTests.assertThat(processInstance)
         .hasPassed("searchLabFormActivity", "viewLabDataFormActivity", "updateLabFormActivity")
         .isEnded();
+
+    assertSystemSignature(processInstanceId, "system_signature_ceph_key",
+        "/json/update-lab/digitalSignatureCephContent.json");
   }
 }

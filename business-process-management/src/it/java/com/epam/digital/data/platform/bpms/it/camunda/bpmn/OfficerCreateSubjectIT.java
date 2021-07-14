@@ -1,11 +1,11 @@
 package com.epam.digital.data.platform.bpms.it.camunda.bpmn;
 
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.historyService;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
-import com.epam.digital.data.platform.bpms.it.util.TestUtils;
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.google.common.io.ByteStreams;
 import java.util.LinkedHashMap;
@@ -16,8 +16,10 @@ import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-@Deployment(resources = {"bpmn/officer-create-subject-bp.bpmn"})
+@Deployment(resources = {"bpmn/officer-create-subject-bp.bpmn", "bpmn/system-signature-bp.bpmn"})
 public class OfficerCreateSubjectIT extends BaseBpmnIT {
 
   @Test
@@ -27,6 +29,8 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
     var testUserToken = new String(ByteStreams
         .toByteArray(Objects.requireNonNull(
             getClass().getResourceAsStream("/json/officer-create-subject/legalUserToken.txt"))));
+    SecurityContextHolder.getContext().setAuthentication(
+        new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
@@ -37,11 +41,13 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
         .build());
     stubDigitalSignatureRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .requestBody("/json/officer-create-subject/dso/subjectSystemSignatureRequest.json")
         .response("{\"signature\": \"userSignature\"}")
         .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject")
         .requestBody("/json/officer-create-subject/data-factory/postSubjectRequest.json")
         .response("{}")
@@ -71,26 +77,21 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
     completeTask(signSubjectTaskDefinitionKey, processInstanceId,
         "/json/officer-create-subject/ceph/sign-subject-officer-create-task.json");
 
-    addCompleterUsernameVariable(signSubjectTaskDefinitionKey, null);
+    addCompleterUsernameVariable(signSubjectTaskDefinitionKey, testUserName);
     addExpectedCephContent(processInstanceId, signSubjectTaskDefinitionKey,
         "/json/officer-create-subject/ceph/sign-subject-officer-create-task.json");
 
-    var subjectSettingsSystemSignatureCephKeyRefVarName = "subject_system_signature_ceph_key";
-    var subjectSettingsSystemSignatureCephKey = "lowcode_" + processInstanceId + "_" +
-        subjectSettingsSystemSignatureCephKeyRefVarName;
+    var processInstances = historyService().createHistoricProcessInstanceQuery()
+        .superProcessInstanceId(processInstanceId).orderByProcessInstanceEndTime().asc()
+        .list();
+    Assertions.assertThat(processInstances).hasSize(1);
 
-    var subjectSettingsSignature = cephService
-        .getContent(cephBucketName, subjectSettingsSystemSignatureCephKey).get();
-    var subjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
-        .readValue(subjectSettingsSignature);
-    var expectedSubjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
-        .readValue(TestUtils.getContent(
-            "/json/officer-create-subject/dso/subjectSignatureCephContent.json"));
-    Assertions.assertThat(subjectSettingsSignatureMap)
-        .isEqualTo(expectedSubjectSettingsSignatureMap);
+    var systemSignatureCephKey = "lowcode_" + processInstanceId + "_" +
+        processInstances.get(0).getId() + "_system_signature_ceph_key";
+    addExpectedVariable("subject_system_signature_ceph_key", systemSignatureCephKey);
 
-    addExpectedVariable(subjectSettingsSystemSignatureCephKeyRefVarName,
-        subjectSettingsSystemSignatureCephKey);
+    assertSystemSignature(processInstanceId, "subject_system_signature_ceph_key",
+        "/json/officer-create-subject/dso/subjectSignatureCephContent.json");
 
     addExpectedVariable("sys-var-process-completion-result", "Суб'єкт створено");
 
@@ -107,6 +108,8 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
     var testUserToken = new String(ByteStreams
         .toByteArray(Objects.requireNonNull(
             getClass().getResourceAsStream("/json/officer-create-subject/indUserToken.txt"))));
+    SecurityContextHolder.getContext().setAuthentication(
+        new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
@@ -117,12 +120,14 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
         .build());
     stubDigitalSignatureRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .requestBody(
             "/json/officer-create-subject/dso/individual/subjectSystemSignatureRequest.json")
         .response("{\"signature\": \"userSignature\"}")
         .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject")
         .requestBody("/json/officer-create-subject/data-factory/individual/postSubjectRequest.json")
         .response("{}")
@@ -151,26 +156,21 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
     completeTask(signSubjectTaskDefinitionKey, processInstanceId,
         "/json/officer-create-subject/ceph/individual/sign-subject-officer-create-task.json");
 
-    addCompleterUsernameVariable(signSubjectTaskDefinitionKey, null);
+    addCompleterUsernameVariable(signSubjectTaskDefinitionKey, testUserName);
     addExpectedCephContent(processInstanceId, signSubjectTaskDefinitionKey,
         "/json/officer-create-subject/ceph/individual/sign-subject-officer-create-task.json");
 
-    var subjectSettingsSystemSignatureCephKeyRefVarName = "subject_system_signature_ceph_key";
-    var subjectSettingsSystemSignatureCephKey = "lowcode_" + processInstanceId + "_" +
-        subjectSettingsSystemSignatureCephKeyRefVarName;
+    var processInstances = historyService().createHistoricProcessInstanceQuery()
+        .superProcessInstanceId(processInstanceId).orderByProcessInstanceEndTime().asc()
+        .list();
+    Assertions.assertThat(processInstances).hasSize(1);
 
-    var subjectSettingsSignature = cephService
-        .getContent(cephBucketName, subjectSettingsSystemSignatureCephKey).get();
-    var subjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
-        .readValue(subjectSettingsSignature);
-    var expectedSubjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
-        .readValue(TestUtils.getContent(
-            "/json/officer-create-subject/dso/individual/subjectSignatureCephContent.json"));
-    Assertions.assertThat(subjectSettingsSignatureMap)
-        .isEqualTo(expectedSubjectSettingsSignatureMap);
+    var systemSignatureCephKey = "lowcode_" + processInstanceId + "_" +
+        processInstances.get(0).getId() + "_system_signature_ceph_key";
+    addExpectedVariable("subject_system_signature_ceph_key", systemSignatureCephKey);
 
-    addExpectedVariable(subjectSettingsSystemSignatureCephKeyRefVarName,
-        subjectSettingsSystemSignatureCephKey);
+    assertSystemSignature(processInstanceId, "subject_system_signature_ceph_key",
+        "/json/officer-create-subject/dso/individual/subjectSignatureCephContent.json");
 
     addExpectedVariable("sys-var-process-completion-result", "Суб'єкт створено");
 

@@ -18,6 +18,7 @@ import com.epam.digital.data.platform.starter.errorhandling.exception.SystemExce
 import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.google.common.collect.ImmutableMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.inject.Inject;
 import org.camunda.bpm.engine.test.Deployment;
@@ -214,16 +215,16 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
   public void testDataFactoryConnectorBatchCreateDelegate() {
     digitalSignatureMockServer.addStubMapping(stubFor(
         post(urlPathEqualTo("/api/eseal/sign"))
-            .withHeader("X-Access-Token", equalTo("token"))
+            .withHeader("X-Access-Token", equalTo(validAccessToken))
             .withRequestBody(equalTo(
                 "{\"data\":\"{\\\"data\\\":\\\"test data\\\",\\\"description\\\":\\\"some description\\\"}\"}"))
             .willReturn(aResponse().withStatus(200).withBody("{\"signature\":\"signature\"}"))));
 
     dataFactoryMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo("/mock-server/test"))
-            .withHeader("X-Access-Token", equalTo("token"))
+            .withHeader("X-Access-Token", equalTo(validAccessToken))
             .withHeader("X-Digital-Signature",
-                matching("lowcode-.*-secure-sys-var-ref-task-form-data-test_signature"))
+                matching("lowcode-.*-secure-sys-var-ref-task-form-data-test_token"))
             .withHeader("X-Digital-Signature-Derived",
                 matching("lowcode_.*_system_signature_ceph_key_0"))
             .withRequestBody(
@@ -232,16 +233,16 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
 
     digitalSignatureMockServer.addStubMapping(stubFor(
         post(urlPathEqualTo("/api/eseal/sign"))
-            .withHeader("X-Access-Token", equalTo("token"))
+            .withHeader("X-Access-Token", equalTo(validAccessToken))
             .withRequestBody(equalTo(
                 "{\"data\":\"{\\\"data2\\\":\\\"test data2\\\",\\\"description2\\\":\\\"some description2\\\"}\"}"))
             .willReturn(aResponse().withStatus(200).withBody("{\"signature\":\"signature2\"}"))));
 
     dataFactoryMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo("/mock-server/test"))
-            .withHeader("X-Access-Token", equalTo("token"))
+            .withHeader("X-Access-Token", equalTo(validAccessToken))
             .withHeader("X-Digital-Signature",
-                matching("lowcode-.*-secure-sys-var-ref-task-form-data-test_signature"))
+                matching("lowcode-.*-secure-sys-var-ref-task-form-data-test_token"))
             .withHeader("X-Digital-Signature-Derived",
                 matching("lowcode_.*_system_signature_ceph_key_1"))
             .withRequestBody(
@@ -253,9 +254,11 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
 
     var cephKeyToken = cephKeyProvider
         .generateKey("test_token", processInstance.getProcessInstanceId());
-    cephService.putFormData(cephKeyToken, FormDataDto.builder().accessToken("token").build());
+    cephService.putFormData(cephKeyToken, FormDataDto.builder().accessToken(validAccessToken)
+        .data(new LinkedHashMap<>()).build());
 
-    String taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionTask").singleResult().getId();
+    var taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionTask").singleResult()
+        .getId();
     taskService.complete(taskId);
 
     BpmnAwareTests.assertThat(processInstance).isEnded();

@@ -1,8 +1,6 @@
 package com.epam.digital.data.platform.bpms.delegate.connector;
 
-import com.epam.digital.data.platform.bpms.delegate.ceph.CephKeyProvider;
 import com.epam.digital.data.platform.bpms.delegate.dto.DataFactoryConnectorResponse;
-import com.epam.digital.data.platform.integration.ceph.service.FormDataCephService;
 import com.epam.digital.data.platform.starter.logger.annotation.Logging;
 import java.util.Map;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -27,10 +25,9 @@ public class DataFactoryConnectorSearchDelegate extends BaseConnectorDelegate {
 
   @Autowired
   public DataFactoryConnectorSearchDelegate(RestTemplate restTemplate,
-      FormDataCephService formDataCephService, CephKeyProvider cephKeyProvider,
       @Value("${spring.application.name}") String springAppName,
       @Value("${camunda.system-variables.const_dataFactoryBaseUrl}") String dataFactoryBaseUrl) {
-    super(restTemplate, formDataCephService, springAppName, cephKeyProvider);
+    super(restTemplate, springAppName);
     this.dataFactoryBaseUrl = dataFactoryBaseUrl;
   }
 

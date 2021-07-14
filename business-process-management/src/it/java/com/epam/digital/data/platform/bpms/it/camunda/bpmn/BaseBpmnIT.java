@@ -11,6 +11,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.historyService;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
 
 import com.epam.digital.data.platform.bpms.api.constant.Constants;
@@ -24,7 +25,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import javax.inject.Inject;
+import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
@@ -42,12 +43,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public abstract class BaseBpmnIT extends BaseIT {
 
-  private final String MOCK_SERVER = "/mock-server";
-  private final String SETTINGS_MOCK_SERVER = "/user-settings-mock-server";
+  private static final String MOCK_SERVER = "/mock-server";
+  private static final String SETTINGS_MOCK_SERVER = "/user-settings-mock-server";
 
   @Inject
   @Qualifier("digitalSignatureMockServer")
@@ -69,17 +72,23 @@ public abstract class BaseBpmnIT extends BaseIT {
   @Inject
   protected CephKeyProvider cephKeyProvider;
 
+  protected String testUserName = "testuser";
+  protected String testUserToken;
+
   protected final Map<String, Object> expectedVariablesMap = new HashMap<>();
   private final Map<String, Object> expectedCephStorage = new HashMap<>();
 
   @Before
-  public void init() {
+  public void init() throws IOException {
     cephService.clearStorage();
     expectedVariablesMap.clear();
     expectedCephStorage.clear();
     runtimeService.createProcessInstanceQuery().list().forEach(
         processInstance -> runtimeService
             .deleteProcessInstance(processInstance.getId(), "test clear"));
+    testUserToken = TestUtils.getContent("/json/testuserAccessToken.json");
+    SecurityContextHolder.getContext().setAuthentication(
+        new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
   }
 
   @After
@@ -88,6 +97,7 @@ public abstract class BaseBpmnIT extends BaseIT {
     dataFactoryMockServer.resetAll();
     userSettingsWireMock.resetAll();
     keycloakMockServer.resetAll();
+    SecurityContextHolder.getContext().setAuthentication(null);
   }
 
   protected void completeTask(String taskId, String processInstanceId, String formData)
@@ -123,8 +133,10 @@ public abstract class BaseBpmnIT extends BaseIT {
       uriBuilder.pathSegment(data.getResourceId());
     }
 
-    var mappingBuilder = getMappingBuilderForMethod(data.getHttpMethod(), uriBuilder.toUriString());
+    var mappingBuilder = getMappingBuilderForMethod(data.getHttpMethod(),
+        uriBuilder.encode().toUriString());
     data.getHeaders().forEach((key, value) -> mappingBuilder.withHeader(key, equalTo(value)));
+    mappingBuilder.withHeader("Content-Type", equalTo(MediaType.APPLICATION_JSON_VALUE));
 
     data.getQueryParams()
         .forEach((key, value) -> mappingBuilder.withQueryParam(key, equalTo(value)));
@@ -134,7 +146,9 @@ public abstract class BaseBpmnIT extends BaseIT {
     }
 
     mappingBuilder
-        .willReturn(aResponse().withStatus(200).withBody(TestUtils.getContent(data.getResponse())));
+        .willReturn(aResponse().withStatus(200)
+            .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+            .withBody(TestUtils.getContent(data.getResponse())));
     return mappingBuilder;
   }
 
@@ -151,79 +165,6 @@ public abstract class BaseBpmnIT extends BaseIT {
       default:
         throw new NullPointerException("Stub method isn't defined");
     }
-  }
-
-  protected void stubDataFactoryCreate(StubData data) throws IOException {
-    var uri = UriComponentsBuilder.fromPath(MOCK_SERVER).pathSegment(data.getResource()).build()
-        .toUri();
-    MappingBuilder mappingBuilder = post(urlPathEqualTo(uri.getPath()))
-        .withRequestBody(equalToJson(TestUtils.getContent(data.getRequestBody())))
-        .willReturn(aResponse().withStatus(200).withBody(TestUtils.getContent(data.getResponse())));
-
-    data.getHeaders().forEach((key, value) -> mappingBuilder.withHeader(key, equalTo(value)));
-    dataFactoryMockServer.addStubMapping(stubFor(mappingBuilder));
-  }
-
-  protected void stubDataFactoryRead(StubData data) throws IOException {
-    var uri = UriComponentsBuilder.fromPath(MOCK_SERVER).pathSegment(data.getResource())
-        .pathSegment(data.getResourceId()).build().toUri();
-    MappingBuilder mappingBuilder = get(urlPathEqualTo(uri.getPath()))
-        .willReturn(aResponse().withStatus(200).withBody(TestUtils.getContent(data.getResponse())));
-
-    data.getHeaders().forEach((key, value) -> mappingBuilder.withHeader(key, equalTo(value)));
-    dataFactoryMockServer.addStubMapping(stubFor(mappingBuilder));
-  }
-
-  protected void stubDataFactoryUpdate(StubData data) throws IOException {
-    var uri = UriComponentsBuilder.fromUri(URI.create(MOCK_SERVER)).pathSegment(data.getResource())
-        .pathSegment(data.getResourceId()).build().toUri();
-    MappingBuilder mappingBuilder = put(urlPathEqualTo(uri.getPath()))
-        .withRequestBody(equalToJson(TestUtils.getContent(data.getRequestBody())))
-        .willReturn(aResponse().withStatus(200).withBody(TestUtils.getContent(data.getResponse())));
-
-    data.getHeaders().forEach((key, value) -> mappingBuilder.withHeader(key, equalTo(value)));
-    dataFactoryMockServer.addStubMapping(stubFor(mappingBuilder));
-  }
-
-  protected void stubDataFactoryGet(StubData stubData) throws IOException {
-    var uri = UriComponentsBuilder.fromPath(MOCK_SERVER)
-        .pathSegment(stubData.getResource(), stubData.getResourceId()).encode().build().toUri();
-    var mappingBuilder = get(urlPathEqualTo(uri.getPath()))
-        .willReturn(aResponse().withStatus(200)
-            .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-            .withBody(TestUtils.getContent(stubData.getResponse())));
-    dataFactoryMockServer.addStubMapping(stubFor(mappingBuilder));
-  }
-
-  protected void stubUserSettingsRead(StubData stubData) throws IOException {
-    var uri = UriComponentsBuilder.fromPath(SETTINGS_MOCK_SERVER)
-        .pathSegment(stubData.getResource(), stubData.getResourceId()).encode().build().toUri();
-    var mappingBuilder = get(urlPathEqualTo(uri.getPath()))
-        .willReturn(aResponse().withStatus(200)
-            .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-            .withBody(TestUtils.getContent(stubData.getResponse())));
-    userSettingsWireMock.addStubMapping(stubFor(mappingBuilder));
-  }
-
-  protected void stubUserSettingsUpdate(StubData data) throws IOException {
-    var uri = UriComponentsBuilder.fromUri(URI.create(SETTINGS_MOCK_SERVER)).pathSegment(data.getResource())
-        .pathSegment(data.getResourceId()).build().toUri();
-    MappingBuilder mappingBuilder = put(urlPathEqualTo(uri.getPath()))
-        .withRequestBody(equalToJson(TestUtils.getContent(data.getRequestBody())))
-        .willReturn(aResponse().withStatus(200).withBody(TestUtils.getContent(data.getResponse())));
-
-    data.getHeaders().forEach((key, value) -> mappingBuilder.withHeader(key, equalTo(value)));
-    userSettingsWireMock.addStubMapping(stubFor(mappingBuilder));
-  }
-
-  protected void stubDigitalSignature(StubData data) throws IOException {
-    MappingBuilder mappingBuilder = post(urlPathEqualTo("/api/eseal/sign"))
-        .withRequestBody(equalToJson(TestUtils.getContent(data.getRequestBody())))
-        .willReturn(aResponse().withStatus(200).withBody(TestUtils.getContent(data.getResponse())));
-
-    data.getHeaders().forEach((key, value) -> mappingBuilder.withHeader(key, equalTo(value)));
-
-    digitalSignatureMockServer.addStubMapping(stubFor(mappingBuilder));
   }
 
   protected void stubSearchSubjects(String responseXmlFilePath) throws Exception {
@@ -258,7 +199,6 @@ public abstract class BaseBpmnIT extends BaseIT {
     try {
       return this.objectMapper.readValue(formData, FormDataDto.class);
     } catch (JsonProcessingException var4) {
-      var4.clearLocation();
       throw new IllegalStateException("Couldn't deserialize form data", var4);
     }
   }
@@ -313,5 +253,29 @@ public abstract class BaseBpmnIT extends BaseIT {
     assertThat(processInstance).variables().hasSize(expectedVariablesMap.size())
         .containsAllEntriesOf(expectedVariablesMap);
     assertCephContent();
+  }
+
+  @SneakyThrows
+  protected void assertSystemSignature(String processInstanceId, String variableName,
+      String cephContent) {
+    var variables = historyService().createHistoricVariableInstanceQuery()
+        .processInstanceId(processInstanceId).list();
+
+    var signatureCephKeyVar = variables.stream()
+        .filter(variable -> variable.getName().equals(variableName)).findAny();
+    Assertions.assertThat(signatureCephKeyVar).isNotEmpty();
+
+    var signatureCephKey = (String) signatureCephKeyVar.get().getValue();
+    Assertions.assertThat(signatureCephKey)
+        .matches("lowcode_" + processInstanceId + "_.+_system_signature_ceph_key");
+
+    var cephDoc = cephService.getContent(cephBucketName, signatureCephKey);
+    Assertions.assertThat(cephDoc).isPresent();
+
+    var actual = objectMapper.readerForMapOf(Object.class).readValue(cephDoc.get());
+    var expected = objectMapper.readerForMapOf(Object.class)
+        .readValue(TestUtils.getContent(cephContent));
+
+    Assertions.assertThat(actual).isEqualTo(expected);
   }
 }

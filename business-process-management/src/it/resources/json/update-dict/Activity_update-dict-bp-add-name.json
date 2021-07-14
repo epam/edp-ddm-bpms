@@ -2,6 +2,5 @@
   "data": {
     "name": "testName",
     "notes": "testNote"
-  },
-  "x-access-token": "token"
+  }
 }

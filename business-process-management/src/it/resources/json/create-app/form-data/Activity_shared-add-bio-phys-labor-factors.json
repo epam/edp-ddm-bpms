@@ -20,6 +20,5 @@
         "name": "string"
       }
     ]
-  },
-  "x-access-token": "token"
+  }
 }

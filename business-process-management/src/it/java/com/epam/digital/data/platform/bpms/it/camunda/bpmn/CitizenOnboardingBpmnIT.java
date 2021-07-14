@@ -1,9 +1,9 @@
 package com.epam.digital.data.platform.bpms.it.camunda.bpmn;
 
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.historyService;
 
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
-import com.epam.digital.data.platform.bpms.it.util.TestUtils;
 import com.google.common.io.ByteStreams;
 import java.util.Map;
 import java.util.Objects;
@@ -47,14 +47,17 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
   }
 
   @Test
-  @Deployment(resources = {"bpmn/citizen-onboarding-bp.bpmn"})
+  @Deployment(resources = {"bpmn/citizen-onboarding-bp.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void testHappyIndividualPass() throws Exception {
     var testUserToken = new String(ByteStreams
         .toByteArray(Objects.requireNonNull(
             getClass().getResourceAsStream("/json/citizen-onboarding/indUserToken.txt"))));
+    SecurityContextHolder.getContext().setAuthentication(
+        new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject-equal-subject-type-equal-subject-code")
         .queryParams(Map.of("subjectType", "INDIVIDUAL", "subjectCode", "1010101010"))
         .response("[]")
@@ -76,8 +79,6 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     addExpectedVariable("const_dataFactoryBaseUrl", "http://localhost:8877/mock-server");
 
     var createSubjectTaskDefinitionKey = "create_subject_task";
-    addExpectedCephContent(processInstanceId, "initiator_token_saving",
-        "/json/citizen-onboarding/ceph/initiator_ind_token_saving.json");
     addExpectedCephContent(processInstanceId, createSubjectTaskDefinitionKey,
         "/json/citizen-onboarding/ceph/create_subject_task_ind_prep.json");
 
@@ -86,7 +87,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     completeTask(createSubjectTaskDefinitionKey, processInstanceId,
         "/json/citizen-onboarding/ceph/create_subject_task_ind.json");
 
-    addCompleterUsernameVariable(createSubjectTaskDefinitionKey, null);
+    addCompleterUsernameVariable(createSubjectTaskDefinitionKey, testUserName);
 
     var signSubjectSettingsTaskDefinitionKey = "sign_subject_settings_task";
     addExpectedCephContent(processInstanceId, createSubjectTaskDefinitionKey,
@@ -99,12 +100,14 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
 
     stubDigitalSignatureRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .requestBody("/json/citizen-onboarding/dso/indSubjectSystemSignatureRequest.json")
         .response("{\"signature\": \"test\"}")
         .build());
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject")
         .requestBody("/json/citizen-onboarding/data-factory/postIndSubjectRequest.json")
         .response("{}")
@@ -120,6 +123,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject-equal-subject-type-equal-subject-code")
         .queryParams(Map.of("subjectType", "INDIVIDUAL", "subjectCode", "1010101010"))
         .response("/json/citizen-onboarding/data-factory/searchSubjectResponse.json")
@@ -127,13 +131,15 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
 
     stubDigitalSignatureRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .requestBody("/json/citizen-onboarding/dso/subjectProfileSystemSignatureRequest.json")
         .response("{\"signature\": \"test\"}")
         .build());
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
-        .resource("subject-profile")
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject-settings")
         .requestBody("/json/citizen-onboarding/data-factory/postSubjectProfileRequest.json")
         .response("{}")
         .build());
@@ -141,59 +147,52 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     completeTask(signSubjectSettingsTaskDefinitionKey, processInstanceId,
         "/json/citizen-onboarding/ceph/sign_subject_setting_task_ind.json");
 
-    addCompleterUsernameVariable(signSubjectSettingsTaskDefinitionKey, null);
+    addCompleterUsernameVariable(signSubjectSettingsTaskDefinitionKey, testUserName);
 
     addExpectedCephContent(processInstanceId, signSubjectSettingsTaskDefinitionKey,
         "/json/citizen-onboarding/ceph/sign_subject_setting_task_ind.json");
+    var processInstances = historyService().createHistoricProcessInstanceQuery()
+        .superProcessInstanceId(processInstanceId).orderByProcessInstanceEndTime().asc()
+        .list();
+    Assertions.assertThat(processInstances).hasSize(2);
 
-    var subjectSystemSignatureCephKeyRefVarName = "subject_system_signature_ceph_key";
     var subjectSystemSignatureCephKey = "lowcode_" + processInstanceId + "_" +
-        subjectSystemSignatureCephKeyRefVarName;
+        processInstances.get(0).getId() + "_system_signature_ceph_key";
+    addExpectedVariable("subject_system_signature_ceph_key", subjectSystemSignatureCephKey);
 
-    var subjectSignature = cephService.getContent(cephBucketName, subjectSystemSignatureCephKey).get();
-    var signatureMap = objectMapper.readerForMapOf(Object.class).readValue(subjectSignature);
-    var expectedSignatureMap = objectMapper.readerForMapOf(Object.class).readValue(TestUtils
-        .getContent("/json/citizen-onboarding/dso/indSubjectSignatureCephContent.json"));
-    Assertions.assertThat(signatureMap).isEqualTo(expectedSignatureMap);
-
-    var subjectSettingsSystemSignatureCephKeyRefVarName = "subject_settings_system_signature_ceph_key";
     var subjectSettingsSystemSignatureCephKey = "lowcode_" + processInstanceId + "_" +
-        subjectSettingsSystemSignatureCephKeyRefVarName;
-
-    var subjectSettingsSignature = cephService
-        .getContent(cephBucketName, subjectSettingsSystemSignatureCephKey).get();
-    var subjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
-        .readValue(subjectSettingsSignature);
-    var expectedSubjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
-        .readValue(TestUtils.getContent(
-            "/json/citizen-onboarding/dso/subjectProfileSignatureCephContent.json"));
-    Assertions.assertThat(subjectSettingsSignatureMap)
-        .isEqualTo(expectedSubjectSettingsSignatureMap);
-
-    addExpectedVariable(subjectSettingsSystemSignatureCephKeyRefVarName,
+        processInstances.get(1).getId() + "_system_signature_ceph_key";
+    addExpectedVariable("subject_settings_system_signature_ceph_key",
         subjectSettingsSystemSignatureCephKey);
-    addExpectedVariable(subjectSystemSignatureCephKeyRefVarName, subjectSystemSignatureCephKey);
 
     assertWaitingActivity(processInstance, "end_process_task", "shared-end-process");
     completeTask("end_process_task", processInstanceId, "{}");
 
-    addCompleterUsernameVariable("end_process_task", null);
+    addCompleterUsernameVariable("end_process_task", testUserName);
     addExpectedVariable("sys-var-process-completion-result", "Суб'єкт створено");
 
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
     assertCephContent();
+
+    assertSystemSignature(processInstanceId, "subject_system_signature_ceph_key",
+        "/json/citizen-onboarding/dso/indSubjectSignatureCephContent.json");
+    assertSystemSignature(processInstanceId, "subject_settings_system_signature_ceph_key",
+        "/json/citizen-onboarding/dso/subjectProfileSignatureCephContent.json");
   }
 
   @Test
-  @Deployment(resources = {"bpmn/citizen-onboarding-bp.bpmn"})
+  @Deployment(resources = {"bpmn/citizen-onboarding-bp.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void testHappyEntrepreneurPass() throws Exception {
     var testUserToken = new String(ByteStreams
         .toByteArray(Objects.requireNonNull(
             getClass().getResourceAsStream("/json/citizen-onboarding/entrUserToken.txt"))));
+    SecurityContextHolder.getContext().setAuthentication(
+        new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject-equal-subject-type-equal-subject-code")
         .queryParams(Map.of("subjectType", "ENTREPRENEUR", "subjectCode", "1010101010"))
         .response("/json/citizen-onboarding/data-factory/searchSubjectResponse.json")
@@ -217,8 +216,6 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     addExpectedVariable("const_dataFactoryBaseUrl", "http://localhost:8877/mock-server");
 
     var createSubjectTaskDefinitionKey = "create_subject_task";
-    addExpectedCephContent(processInstanceId, "initiator_token_saving",
-        "/json/citizen-onboarding/ceph/initiator_entr_token_saving.json");
     addExpectedCephContent(processInstanceId, createSubjectTaskDefinitionKey,
         "/json/citizen-onboarding/ceph/create_subject_task_entr_prep.json");
 
@@ -227,7 +224,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     completeTask(createSubjectTaskDefinitionKey, processInstanceId,
         "/json/citizen-onboarding/ceph/create_subject_task_entr.json");
 
-    addCompleterUsernameVariable(createSubjectTaskDefinitionKey, null);
+    addCompleterUsernameVariable(createSubjectTaskDefinitionKey, testUserName);
 
     var signSubjectSettingsTaskDefinitionKey = "sign_subject_settings_task";
     addExpectedCephContent(processInstanceId, createSubjectTaskDefinitionKey,
@@ -248,6 +245,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject-equal-subject-type-equal-subject-code")
         .queryParams(Map.of("subjectType", "ENTREPRENEUR", "subjectCode", "1010101010"))
         .response("/json/citizen-onboarding/data-factory/searchSubjectResponse.json")
@@ -255,13 +253,15 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
 
     stubDigitalSignatureRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .requestBody("/json/citizen-onboarding/dso/subjectProfileSystemSignatureRequest.json")
         .response("{\"signature\": \"test\"}")
         .build());
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
-        .resource("subject-profile")
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject-settings")
         .requestBody("/json/citizen-onboarding/data-factory/postSubjectProfileRequest.json")
         .response("{}")
         .build());
@@ -269,46 +269,46 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     completeTask(signSubjectSettingsTaskDefinitionKey, processInstanceId,
         "/json/citizen-onboarding/ceph/sign_subject_setting_task_entr.json");
 
-    addCompleterUsernameVariable(signSubjectSettingsTaskDefinitionKey, null);
+    addCompleterUsernameVariable(signSubjectSettingsTaskDefinitionKey, testUserName);
     addExpectedCephContent(processInstanceId, signSubjectSettingsTaskDefinitionKey,
         "/json/citizen-onboarding/ceph/sign_subject_setting_task_entr.json");
 
+    var processInstances = historyService().createHistoricProcessInstanceQuery()
+        .superProcessInstanceId(processInstanceId).orderByProcessInstanceEndTime().asc()
+        .list();
+    Assertions.assertThat(processInstances).hasSize(1);
+
     var subjectSettingsSystemSignatureCephKeyRefVarName = "subject_settings_system_signature_ceph_key";
     var subjectSettingsSystemSignatureCephKey = "lowcode_" + processInstanceId + "_" +
-        subjectSettingsSystemSignatureCephKeyRefVarName;
-
-    var subjectSettingsSignature = cephService
-        .getContent(cephBucketName, subjectSettingsSystemSignatureCephKey).get();
-    var subjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
-        .readValue(subjectSettingsSignature);
-    var expectedSubjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
-        .readValue(TestUtils.getContent(
-            "/json/citizen-onboarding/dso/subjectProfileSignatureCephContent.json"));
-    Assertions.assertThat(subjectSettingsSignatureMap)
-        .isEqualTo(expectedSubjectSettingsSignatureMap);
-
+        processInstances.get(0).getId() + "_system_signature_ceph_key";
     addExpectedVariable(subjectSettingsSystemSignatureCephKeyRefVarName,
         subjectSettingsSystemSignatureCephKey);
 
     assertWaitingActivity(processInstance, "end_process_task", "shared-end-process");
     completeTask("end_process_task", processInstanceId, "{}");
     addExpectedVariable("sys-var-process-completion-result", "Суб'єкт створено");
-    addCompleterUsernameVariable("end_process_task", null);
+    addCompleterUsernameVariable("end_process_task", testUserName);
 
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
     assertCephContent();
+
+    assertSystemSignature(processInstanceId, "subject_settings_system_signature_ceph_key",
+        "/json/citizen-onboarding/dso/subjectProfileSignatureCephContent.json");
   }
 
   @Test
-  @Deployment(resources = {"bpmn/citizen-onboarding-bp.bpmn"})
+  @Deployment(resources = {"bpmn/citizen-onboarding-bp.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void testHappyLegalPass() throws Exception {
     var testUserToken = new String(ByteStreams
         .toByteArray(Objects.requireNonNull(
             getClass().getResourceAsStream("/json/citizen-onboarding/legalUserToken.txt"))));
 
+    SecurityContextHolder.getContext().setAuthentication(
+        new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject-equal-subject-type-equal-subject-code")
         .queryParams(Map.of("subjectType", "LEGAL", "subjectCode", "1010101010"))
         .response("/json/citizen-onboarding/data-factory/searchSubjectResponse.json")
@@ -323,7 +323,8 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
-        .resource("subject-profile-sc")
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject-settings-equal-settings-id")
         .queryParams(Map.of("settingsId", "settingsId"))
         .response("[]")
         .build());
@@ -338,8 +339,6 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     addExpectedVariable("const_dataFactoryBaseUrl", "http://localhost:8877/mock-server");
 
     var createSubjectTaskDefinitionKey = "create_subject_task";
-    addExpectedCephContent(processInstanceId, "initiator_token_saving",
-        "/json/citizen-onboarding/ceph/initiator_legal_token_saving.json");
     addExpectedCephContent(processInstanceId, createSubjectTaskDefinitionKey,
         "/json/citizen-onboarding/ceph/create_subject_task_legal_prep.json");
 
@@ -348,7 +347,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     completeTask(createSubjectTaskDefinitionKey, processInstanceId,
         "/json/citizen-onboarding/ceph/create_subject_task_legal.json");
 
-    addCompleterUsernameVariable(createSubjectTaskDefinitionKey, null);
+    addCompleterUsernameVariable(createSubjectTaskDefinitionKey, testUserName);
 
     var signSubjectSettingsTaskDefinitionKey = "sign_subject_settings_task";
     addExpectedCephContent(processInstanceId, createSubjectTaskDefinitionKey,
@@ -369,6 +368,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject-equal-subject-type-equal-subject-code")
         .queryParams(Map.of("subjectType", "INDIVIDUAL", "subjectCode", "1010101010"))
         .response("/json/citizen-onboarding/data-factory/searchSubjectResponse.json")
@@ -376,13 +376,15 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
 
     stubDigitalSignatureRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .requestBody("/json/citizen-onboarding/dso/subjectProfileSystemSignatureRequest.json")
         .response("{\"signature\": \"test\"}")
         .build());
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
-        .resource("subject-profile")
+        .resource("subject-settings")
+        .headers(Map.of("X-Access-Token", testUserToken))
         .requestBody("/json/citizen-onboarding/data-factory/postSubjectProfileRequest.json")
         .response("{}")
         .build());
@@ -390,35 +392,31 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     completeTask(signSubjectSettingsTaskDefinitionKey, processInstanceId,
         "/json/citizen-onboarding/ceph/sign_subject_setting_task_legal.json");
 
-    addCompleterUsernameVariable(signSubjectSettingsTaskDefinitionKey, null);
+    addCompleterUsernameVariable(signSubjectSettingsTaskDefinitionKey, testUserName);
     addExpectedCephContent(processInstanceId, signSubjectSettingsTaskDefinitionKey,
         "/json/citizen-onboarding/ceph/sign_subject_setting_task_legal.json");
 
-    var subjectSettingsSystemSignatureCephKeyRefVarName = "subject_settings_system_signature_ceph_key";
+    var processInstances = historyService().createHistoricProcessInstanceQuery()
+        .superProcessInstanceId(processInstanceId).orderByProcessInstanceEndTime().asc()
+        .list();
+    Assertions.assertThat(processInstances).hasSize(1);
+
     var subjectSettingsSystemSignatureCephKey = "lowcode_" + processInstanceId + "_" +
-        subjectSettingsSystemSignatureCephKeyRefVarName;
-
-    var subjectSettingsSignature = cephService
-        .getContent(cephBucketName, subjectSettingsSystemSignatureCephKey).get();
-    var subjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
-        .readValue(subjectSettingsSignature);
-    var expectedSubjectSettingsSignatureMap = objectMapper.readerForMapOf(Object.class)
-        .readValue(TestUtils.getContent(
-            "/json/citizen-onboarding/dso/subjectProfileSignatureCephContent.json"));
-    Assertions.assertThat(subjectSettingsSignatureMap)
-        .isEqualTo(expectedSubjectSettingsSignatureMap);
-
-    addExpectedVariable(subjectSettingsSystemSignatureCephKeyRefVarName,
+        processInstances.get(0).getId() + "_system_signature_ceph_key";
+    addExpectedVariable("subject_settings_system_signature_ceph_key",
         subjectSettingsSystemSignatureCephKey);
 
     assertWaitingActivity(processInstance, "end_process_task", "shared-end-process");
     completeTask("end_process_task", processInstanceId, "{}");
     addExpectedVariable("sys-var-process-completion-result", "Суб'єкт створено");
-    addCompleterUsernameVariable("end_process_task", null);
+    addCompleterUsernameVariable("end_process_task", testUserName);
 
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
     assertCephContent();
+
+    assertSystemSignature(processInstanceId, "subject_settings_system_signature_ceph_key",
+        "/json/citizen-onboarding/dso/subjectProfileSignatureCephContent.json");
   }
 
   @Test
@@ -429,11 +427,12 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         .toByteArray(Objects.requireNonNull(getClass()
             .getResourceAsStream("/json/citizen-onboarding/entrUserToken.txt"))));
 
-    var auth = new UsernamePasswordAuthenticationToken(testUserName, testUserToken);
-    SecurityContextHolder.getContext().setAuthentication(auth);
+    SecurityContextHolder.getContext().setAuthentication(
+        new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject-equal-subject-type-equal-subject-code")
         .queryParams(Map.of("subjectType", "ENTREPRENEUR", "subjectCode", "1010101010"))
         .response("/json/citizen-onboarding/data-factory/searchSubjectResponse.json")
@@ -448,7 +447,8 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
-        .resource("subject-profile-sc")
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject-settings-equal-settings-id")
         .queryParams(Map.of("settingsId", "settingsId"))
         .response("[{}]")
         .build());
@@ -459,11 +459,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         .processInstanceId(processInstanceId).singleResult();
 
     addExpectedVariable("initiator", testUserName);
-    addExpectedVariable("initiator_role", "unregistered-entrepreneur");
     addExpectedVariable("const_dataFactoryBaseUrl", "http://localhost:8877/mock-server");
-
-    addExpectedCephContent(processInstanceId, "initiator_token_saving",
-        "/json/citizen-onboarding/ceph/initiator_entr_token_saving.json");
 
     assertWaitingActivity(processInstance, "error_logout_task", "shared-error-logout");
   }

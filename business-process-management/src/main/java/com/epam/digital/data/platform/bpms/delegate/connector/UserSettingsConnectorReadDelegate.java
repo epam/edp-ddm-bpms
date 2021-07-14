@@ -1,8 +1,6 @@
 package com.epam.digital.data.platform.bpms.delegate.connector;
 
-import com.epam.digital.data.platform.bpms.delegate.ceph.CephKeyProvider;
 import com.epam.digital.data.platform.bpms.delegate.dto.DataFactoryConnectorResponse;
-import com.epam.digital.data.platform.integration.ceph.service.FormDataCephService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +22,9 @@ public class UserSettingsConnectorReadDelegate extends BaseConnectorDelegate {
   @Autowired
   public UserSettingsConnectorReadDelegate(
       RestTemplate restTemplate,
-      CephKeyProvider cephKeyProvider,
-      FormDataCephService formDataCephService,
       @Value("${spring.application.name}") String springAppName,
       @Value("${user-settings-service-api.url}") String userSettingsBaseUrl) {
-    super(restTemplate, formDataCephService, springAppName, cephKeyProvider);
+    super(restTemplate, springAppName);
     this.userSettingsBaseUrl = userSettingsBaseUrl;
   }
 

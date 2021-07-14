@@ -21,7 +21,7 @@ public class CompleterTaskEventListener implements TaskListener {
   @Override
   public void notify(DelegateTask delegateTask) {
     var taskDefinitionKey = delegateTask.getTaskDefinitionKey();
-    var variableScope = (AbstractVariableScope) delegateTask.getExecution();
+    AbstractVariableScope variableScope = getRootExecution(delegateTask);
     String completerToken = null;
     String completerName = null;
     var authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -36,5 +36,13 @@ public class CompleterTaskEventListener implements TaskListener {
     var completerVarResultToken = String.format(COMPLETER_VAR_TOKEN_FORMAT, taskDefinitionKey);
     variableScope.setVariable(completerVarResultName, completerName);
     variableScope.setVariableLocalTransient(completerVarResultToken, completerToken);
+  }
+
+  private AbstractVariableScope getRootExecution(DelegateTask delegateTask) {
+    var variableScope = (AbstractVariableScope) delegateTask.getExecution();
+    while (variableScope.getParentVariableScope() != null) {
+      variableScope = variableScope.getParentVariableScope();
+    }
+    return variableScope;
   }
 }

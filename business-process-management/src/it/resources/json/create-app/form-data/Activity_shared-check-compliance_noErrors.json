@@ -3,6 +3,5 @@
     "name": "labName",
     "registrationNo": "1234567890-primary-add",
     "errorCheckFlag": false
-  },
-  "x-access-token": "token"
+  }
 }

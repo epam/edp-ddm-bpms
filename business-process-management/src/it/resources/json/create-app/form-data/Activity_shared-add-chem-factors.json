@@ -27,6 +27,5 @@
       }
     ],
     "errorCheckFlag": false
-  },
-  "x-access-token": "token"
+  }
 }
