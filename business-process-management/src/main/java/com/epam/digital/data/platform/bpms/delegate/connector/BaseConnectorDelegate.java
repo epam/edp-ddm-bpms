@@ -69,7 +69,15 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
     headers.add(PlatformHttpHeader.X_SOURCE_BUSINESS_PROCESS.getName(),
         ((ExecutionEntity) delegateExecution).getProcessDefinition().getName());
     headers.add(PlatformHttpHeader.X_SOURCE_BUSINESS_ACTIVITY.getName(),
+        delegateExecution.getCurrentActivityName());
+    headers.add(PlatformHttpHeader.X_SOURCE_BUSINESS_ACTIVITY_INSTANCE_ID.getName(),
         delegateExecution.getActivityInstanceId());
+    headers.add(PlatformHttpHeader.X_SOURCE_BUSINESS_ACTIVITY_DEFINITION_ID.getName(),
+        delegateExecution.getCurrentActivityId());
+    headers.add(PlatformHttpHeader.X_SOURCE_BUSINESS_PROCESS_INSTANCE_ID.getName(),
+        delegateExecution.getProcessInstanceId());
+    headers.add(PlatformHttpHeader.X_SOURCE_BUSINESS_PROCESS_DEFINITION_ID.getName(),
+        delegateExecution.getProcessDefinitionId());
 
     getAccessToken(delegateExecution).ifPresent(xAccessToken ->
         headers.add(PlatformHttpHeader.X_ACCESS_TOKEN.getName(), xAccessToken));
