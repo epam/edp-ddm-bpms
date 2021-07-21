@@ -83,13 +83,13 @@
             <div style="box-sizing: border-box; font-size: 0; text-align: center; ">
               <div
                 style="display: inline-block; font-size: 12px; font-family: Helvetica; color: #000000; line-height: 1.2; pointer-events: all; white-space: nowrap; ">
-                <font style="font-size: 10px">backend-ceph-bucket</font>
+                <font style="font-size: 10px">lowcode-form-data-storage</font>
               </div>
             </div>
           </div>
         </foreignObject>
         <text x="435" y="717" fill="#000000" font-family="Helvetica" font-size="12px"
-          text-anchor="middle">backend-ceph-bucket
+          text-anchor="middle">lowcode-form-data-storage
         </text>
       </switch>
     </g>

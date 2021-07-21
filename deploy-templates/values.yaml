@@ -27,7 +27,7 @@ ingress: # expose the service with a route or an ingress depending on platform t
   platform: openshift # openshift or kubernetes
 
 ceph:
-  bucketName: backend-ceph-bucket
+  bucketName: lowcode-form-data-storage
 
 fileStorage:
   bucketName: lowcode-file-storage
