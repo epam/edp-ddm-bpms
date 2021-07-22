@@ -10,6 +10,7 @@ appConfigMountPath: "/app/config/main"
 camundaVarsMountPath: "/app/config/camunda"
 appSecretsMountPath: "/app/secrets/main"
 cephSecretMountPath: "/app/secrets/ceph"
+fileStorageSecretMountPath: "/app/secrets/fileStorage"
 citizenKeycloakClientSecretsMountPath: "/app/secrets/citizen-realm-admin-client"
 officerKeycloakClientSecretsMountPath: "/app/secrets/officer-realm-admin-client"
 prometheusScrapePath: "/actuator/prometheus"
@@ -27,6 +28,9 @@ ingress: # expose the service with a route or an ingress depending on platform t
 
 ceph:
   bucketName: backend-ceph-bucket
+
+fileStorage:
+  bucketName: lowcode-file-storage
 
 monitoring:
   namespace: openshift-monitoring

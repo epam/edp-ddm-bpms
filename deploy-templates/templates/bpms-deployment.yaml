@@ -102,6 +102,10 @@ spec:
             mountPath: {{ .Values.camundaVarsMountPath }}
           - name: {{ .Chart.Name }}-ceph-bucket-credentials
             mountPath: {{ .Values.cephSecretMountPath }}
+          {{ if (lookup "v1" "Secret" .Release.Namespace .Values.fileStorage.bucketName) }}
+          - name: {{ .Values.fileStorage.bucketName }}-credentials
+            mountPath: {{ .Values.fileStorageSecretMountPath }}
+          {{- end }}
           - name: {{ .Values.keycloak.citizenClient.secretName }}
             mountPath: {{ .Values.citizenKeycloakClientSecretsMountPath }}
           - name: {{ .Values.keycloak.officerClient.secretName }}
@@ -133,6 +137,14 @@ spec:
               path: ceph.access-key
             - key: AWS_SECRET_ACCESS_KEY
               path: ceph.secret-key
+        - name: {{ .Values.fileStorage.bucketName }}-credentials
+          secret:
+            secretName: {{ .Values.fileStorage.bucketName }}
+            items:
+            - key: AWS_ACCESS_KEY_ID
+              path: ceph.file-storage-access-key
+            - key: AWS_SECRET_ACCESS_KEY
+              path: ceph.file-storage-secret-key
         - name: {{ .Chart.Name }}-camunda-global-system-vars
           configMap:
             name: {{ .Chart.Name }}-camunda-global-system-vars
