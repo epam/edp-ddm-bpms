@@ -269,6 +269,37 @@ CamundaSystemVariablesSupportListener o- PutFormDataToCephTaskListener
 Якщо інпут параметр `userTaskInputFormDataPrepopulate` буде `null` або іншого від `SpinJsonNode` типу, то `PutFormDataToCephTaskListener` не збереже його у Ceph
 --
 
+== Видалення файлів з Ceph перед завершенням бізнес-процесу
+
+Для видалення файлів з Ceph було імплементовано наступну ієрархію класів
+
+[plantuml,ceph-cleaner-listener,svg]
+----
+@startuml
+class AbstractBpmnParseListener {
+  parseEndEvent()
+}
+
+class CamundaSystemVariablesSupportListener #back:lightblue;line:green;text:black extends AbstractBpmnParseListener {
+  parseEndEvent()
+}
+
+interface ExecutionListener {
+  notify(DelegateExecution)
+}
+
+class FileCleanerEndEventListener #back:lightblue;line:green;text:black implements ExecutionListener {
+  void notify(DelegateExecution)
+}
+
+CamundaSystemVariablesSupportListener o- FileCleanerEndEventListener
+@enduml
+----
+
+- `FileCleanerEndEventListener` отримує ідентифікатор екземпляра бізнес-процесу та формує префікс формату `process/{processInstanceId}/` за яким отримує перелік ключів файлів збережених у Ceph, після чого видаляє файли за цим переліком.
+- `CamundaSystemVariablesSupportListener` містить екземпляр класу `FileCleanerEndEventListener` та у методі `parseEndEvent` додає цей об'єкт до загального списку `executionListeners` кінцевого івенту.
+
+
 == Маппинг виключень на HTTP відповідь
 
 У разі виникнення виключної ситуації Camunda маппить це виключення використовуючи `ExceptionMapper`

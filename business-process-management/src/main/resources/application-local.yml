@@ -31,6 +31,9 @@ ceph:
   access-key: access-key
   secret-key: secret-key
   bucket: bucket
+  file-storage-access-key: file-access-key
+  file-storage-secret-key: file-secret-key
+  file-storage-bucket: file-bucket
 
 keycloak:
   url: http://localhost:8200/auth

@@ -1,7 +1,16 @@
 package com.epam.digital.data.platform.bpms.config;
 
+import com.amazonaws.ClientConfiguration;
+import com.amazonaws.Protocol;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.epam.digital.data.platform.bpms.exception.handler.ConnectorResponseErrorHandler;
 import com.epam.digital.data.platform.integration.ceph.config.CephConfig;
+import com.epam.digital.data.platform.integration.ceph.service.S3ObjectCephService;
+import com.epam.digital.data.platform.integration.ceph.service.impl.S3ObjectCephServiceImpl;
 import java.util.stream.Stream;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,5 +60,32 @@ public class GeneralConfig {
           .map(bf::getBeanDefinition)
           .forEach(it -> it.setDependsOn("databaseStartupValidator"));
     };
+  }
+
+  @Bean
+  public S3ObjectCephService s3FileStorageCephService(
+      @Value("${ceph.file-storage-bucket}") String cephBucketName,
+      AmazonS3 cephAmazonFileStorageS3) {
+    return new S3ObjectCephServiceImpl(cephBucketName, cephAmazonFileStorageS3);
+  }
+
+  @Bean
+  public AmazonS3 cephAmazonFileStorageS3(
+      @Value("${ceph.http-endpoint}") String cephHttpEndpoint,
+      @Value("${ceph.file-storage-access-key}") String cephAccessKey,
+      @Value("${ceph.file-storage-secret-key}") String cephSecretKey) {
+
+    var credentials = new AWSStaticCredentialsProvider(
+        new BasicAWSCredentials(cephAccessKey, cephSecretKey));
+
+    var clientConfig = new ClientConfiguration();
+    clientConfig.setProtocol(Protocol.HTTP);
+
+    return AmazonS3ClientBuilder.standard()
+        .withCredentials(credentials)
+        .withClientConfiguration(clientConfig)
+        .withEndpointConfiguration(new EndpointConfiguration(cephHttpEndpoint, null))
+        .withPathStyleAccessEnabled(true)
+        .build();
   }
 }

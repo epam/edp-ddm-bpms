@@ -1,5 +1,6 @@
 package com.epam.digital.data.platform.bpms.it.config;
 
+import com.epam.digital.data.platform.integration.ceph.dto.CephObject;
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.epam.digital.data.platform.integration.ceph.exception.MisconfigurationException;
 import com.epam.digital.data.platform.integration.ceph.service.CephService;
@@ -31,13 +32,23 @@ public class TestCephServiceImpl implements CephService, FormDataCephService {
   }
 
   @Override
+  public Optional<CephObject> getObject(String s, String s1) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public void putContent(String cephBucketName, String key, String content) {
     verifyBucketName(cephBucketName);
     storage.put(key, content);
   }
 
   @Override
-  public void deleteContent(String cephBucketName, String key) {
+  public void putObject(String cephBucketName, String key, CephObject cephObject) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void deleteObject(String cephBucketName, String key) {
     verifyBucketName(cephBucketName);
     storage.remove(key);
   }

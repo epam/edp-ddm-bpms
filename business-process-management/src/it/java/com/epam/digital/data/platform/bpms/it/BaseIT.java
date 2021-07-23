@@ -12,6 +12,7 @@ import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT
 
 import com.epam.digital.data.platform.bpms.delegate.ceph.CephKeyProvider;
 import com.epam.digital.data.platform.bpms.it.config.TestCephServiceImpl;
+import com.epam.digital.data.platform.bpms.it.config.TestS3ObjectCephServiceImpl;
 import com.epam.digital.data.platform.bpms.it.util.TestUtils;
 import com.epam.digital.data.platform.starter.security.SystemRole;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -70,6 +71,8 @@ public abstract class BaseIT {
   protected TestCephServiceImpl cephService;
   @Inject
   protected CephKeyProvider cephKeyProvider;
+  @Inject
+  protected TestS3ObjectCephServiceImpl testS3ObjectCephService;
   @Inject
   private AuthorizationService authorizationService;
   @Inject

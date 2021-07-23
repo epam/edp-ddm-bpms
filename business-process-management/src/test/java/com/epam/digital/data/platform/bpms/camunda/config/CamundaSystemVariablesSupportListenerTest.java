@@ -10,6 +10,7 @@ import com.epam.digital.data.platform.bpms.config.CamundaProperties;
 import com.epam.digital.data.platform.bpms.config.CamundaSystemVariablesSupportListener;
 import com.epam.digital.data.platform.bpms.listener.AuthorizationStartEventListener;
 import com.epam.digital.data.platform.bpms.listener.CompleterTaskEventListener;
+import com.epam.digital.data.platform.bpms.listener.FileCleanerEndEventListener;
 import com.epam.digital.data.platform.bpms.listener.InitiatorTokenStartEventListener;
 import com.epam.digital.data.platform.bpms.listener.PutFormDataToCephTaskListener;
 import java.util.List;
@@ -47,6 +48,8 @@ public class CamundaSystemVariablesSupportListenerTest {
   @Mock
   private UserTaskActivityBehavior userTaskActivityBehavior;
   @Mock
+  private FileCleanerEndEventListener fileCleanerEndEventListener;
+  @Mock
   private TaskDefinition taskDefinition;
 
   private CamundaSystemVariablesSupportListener camundaSystemVariablesSupportListener;
@@ -55,7 +58,7 @@ public class CamundaSystemVariablesSupportListenerTest {
   public void init() {
     camundaSystemVariablesSupportListener = new CamundaSystemVariablesSupportListener(
         camundaProperties, authorizationStartEventListener, initiatorTokenStartEventListener,
-        completerTaskEventListener, putFormDataToCephTaskListener);
+        completerTaskEventListener, putFormDataToCephTaskListener, fileCleanerEndEventListener);
   }
 
   @Test
@@ -89,5 +92,14 @@ public class CamundaSystemVariablesSupportListenerTest {
         .addTaskListener(eq(TaskListener.EVENTNAME_COMPLETE), captor.capture());
     verify(taskDefinition, times(1))
         .addTaskListener(eq(TaskListener.EVENTNAME_CREATE), captor.capture());
+  }
+
+  @Test
+  public void shouldAddEndEventListener() {
+    camundaSystemVariablesSupportListener.parseEndEvent(null, null, activity);
+
+    ArgumentCaptor<ExecutionListener> captor = ArgumentCaptor.forClass(ExecutionListener.class);
+    verify(activity, times(1))
+        .addListener(eq(ExecutionListener.EVENTNAME_END), captor.capture());
   }
 }
