@@ -97,6 +97,11 @@ spec:
               configMapKeyRef:
                 name: {{ .Values.ceph.bucketName }}
                 key: BUCKET_NAME
+          - name: ceph.file-storage-bucket
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Values.fileStorage.bucketName }}
+                key: BUCKET_NAME
           - name: JAVA_OPTS
             value: {{ .Values.javaOpts }}
         volumeMounts:
