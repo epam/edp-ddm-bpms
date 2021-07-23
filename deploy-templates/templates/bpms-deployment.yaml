@@ -57,12 +57,6 @@ spec:
         ports:
           - containerPort: {{ .Values.port }}
             name: {{ .Chart.Name }}
-        - resources:
-            limits:
-              memory: 2Gi
-            requests:
-              cpu: 300m
-              memory: 1Gi
         livenessProbe:
           httpGet:
             path: {{ .Values.livenessPath }}
@@ -81,6 +75,12 @@ spec:
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 5
+        resources:
+          limits:
+            memory: 2Gi
+          requests:
+            cpu: 300m
+            memory: 1Gi
         env:
           - name: CEPH_BUCKET_HOST
             valueFrom:
