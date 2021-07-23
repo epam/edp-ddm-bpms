@@ -57,6 +57,12 @@ spec:
         ports:
           - containerPort: {{ .Values.port }}
             name: {{ .Chart.Name }}
+        - resources:
+            limits:
+              memory: 2Gi
+            requests:
+              cpu: 300m
+              memory: 1Gi
         livenessProbe:
           httpGet:
             path: {{ .Values.livenessPath }}

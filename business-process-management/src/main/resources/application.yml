@@ -27,6 +27,11 @@ spring:
       correlation-enabled: true
       correlation-fields: x-request-id
       remote-fields: x-request-id, x-access-token
+  datasource:
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      max-lifetime: 600000
 
 # Configuration => prometheus.yml:
 #   scrape_configs:
