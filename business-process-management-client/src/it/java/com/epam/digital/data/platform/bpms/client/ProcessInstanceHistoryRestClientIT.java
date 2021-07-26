@@ -10,15 +10,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.epam.digital.data.platform.bpms.api.dto.HistoryProcessInstanceQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.enums.SortOrder;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import java.util.Collections;
 import java.util.Date;
+import lombok.SneakyThrows;
 import org.assertj.core.util.Lists;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 public class ProcessInstanceHistoryRestClientIT extends BaseIT {
+
+  private static final String HISTORY_PROCESS_INSTANCE_URL = "/api/history/process-instance";
 
   @Autowired
   private ProcessInstanceHistoryRestClient processInstanceHistoryRestClient;
@@ -34,7 +41,7 @@ public class ProcessInstanceHistoryRestClientIT extends BaseIT {
     var historicProcessInstanceDto = HistoricProcessInstanceDto
         .fromHistoricProcessInstance(historicProcessInstanceEntity);
     restClientWireMock.addStubMapping(
-        stubFor(get(urlPathEqualTo("/api/history/process-instance"))
+        stubFor(get(urlPathEqualTo(HISTORY_PROCESS_INSTANCE_URL))
             .withQueryParam("sortOrder", equalTo("asc"))
             .withQueryParam("unfinished", equalTo("true"))
             .withQueryParam("sortBy", equalTo("startTime"))
@@ -49,7 +56,7 @@ public class ProcessInstanceHistoryRestClientIT extends BaseIT {
 
     // init list of finished process instance response
     restClientWireMock.addStubMapping(
-        stubFor(get(urlPathEqualTo("/api/history/process-instance"))
+        stubFor(get(urlPathEqualTo(HISTORY_PROCESS_INSTANCE_URL))
             .withQueryParam("rootProcessInstances", equalTo("true"))
             .withQueryParam("finished", equalTo("true"))
             .willReturn(aResponse()
@@ -76,6 +83,47 @@ public class ProcessInstanceHistoryRestClientIT extends BaseIT {
     assertThat(processInstances.get(0).getProcessDefinitionName())
         .isEqualTo("processDefinitionName");
     assertThat(processInstances.get(0).getStartTime()).isEqualTo(new Date(10000L));
+  }
+
+  @Test
+  @SneakyThrows
+  public void shouldReturnHistoryListWithSetFirstAndMaxResult() {
+    var resultWithOffset = new HistoricProcessInstanceEntity();
+    resultWithOffset.setId("id");
+    resultWithOffset.setProcessDefinitionId("offsetId");
+    resultWithOffset.setProcessDefinitionName("offsetName");
+    resultWithOffset.setStartTime(new Date(420L));
+    var offsetDto = HistoricProcessInstanceDto
+        .fromHistoricProcessInstance(resultWithOffset);
+
+    restClientWireMock.addStubMapping(
+        stubFor(
+            get(urlPathEqualTo(HISTORY_PROCESS_INSTANCE_URL))
+                .withQueryParam("firstResult", equalTo("10"))
+                .withQueryParam("maxResult", equalTo("1"))
+                .willReturn(aResponse()
+                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .withStatus(HttpStatus.OK.value())
+                    .withBody(
+                        objectMapper.writeValueAsString(
+                            Collections.singletonList(offsetDto)
+                        )
+                    ))
+        )
+    );
+    var processInstances = processInstanceHistoryRestClient.getProcessInstances(
+        HistoryProcessInstanceQueryDto.builder()
+            .firstResult(10)
+            .maxResult(1)
+            .build()
+    );
+
+    assertThat(processInstances.size()).isOne();
+    assertThat(processInstances.get(0).getId()).isEqualTo("id");
+    assertThat(processInstances.get(0).getProcessDefinitionId()).isEqualTo("offsetId");
+    assertThat(processInstances.get(0).getProcessDefinitionName())
+        .isEqualTo("offsetName");
+    assertThat(processInstances.get(0).getStartTime()).isEqualTo(new Date(420L));
   }
 
   @Test

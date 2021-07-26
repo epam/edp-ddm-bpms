@@ -15,6 +15,8 @@ public class HistoryProcessInstanceQueryDto {
   private boolean finished;
   private String sortBy;
   private String sortOrder;
+  private Integer firstResult;
+  private Integer maxResult;
 
   /**
    * The class represents a list of constants that is used for history process instance sorting.
