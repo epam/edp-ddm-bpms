@@ -1,5 +1,6 @@
 package com.epam.digital.data.platform.bpms.client;
 
+import com.epam.digital.data.platform.bpms.api.dto.HistoryProcessInstanceCountQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.HistoryProcessInstanceQueryDto;
 import com.epam.digital.data.platform.bpms.client.exception.ProcessInstanceNotFoundException;
 import feign.error.ErrorCodes;
@@ -50,5 +51,5 @@ public interface ProcessInstanceHistoryRestClient extends BaseFeignClient {
    */
   @GetMapping("/count")
   @ErrorHandling
-  CountResultDto getProcessInstancesCount(@SpringQueryMap HistoryProcessInstanceQueryDto query);
+  CountResultDto getProcessInstancesCount(@SpringQueryMap HistoryProcessInstanceCountQueryDto query);
 }

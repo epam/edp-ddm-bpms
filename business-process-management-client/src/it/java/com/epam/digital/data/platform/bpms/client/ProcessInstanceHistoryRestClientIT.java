@@ -7,6 +7,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.epam.digital.data.platform.bpms.api.dto.HistoryProcessInstanceCountQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.HistoryProcessInstanceQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.enums.SortOrder;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -178,7 +179,7 @@ public class ProcessInstanceHistoryRestClientIT extends BaseIT {
     );
 
     var processInstances = processInstanceHistoryRestClient.getProcessInstancesCount(
-        HistoryProcessInstanceQueryDto.builder()
+        HistoryProcessInstanceCountQueryDto.builder()
         .rootProcessInstances(true)
         .finished(true)
         .build()
