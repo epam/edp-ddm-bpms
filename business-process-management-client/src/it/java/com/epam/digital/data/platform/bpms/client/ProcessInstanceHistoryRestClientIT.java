@@ -102,7 +102,7 @@ public class ProcessInstanceHistoryRestClientIT extends BaseIT {
         stubFor(
             get(urlPathEqualTo(HISTORY_PROCESS_INSTANCE_URL))
                 .withQueryParam("firstResult", equalTo("10"))
-                .withQueryParam("maxResult", equalTo("1"))
+                .withQueryParam("maxResults", equalTo("1"))
                 .willReturn(aResponse()
                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .withStatus(HttpStatus.OK.value())
@@ -116,7 +116,7 @@ public class ProcessInstanceHistoryRestClientIT extends BaseIT {
     var processInstances = processInstanceHistoryRestClient.getProcessInstances(
         HistoryProcessInstanceQueryDto.builder()
             .firstResult(10)
-            .maxResult(1)
+            .maxResults(1)
             .build()
     );
 
