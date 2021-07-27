@@ -15,6 +15,7 @@ import java.util.Date;
 import lombok.SneakyThrows;
 import org.assertj.core.util.Lists;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.junit.Before;
 import org.junit.Test;
@@ -159,5 +160,30 @@ public class ProcessInstanceHistoryRestClientIT extends BaseIT {
     var processInstances = processInstanceHistoryRestClient.getProcessInstanceById("testId");
 
     assertThat(processInstances.getId()).isEqualTo("testId");
+  }
+
+  @Test
+  public void shouldReturnHistoricProcessCount() throws JsonProcessingException {
+    var countDto = new CountResultDto(42);
+    restClientWireMock.addStubMapping(
+        stubFor(get(urlPathEqualTo("/api/history/process-instance/count"))
+            .withQueryParam("rootProcessInstances", equalTo("true"))
+            .withQueryParam("finished", equalTo("true"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withStatus(200)
+                .withBody(objectMapper.writeValueAsString(countDto))
+            )
+        )
+    );
+
+    var processInstances = processInstanceHistoryRestClient.getProcessInstancesCount(
+        HistoryProcessInstanceQueryDto.builder()
+        .rootProcessInstances(true)
+        .finished(true)
+        .build()
+    );
+
+    assertThat(processInstances.getCount()).isEqualTo(42);
   }
 }

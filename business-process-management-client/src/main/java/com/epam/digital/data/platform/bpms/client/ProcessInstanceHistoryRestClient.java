@@ -5,6 +5,7 @@ import com.epam.digital.data.platform.bpms.client.exception.ProcessInstanceNotFo
 import feign.error.ErrorCodes;
 import feign.error.ErrorHandling;
 import java.util.List;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
@@ -40,4 +41,14 @@ public interface ProcessInstanceHistoryRestClient extends BaseFeignClient {
       @ErrorCodes(codes = {404}, generate = ProcessInstanceNotFoundException.class)
   })
   HistoricProcessInstanceDto getProcessInstanceById(@PathVariable("id") String id);
+
+  /**
+   * Method for getting the number of camunda historic process instances
+   *
+   * @param query query map of possible parameters for request
+   * @return the number of camunda historic process instances
+   */
+  @GetMapping("/count")
+  @ErrorHandling
+  CountResultDto getProcessInstancesCount(@SpringQueryMap HistoryProcessInstanceQueryDto query);
 }
