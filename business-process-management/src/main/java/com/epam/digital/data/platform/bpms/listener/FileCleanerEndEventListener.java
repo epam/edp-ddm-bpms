@@ -25,8 +25,13 @@ public class FileCleanerEndEventListener implements ExecutionListener {
     var processInstanceId = execution.getProcessInstanceId();
     var prefix = String.format(PREFIX_FORMAT, processInstanceId);
     var keys = s3FileStorageCephService.getKeys(prefix);
-    if (!keys.isEmpty()) {
-      s3FileStorageCephService.delete(keys);
+    try {
+      if (!keys.isEmpty()) {
+        s3FileStorageCephService.delete(keys);
+      }
+    } catch (RuntimeException ex) {
+      log.warn("Error while deleting documents, processDefinitionId={} keys={}",
+          execution.getProcessDefinitionId(), keys, ex);
     }
   }
 }
