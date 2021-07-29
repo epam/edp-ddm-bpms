@@ -10,6 +10,7 @@ import static com.github.tomakehurst.wiremock.matching.RequestPatternBuilder.new
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.epam.digital.data.platform.bpms.api.dto.ProcessInstanceCountQueryDto;
 import com.epam.digital.data.platform.bpms.client.exception.ProcessInstanceVariableNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.http.RequestMethod;
@@ -28,7 +29,7 @@ public class ProcessInstanceRestClientIT extends BaseIT {
   @Test
   public void shouldReturnProcessInstancesCount() throws JsonProcessingException {
     restClientWireMock.addStubMapping(
-        stubFor(get(urlEqualTo("/api/process-instance/count"))
+        stubFor(get(urlEqualTo("/api/process-instance/count?rootProcessInstances=true"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(200)
@@ -36,7 +37,11 @@ public class ProcessInstanceRestClientIT extends BaseIT {
         )
     );
 
-    CountResultDto processInstancesCount = processInstanceRestClient.getProcessInstancesCount();
+    CountResultDto processInstancesCount = processInstanceRestClient.getProcessInstancesCount(
+        ProcessInstanceCountQueryDto.builder()
+            .rootProcessInstances(true)
+            .build()
+    );
 
     assertThat(processInstancesCount.getCount()).isOne();
   }
