@@ -4,6 +4,7 @@ import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
 import com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -27,8 +28,10 @@ public class TaskPropertyServiceImpl implements TaskPropertyService {
 
   @Override
   public Map<String, String> getTaskProperty(String taskId) {
-    return getCamundaProperties(taskId).stream().collect(
-        Collectors.toMap(CamundaProperty::getCamundaName, CamundaProperty::getCamundaValue));
+    Map<String, String> taskProperties = new HashMap<>();
+    var properties = getCamundaProperties(taskId);
+    properties.forEach(pr -> taskProperties.put(pr.getCamundaName(), pr.getCamundaValue()));
+    return taskProperties;
   }
 
   /**
