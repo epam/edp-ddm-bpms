@@ -8,11 +8,13 @@ import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.epam.digital.data.platform.bpms.exception.handler.ConnectorResponseErrorHandler;
+import com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory;
 import com.epam.digital.data.platform.integration.ceph.config.CephConfig;
 import com.epam.digital.data.platform.integration.ceph.service.S3ObjectCephService;
 import com.epam.digital.data.platform.integration.ceph.service.impl.S3ObjectCephServiceImpl;
 import java.util.stream.Stream;
 import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
@@ -87,5 +89,13 @@ public class GeneralConfig {
         .withEndpointConfiguration(new EndpointConfiguration(cephHttpEndpoint, null))
         .withPathStyleAccessEnabled(true)
         .build();
+  }
+
+  @Bean
+  @Qualifier("camundaAdminImpersonationFactory")
+  public CamundaImpersonationFactory camundaAdminImpersonationFactory(
+      @Value("${camunda.admin-user-id}") String administratorUserId,
+      @Value("${camunda.admin-group-id}") String administratorGroupName) {
+    return new CamundaImpersonationFactory(administratorUserId, administratorGroupName);
   }
 }

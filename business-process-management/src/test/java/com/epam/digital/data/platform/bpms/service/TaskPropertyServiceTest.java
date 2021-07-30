@@ -1,11 +1,16 @@
 package com.epam.digital.data.platform.bpms.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
+import com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.TaskService;
@@ -40,6 +45,17 @@ public class TaskPropertyServiceTest {
   private BpmnModelInstance bpmnModelInstance;
   @Mock
   private UserTask userTask;
+  @Mock
+  private CamundaImpersonationFactory camundaImpersonationFactory;
+  @Mock
+  private CamundaImpersonation camundaImpersonation;
+
+  @Test
+  public void shouldThrowExceptionIfImpersonationIsEmpty() {
+    when(camundaImpersonationFactory.getCamundaImpersonation()).thenReturn(Optional.empty());
+
+    assertThrows(IllegalStateException.class, () -> taskPropertyService.getTaskProperty(ID));
+  }
 
   @Test
   public void shouldReturnEmptyMapAsTaskHasEmptyProperty() {
@@ -58,9 +74,13 @@ public class TaskPropertyServiceTest {
     when(bpmnModelInstance.getModelElementsByType(UserTask.class)).thenReturn(userTasks);
     when(userTask.getId()).thenReturn(ID);
     when(task.getTaskDefinitionKey()).thenReturn(ID);
+    when(camundaImpersonationFactory.getCamundaImpersonation())
+        .thenReturn(Optional.of(camundaImpersonation));
 
     Map<String, String> taskProperties = taskPropertyService.getTaskProperty(ID);
 
     assertThat(taskProperties).isEmpty();
+    verify(camundaImpersonation).impersonate();
+    verify(camundaImpersonation).revertToSelf();
   }
 }

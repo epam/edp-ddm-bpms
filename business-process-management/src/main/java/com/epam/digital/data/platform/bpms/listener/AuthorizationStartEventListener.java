@@ -2,13 +2,10 @@ package com.epam.digital.data.platform.bpms.listener;
 
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
 
-import java.util.Collections;
-import java.util.Objects;
+import com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
@@ -16,8 +13,7 @@ import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.impl.identity.Authentication;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,32 +25,28 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AuthorizationStartEventListener implements ExecutionListener {
 
-  @Value("${camunda.admin-user-id}")
-  private final String administratorUserId;
-  @Value("${camunda.admin-group-id}")
-  private final String administratorGroupName;
+  @Qualifier("camundaAdminImpersonationFactory")
+  private final CamundaImpersonationFactory camundaImpersonationFactory;
 
   @Override
   public void notify(DelegateExecution execution) throws Exception {
     log.info("AuthorizationStartEventListener started...");
-    ProcessEngine processEngine = BpmPlatform.getDefaultProcessEngine();
-    if (processEngine == null) {
-      processEngine = ProcessEngines.getDefaultProcessEngine(false);
-    }
-    if (Objects.isNull(processEngine.getIdentityService().getCurrentAuthentication())) {
-      log.warn("User is not authenticated in Camunda IdentityService");
+    var optionalCamundaImpersonation = camundaImpersonationFactory.getCamundaImpersonation();
+    if (optionalCamundaImpersonation.isEmpty()) {
       return;
     }
-    Authentication currentAuthentication = processEngine.getIdentityService()
-        .getCurrentAuthentication();
+    var camundaImpersonation = optionalCamundaImpersonation.get();
+    var processEngine = camundaImpersonation.getProcessEngine();
+    var impersonator = camundaImpersonation.getImpersonator();
 
     //only admin user has rights for creation authorizations
-    processEngine.getIdentityService().setAuthentication(
-        new Authentication(administratorUserId, Collections.singletonList(administratorGroupName)));
-    addPermissionForProcessInstances(processEngine, execution, currentAuthentication.getUserId());
-    addPermissionReadHistory(processEngine, execution, currentAuthentication.getUserId());
-
-    processEngine.getIdentityService().setAuthentication(currentAuthentication);
+    try {
+      camundaImpersonation.impersonate();
+      addPermissionForProcessInstances(processEngine, execution, impersonator.getUserId());
+      addPermissionReadHistory(processEngine, execution, impersonator.getUserId());
+    } finally {
+      camundaImpersonation.revertToSelf();
+    }
     log.info("AuthorizationStartEventListener finished...");
   }
 

@@ -1,8 +1,9 @@
 package com.epam.digital.data.platform.bpms.service;
 
-import java.util.ArrayList;
+import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
+import com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -13,6 +14,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperties;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperty;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,13 +22,13 @@ import org.springframework.stereotype.Service;
 public class TaskPropertyServiceImpl implements TaskPropertyService {
 
   private final ProcessEngine processEngine;
+  @Qualifier("camundaAdminImpersonationFactory")
+  private final CamundaImpersonationFactory camundaImpersonationFactory;
 
   @Override
   public Map<String, String> getTaskProperty(String taskId) {
-    Map<String, String> taskProperties = new HashMap<>();
-    List<CamundaProperty> properties = getCamundaProperties(taskId);
-    properties.forEach(pr -> taskProperties.put(pr.getCamundaName(), pr.getCamundaValue()));
-    return taskProperties;
+    return getCamundaProperties(taskId).stream().collect(
+        Collectors.toMap(CamundaProperty::getCamundaName, CamundaProperty::getCamundaValue));
   }
 
   /**
@@ -39,21 +41,36 @@ public class TaskPropertyServiceImpl implements TaskPropertyService {
    * @return a list containing the CamundaProperty objects of the task
    */
   private List<CamundaProperty> getCamundaProperties(String taskId) {
-    List<CamundaProperty> camundaProperties = new ArrayList<>();
-    Task task = processEngine.getTaskService().createTaskQuery().taskId(taskId).singleResult();
-    if (Objects.nonNull(task)) {
-      Collection<UserTask> userTasks = processEngine
-          .getRepositoryService()
+    var optionalImpersonation = camundaImpersonationFactory.getCamundaImpersonation();
+    if (optionalImpersonation.isEmpty()) {
+      throw new IllegalStateException(
+          String.format("Error occurred during getting camunda extension properties for task %s. "
+              + "There is no user that authenticated in camunda", taskId));
+    }
+    var adminImpersonation = optionalImpersonation.get();
+
+    var task = processEngine.getTaskService().createTaskQuery().taskId(taskId).singleResult();
+    if (Objects.isNull(task)) {
+      return Collections.emptyList();
+    }
+
+    return getUserTasks(adminImpersonation, task).stream()
+        .filter(userTask -> userTask.getId().equals(task.getTaskDefinitionKey()))
+        .map(UserTask::getExtensionElements)
+        .filter(Objects::nonNull)
+        .flatMap(e -> e.getElementsQuery().filterByType(CamundaProperties.class).list().stream())
+        .flatMap(e -> e.getCamundaProperties().stream())
+        .collect(Collectors.toList());
+  }
+
+  private Collection<UserTask> getUserTasks(CamundaImpersonation adminImpersonation, Task task) {
+    adminImpersonation.impersonate();
+    try {
+      return processEngine.getRepositoryService()
           .getBpmnModelInstance(task.getProcessDefinitionId())
           .getModelElementsByType(UserTask.class);
-      camundaProperties = userTasks.stream()
-          .filter(userTask -> userTask.getId().equals(task.getTaskDefinitionKey()))
-          .map(UserTask::getExtensionElements)
-          .filter(Objects::nonNull)
-          .flatMap(e -> e.getElementsQuery().filterByType(CamundaProperties.class).list().stream())
-          .flatMap(e -> e.getCamundaProperties().stream())
-          .collect(Collectors.toList());
+    } finally {
+      adminImpersonation.revertToSelf();
     }
-    return camundaProperties;
   }
 }
