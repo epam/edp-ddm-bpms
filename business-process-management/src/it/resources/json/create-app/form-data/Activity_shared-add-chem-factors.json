@@ -1,0 +1,31 @@
+{
+  "data": {
+    "name": "labName",
+    "registrationNo": "1234567890-primary-add",
+    "chemfactgost": [
+      {
+        "factorId": "chemfactgost1",
+        "name": "string"
+      }
+    ],
+    "chemfacthyge": [
+      {
+        "factorId": "chemfacthyge1",
+        "name": "string"
+      }
+    ],
+    "chemfactobrv": [
+      {
+        "factorId": "chemfactobrv1",
+        "name": "string"
+      }
+    ],
+    "chemfactodovilni": [
+      {
+        "factorId": "chemfactodovilni1",
+        "name": "string"
+      }
+    ],
+    "errorCheckFlag": false
+  }
+}

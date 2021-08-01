@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1k0ac1n" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:process id="testTaskProperty_key" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="start" camunda:initiator="initiator">
+      <bpmn:outgoing>Flow_06ui25m</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_0fuo4v3" name="end">
+      <bpmn:incoming>Flow_0r9kanj</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0r9kanj" sourceRef="testTaskPropertyId" targetRef="Event_0fuo4v3" />
+    <bpmn:sequenceFlow id="Flow_06ui25m" sourceRef="StartEvent_1" targetRef="testTaskPropertyId" />
+    <bpmn:userTask id="testTaskPropertyId" name="Test task property" camunda:formKey="formwithcomponents" camunda:assignee="${initiator}">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="eSign" value="true" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_06ui25m</bpmn:incoming>
+      <bpmn:outgoing>Flow_0r9kanj</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testTaskProperty_key">
+      <bpmndi:BPMNEdge id="Flow_0r9kanj_di" bpmnElement="Flow_0r9kanj">
+        <di:waypoint x="330" y="120" />
+        <di:waypoint x="382" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06ui25m_di" bpmnElement="Flow_06ui25m">
+        <di:waypoint x="188" y="120" />
+        <di:waypoint x="230" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="159" y="145" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0fuo4v3_di" bpmnElement="Event_0fuo4v3">
+        <dc:Bounds x="382" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="391" y="145" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_176lxbu_di" bpmnElement="testTaskPropertyId">
+        <dc:Bounds x="230" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

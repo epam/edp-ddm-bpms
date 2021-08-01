@@ -1,0 +1,55 @@
+{
+  "data": {
+    "name": "labName",
+    "registrationNo": "1234567890-primary-add",
+    "errorCheckFlag": true,
+    "regComplianceFlag": true,
+    "regRefusalReason": [
+      {
+        "constantCode": "string",
+        "name": "string",
+        "refusalReasonId": "regRefusalReasonId1"
+      }
+    ],
+    "factorComplianceFlag": true,
+    "factorRefusalReason": [
+      {
+        "constantCode": "string",
+        "name": "string",
+        "refusalReasonId": "factorRefusalReasonId1"
+      }
+    ],
+    "zvtComplianceFlag": true,
+    "zvtRefusalReason": [
+      {
+        "constantCode": "string",
+        "name": "string",
+        "refusalReasonId": "zvtRefusalReasonId1"
+      }
+    ],
+    "staffComplianceFlag": true,
+    "staffRefusalReason": [
+      {
+        "constantCode": "string",
+        "name": "string",
+        "refusalReasonId": "staffRefusalReasonId1"
+      }
+    ],
+    "reagentComplianceFlag": true,
+    "reagentRefusalReason": [
+      {
+        "constantCode": "string",
+        "name": "string",
+        "refusalReasonId": "reagentRefusalReasonId1"
+      }
+    ],
+    "facilityComplianceFlag": true,
+    "facilityRefusalReason": [
+      {
+        "constantCode": "string",
+        "name": "string",
+        "refusalReasonId": "facilityRefusalReasonId1"
+      }
+    ]
+  }
+}

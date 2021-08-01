@@ -1,0 +1,28 @@
+spring:
+  profiles: local
+  cloud:
+    kubernetes:
+      config:
+        enabled: false
+logging:
+  config: classpath:log4j2-local-console.xml
+
+---
+spring:
+  application:
+    name: business-process-management
+  cloud:
+    kubernetes:
+      config:
+        enabled: true
+        enable-api: false
+        paths:
+          - /app/config/main/application.yml
+          - /app/config/camunda/camunda-global-system-vars.yml
+      secrets:
+        enabled: true
+        enable-api: false
+        paths:
+          - /app/secrets
+logging:
+  config: classpath:log4j2-json-console.xml # stdout log streaming for fluentd

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1unqyas"
+  targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:process id="testSynchronization" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="start">
+      <bpmn:outgoing>Flow_1coz83o</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1coz83o" sourceRef="StartEvent_1" targetRef="Activity_05biex2"/>
+    <bpmn:endEvent id="Event_0ivuy5h" name="end">
+      <bpmn:incoming>Flow_0e4ugde</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0e4ugde" sourceRef="Activity_0fcx93j" targetRef="Event_0ivuy5h"/>
+    <bpmn:scriptTask id="Activity_0fcx93j" name="sleep" scriptFormat="groovy">
+      <bpmn:incoming>Flow_01whxxj</bpmn:incoming>
+      <bpmn:outgoing>Flow_0e4ugde</bpmn:outgoing>
+      <bpmn:script>Thread.sleep(1000)</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_01whxxj" sourceRef="Activity_05biex2" targetRef="Activity_0fcx93j"/>
+    <bpmn:userTask id="Activity_05biex2" name="user-task">
+      <bpmn:incoming>Flow_1coz83o</bpmn:incoming>
+      <bpmn:outgoing>Flow_01whxxj</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testSynchronization">
+      <bpmndi:BPMNEdge id="Flow_1coz83o_di" bpmnElement="Flow_1coz83o">
+        <di:waypoint x="188" y="117"/>
+        <di:waypoint x="220" y="117"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0e4ugde_di" bpmnElement="Flow_0e4ugde">
+        <di:waypoint x="450" y="117"/>
+        <di:waypoint x="512" y="117"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_01whxxj_di" bpmnElement="Flow_01whxxj">
+        <di:waypoint x="320" y="117"/>
+        <di:waypoint x="350" y="117"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0ivuy5h_di" bpmnElement="Event_0ivuy5h">
+        <dc:Bounds x="512" y="99" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="521" y="142" width="19" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0u0nes7_di" bpmnElement="Activity_0fcx93j">
+        <dc:Bounds x="350" y="77" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="99" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="160" y="142" width="23" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0351zk0_di" bpmnElement="Activity_05biex2">
+        <dc:Bounds x="220" y="77" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

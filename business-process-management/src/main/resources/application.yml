@@ -1,0 +1,65 @@
+server:
+  port: 8080
+  max-http-header-size: 16KB
+
+camunda:
+  system-variables:
+    const_dataFactoryBaseUrl: http://registry-rest-api:8080
+  admin-user-id: camunda
+  admin-group-id: camunda-admin
+  bpm:
+    generic-properties:
+      properties:
+        enableHistoricInstancePermissions: true
+        userResourceWhitelistPattern: '[a-zA-Z0-9_@.]+|camunda-admin'
+    authorization:
+      enabled: true
+
+spring:
+  jersey:
+    application-path: api
+  application:
+    name: business-process-management
+  sleuth:
+    opentracing:
+      enabled: true
+    baggage:
+      correlation-enabled: true
+      correlation-fields: x-request-id
+      remote-fields: x-request-id, x-access-token
+  datasource:
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      max-lifetime: 600000
+
+# Configuration => prometheus.yml:
+#   scrape_configs:
+#     metrics_path: '/actuator/prometheus'
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState, db
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+    kafka:
+      enabled: false
+
+ceph:
+  bucket: ${CEPH_BUCKET_NAME:bucket}
+
+user-settings-service-api:
+  url: http://user-settings-service-api:8080

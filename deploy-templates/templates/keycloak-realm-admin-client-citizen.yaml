@@ -1,0 +1,37 @@
+apiVersion: v1.edp.epam.com/v1alpha1
+kind: KeycloakClient
+metadata:
+  annotations:
+    helm.sh/resource-policy: keep
+  name: {{ template "bpms.name" . }}-{{ .Values.keycloak.citizenClient.clientName }}-{{ .Values.keycloak.citizenClient.realm }}
+  namespace: {{ .Values.namespace }}
+spec:
+  clientId: {{ .Values.keycloak.citizenClient.clientName }}
+  description: "Role for {{ template "bpms.name" . }} service"
+  public: {{ .Values.keycloak.citizenClient.public }}
+  {{- if eq .Values.keycloak.citizenClient.public false }}
+  serviceAccount:
+    enabled: true
+    clientRoles: {{ .Values.keycloak.citizenClient.serviceAccount.clientRoles | toYaml | nindent 4 }}
+  secret: {{ .Values.keycloak.citizenClient.secretName }}
+  {{- else }}
+  serviceAccount:
+    enabled: false
+  secret: ''
+  {{- end }}
+  directAccess: false
+  audRequired: false
+  {{- if .Values.keycloak.citizenClient.clientRoles }}
+  clientRoles:
+    {{- range .Values.keycloak.citizenClient.clientRoles }}
+    - {{ . }}
+    {{- end }}
+  {{- end }}
+  {{- if .Values.keycloak.citizenClient.realmRoles }}
+  realmRoles: {{ .Values.keycloak.citizenClient.realmRoles | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.keycloak.citizenClient.protocolMappers }}
+  protocolMappers: {{ .Values.keycloak.citizenClient.protocolMappers | toYaml | nindent 4 }}
+  {{- end }}
+  targetRealm: {{ template "keycloak.citizenTargetRealm" . }}
+  webUrl: {{ template "bpms.url" . }}
