@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1t4l6n3" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:process id="test_subject_detail_key" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_17u14gm</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_17u14gm" sourceRef="StartEvent_1" targetRef="Activity_0qfu573" />
+    <bpmn:endEvent id="Event_1ttmzey">
+      <bpmn:incoming>Flow_097x29c</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_097x29c" sourceRef="Activity_1exfr1y" targetRef="Event_1ttmzey" />
+    <bpmn:scriptTask id="Activity_1exfr1y" name="Assert" scriptFormat="groovy">
+      <bpmn:incoming>Flow_18ssjbi</bpmn:incoming>
+      <bpmn:outgoing>Flow_097x29c</bpmn:outgoing>
+      <bpmn:script>assert response.statusCode == 200
+assert response.responseBody.prop("code").value().equals('00000002')
+assert response.responseBody.prop("olfName").value().equals('ОРГАН ДЕРЖАВНОЇ ВЛАДИ')
+assert response.responseBody.prop("olfCode").value().equals('410')</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_18ssjbi" sourceRef="Activity_0qfu573" targetRef="Activity_1exfr1y" />
+    <bpmn:serviceTask id="Activity_0qfu573" name="SubjectDetail" camunda:modelerTemplate="subjectDetailEdrRegistryConnectorDelegate" camunda:delegateExpression="${subjectDetailEdrRegistryConnectorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="authorizationToken">token</camunda:inputParameter>
+          <camunda:inputParameter name="id">111222333</camunda:inputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_17u14gm</bpmn:incoming>
+      <bpmn:outgoing>Flow_18ssjbi</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="test_subject_detail_key">
+      <bpmndi:BPMNEdge id="Flow_097x29c_di" bpmnElement="Flow_097x29c">
+        <di:waypoint x="530" y="117" />
+        <di:waypoint x="592" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17u14gm_di" bpmnElement="Flow_17u14gm">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18ssjbi_di" bpmnElement="Flow_18ssjbi">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="430" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1ttmzey_di" bpmnElement="Event_1ttmzey">
+        <dc:Bounds x="592" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0mp87pt_di" bpmnElement="Activity_1exfr1y">
+        <dc:Bounds x="430" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1fdz84l_di" bpmnElement="Activity_0qfu573">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

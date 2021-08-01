@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="objectMapper" class="com.fasterxml.jackson.databind.ObjectMapper"/>
+  <bean id="cephKeyProvider"
+    class="com.epam.digital.data.platform.bpms.delegate.ceph.CephKeyProvider"/>
+  <bean id="cephService"
+    class="com.epam.digital.data.platform.bpms.it.config.TestCephServiceImpl">
+    <constructor-arg value="bucket"/>
+    <constructor-arg ref="objectMapper"/>
+  </bean>
+  <bean id="s3ObjectCephServiceTest"
+    class="com.epam.digital.data.platform.bpms.it.config.TestS3ObjectCephServiceImpl"/>
+  <bean id="camundaAdminImpersonationFactory"
+    class="com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory">
+    <constructor-arg value="administratorUserId"/>
+    <constructor-arg value="administratorGroup"/>
+  </bean>
+
+  <bean id="camundaProperties"
+    class="com.epam.digital.data.platform.bpms.config.CamundaProperties"/>
+  <bean id="authListener"
+    class="com.epam.digital.data.platform.bpms.listener.AuthorizationStartEventListener">
+    <constructor-arg ref="camundaAdminImpersonationFactory"/>
+  </bean>
+  <bean id="initiatorListener"
+    class="com.epam.digital.data.platform.bpms.listener.InitiatorTokenStartEventListener"/>
+  <bean id="completerListener"
+    class="com.epam.digital.data.platform.bpms.listener.CompleterTaskEventListener"/>
+  <bean id="putFormDataToCephListener"
+    class="com.epam.digital.data.platform.bpms.listener.PutFormDataToCephTaskListener">
+    <constructor-arg ref="cephService"/>
+    <constructor-arg ref="cephKeyProvider"/>
+    <constructor-arg ref="objectMapper"/>
+  </bean>
+  <bean id="fileCleanerEndEventListener"
+    class="com.epam.digital.data.platform.bpms.listener.FileCleanerEndEventListener">
+    <constructor-arg ref="s3ObjectCephServiceTest"/>
+  </bean>
+
+  <bean id="processEngineConfiguration"
+    class="com.epam.digital.data.platform.bpms.camunda.bpmn.config.LowcodeStandaloneProcessEngineConfiguration">
+
+    <property name="jdbcUrl" value="jdbc:h2:mem:camunda;DB_CLOSE_DELAY=1000"/>
+    <property name="jdbcDriver" value="org.h2.Driver"/>
+    <property name="jdbcUsername" value="sa"/>
+    <property name="jdbcPassword" value=""/>
+
+    <property name="databaseSchemaUpdate" value="true"/>
+
+    <property name="jobExecutorActivate" value="false"/>
+
+    <!-- activates the camunda Connect process engine plugins -->
+    <property name="processEnginePlugins">
+      <list>
+        <bean class="org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin"/>
+        <bean class="org.camunda.spin.plugin.impl.SpinProcessEnginePlugin"/>
+        <bean
+          class="com.epam.digital.data.platform.bpms.scripting.StaticJavaFunctionsProcessEnginePlugin">
+          <constructor-arg index="0">
+            <bean
+              class="com.epam.digital.data.platform.bpms.scripting.groovy.StaticJavaFunctionsGroovyScriptEnvResolver"/>
+          </constructor-arg>
+        </bean>
+      </list>
+    </property>
+
+    <property name="expressionManager">
+      <bean class="com.epam.digital.data.platform.bpms.camunda.bpmn.config.TestExpressionManager">
+        <constructor-arg ref="cephService"/>
+        <constructor-arg ref="objectMapper"/>
+      </bean>
+    </property>
+    <property name="preParseListeners">
+      <list>
+        <bean
+          class="com.epam.digital.data.platform.bpms.config.CamundaSystemVariablesSupportListener">
+          <constructor-arg ref="camundaProperties"/>
+          <constructor-arg ref="authListener"/>
+          <constructor-arg ref="initiatorListener"/>
+          <constructor-arg ref="completerListener"/>
+          <constructor-arg ref="putFormDataToCephListener"/>
+          <constructor-arg ref="fileCleanerEndEventListener"/>
+        </bean>
+      </list>
+    </property>
+  </bean>
+
+</beans>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0o5e53o" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:process id="testCompleterKey" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="start">
+      <bpmn:outgoing>Flow_0a77l29</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0a77l29" sourceRef="StartEvent_1" targetRef="waitConditionTaskKey" />
+    <bpmn:endEvent id="Event_0g9wccj" name="end">
+      <bpmn:incoming>Flow_0errwpw</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0errwpw" sourceRef="Activity_133wg3p" targetRef="Event_0g9wccj" />
+    <bpmn:scriptTask id="Activity_133wg3p" name="completer test" scriptFormat="groovy">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="completerObj">${completer('waitConditionTaskKey')}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_08htgvd</bpmn:incoming>
+      <bpmn:outgoing>Flow_0errwpw</bpmn:outgoing>
+      <bpmn:script>assert completer('waitConditionTaskKey').userName.equals('testuser')
+assert completerObj.userName.equals('testuser')</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_08htgvd" sourceRef="waitConditionTaskKey" targetRef="Activity_133wg3p" />
+    <bpmn:userTask id="waitConditionTaskKey" name="Wait to get process instance id" camunda:formKey="testForm">
+      <bpmn:incoming>Flow_0a77l29</bpmn:incoming>
+      <bpmn:outgoing>Flow_08htgvd</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testCompleterKey">
+      <bpmndi:BPMNEdge id="Flow_08htgvd_di" bpmnElement="Flow_08htgvd">
+        <di:waypoint x="350" y="117" />
+        <di:waypoint x="410" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0errwpw_di" bpmnElement="Flow_0errwpw">
+        <di:waypoint x="510" y="117" />
+        <di:waypoint x="582" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0a77l29_di" bpmnElement="Flow_0a77l29">
+        <di:waypoint x="188" y="117" />
+        <di:waypoint x="250" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="159" y="142" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0g9wccj_di" bpmnElement="Event_0g9wccj">
+        <dc:Bounds x="582" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="591" y="142" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1irqssg_di" bpmnElement="Activity_133wg3p">
+        <dc:Bounds x="410" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0857pqo_di" bpmnElement="waitConditionTaskKey">
+        <dc:Bounds x="250" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

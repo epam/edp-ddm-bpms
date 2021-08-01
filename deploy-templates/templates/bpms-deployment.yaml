@@ -1,0 +1,173 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  replicas: {{ .Values.replicas }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        traffic.sidecar.istio.io/excludeOutboundPorts: '5432'
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      initContainers:
+      - command:
+          - sh
+          - '-c'
+          - >-
+            while ! nc -w 1 {{ .Values.db.url }} {{ .Values.db.port }} </dev/null; do echo waiting for
+            database; sleep 10; done;
+        image: {{ template "dockerProxyRegistry" . -}} busybox
+        imagePullPolicy: IfNotPresent
+        name: {{ .Chart.Name }}-init
+      - name: create-db
+        image: {{ template "dockerProxyRegistry" . -}} bitnami/postgresql:latest
+        env:
+          - name: PSQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.db.secret }}
+                key: username
+          - name: PGPASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.db.secret }}
+                key: password
+        imagePullPolicy: IfNotPresent
+        command:
+          - sh
+          - '-c'
+          - >-
+            echo "SELECT 'CREATE DATABASE {{ .Values.db.defaultDatabase }}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '{{ .Values.db.defaultDatabase }}')\gexec" | psql -U $PSQL_USER --host={{ .Values.db.url }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
+        ports:
+          - containerPort: {{ .Values.port }}
+            name: {{ .Chart.Name }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.livenessPath }}
+            port: {{ .Values.port }}
+          failureThreshold: 10
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.readinessPath }}
+            port: {{ .Values.port }}
+          failureThreshold: 10
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        resources:
+          limits:
+            memory: 2Gi
+          requests:
+            cpu: 300m
+            memory: 1Gi
+        env:
+          - name: CEPH_BUCKET_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Values.ceph.bucketName }}
+                key: BUCKET_HOST
+          - name: CEPH_BUCKET_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Values.ceph.bucketName }}
+                key: BUCKET_PORT
+          - name: CEPH_BUCKET_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Values.ceph.bucketName }}
+                key: BUCKET_NAME
+          - name: ceph.file-storage-bucket
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Values.fileStorage.bucketName }}
+                key: BUCKET_NAME
+          - name: JAVA_OPTS
+            value: {{ .Values.javaOpts }}
+        volumeMounts:
+          - name: {{ .Chart.Name }}
+            mountPath: {{ .Values.appConfigMountPath }}
+          - name: {{ .Values.db.secret }}
+            mountPath: {{ .Values.appSecretsMountPath }}
+          - name: {{ .Chart.Name }}-camunda-global-system-vars
+            mountPath: {{ .Values.camundaVarsMountPath }}
+          - name: {{ .Chart.Name }}-ceph-bucket-credentials
+            mountPath: {{ .Values.cephSecretMountPath }}
+          {{ if (lookup "v1" "Secret" .Release.Namespace .Values.fileStorage.bucketName) }}
+          - name: {{ .Values.fileStorage.bucketName }}-credentials
+            mountPath: {{ .Values.fileStorageSecretMountPath }}
+          {{- end }}
+          - name: {{ .Values.keycloak.citizenClient.secretName }}
+            mountPath: {{ .Values.citizenKeycloakClientSecretsMountPath }}
+          - name: {{ .Values.keycloak.officerClient.secretName }}
+            mountPath: {{ .Values.officerKeycloakClientSecretsMountPath }}
+      serviceAccountName: {{ .Chart.Name }}
+      {{- if .Values.nodeSelector }}
+      nodeSelector: {{ toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.podSecurityContext }}
+      securityContext: {{ toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: {{ .Chart.Name }}
+          configMap:
+            name: {{ .Chart.Name }}
+        - name: {{ .Values.db.secret }}
+          secret:
+            secretName: {{ .Values.db.secret }}
+            items:
+            - key: username
+              path: spring.datasource.username
+            - key: password
+              path: spring.datasource.password
+        - name: {{ .Chart.Name }}-ceph-bucket-credentials
+          secret:
+            secretName: {{ .Values.ceph.bucketName }}
+            items:
+            - key: AWS_ACCESS_KEY_ID
+              path: ceph.access-key
+            - key: AWS_SECRET_ACCESS_KEY
+              path: ceph.secret-key
+        - name: {{ .Values.fileStorage.bucketName }}-credentials
+          secret:
+            secretName: {{ .Values.fileStorage.bucketName }}
+            items:
+            - key: AWS_ACCESS_KEY_ID
+              path: ceph.file-storage-access-key
+            - key: AWS_SECRET_ACCESS_KEY
+              path: ceph.file-storage-secret-key
+        - name: {{ .Chart.Name }}-camunda-global-system-vars
+          configMap:
+            name: {{ .Chart.Name }}-camunda-global-system-vars
+        - name: {{ .Values.keycloak.citizenClient.secretName }}
+          secret:
+            secretName: {{ .Values.keycloak.citizenClient.secretName }}
+            items:
+            - key: clientSecret
+              path: keycloak.citizen.client-secret
+        - name: {{ .Values.keycloak.officerClient.secretName }}
+          secret:
+            secretName: {{ .Values.keycloak.officerClient.secretName }}
+            items:
+            - key: clientSecret
+              path: keycloak.officer.client-secret

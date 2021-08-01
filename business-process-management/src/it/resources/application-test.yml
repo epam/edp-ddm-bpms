@@ -1,0 +1,64 @@
+spring:
+  jersey:
+    application-path: api
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
+    username: bpms
+    password: password
+
+camunda:
+  admin-user-id: camunda
+  admin-group-id: camunda-admin
+  bpm:
+    generic-properties:
+      properties:
+        enableHistoricInstancePermissions: true
+    authorization:
+      enabled: true
+    admin-user:
+      id: ${camunda.admin-user-id}
+      password: camunda
+  system-variables:
+    const_dataFactoryBaseUrl: http://localhost:8877/mock-server
+dso:
+  url: http://localhost:8081
+
+ceph:
+  http-endpoint: http://localhost:8100
+  access-key: access-key
+  secret-key: secret-key
+  bucket: bucket
+  file-storage-access-key: file-access-key
+  file-storage-secret-key: file-secret-key
+  file-storage-bucket: file-bucket
+
+user-settings-service-api:
+  url: http://localhost:8878/user-settings-mock-server
+
+keycloak:
+  url: http://localhost:8200/auth
+  citizen:
+    realm: citizen-realm
+    client-id: citizen-client-id
+    client-secret: citizen-client-secret
+  officer:
+    realm: officer-realm
+    client-id: officer-client-id
+    client-secret: officer-client-secret
+
+trembita-exchange-gateway:
+  userId: MDTUDDM
+  protocol-version: 4.0
+  url: http://localhost:7788/trembita-mock-server
+  client:
+    x-road-instance: CLIENT-TEST
+    member-class: GOV
+    member-code: 666777666
+    subsystem-code: GOV_TEST
+  registries:
+    edr-registry:
+      x-road-instance: EDR-TEST
+      member-class: GOV
+      member-code: 11115888
+      subsystem-code: EDR_test

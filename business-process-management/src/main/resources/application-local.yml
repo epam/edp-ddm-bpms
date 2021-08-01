@@ -1,0 +1,47 @@
+camunda:
+  system-variables:
+    const_dataFactoryBaseUrl: http://localhost:8877/mock-server
+  bpm:
+    authorization:
+      enabled: false
+    job-execution:
+      deployment-aware: true
+    database:
+      schema-update: true
+    admin-user:
+      id: ${camunda.admin-user-id}
+      password: camunda
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/camunda
+    username: bpms
+    password: password
+
+lowcode:
+  security:
+    enabled: false
+
+dso:
+  url: http://localhost:8100
+
+ceph:
+  http-endpoint: http://localhost:8100
+  access-key: access-key
+  secret-key: secret-key
+  bucket: bucket
+  file-storage-access-key: file-access-key
+  file-storage-secret-key: file-secret-key
+  file-storage-bucket: file-bucket
+
+keycloak:
+  url: http://localhost:8200/auth
+  citizen:
+    realm: citizenRealm
+    client-id: citizenClientId
+    client-secret: citizenClientSecret
+  officer:
+    realm: officerRealm
+    client-id: officerClientId
+    client-secret: officerClientSecret

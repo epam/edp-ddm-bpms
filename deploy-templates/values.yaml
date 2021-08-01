@@ -1,0 +1,74 @@
+image:
+  name: business-process-management
+  version: latest
+port: 8080
+service:
+  type: ClusterIP
+  port: 8080
+replicas: 1
+appConfigMountPath: "/app/config/main"
+camundaVarsMountPath: "/app/config/camunda"
+appSecretsMountPath: "/app/secrets/main"
+cephSecretMountPath: "/app/secrets/ceph"
+fileStorageSecretMountPath: "/app/secrets/fileStorage"
+citizenKeycloakClientSecretsMountPath: "/app/secrets/citizen-realm-admin-client"
+officerKeycloakClientSecretsMountPath: "/app/secrets/officer-realm-admin-client"
+prometheusScrapePath: "/actuator/prometheus"
+readinessPath: "/actuator/health/readiness"
+livenessPath: "/actuator/health/liveness"
+
+db:
+  url: citus-master
+  port: 5432
+  defaultDatabase: camunda
+  secret: citus-secrets
+
+ingress: # expose the service with a route or an ingress depending on platform type
+  platform: openshift # openshift or kubernetes
+
+ceph:
+  bucketName: lowcode-form-data-storage
+
+fileStorage:
+  bucketName: lowcode-file-storage
+
+monitoring:
+  namespace: openshift-monitoring
+
+javaOpts: "-Duser.timezone=UTC"
+
+keycloak:
+  citizenClient:
+    clientName: realm-admin
+    realm: citizen-portal
+    public: false
+    secretName: keycloak-realm-admin-citizen-client-secret
+    serviceAccount:
+      clientRoles:
+      - clientId: realm-management
+        roles: ["realm-admin"]
+  officerClient:
+    clientName: realm-admin
+    realm: officer-portal
+    public: false
+    secretName: keycloak-realm-admin-officer-client-secret
+    serviceAccount:
+      clientRoles:
+      - clientId: realm-management
+        roles: ["realm-admin"]
+
+trembitaExchangeGateway:
+  userId: 'MDTUDDM'
+  protocol-version: '4.0'
+  url: 'http://trembita.mdtu-ddm.projects.epam.com'
+  client:
+    x-road-instance: 'SEVDEIR-TEST'
+    member-class: 'GOV'
+    member-code: '43395033'
+    subsystem-code: 'IDGOV_TEST_01'
+  registries:
+    edr-registry:
+      x-road-instance: 'SEVDEIR-TEST'
+      member-class: 'GOV'
+      member-code: '00015622'
+      subsystem-code: '2_MJU_EDR_prod'

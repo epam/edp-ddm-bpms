@@ -1,0 +1,13 @@
+[
+  {
+    "id": "572354c1-361d-4c05-b9ed-073183cc3063",
+    "name": "unregistered-entrepreneur",
+    "description": "",
+    "scopeParamRequired": null,
+    "composite": false,
+    "composites": null,
+    "clientRole": false,
+    "containerId": "3d3edc65-f05a-4841-abf5-a357149736d9",
+    "attributes": {}
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "data":{
+    "name":"labName",
+    "registrationNo":"123123123",
+    "initiated":"держпраці",
+    "errorCheckFlag":false,
+    "submit":true,
+    "edrpou":"23510933",
+    "registrationSource":"держпраці",
+    "createdDate":"1999-11-12",
+    "acceptedBy":"jogn doe"
+  }
+}
