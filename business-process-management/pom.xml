@@ -95,6 +95,12 @@
     </dependency>
 
     <dependency>
+      <groupId>com.epam.digital.data.platform</groupId>
+      <artifactId>excerpt-model</artifactId>
+      <version>${excerpt-model.version}</version>
+    </dependency>
+
+    <dependency>
       <artifactId>spring-cloud-starter-kubernetes-config</artifactId>
       <groupId>org.springframework.cloud</groupId>
     </dependency>

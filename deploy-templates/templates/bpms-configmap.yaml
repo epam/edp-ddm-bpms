@@ -17,3 +17,4 @@ data:
     keycloak.officer.realm: {{ template "keycloak.officerTargetRealm" . }}
     keycloak.officer.client-id: {{ .Values.keycloak.officerClient.clientName }}
     trembita-exchange-gateway: {{ toYaml .Values.trembitaExchangeGateway | nindent 6 }}
+    excerpt-service-api.url: http://excerpt-service-api:8080
