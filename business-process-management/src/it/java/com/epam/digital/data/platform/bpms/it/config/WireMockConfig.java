@@ -47,4 +47,12 @@ public class WireMockConfig {
       throws MalformedURLException {
     return WireMockUtil.createAndStartMockServerForUrl(urlStr);
   }
+
+  @Bean(destroyMethod = "stop")
+  @Qualifier("excerptServiceWireMock")
+  public WireMockServer userExcerptServiceWireMock(
+      @Value("${excerpt-service-api.url}") String urlStr)
+      throws MalformedURLException {
+    return WireMockUtil.createAndStartMockServerForUrl(urlStr);
+  }
 }

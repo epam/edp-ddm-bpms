@@ -51,6 +51,7 @@ public abstract class BaseBpmnIT extends BaseIT {
 
   private static final String MOCK_SERVER = "/mock-server";
   private static final String SETTINGS_MOCK_SERVER = "/user-settings-mock-server";
+  private static final String EXCERPT_SERVICE_MOCK_SERVER = "/excerpt-mock-service";
 
   @Inject
   @Qualifier("digitalSignatureMockServer")
@@ -61,6 +62,9 @@ public abstract class BaseBpmnIT extends BaseIT {
   @Inject
   @Qualifier("userSettingsWireMock")
   protected WireMockServer userSettingsWireMock;
+  @Inject
+  @Qualifier("excerptServiceWireMock")
+  protected WireMockServer excerptServiceWireMock;
   @Inject
   @Qualifier("trembitaMockServer")
   protected WireMockServer trembitaMockServer;
@@ -125,6 +129,12 @@ public abstract class BaseBpmnIT extends BaseIT {
         .pathSegment(data.getResource());
 
     userSettingsWireMock.addStubMapping(stubFor(getMappingBuilder(data, uriBuilder)));
+  }
+
+  protected void stubExcerptServiceRequest(StubData data) throws IOException {
+    var uriBuilder = UriComponentsBuilder.fromPath(EXCERPT_SERVICE_MOCK_SERVER)
+        .pathSegment(data.getResource());
+    excerptServiceWireMock.addStubMapping(stubFor(getMappingBuilder(data, uriBuilder)));
   }
 
   private MappingBuilder getMappingBuilder(StubData data, UriComponentsBuilder uriBuilder)

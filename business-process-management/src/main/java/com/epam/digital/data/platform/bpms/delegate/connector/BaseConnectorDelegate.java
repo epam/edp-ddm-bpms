@@ -27,6 +27,7 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
 
   protected static final String RESOURCE_SETTINGS = "settings";
   protected static final String RESOURCE_VARIABLE = "resource";
+  protected static final String RESOURCE_EXCERPTS = "excerpts";
   protected static final String RESOURCE_ID_VARIABLE = "id";
   protected static final String PAYLOAD_VARIABLE = "payload";
   protected static final String RESPONSE_VARIABLE = "response";
