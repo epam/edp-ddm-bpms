@@ -6,8 +6,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.google.common.io.ByteStreams;
 import java.io.IOException;
 import java.util.stream.Stream;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
@@ -180,31 +178,5 @@ public class AuthorizationFilterIT extends BaseIT {
     Stream.of(testuser2Tasks).forEach(historyTask -> {
       assertThat(historyTask.getAssignee()).isEqualTo("testuser2");
     });
-  }
-
-  @Test
-  public void shouldFilterTasksWithoutIdentityLinks() throws IOException {
-    ProcessDefinitionDto[] processDefinitionDtos = getForObject("api/process-definition",
-        ProcessDefinitionDto[].class);
-    ProcessDefinitionDto processDefinition = Stream.of(processDefinitionDtos)
-        .filter(pd -> "testInitSystemVariablesProcess_key".equals(pd.getKey())).findFirst().get();
-
-    ProcessInstanceDto processInstance = postForObject(
-        "api/process-definition/" + processDefinition.getId() + "/start", "{}",
-        ProcessInstanceDto.class);
-
-    TaskDto[] tasks = getForObject(
-        String.format("api/task?processInstanceId=%s", processInstance.getId()), TaskDto[].class);
-
-    String changeAssigneeUtl = "api/task/" + tasks[0].getId() + "/assignee";
-    jerseyClient.target(String.format("http://localhost:%d/%s", port, changeAssigneeUtl))
-        .request()
-        .header(TOKEN_HEADER, validAccessToken)
-        .post(Entity.entity("{\"userId\":null}", MediaType.APPLICATION_JSON));
-
-    TaskDto[] tasks2 = getForObject(
-        String.format("api/task?processInstanceId=%s", processInstance.getId()), TaskDto[].class);
-
-    assertThat(tasks2).isEmpty();
   }
 }
