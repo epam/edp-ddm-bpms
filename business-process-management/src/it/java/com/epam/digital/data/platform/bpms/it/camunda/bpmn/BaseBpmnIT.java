@@ -51,7 +51,7 @@ public abstract class BaseBpmnIT extends BaseIT {
 
   private static final String MOCK_SERVER = "/mock-server";
   private static final String SETTINGS_MOCK_SERVER = "/user-settings-mock-server";
-  private static final String EXCERPT_SERVICE_MOCK_SERVER = "/excerpt-mock-service";
+  protected static final String EXCERPT_SERVICE_MOCK_SERVER = "/excerpt-mock-service";
 
   @Inject
   @Qualifier("digitalSignatureMockServer")
@@ -132,8 +132,8 @@ public abstract class BaseBpmnIT extends BaseIT {
   }
 
   protected void stubExcerptServiceRequest(StubData data) throws IOException {
-    var uriBuilder = UriComponentsBuilder.fromPath(EXCERPT_SERVICE_MOCK_SERVER)
-        .pathSegment(data.getResource());
+    var uriBuilder = Objects.nonNull(data.getUri()) ? data.getUri() :
+        UriComponentsBuilder.fromPath(EXCERPT_SERVICE_MOCK_SERVER).pathSegment(data.getResource());
     excerptServiceWireMock.addStubMapping(stubFor(getMappingBuilder(data, uriBuilder)));
   }
 
