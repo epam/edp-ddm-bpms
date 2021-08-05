@@ -5,6 +5,7 @@ import java.util.Map;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.HttpMethod;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Getter
 @Builder
@@ -19,5 +20,6 @@ public class StubData {
   @Builder.Default
   private Map<String, String> headers = new HashMap<>();
   private String response;
+  private UriComponentsBuilder uri;
 
 }
