@@ -48,6 +48,12 @@
         "name": "string"
       }
     ],
+    "factorPesticide": [
+      {
+        "factorId": "factorPesticide",
+        "name": "string"
+      }
+    ],
     "solutionName": "Внести до інформаційного переліку",
     "solutionDate": "2021-03-24",
     "letterNo": "1234567890-letterNo",

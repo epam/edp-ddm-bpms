@@ -177,7 +177,8 @@ public abstract class BaseBpmnIT extends BaseIT {
     }
   }
 
-  protected void stubSearchSubjects(String responseXmlFilePath) throws Exception {
+  @SneakyThrows
+  protected void stubSearchSubjects(String responseXmlFilePath) {
     stubTrembita(responseXmlFilePath, "SearchSubjects");
   }
 
@@ -187,7 +188,8 @@ public abstract class BaseBpmnIT extends BaseIT {
 
   private void stubTrembita(String responseXmlFilePath, String serviceCode) throws Exception {
     String response = Files.readString(
-        Paths.get(TestUtils.class.getResource(responseXmlFilePath).toURI()), StandardCharsets.UTF_8);
+        Paths.get(TestUtils.class.getResource(responseXmlFilePath).toURI()),
+        StandardCharsets.UTF_8);
 
     trembitaMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo("/trembita-mock-server"))

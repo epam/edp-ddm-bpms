@@ -48,6 +48,12 @@
         "name": "string"
       }
     ],
+    "factorPesticide": [
+      {
+        "factorId": "factorPesticide",
+        "name": "string"
+      }
+    ],
     "errorCheckFlag": true,
     "regComplianceFlag": true,
     "regRefusalReason": [
