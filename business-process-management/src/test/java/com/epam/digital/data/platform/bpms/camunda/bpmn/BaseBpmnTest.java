@@ -5,7 +5,10 @@ import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.complet
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.historyService;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.springframework.test.web.client.ExpectedCount.once;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
@@ -31,6 +34,8 @@ import com.epam.digital.data.platform.bpms.delegate.connector.UserSettingsConnec
 import com.epam.digital.data.platform.bpms.delegate.connector.UserSettingsConnectorUpdateDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.keycloak.KeycloakAddRoleConnectorDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.keycloak.KeycloakRemoveRoleConnectorDelegate;
+import com.epam.digital.data.platform.bpms.delegate.connector.registry.SearchSubjectsEdrRegistryConnectorDelegate;
+import com.epam.digital.data.platform.bpms.delegate.dto.EdrRegistryConnectorResponse;
 import com.epam.digital.data.platform.bpms.exception.handler.ConnectorResponseErrorHandler;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
 import com.epam.digital.data.platform.bpms.it.config.TestCephServiceImpl;
@@ -48,9 +53,11 @@ import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.mock.Mocks;
+import org.camunda.spin.Spin;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Before;
@@ -82,6 +89,8 @@ public abstract class BaseBpmnTest {
       mock(KeycloakRemoveRoleConnectorDelegate.class);
   protected final KeycloakAddRoleConnectorDelegate keycloakAddRoleConnectorDelegate =
       mock(KeycloakAddRoleConnectorDelegate.class);
+  protected final SearchSubjectsEdrRegistryConnectorDelegate searchSubjectsEdrRegistryConnectorDelegate = mock(
+      SearchSubjectsEdrRegistryConnectorDelegate.class);
 
   // init base classes for delegates
   protected ObjectMapper objectMapper;
@@ -271,6 +280,21 @@ public abstract class BaseBpmnTest {
         springAppName, userSettingsBaseUrl);
     Mocks.register("userSettingsConnectorReadDelegate", userSettingsConnectorReadDelegate);
     Mocks.register("userSettingsConnectorUpdateDelegate", userSettingsConnectorUpdateDelegate);
+
+    Mocks.register("searchSubjectsEdrRegistryConnectorDelegate",
+        searchSubjectsEdrRegistryConnectorDelegate);
+  }
+
+  @SneakyThrows
+  protected void mockEdrResponse(String responseBody) {
+    reset(searchSubjectsEdrRegistryConnectorDelegate);
+    doAnswer(invocation -> {
+      var execution = (AbstractVariableScope) invocation.getArgument(0);
+      execution.setVariableLocalTransient("response",
+          EdrRegistryConnectorResponse.builder().responseBody(
+              Spin.JSON(TestUtils.getContent(responseBody))).build());
+      return null;
+    }).when(searchSubjectsEdrRegistryConnectorDelegate).execute(any());
   }
 
   @SneakyThrows

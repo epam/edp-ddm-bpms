@@ -2,13 +2,15 @@ package com.epam.digital.data.platform.bpms.it.camunda.bpmn;
 
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.historyService;
-import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
-import static org.junit.Assert.assertThrows;
 
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
+import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.epam.digital.data.platform.starter.errorhandling.dto.ErrorDetailDto;
 import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.test.Deployment;
@@ -19,6 +21,7 @@ import org.springframework.http.HttpMethod;
 public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
 
   private static final String PROCESS_DEFINITION_ID = "create-app-expanse";
+  private static final String START_FORM_CEPH_KEY = "startFormCephKey";
 
   @Value("${camunda.system-variables.const_dataFactoryBaseUrl}")
   private String dataFactoryBaseUrl;
@@ -28,21 +31,21 @@ public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
   public void testAdditionHappyPass_accreditationFlagIsTrue() throws IOException {
     var labId = "bb652d3f-a36f-465a-b7ba-232a5a1680c5";
 
-    var searchLabFormActivityDefinitionKey = "Activity_shared-search-lab";
     var addApplicationActivityDefinitionKey = "Activity_shared-add-application";
-    var addBioPhysLaborFactorsActivityDefinitionKey = "Activity_shared-add-bio-phys-labor-factors";
-    var addChemFactorsActivityDefinitionKey = "Activity_shared-add-chem-factors";
+    var addFactorsActivityDefinitionKey = "Activity_shared-add-factors";
     var checkComplianceActivityDefinitionKey = "Activity_shared-check-complience";
     var addDecisionIncludeActivityDefinitionKey = "Activity_shared-add-decision-include";
     var addLetterDataActivityDefinitionKey = "Activity_shared-add-letter-data";
     var signAppIncludeActivityDefinitionKey = "Activity_shared-sign-app-include";
 
+    stubSearchSubjects("/xml/create-app/searchSubjectsActiveResponse.xml");
+
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("laboratory")
-        .resourceId(labId)
-        .response("/json/create-app/data-factory/findLaboratoryResponse.json")
+        .resource("last-laboratory-solution")
+        .queryParams(Map.of("laboratoryId", labId))
+        .response("/json/create-app/data-factory/last-laboratory-solution-add.json")
         .build());
 
     stubDataFactoryRequest(StubData.builder()
@@ -57,8 +60,24 @@ public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("application-type-equal-constant-code")
+        .queryParams(Map.of("constantCode", "ADD"))
+        .response("/json/create-app/data-factory/applicationTypeResponse.json")
+        .build());
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("application-type-equal-constant-code")
         .queryParams(Map.of("constantCode", "EXPANSE"))
         .response("/json/create-app/data-factory/applicationTypeExpanseResponse.json")
+        .build());
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("laboratory")
+        .resourceId(labId)
+        .response("/json/create-app/data-factory/findLaboratoryResponse.json")
         .build());
 
     stubDigitalSignatureRequest(StubData.builder()
@@ -76,29 +95,14 @@ public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
         .response("{}")
         .build());
 
-    var processInstance = runtimeService().startProcessInstanceByKey(PROCESS_DEFINITION_ID);
-    assertThat(processInstance).isStarted();
+    var processInstanceId = startProcessInstanceAndGetId(labId);
+    var processInstance = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstanceId).list().get(0);
 
-    var processInstanceId = processInstance.getId();
-    String initiator = null;
-
-    expectedVariablesMap.put("initiator", initiator);
+    expectedVariablesMap.put("initiator", testUserName);
     expectedVariablesMap.put("fullName", null);
     expectedVariablesMap.put("const_dataFactoryBaseUrl", dataFactoryBaseUrl);
-
-    // search lab
-    assertWaitingActivity(processInstance, searchLabFormActivityDefinitionKey, "shared-search-lab");
-
-    completeTask(searchLabFormActivityDefinitionKey, processInstanceId,
-        "/json/create-app/form-data/Activity_shared-search-lab.json");
-
-    addCompleterUsernameVariable(searchLabFormActivityDefinitionKey, testUserName);
-    addExpectedCephContent(processInstanceId, addApplicationActivityDefinitionKey,
-        "/json/create-app/form-data/name-edrpou-prepopulation.json");
-    addExpectedCephContent(processInstanceId, searchLabFormActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-search-lab.json");
-
-    expectedVariablesMap.put("laboratoryId", labId);
+    expectedVariablesMap.put("start_form_ceph_key", START_FORM_CEPH_KEY);
 
     // add application
     assertWaitingActivity(processInstance, addApplicationActivityDefinitionKey,
@@ -110,27 +114,17 @@ public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
     addCompleterUsernameVariable(addApplicationActivityDefinitionKey, testUserName);
     addExpectedCephContent(processInstanceId, addApplicationActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-add-application.json");
-    addExpectedCephContent(processInstanceId, addBioPhysLaborFactorsActivityDefinitionKey,
-        "/json/create-app/form-data/name-registrationNo-prepopulation.json");
-    addExpectedCephContent(processInstanceId, addChemFactorsActivityDefinitionKey,
+    addExpectedCephContent(processInstanceId, addFactorsActivityDefinitionKey,
         "/json/create-app/form-data/name-registrationNo-prepopulation.json");
     // add bio phys labor and chem factors
-    assertWaitingActivity(processInstance, addBioPhysLaborFactorsActivityDefinitionKey,
-        "shared-add-bio-phys-labor-factors");
-    assertWaitingActivity(processInstance, addChemFactorsActivityDefinitionKey,
-        "shared-add-chem-factors");
+    assertWaitingActivity(processInstance, addFactorsActivityDefinitionKey, "shared-add-factors");
 
-    completeTask(addBioPhysLaborFactorsActivityDefinitionKey, processInstanceId,
-        "/json/create-app/form-data/Activity_shared-add-bio-phys-labor-factors.json");
-    completeTask(addChemFactorsActivityDefinitionKey, processInstanceId,
-        "/json/create-app/form-data/Activity_shared-add-chem-factors.json");
+    completeTask(addFactorsActivityDefinitionKey, processInstanceId,
+        "/json/create-app/form-data/Activity_shared-add-factors.json");
 
-    addCompleterUsernameVariable(addBioPhysLaborFactorsActivityDefinitionKey, testUserName);
-    addCompleterUsernameVariable(addChemFactorsActivityDefinitionKey, testUserName);
-    addExpectedCephContent(processInstanceId, addBioPhysLaborFactorsActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-add-bio-phys-labor-factors.json");
-    addExpectedCephContent(processInstanceId, addChemFactorsActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-add-chem-factors.json");
+    addCompleterUsernameVariable(addFactorsActivityDefinitionKey, testUserName);
+    addExpectedCephContent(processInstanceId, addFactorsActivityDefinitionKey,
+        "/json/create-app/form-data/Activity_shared-add-factors.json");
     addExpectedCephContent(processInstanceId, checkComplianceActivityDefinitionKey,
         "/json/create-app/form-data/name-registrationNo-prepopulation.json");
 
@@ -210,14 +204,15 @@ public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
   public void testDenyingHappyPass_accreditationFlagIsTrue() throws IOException {
     var labId = "bb652d3f-a36f-465a-b7ba-232a5a1680c5";
 
-    var searchLabFormActivityDefinitionKey = "Activity_shared-search-lab";
+    var subjectStatusErrorActivityDefinitionKey = "Activity_shared-subject-status-error";
     var addApplicationActivityDefinitionKey = "Activity_shared-add-application";
-    var addBioPhysLaborFactorsActivityDefinitionKey = "Activity_shared-add-bio-phys-labor-factors";
-    var addChemFactorsActivityDefinitionKey = "Activity_shared-add-chem-factors";
+    var addFactorsActivityDefinitionKey = "Activity_shared-add-factors";
     var checkComplianceActivityDefinitionKey = "Activity_shared-check-complience";
     var addDecisionDenyActivityDefinitionKey = "Activity_shared-add-decision-deny";
     var addLetterDataActivityDefinitionKey = "Activity_1eujure";
     var signAppDenyActivityDefinitionKey = "Activity_shared-sign-app-deny";
+
+    stubSearchSubjects("/xml/create-app/searchSubjectsDisabledResponse.xml");
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
@@ -258,30 +253,24 @@ public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
         .response("{}")
         .build());
 
-    var processInstance = runtimeService().startProcessInstanceByKey(PROCESS_DEFINITION_ID);
-    assertThat(processInstance).isStarted();
+    var processInstanceId = startProcessInstanceAndGetId(labId);
+    var processInstance = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstanceId).list().get(0);
 
-    var processInstanceId = processInstance.getId();
-    String initiator = null;
-
-    expectedVariablesMap.put("initiator", initiator);
-    expectedVariablesMap.put("fullName", null);
+    expectedVariablesMap.put("initiator", testUserName);
     expectedVariablesMap.put("const_dataFactoryBaseUrl", dataFactoryBaseUrl);
+    expectedVariablesMap.put("start_form_ceph_key", START_FORM_CEPH_KEY);
 
-    // search lab
-    assertWaitingActivity(processInstance, searchLabFormActivityDefinitionKey, "shared-search-lab");
-
-    completeTask(searchLabFormActivityDefinitionKey, processInstanceId,
-        "/json/create-app/form-data/Activity_shared-search-lab.json");
-
-    addCompleterUsernameVariable(searchLabFormActivityDefinitionKey, testUserName);
-    addExpectedCephContent(processInstanceId, addApplicationActivityDefinitionKey,
-        "/json/create-app/form-data/name-edrpou-prepopulation.json");
-    addExpectedCephContent(processInstanceId, searchLabFormActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-search-lab.json");
-
-    expectedVariablesMap.put("laboratoryId", labId);
-
+    // subject status error
+    assertWaitingActivity(processInstance, subjectStatusErrorActivityDefinitionKey,
+        "shared-subject-status-error");
+    completeTask(subjectStatusErrorActivityDefinitionKey, processInstanceId,
+        "/json/create-app/form-data/Activity_shared-subject-status-error.json");
+    addExpectedCephContent(processInstanceId, subjectStatusErrorActivityDefinitionKey,
+        "/json/create-app/form-data/Activity_shared-subject-status-error.json");
+    addCompleterUsernameVariable(subjectStatusErrorActivityDefinitionKey, testUserName);
+    expectedVariablesMap.put("edrSuspendedOrCancelled", "true");
+    expectedVariablesMap.put("fullName", null);
     // add application
     assertWaitingActivity(processInstance, addApplicationActivityDefinitionKey,
         "shared-add-application");
@@ -292,27 +281,18 @@ public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
     addCompleterUsernameVariable(addApplicationActivityDefinitionKey, testUserName);
     addExpectedCephContent(processInstanceId, addApplicationActivityDefinitionKey,
         "/json/create-app/form-data/Activity_shared-add-application.json");
-    addExpectedCephContent(processInstanceId, addBioPhysLaborFactorsActivityDefinitionKey,
-        "/json/create-app/form-data/name-registrationNo-prepopulation.json");
-    addExpectedCephContent(processInstanceId, addChemFactorsActivityDefinitionKey,
+    addExpectedCephContent(processInstanceId, addFactorsActivityDefinitionKey,
         "/json/create-app/form-data/name-registrationNo-prepopulation.json");
     // add bio phys labor and chem factors
-    assertWaitingActivity(processInstance, addBioPhysLaborFactorsActivityDefinitionKey,
-        "shared-add-bio-phys-labor-factors");
-    assertWaitingActivity(processInstance, addChemFactorsActivityDefinitionKey,
-        "shared-add-chem-factors");
+    assertWaitingActivity(processInstance, addFactorsActivityDefinitionKey,
+        "shared-add-factors");
 
-    completeTask(addBioPhysLaborFactorsActivityDefinitionKey, processInstanceId,
-        "/json/create-app/form-data/Activity_shared-add-bio-phys-labor-factors.json");
-    completeTask(addChemFactorsActivityDefinitionKey, processInstanceId,
-        "/json/create-app/form-data/Activity_shared-add-chem-factors.json");
+    completeTask(addFactorsActivityDefinitionKey, processInstanceId,
+        "/json/create-app/form-data/Activity_shared-add-factors.json");
 
-    addCompleterUsernameVariable(addBioPhysLaborFactorsActivityDefinitionKey, testUserName);
-    addCompleterUsernameVariable(addChemFactorsActivityDefinitionKey, testUserName);
-    addExpectedCephContent(processInstanceId, addBioPhysLaborFactorsActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-add-bio-phys-labor-factors.json");
-    addExpectedCephContent(processInstanceId, addChemFactorsActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-add-chem-factors.json");
+    addCompleterUsernameVariable(addFactorsActivityDefinitionKey, testUserName);
+    addExpectedCephContent(processInstanceId, addFactorsActivityDefinitionKey,
+        "/json/create-app/form-data/Activity_shared-add-factors.json");
     addExpectedCephContent(processInstanceId, checkComplianceActivityDefinitionKey,
         "/json/create-app/form-data/name-registrationNo-prepopulation.json");
 
@@ -392,7 +372,31 @@ public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
   public void testValidationError() throws IOException {
     var labId = "bb652d3f-a36f-465a-b7ba-232a5a1680c4";
 
-    var searchLabFormActivityDefinitionKey = "Activity_shared-search-lab";
+    stubSearchSubjects("/xml/create-app/searchSubjectsActiveResponse.xml");
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("last-laboratory-solution")
+        .queryParams(Map.of("laboratoryId", labId))
+        .response("/json/create-app/data-factory/last-laboratory-solution-add.json")
+        .build());
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("solution-type-equal-constant-code")
+        .queryParams(Map.of("constantCode", "ADD"))
+        .response("/json/create-app/data-factory/solutionTypeAddResponse.json")
+        .build());
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("application-type-equal-constant-code")
+        .queryParams(Map.of("constantCode", "ADD"))
+        .response("/json/create-app/data-factory/applicationTypeResponse.json")
+        .build());
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
@@ -411,25 +415,13 @@ public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
         .response("[]")
         .build());
 
-    var processInstance = runtimeService().startProcessInstanceByKey(PROCESS_DEFINITION_ID);
-    assertThat(processInstance).isStarted();
+    var resultMap = startProcessInstanceForError(labId);
 
-    var processInstanceId = processInstance.getId();
-    String initiator = null;
-
-    expectedVariablesMap.put("initiator", initiator);
-    expectedVariablesMap.put("fullName", null);
-    expectedVariablesMap.put("const_dataFactoryBaseUrl", dataFactoryBaseUrl);
-    // search lab
-    assertWaitingActivity(processInstance, searchLabFormActivityDefinitionKey, "shared-search-lab");
-
-    var ex = assertThrows(ValidationException.class,
-        () -> completeTask(searchLabFormActivityDefinitionKey, processInstanceId,
-            "/json/create-app/form-data/Activity_shared-search-lab_without_accreditation.json"));
-    assertWaitingActivity(processInstance, searchLabFormActivityDefinitionKey, "shared-search-lab");
-    Assertions.assertThat(ex.getDetails().getErrors()).hasSize(1);
-    Assertions.assertThat(ex.getDetails().getErrors())
-        .contains(new ErrorDetailDto("Додайте кадровий склад до лабораторії", "id", labId));
+    var errors = resultMap.get("details").get("errors");
+    Assertions.assertThat(errors).hasSize(1);
+    Assertions.assertThat(errors.get(0)).contains(Map.entry("field", "laboratory"),
+        Map.entry("message", "Додайте кадровий склад до лабораторії"),
+        Map.entry("value", labId));
   }
 
   @Test
@@ -437,8 +429,33 @@ public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
   public void testNoAccreditationFlag() throws IOException {
     var labId = "bb652d3f-a36f-465a-b7ba-232a5a1680c4";
 
-    var searchLabFormActivityDefinitionKey = "Activity_shared-search-lab";
     var addApplicationActivityDefinitionKey = "Activity_shared-add-application";
+
+    stubSearchSubjects("/xml/create-app/searchSubjectsActiveResponse.xml");
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("last-laboratory-solution")
+        .queryParams(Map.of("laboratoryId", labId))
+        .response("/json/create-app/data-factory/last-laboratory-solution-add.json")
+        .build());
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("solution-type-equal-constant-code")
+        .queryParams(Map.of("constantCode", "ADD"))
+        .response("/json/create-app/data-factory/solutionTypeAddResponse.json")
+        .build());
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("application-type-equal-constant-code")
+        .queryParams(Map.of("constantCode", "ADD"))
+        .response("/json/create-app/data-factory/applicationTypeResponse.json")
+        .build());
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
@@ -457,29 +474,156 @@ public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
         .response("[{\"cnt\":1}]")
         .build());
 
-    var processInstance = runtimeService().startProcessInstanceByKey(PROCESS_DEFINITION_ID);
-    assertThat(processInstance).isStarted();
+    var processInstanceId = startProcessInstanceAndGetId(labId);
+    var processInstance = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstanceId).list().get(0);
 
-    var processInstanceId = processInstance.getId();
-    String initiator = null;
-
-    expectedVariablesMap.put("initiator", initiator);
+    expectedVariablesMap.put("initiator", testUserName);
     expectedVariablesMap.put("fullName", null);
     expectedVariablesMap.put("const_dataFactoryBaseUrl", dataFactoryBaseUrl);
-    // search lab
-    assertWaitingActivity(processInstance, searchLabFormActivityDefinitionKey, "shared-search-lab");
-
-    completeTask(searchLabFormActivityDefinitionKey, processInstanceId,
-        "/json/create-app/form-data/Activity_shared-search-lab_without_accreditation.json");
-
-    addCompleterUsernameVariable(searchLabFormActivityDefinitionKey, testUserName);
-    expectedVariablesMap.put("laboratoryId", labId);
-    addExpectedCephContent(processInstanceId, searchLabFormActivityDefinitionKey,
-        "/json/create-app/form-data/Activity_shared-search-lab_without_accreditation.json");
+    expectedVariablesMap.put("start_form_ceph_key", START_FORM_CEPH_KEY);
     addExpectedCephContent(processInstanceId, addApplicationActivityDefinitionKey,
         "/json/create-app/form-data/name-edrpou-prepopulation.json");
 
     assertWaitingActivity(processInstance, addApplicationActivityDefinitionKey,
         "shared-add-application");
+  }
+
+  @Test
+  @Deployment(resources = "bpmn/create-app-expanse.bpmn")
+  public void testAppIsNotCreated() throws IOException {
+    var labId = "bb652d3f-a36f-465a-b7ba-232a5a1680c4";
+
+    stubSearchSubjects("/xml/create-app/searchSubjectsActiveResponse.xml");
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("last-laboratory-solution")
+        .queryParams(Map.of("laboratoryId", labId))
+        .response("/json/create-app/data-factory/last-laboratory-solution-deny.json")
+        .build());
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("solution-type-equal-constant-code")
+        .queryParams(Map.of("constantCode", "ADD"))
+        .response("/json/create-app/data-factory/solutionTypeAddResponse.json")
+        .build());
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("application-type-equal-constant-code")
+        .queryParams(Map.of("constantCode", "ADD"))
+        .response("/json/create-app/data-factory/applicationTypeResponse.json")
+        .build());
+
+    var errorMap = startProcessInstanceForError(labId);
+
+    var errors = errorMap.get("details").get("errors");
+    Assertions.assertThat(errors).hasSize(1);
+    Assertions.assertThat(errors.get(0)).contains(Map.entry("field", "laboratory"),
+        Map.entry("message", "Заява на первинне внесення не створена"),
+        Map.entry("value", labId));
+  }
+
+  @Test
+  @Deployment(resources = "bpmn/create-app-expanse.bpmn")
+  public void testSubjectIsDisabledButNoErrors() throws IOException {
+    var labId = "bb652d3f-a36f-465a-b7ba-232a5a1680c4";
+
+    var subjectStatusErrorActivityDefinitionKey = "Activity_shared-subject-status-error";
+    var addApplicationActivityDefinitionKey = "Activity_shared-add-application";
+    var addFactorsActivityDefinitionKey = "Activity_shared-add-factors";
+    var checkComplianceActivityDefinitionKey = "Activity_shared-check-complience";
+
+    stubSearchSubjects("/xml/create-app/searchSubjectsDisabledResponse.xml");
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("laboratory")
+        .resourceId(labId)
+        .response("/json/create-app/data-factory/findLaboratoryResponse.json")
+        .build());
+
+    var processInstanceId = startProcessInstanceAndGetId(labId);
+    var processInstance = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstanceId).list().get(0);
+
+    expectedVariablesMap.put("initiator", testUserName);
+    expectedVariablesMap.put("const_dataFactoryBaseUrl", dataFactoryBaseUrl);
+    expectedVariablesMap.put("start_form_ceph_key", START_FORM_CEPH_KEY);
+
+    // subject status error
+    assertWaitingActivity(processInstance, subjectStatusErrorActivityDefinitionKey,
+        "shared-subject-status-error");
+    completeTask(subjectStatusErrorActivityDefinitionKey, processInstanceId,
+        "/json/create-app/form-data/Activity_shared-subject-status-error.json");
+    addExpectedCephContent(processInstanceId, subjectStatusErrorActivityDefinitionKey,
+        "/json/create-app/form-data/Activity_shared-subject-status-error.json");
+    addCompleterUsernameVariable(subjectStatusErrorActivityDefinitionKey, testUserName);
+    expectedVariablesMap.put("edrSuspendedOrCancelled", "true");
+    expectedVariablesMap.put("fullName", null);
+    // add application
+    assertWaitingActivity(processInstance, addApplicationActivityDefinitionKey,
+        "shared-add-application");
+
+    completeTask(addApplicationActivityDefinitionKey, processInstanceId,
+        "/json/create-app/form-data/Activity_shared-add-application.json");
+
+    addCompleterUsernameVariable(addApplicationActivityDefinitionKey, testUserName);
+    addExpectedCephContent(processInstanceId, addApplicationActivityDefinitionKey,
+        "/json/create-app/form-data/Activity_shared-add-application.json");
+    addExpectedCephContent(processInstanceId, addFactorsActivityDefinitionKey,
+        "/json/create-app/form-data/name-registrationNo-prepopulation.json");
+    // add bio phys labor and chem factors
+    assertWaitingActivity(processInstance, addFactorsActivityDefinitionKey,
+        "shared-add-factors");
+
+    completeTask(addFactorsActivityDefinitionKey, processInstanceId,
+        "/json/create-app/form-data/Activity_shared-add-factors.json");
+
+    addCompleterUsernameVariable(addFactorsActivityDefinitionKey, testUserName);
+    addExpectedCephContent(processInstanceId, addFactorsActivityDefinitionKey,
+        "/json/create-app/form-data/Activity_shared-add-factors.json");
+    // check compliance
+    assertWaitingActivity(processInstance, checkComplianceActivityDefinitionKey,
+        "shared-check-complience");
+
+    var ex = org.junit.jupiter.api.Assertions.assertThrows(ValidationException.class,
+        () -> completeTask(checkComplianceActivityDefinitionKey, processInstanceId,
+            "/json/create-app/form-data/Activity_shared-check-compliance_noErrors.json"));
+
+    Assertions.assertThat(ex.getDetails().getErrors()).hasSize(1);
+    Assertions.assertThat(ex.getDetails().getErrors()).contains(
+        new ErrorDetailDto("Статус суб'єкта в ЄДР \"Скаcовано\" або \"Припинено\","
+            + " оберіть відповідну причину відмови", "errorCheckFlag", "false"));
+  }
+
+  private String startProcessInstanceAndGetId(String labId) throws JsonProcessingException {
+    saveStartFormDataToCeph(labId);
+    return startProcessInstanceWithStartFormAndGetId(PROCESS_DEFINITION_ID, START_FORM_CEPH_KEY,
+        testUserToken);
+  }
+
+  private void saveStartFormDataToCeph(String labId) {
+    var data = new LinkedHashMap<String, Object>();
+    data.put("laboratory", Map.of("laboratoryId", labId));
+    data.put("edrpou", "77777777");
+    data.put("subjectType", "LEGAL");
+    data.put("subject", Map.of("subjectId", "activeSubject"));
+    cephService.putFormData(START_FORM_CEPH_KEY, FormDataDto.builder().data(data).build());
+  }
+
+  @SuppressWarnings("unchecked")
+  private Map<String, Map<String, List<Map<String, String>>>> startProcessInstanceForError(
+      String labId) throws JsonProcessingException {
+    saveStartFormDataToCeph(labId);
+    var resultMap = startProcessInstanceWithStartForm(PROCESS_DEFINITION_ID,
+        START_FORM_CEPH_KEY, testUserToken);
+    return (Map<String, Map<String, List<Map<String, String>>>>) resultMap;
   }
 }
