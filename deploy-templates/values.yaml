@@ -11,6 +11,7 @@ camundaVarsMountPath: "/app/config/camunda"
 appSecretsMountPath: "/app/secrets/main"
 cephSecretMountPath: "/app/secrets/ceph"
 fileStorageSecretMountPath: "/app/secrets/fileStorage"
+systemUserKeycloakClientSecretsMountPath: "/app/secrets/system-user-client"
 citizenKeycloakClientSecretsMountPath: "/app/secrets/citizen-realm-admin-client"
 officerKeycloakClientSecretsMountPath: "/app/secrets/officer-realm-admin-client"
 prometheusScrapePath: "/actuator/prometheus"
@@ -56,6 +57,11 @@ keycloak:
       clientRoles:
       - clientId: realm-management
         roles: ["realm-admin"]
+  systemUserClient:
+    clientName: system-user
+    realm: citizen-portal
+    public: false
+    secretName: keycloak-system-user-citizen-client-secret
 
 trembitaExchangeGateway:
   userId: 'MDTUDDM'
