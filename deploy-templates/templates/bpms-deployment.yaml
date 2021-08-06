@@ -121,6 +121,8 @@ spec:
             mountPath: {{ .Values.citizenKeycloakClientSecretsMountPath }}
           - name: {{ .Values.keycloak.officerClient.secretName }}
             mountPath: {{ .Values.officerKeycloakClientSecretsMountPath }}
+          - name: {{ .Values.keycloak.systemUserClient.secretName }}
+            mountPath: {{ .Values.systemUserKeycloakClientSecretsMountPath }}
       serviceAccountName: {{ .Chart.Name }}
       {{- if .Values.nodeSelector }}
       nodeSelector: {{ toYaml .Values.nodeSelector | nindent 8 }}
@@ -171,3 +173,9 @@ spec:
             items:
             - key: clientSecret
               path: keycloak.officer.client-secret
+        - name: {{ .Values.keycloak.systemUserClient.secretName }}
+          secret:
+            secretName: {{ .Values.keycloak.systemUserClient.secretName }}
+            items:
+            - key: clientSecret
+              path: system-user.keycloak.client-secret
