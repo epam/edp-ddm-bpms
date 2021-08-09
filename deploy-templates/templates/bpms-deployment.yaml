@@ -178,4 +178,4 @@ spec:
             secretName: {{ .Values.keycloak.systemUserClient.secretName }}
             items:
             - key: clientSecret
-              path: system-user.keycloak.client-secret
+              path: keycloak.system-user.client-secret
