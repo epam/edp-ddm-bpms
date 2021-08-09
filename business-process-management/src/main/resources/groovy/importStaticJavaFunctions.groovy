@@ -6,3 +6,4 @@ initiator = com.epam.digital.data.platform.el.juel.InitiatorJuelFunction.&initia
 completer = com.epam.digital.data.platform.el.juel.CompleterJuelFunction.&completer
 submission = com.epam.digital.data.platform.el.juel.SubmissionJuelFunction.&submission
 sign_submission = com.epam.digital.data.platform.el.juel.SignSubmissionJuelFunction.&sign_submission
+system_user = com.epam.digital.data.platform.el.juel.SystemUserJuelFunction.&system_user
