@@ -557,3 +557,75 @@ package el {
 
 [IMPORTANT]
 Функія `sign_submission(<activity_id|event_id>)` доступна для використання після успішного завершення підписуючої користувацької задачі або стартової форми.
+
+=== system_user()
+
+Діаграма класів:
+
+[plantuml,sign_submission-class,svg]
+----
+@startuml
+package el {
+  package juel {
+    abstract class AbstractApplicationContextAwareJuelFunction
+    class SystemUserJuelFunction #back:lightblue;line:green;text:black extends AbstractApplicationContextAwareJuelFunction {
+      + {static} UserDto system_user()
+    }
+  }
+  package dto {
+    class UserDto #back:lightblue;line:green;text:black {
+      - String userName
+      - String accessToken
+      - JwtClaimsDto claims
+    }
+  AbstractApplicationContextAwareJuelFunction ..[hidden]> UserDto
+  SystemUserJuelFunction .> UserDto : returns
+}
+@enduml
+----
+
+* `SystemUserJuelFunction` -- наслідує `AbstractApplicationContextAwareJuelFunction` та надає функцію `system_user()` що:
+
+[plantuml,system_user-sequence,svg]
+----
+@startuml
+  skinparam responseMessageBelowArrow true
+
+  participant "system_user()" as system_user order 10
+  participant "Camunda Execution Context" as camunda order 20
+  participant "Keycloak" as keycloak order 30
+
+  -> system_user
+  activate system_user
+
+  system_user -> camunda : Отримати існуючий UserDto об'єкт
+  activate camunda
+
+  alt Об'єкт UserDto знайдено
+    system_user <-- camunda : Знайдений об'єкт UserDto
+    <-- system_user : UserDto
+
+  else Об'єкт UserDto не знайдено
+    system_user <-- camunda : null
+    deactivate camunda
+
+    system_user -> keycloak : Отримати токен системного користувача
+      activate keycloak
+      system_user <-- keycloak : токен системного користувача
+      deactivate keycloak
+
+    system_user -> system_user : Парсинг токена системного користувача
+    system_user -> system_user : Збудувати об'єкт UserDto
+
+    system_user -> camunda : Зберегти UserDto об'єкт у контексті \nу якості transient змінної
+      activate camunda
+      system_user <-- camunda : Збережено
+      deactivate camunda
+
+      <-- system_user : UserDto
+      deactivate system_user
+  end
+@enduml
+----
+
+* `UserDto` -- клас що являє собою обгортку для даних системного користувача, таких як токен, та username.

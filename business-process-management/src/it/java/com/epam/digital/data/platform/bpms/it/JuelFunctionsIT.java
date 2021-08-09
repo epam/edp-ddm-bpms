@@ -1,5 +1,10 @@
 package com.epam.digital.data.platform.bpms.it;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
@@ -94,6 +99,20 @@ public class JuelFunctionsIT extends BaseIT {
 
     String taskId = taskService.createTaskQuery().taskDefinitionKey(taskDefinitionKey).singleResult().getId();
     taskService.complete(taskId);
+
+    BpmnAwareTests.assertThat(processInstance).isEnded();
+  }
+
+  @Test
+  public void testSystemUserFunction() {
+    keycloakMockServer.addStubMapping(
+        stubFor(post(urlPathEqualTo("/auth/realms/system-user-realm/protocol/openid-connect/token"))
+            .withRequestBody(equalTo("grant_type=client_credentials"))
+            .willReturn(aResponse().withStatus(200)
+                .withHeader("Content-type", "application/json")
+                .withBody(convertJsonToString("/json/keycloak/keycloakSystemUserConnectResponse.json")))));
+
+    var processInstance = runtimeService.startProcessInstanceByKey("test_system_user", Map.of());
 
     BpmnAwareTests.assertThat(processInstance).isEnded();
   }

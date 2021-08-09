@@ -1,0 +1,10 @@
+{
+  "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0ZXN0IiwiaWF0IjoxNjEyMzY1ODM1LCJleHAiOjE2NDM5MDE4MzUsImF1ZCI6Ind3dy5leGFtcGxlLmNvbSIsInN1YiI6InRlc3RAZXhhbXBsZS5jb20iLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJKb2hubnkifQ.yIZTll8gxS3d1I0_SUdUCRiBAx22ZxmOTiC5jYLGLBA",
+  "expires_in": 300,
+  "refresh_expires_in": 1800,
+  "refresh_token": "refreshToken",
+  "token_type": "Bearer",
+  "not-before-policy": 0,
+  "session_state": "58687863-24de-435a-abca-3af39e38f866",
+  "scope": "email profile"
+}
