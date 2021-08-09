@@ -62,6 +62,33 @@ keycloak:
     realm: citizen-portal
     public: false
     secretName: keycloak-system-user-citizen-client-secret
+    protocolMappers:
+      - config:
+          access.token.claim: 'true'
+          aggregate.attrs: 'false'
+          claim.name: drfo
+          id.token.claim: 'true'
+          jsonType.label: String
+          multivalued: 'false'
+          name: drfo
+          user.attribute: drfo
+          userinfo.token.claim: 'true'
+        name: drfo
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+      - config:
+          access.token.claim: 'true'
+          aggregate.attrs: 'false'
+          claim.name: fullName
+          id.token.claim: 'true'
+          jsonType.label: String
+          multivalued: 'false'
+          name: fullName
+          user.attribute: fullName
+          userinfo.token.claim: 'true'
+        name: fullName
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
 
 trembitaExchangeGateway:
   userId: 'MDTUDDM'
