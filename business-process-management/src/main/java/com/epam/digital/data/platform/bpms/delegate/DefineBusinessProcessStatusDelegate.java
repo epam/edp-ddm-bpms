@@ -1,5 +1,6 @@
 package com.epam.digital.data.platform.bpms.delegate;
 
+import com.epam.digital.data.platform.bpms.api.constant.Constants;
 import com.epam.digital.data.platform.starter.logger.annotation.Logging;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -15,11 +16,9 @@ import org.springframework.stereotype.Component;
 @Logging
 public class DefineBusinessProcessStatusDelegate implements JavaDelegate {
 
-  private static final String SYS_VAR_PROCESS_COMPLETION_RESULT = "sys-var-process-completion-result";
-
   @Override
   public void execute(DelegateExecution execution) {
     var status = execution.getVariable("status");
-    execution.setVariable(SYS_VAR_PROCESS_COMPLETION_RESULT, status);
+    execution.setVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT, status);
   }
 }

@@ -25,6 +25,8 @@ lowcode:
 
 dso:
   url: http://localhost:8100
+excerpt-service-api:
+  url: http://localhost:9999
 
 ceph:
   http-endpoint: http://localhost:8100
