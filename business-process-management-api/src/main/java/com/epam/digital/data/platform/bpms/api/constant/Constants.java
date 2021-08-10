@@ -15,6 +15,13 @@ public final class Constants {
    */
   public static final String BPMS_START_FORM_CEPH_KEY_VARIABLE_FORMAT = "lowcode_%s_start_form_%s";
 
+  /**
+   * Format of the system variables of the process instance.
+   */
+  public static final String SYS_VAR_PREFIX_LIKE = "sys-var-%";
+  public static final String SYS_VAR_PROCESS_COMPLETION_RESULT = "sys-var-process-completion-result";
+  public static final String SYS_VAR_PROCESS_EXCERPT_ID = "sys-var-process-excerpt-id";
+
   private Constants() {
   }
 }

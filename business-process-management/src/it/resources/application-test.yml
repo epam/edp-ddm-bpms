@@ -47,7 +47,7 @@ keycloak:
     realm: officer-realm
     client-id: officer-client-id
     client-secret: officer-client-secret
-  system_user:
+  system-user:
     realm: system-user-realm
     client-id: system-user-client-id
     client-secret: system-user-client-secret

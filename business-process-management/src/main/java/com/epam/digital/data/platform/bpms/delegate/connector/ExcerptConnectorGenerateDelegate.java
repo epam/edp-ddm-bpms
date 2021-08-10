@@ -1,5 +1,6 @@
 package com.epam.digital.data.platform.bpms.delegate.connector;
 
+import com.epam.digital.data.platform.bpms.api.constant.Constants;
 import com.epam.digital.data.platform.bpms.delegate.dto.DataFactoryConnectorResponse;
 import com.epam.digital.data.platform.excerpt.model.ExcerptEventDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,6 +50,8 @@ public class ExcerptConnectorGenerateDelegate extends BaseConnectorDelegate {
         requiresSystemSignature);
 
     var response = performPost(execution, objectMapper.writeValueAsString(requestBody));
+    execution.setVariable(Constants.SYS_VAR_PROCESS_EXCERPT_ID,
+        response.getResponseBody().prop("excerptIdentifier").value());
     ((AbstractVariableScope) execution).setVariableLocalTransient(RESPONSE_VARIABLE, response);
   }
 
