@@ -14,5 +14,6 @@ public class HistoryVariableInstanceQueryDto {
   private String variableName;
   private String processInstanceId;
   private List<String> processInstanceIdIn;
+  private String variableNameLike;
 
 }
