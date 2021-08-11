@@ -19,6 +19,8 @@ camunda:
     admin-user:
       id: ${camunda.admin-user-id}
       password: camunda
+    job-execution:
+      enabled: false
   system-variables:
     const_dataFactoryBaseUrl: http://localhost:8877/mock-server
 dso:

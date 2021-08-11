@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1xanq84" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:collaboration id="Collaboration_0uxmrbg">
+    <bpmn:participant id="Participant_0ub6bh2" name="Перевірка статусу генерації витяга" processRef="check-excerpt-status" />
+  </bpmn:collaboration>
+  <bpmn:process id="check-excerpt-status" name="Перевірка статусу генерації витяга" isExecutable="true">
+    <bpmn:startEvent id="Event_0l21cap" name="Початок" camunda:initiator="initiator">
+      <bpmn:outgoing>Flow_1yws657</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_0x1eyqr" name="Конектор перевірки статусу генерації витягу" camunda:modelerTemplate="excerptConnectorStatusDelegate" camunda:delegateExpression="${excerptConnectorStatusDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="excerptIdentifier">${excerptIdentifier}</camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token">${system_user().accessToken}</camunda:inputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_10vuz4j</bpmn:incoming>
+      <bpmn:outgoing>Flow_0imlqm2</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_0blllvs">
+      <bpmn:incoming>Flow_16imkxj</bpmn:incoming>
+      <bpmn:incoming>Flow_1yws657</bpmn:incoming>
+      <bpmn:outgoing>Flow_10vuz4j</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="Gateway_1hfbr9i" name="Генерацію завершено?">
+      <bpmn:incoming>Flow_0imlqm2</bpmn:incoming>
+      <bpmn:outgoing>Flow_1t2qk5o</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0kly48c</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:intermediateCatchEvent id="tryAgainEvent" name="Зачекати та повторити спробу PT5S">
+      <bpmn:incoming>Flow_1t2qk5o</bpmn:incoming>
+      <bpmn:outgoing>Flow_16imkxj</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_1uvuub5">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT10S</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:endEvent id="Event_0qqey6o" name="Кінець">
+      <bpmn:incoming>Flow_05wvizo</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:scriptTask id="Activity_05k1xgp" name="Зберегти статус генерації витягу" scriptFormat="groovy" camunda:resultVariable="excerptStatus">
+      <bpmn:incoming>Flow_0kly48c</bpmn:incoming>
+      <bpmn:outgoing>Flow_05wvizo</bpmn:outgoing>
+      <bpmn:script>response.responseBody.prop('status').value()</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_16imkxj" sourceRef="tryAgainEvent" targetRef="Gateway_0blllvs" />
+    <bpmn:sequenceFlow id="Flow_1t2qk5o" name="ні" sourceRef="Gateway_1hfbr9i" targetRef="tryAgainEvent">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${response.value.responseBody.prop('status').value().equals('IN_PROGRESS')}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0kly48c" name="так" sourceRef="Gateway_1hfbr9i" targetRef="Activity_05k1xgp">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!response.value.responseBody.prop('status').value().equals('IN_PROGRESS')}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0imlqm2" sourceRef="Activity_0x1eyqr" targetRef="Gateway_1hfbr9i" />
+    <bpmn:sequenceFlow id="Flow_10vuz4j" sourceRef="Gateway_0blllvs" targetRef="Activity_0x1eyqr" />
+    <bpmn:sequenceFlow id="Flow_1yws657" sourceRef="Event_0l21cap" targetRef="Gateway_0blllvs" />
+    <bpmn:sequenceFlow id="Flow_05wvizo" sourceRef="Activity_05k1xgp" targetRef="Event_0qqey6o" />
+    <bpmn:textAnnotation id="TextAnnotation_1jdq6rq">
+      <bpmn:text>Перевірка стану за  ${excerptIdentifier} від імені системного користувача</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_0smoi1q" sourceRef="Activity_0x1eyqr" targetRef="TextAnnotation_1jdq6rq" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0uxmrbg">
+      <bpmndi:BPMNShape id="Participant_0ub6bh2_di" bpmnElement="Participant_0ub6bh2" isHorizontal="true" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="129" y="78" width="590" height="320" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_05wvizo_di" bpmnElement="Flow_05wvizo">
+        <di:waypoint x="639" y="208" />
+        <di:waypoint x="661" y="208" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1yws657_di" bpmnElement="Flow_1yws657">
+        <di:waypoint x="227" y="208" />
+        <di:waypoint x="244" y="208" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10vuz4j_di" bpmnElement="Flow_10vuz4j">
+        <di:waypoint x="294" y="208" />
+        <di:waypoint x="319" y="208" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0imlqm2_di" bpmnElement="Flow_0imlqm2">
+        <di:waypoint x="419" y="208" />
+        <di:waypoint x="464" y="208" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kly48c_di" bpmnElement="Flow_0kly48c">
+        <di:waypoint x="514" y="208" />
+        <di:waypoint x="539" y="208" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="511" y="190" width="16" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1t2qk5o_di" bpmnElement="Flow_1t2qk5o">
+        <di:waypoint x="489" y="233" />
+        <di:waypoint x="489" y="318" />
+        <di:waypoint x="397" y="318" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="500" y="273" width="9" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16imkxj_di" bpmnElement="Flow_16imkxj">
+        <di:waypoint x="361" y="318" />
+        <di:waypoint x="269" y="318" />
+        <di:waypoint x="269" y="233" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0l21cap_di" bpmnElement="Event_0l21cap">
+        <dc:Bounds x="191" y="190" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="188" y="233" width="43" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0x1eyqr_di" bpmnElement="Activity_0x1eyqr">
+        <dc:Bounds x="319" y="168" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0blllvs_di" bpmnElement="Gateway_0blllvs" isMarkerVisible="true">
+        <dc:Bounds x="244" y="183" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1hfbr9i_di" bpmnElement="Gateway_1hfbr9i" isMarkerVisible="true">
+        <dc:Bounds x="464" y="183" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="458" y="153" width="63" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0zkj8rm_di" bpmnElement="tryAgainEvent">
+        <dc:Bounds x="361" y="300" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="337" y="343" width="66" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0qqey6o_di" bpmnElement="Event_0qqey6o">
+        <dc:Bounds x="661" y="190" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="662" y="233" width="34" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_05k1xgp_di" bpmnElement="Activity_05k1xgp">
+        <dc:Bounds x="539" y="168" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1jdq6rq_di" bpmnElement="TextAnnotation_1jdq6rq">
+        <dc:Bounds x="312" y="88" width="220" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_0smoi1q_di" bpmnElement="Association_0smoi1q">
+        <di:waypoint x="367" y="168" />
+        <di:waypoint x="367" y="148" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

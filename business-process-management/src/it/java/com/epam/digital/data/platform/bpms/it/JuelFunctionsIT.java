@@ -105,6 +105,7 @@ public class JuelFunctionsIT extends BaseIT {
 
   @Test
   public void testSystemUserFunction() {
+    keycloakMockServer.resetAll();
     keycloakMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo("/auth/realms/system-user-realm/protocol/openid-connect/token"))
             .withRequestBody(equalTo("grant_type=client_credentials"))

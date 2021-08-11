@@ -1,0 +1,9 @@
+{
+  "data": {
+    "laboratory": {
+      "laboratoryId": "laboratory1",
+      "name": "laboratory1Name",
+      "subjectId": "subjectId1"
+    }
+  }
+}

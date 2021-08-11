@@ -17,7 +17,7 @@
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_18zxk80</bpmn:incoming>
       <bpmn:outgoing>Flow_0dlrbi6</bpmn:outgoing>
-      <bpmn:script>assert systemUser.userName.equals('Johnny')
+      <bpmn:script>assert systemUser.userName.equals('testuser2')
 assert !systemUser.accessToken.isEmpty()</bpmn:script>
     </bpmn:scriptTask>
   </bpmn:process>
