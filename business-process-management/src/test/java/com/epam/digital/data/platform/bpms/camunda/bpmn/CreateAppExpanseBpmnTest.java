@@ -8,7 +8,6 @@ import com.epam.digital.data.platform.bpms.it.builder.StubData;
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.epam.digital.data.platform.starter.errorhandling.dto.ErrorDetailDto;
 import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
@@ -23,7 +22,7 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
 
   @Test
   @Deployment(resources = {"bpmn/create-app-expanse.bpmn", "bpmn/system-signature-bp.bpmn"})
-  public void testAdditionHappyPass_accreditationFlagIsTrue() throws IOException {
+  public void testAdditionHappyPass_accreditationFlagIsTrue() {
     var labId = "bb652d3f-a36f-465a-b7ba-232a5a1680c5";
 
     var addApplicationActivityDefinitionKey = "Activity_shared-add-application";
@@ -101,7 +100,7 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
     startProcessInstanceWithStartForm(labId);
 
     expectedVariablesMap.put("initiator", testUserName);
-    expectedVariablesMap.put("fullName", null);
+    expectedVariablesMap.put("fullName", "testuser testuser testuser");
     expectedVariablesMap.put("start_form_ceph_key", START_FORM_CEPH_KEY);
 
     // add application
@@ -199,7 +198,7 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
 
   @Test
   @Deployment(resources = {"bpmn/create-app-expanse.bpmn", "bpmn/system-signature-bp.bpmn"})
-  public void testDenyingHappyPass_accreditationFlagIsTrue() throws IOException {
+  public void testDenyingHappyPass_accreditationFlagIsTrue() {
     var labId = "bb652d3f-a36f-465a-b7ba-232a5a1680c5";
 
     var subjectStatusErrorActivityDefinitionKey = "Activity_shared-subject-status-error";
@@ -360,7 +359,7 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
 
   @Test
   @Deployment(resources = "bpmn/create-app-expanse.bpmn")
-  public void testValidationError() throws IOException {
+  public void testValidationError() {
     var labId = "bb652d3f-a36f-465a-b7ba-232a5a1680c4";
 
     mockEdrResponse("/json/create-app/edr/searchSubjectsActiveResponse.json");
@@ -418,7 +417,7 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
 
   @Test
   @Deployment(resources = "bpmn/create-app-expanse.bpmn")
-  public void testNoAccreditationFlag() throws IOException {
+  public void testNoAccreditationFlag() {
     var labId = "bb652d3f-a36f-465a-b7ba-232a5a1680c4";
 
     var addApplicationActivityDefinitionKey = "Activity_shared-add-application";
@@ -469,7 +468,7 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
     startProcessInstanceWithStartForm(labId);
 
     expectedVariablesMap.put("initiator", testUserName);
-    expectedVariablesMap.put("fullName", null);
+    expectedVariablesMap.put("fullName", "testuser testuser testuser");
     expectedVariablesMap.put("start_form_ceph_key", START_FORM_CEPH_KEY);
     addExpectedCephContent(addApplicationActivityDefinitionKey,
         "/json/create-app/form-data/name-edrpou-prepopulation.json");
@@ -481,7 +480,7 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
 
   @Test
   @Deployment(resources = "bpmn/create-app-expanse.bpmn")
-  public void testAppAlreadyCreated() throws IOException {
+  public void testAppAlreadyCreated() {
     var labId = "bb652d3f-a36f-465a-b7ba-232a5a1680c4";
 
     mockEdrResponse("/json/create-app/edr/searchSubjectsActiveResponse.json");
@@ -523,7 +522,7 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
 
   @Test
   @Deployment(resources = "bpmn/create-app-expanse.bpmn")
-  public void testSubjectIsDisabledButNoErrors() throws IOException {
+  public void testSubjectIsDisabledButNoErrors() {
     var labId = "bb652d3f-a36f-465a-b7ba-232a5a1680c4";
 
     var subjectStatusErrorActivityDefinitionKey = "Activity_shared-subject-status-error";
