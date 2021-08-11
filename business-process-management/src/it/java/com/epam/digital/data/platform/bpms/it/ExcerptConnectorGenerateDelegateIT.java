@@ -7,6 +7,7 @@ import com.epam.digital.data.platform.excerpt.model.ExcerptEventDto;
 import java.util.Map;
 import java.util.UUID;
 import org.assertj.core.api.Assertions;
+import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.util.CollectionUtils;
@@ -14,6 +15,8 @@ import org.springframework.util.CollectionUtils;
 public class ExcerptConnectorGenerateDelegateIT extends BaseBpmnIT {
 
   @Test
+  @Deployment(resources = {"/bpmn/citizen-attestation-excerpt.bpmn",
+      "/bpmn/system-signature-bp.bpmn", "/bpmn/check-excerpt-status.bpmn"})
   public void shouldGenerateExcerpt() throws Exception {
     var requestDto = new ExcerptEventDto();
     requestDto.setExcerptType("subject-laboratories-accreditation-excerpt");

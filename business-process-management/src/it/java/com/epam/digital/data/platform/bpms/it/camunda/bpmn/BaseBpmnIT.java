@@ -12,6 +12,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.historyService;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.managementService;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
 
 import com.epam.digital.data.platform.bpms.api.constant.Constants;
@@ -24,7 +25,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -84,7 +84,7 @@ public abstract class BaseBpmnIT extends BaseIT {
   private final Map<String, Object> expectedCephStorage = new HashMap<>();
 
   @Before
-  public void init() throws IOException {
+  public void init() {
     cephService.clearStorage();
     expectedVariablesMap.clear();
     expectedCephStorage.clear();
@@ -105,41 +105,39 @@ public abstract class BaseBpmnIT extends BaseIT {
     SecurityContextHolder.getContext().setAuthentication(null);
   }
 
-  protected void completeTask(String taskId, String processInstanceId, String formData)
-      throws IOException {
+  protected void completeTask(String taskId, String processInstanceId, String formData) {
     var cephKey = cephKeyProvider.generateKey(taskId, processInstanceId);
     cephService.putFormData(cephKey, deserializeFormData(TestUtils.getContent(formData)));
     String id = taskService.createTaskQuery().taskDefinitionKey(taskId).singleResult().getId();
     taskService.complete(id);
   }
 
-  protected void stubDataFactoryRequest(StubData data) throws IOException {
+  protected void stubDataFactoryRequest(StubData data) {
     var uriBuilder = UriComponentsBuilder.fromPath(MOCK_SERVER).pathSegment(data.getResource());
 
     dataFactoryMockServer.addStubMapping(stubFor(getMappingBuilder(data, uriBuilder)));
   }
 
-  protected void stubDigitalSignatureRequest(StubData data) throws IOException {
+  protected void stubDigitalSignatureRequest(StubData data) {
     var uriBuilder = UriComponentsBuilder.fromPath("/api/eseal/sign");
 
     digitalSignatureMockServer.addStubMapping(stubFor(getMappingBuilder(data, uriBuilder)));
   }
 
-  protected void stubSettingsRequest(StubData data) throws IOException {
+  protected void stubSettingsRequest(StubData data) {
     var uriBuilder = UriComponentsBuilder.fromPath(SETTINGS_MOCK_SERVER)
         .pathSegment(data.getResource());
 
     userSettingsWireMock.addStubMapping(stubFor(getMappingBuilder(data, uriBuilder)));
   }
 
-  protected void stubExcerptServiceRequest(StubData data) throws IOException {
+  protected void stubExcerptServiceRequest(StubData data) {
     var uriBuilder = Objects.nonNull(data.getUri()) ? data.getUri() :
         UriComponentsBuilder.fromPath(EXCERPT_SERVICE_MOCK_SERVER).pathSegment(data.getResource());
     excerptServiceWireMock.addStubMapping(stubFor(getMappingBuilder(data, uriBuilder)));
   }
 
-  private MappingBuilder getMappingBuilder(StubData data, UriComponentsBuilder uriBuilder)
-      throws IOException {
+  private MappingBuilder getMappingBuilder(StubData data, UriComponentsBuilder uriBuilder) {
     if (Objects.nonNull(data.getResourceId())) {
       uriBuilder.pathSegment(data.getResourceId());
     }
@@ -202,9 +200,9 @@ public abstract class BaseBpmnIT extends BaseIT {
 
   protected void assertCephContent() {
     expectedCephStorage.forEach((key, value) -> {
-      var actualMap = cephService.getFormData(key).get();
+      var actualMap = cephService.getFormData(key);
 
-      Assertions.assertThat(actualMap).isEqualTo(value);
+      Assertions.assertThat(actualMap).get().isEqualTo(value);
     });
   }
 
@@ -217,7 +215,7 @@ public abstract class BaseBpmnIT extends BaseIT {
   }
 
   protected void addExpectedCephContent(String processInstanceId, String taskDefinitionKey,
-      String cephContent) throws IOException {
+      String cephContent) {
     var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, processInstanceId);
 
     expectedCephStorage.put(cephKey, deserializeFormData(TestUtils.getContent(cephContent)));
@@ -290,5 +288,11 @@ public abstract class BaseBpmnIT extends BaseIT {
         .readValue(TestUtils.getContent(cephContent));
 
     Assertions.assertThat(actual).isEqualTo(expected);
+  }
+
+  protected void executeWaitingJob(String activityDefinitionId) {
+    var jobs = managementService().createJobQuery().activityId(activityDefinitionId).list();
+    Assertions.assertThat(jobs).hasSize(1);
+    jobs.forEach(job -> managementService().executeJob(job.getId()));
   }
 }

@@ -92,7 +92,7 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
         .processInstanceId(processInstanceId).list().get(0);
 
     expectedVariablesMap.put("initiator", testUserName);
-    expectedVariablesMap.put("fullName", null);
+    expectedVariablesMap.put("fullName", "testuser testuser testuser");
     expectedVariablesMap.put("const_dataFactoryBaseUrl", dataFactoryBaseUrl);
     expectedVariablesMap.put("start_form_ceph_key", START_FORM_CEPH_KEY);
 
@@ -471,7 +471,7 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
         .processInstanceId(processInstanceId).list().get(0);
 
     expectedVariablesMap.put("initiator", testUserName);
-    expectedVariablesMap.put("fullName", null);
+    expectedVariablesMap.put("fullName", "testuser testuser testuser");
     expectedVariablesMap.put("const_dataFactoryBaseUrl", dataFactoryBaseUrl);
     expectedVariablesMap.put("start_form_ceph_key", START_FORM_CEPH_KEY);
     addExpectedCephContent(processInstanceId, addApplicationActivityDefinitionKey,

@@ -18,6 +18,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 import com.epam.digital.data.platform.bpms.delegate.DefineBusinessProcessStatusDelegate;
+import com.epam.digital.data.platform.bpms.delegate.DefineProcessExcerptIdDelegate;
 import com.epam.digital.data.platform.bpms.delegate.UserDataValidationErrorDelegate;
 import com.epam.digital.data.platform.bpms.delegate.ceph.CephKeyProvider;
 import com.epam.digital.data.platform.bpms.delegate.ceph.GetContentFromCephDelegate;
@@ -30,6 +31,8 @@ import com.epam.digital.data.platform.bpms.delegate.connector.DataFactoryConnect
 import com.epam.digital.data.platform.bpms.delegate.connector.DataFactoryConnectorReadDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.DataFactoryConnectorSearchDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.DigitalSignatureConnectorDelegate;
+import com.epam.digital.data.platform.bpms.delegate.connector.ExcerptConnectorGenerateDelegate;
+import com.epam.digital.data.platform.bpms.delegate.connector.ExcerptConnectorStatusDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.UserSettingsConnectorReadDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.UserSettingsConnectorUpdateDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.keycloak.KeycloakAddRoleConnectorDelegate;
@@ -45,7 +48,6 @@ import com.epam.digital.data.platform.starter.localization.MessageResolver;
 import com.epam.digital.data.platform.starter.security.jwt.TokenParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -81,6 +83,7 @@ public abstract class BaseBpmnTest {
   protected final String dataFactoryUrl = "http://data-factory:8080/";
   protected final String userSettingsBaseUrl = "http://user-setings:8080/";
   protected final String digitalSignatureUrl = "http://digital-signature-ops:8080/";
+  protected final String excerptServiceBaseUrl = "http://excerpt-service-api:8080/";
   protected final String springAppName = "business-process-management";
 
   // init mocks
@@ -113,7 +116,7 @@ public abstract class BaseBpmnTest {
   protected ProcessInstance currentProcessInstance;
 
   @Before
-  public void init() throws IOException {
+  public void init() {
     var beans = processEngineRule.getProcessEngineConfiguration().getBeans();
 
     objectMapper = (ObjectMapper) beans.get("objectMapper");
@@ -131,8 +134,10 @@ public abstract class BaseBpmnTest {
 
     var userDataValidationErrorDelegate = new UserDataValidationErrorDelegate(objectMapper);
     var defineBusinessProcessStatusDelegate = new DefineBusinessProcessStatusDelegate();
+    var defineProcessExcerptIdDelegate = new DefineProcessExcerptIdDelegate();
     Mocks.register("defineBusinessProcessStatusDelegate", defineBusinessProcessStatusDelegate);
     Mocks.register("userDataValidationErrorDelegate", userDataValidationErrorDelegate);
+    Mocks.register("defineProcessExcerptIdDelegate", defineProcessExcerptIdDelegate);
 
     // register keycloak delegates
     Mocks.register("keycloakRemoveRoleConnectorDelegate", keycloakRemoveRoleConnectorDelegate);
@@ -147,25 +152,32 @@ public abstract class BaseBpmnTest {
         new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
   }
 
-  protected void completeTask(String taskDefinitionKey, String formData) throws IOException {
+  protected void completeTask(String taskDefinitionKey, String formData) {
     var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, currentProcessInstanceId);
     cephService.putContent(cephBucketName, cephKey, TestUtils.getContent(formData));
     complete(task(taskDefinitionKey));
   }
 
-  protected void mockDataFactoryRequest(StubData stubData) throws IOException {
+  protected void mockDataFactoryRequest(StubData stubData) {
     mockRequest(stubData, dataFactoryUrl);
   }
 
-  private void mockRequest(StubData stubData, String baseUrl, String... pathSegments)
-      throws IOException {
+  protected void mockExcerptRequest(StubData stubData) {
+    mockRequest(stubData, excerptServiceBaseUrl);
+  }
+
+  protected void mockExcerptStatusRequest(StubData stubData) {
+    mockRequest(stubData, excerptServiceBaseUrl, "status");
+  }
+
+  private void mockRequest(StubData stubData, String baseUrl, String... pathSegments) {
     var uriBuilder = UriComponentsBuilder.fromHttpUrl(baseUrl)
         .pathSegment(stubData.getResource()).encode();
-    if (Objects.nonNull(pathSegments)) {
-      uriBuilder.pathSegment(pathSegments);
-    }
     if (Objects.nonNull(stubData.getResourceId())) {
       uriBuilder = uriBuilder.pathSegment(stubData.getResourceId());
+    }
+    if (Objects.nonNull(pathSegments)) {
+      uriBuilder.pathSegment(pathSegments);
     }
 
     var responseActions = mockServer
@@ -185,19 +197,19 @@ public abstract class BaseBpmnTest {
         .body(TestUtils.getContent(stubData.getResponse())));
   }
 
-  protected void mockDigitalSignatureSign(StubData stubData) throws IOException {
+  protected void mockDigitalSignatureSign(StubData stubData) {
     mockRequest(stubData, digitalSignatureUrl, "api", "eseal", "sign");
   }
 
-  protected void mockSettingsRequest(StubData stubData) throws IOException {
+  protected void mockSettingsRequest(StubData stubData) {
     mockRequest(stubData, userSettingsBaseUrl);
   }
 
   protected void assertCephContent() {
     expectedCephStorage.forEach((key, value) -> {
-      var actualMap = cephService.getFormData(key).get();
+      var actualMap = cephService.getFormData(key);
 
-      Assertions.assertThat(actualMap).isEqualTo(value);
+      Assertions.assertThat(actualMap).get().isEqualTo(value);
     });
   }
 
@@ -213,8 +225,7 @@ public abstract class BaseBpmnTest {
     expectedVariablesMap.put(name, value);
   }
 
-  protected void addExpectedCephContent(String taskDefinitionKey, String cephContent)
-      throws IOException {
+  protected void addExpectedCephContent(String taskDefinitionKey, String cephContent) {
     var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, currentProcessInstanceId);
 
     expectedCephStorage.put(cephKey, deserializeFormData(TestUtils.getContent(cephContent)));
@@ -236,6 +247,13 @@ public abstract class BaseBpmnTest {
     currentProcessInstance = runtimeService().startProcessInstanceByKey(processDefinitionKey, vars);
     assertThat(currentProcessInstance).isStarted();
     currentProcessInstanceId = currentProcessInstance.getProcessInstanceId();
+  }
+
+  protected void executeWaitingJob(String activityDefinitionId) {
+    var jobs = processEngineRule.getManagementService().createJobQuery()
+        .activityId(activityDefinitionId).list();
+    Assertions.assertThat(jobs).hasSize(1);
+    jobs.forEach(job -> processEngineRule.getManagementService().executeJob(job.getId()));
   }
 
   private void initCephDelegates() {
@@ -283,6 +301,13 @@ public abstract class BaseBpmnTest {
 
     Mocks.register("searchSubjectsEdrRegistryConnectorDelegate",
         searchSubjectsEdrRegistryConnectorDelegate);
+
+    var excerptConnectorGenerateDelegate = new ExcerptConnectorGenerateDelegate(restTemplate,
+        springAppName, excerptServiceBaseUrl, objectMapper);
+    Mocks.register("excerptConnectorGenerateDelegate", excerptConnectorGenerateDelegate);
+    var excerptConnectorStatusDelegate = new ExcerptConnectorStatusDelegate(restTemplate,
+        springAppName, excerptServiceBaseUrl, objectMapper);
+    Mocks.register("excerptConnectorStatusDelegate", excerptConnectorStatusDelegate);
   }
 
   @SneakyThrows

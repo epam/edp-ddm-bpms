@@ -1,0 +1,19 @@
+{
+  "laboratoryId": "laboratory1",
+  "subjectId": "subjectId1",
+  "koatuuId": "",
+  "ownershipId": "",
+  "accreditationFlag": false,
+  "headName": "",
+  "phoneNumber": "",
+  "notes": "",
+  "address": "",
+  "kopfgId": "",
+  "accreditationEndDate": "",
+  "edrpou": "01010101",
+  "name": "laboratory1Name",
+  "premisesFile": {
+    "id": "",
+    "checksum": ""
+  }
+}
