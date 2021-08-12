@@ -1,7 +1,10 @@
 package com.epam.digital.data.platform.bpms.it.camunda.bpmn;
 
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
+import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.groovy.util.Maps;
 import org.camunda.bpm.engine.test.Deployment;
@@ -77,8 +80,9 @@ public class UpdateLabBpmnIT extends BaseBpmnIT {
         .build());
 
     //start process
-    var processInstance = runtimeService.startProcessInstanceByKey("update-lab");
-    var processInstanceId = processInstance.getId();
+    var processInstanceId = startProcessInstanceAndGetId();
+    var processInstance = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstanceId).list().get(0);
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.PUT)
@@ -88,10 +92,6 @@ public class UpdateLabBpmnIT extends BaseBpmnIT {
         .requestBody("/json/update-lab/updateLabRequestBody.json")
         .response("{}")
         .build());
-
-    BpmnAwareTests.assertThat(processInstance).isWaitingAt("searchLabFormActivity");
-    completeTask("searchLabFormActivity", processInstanceId,
-        "/json/update-lab/searchLabFormActivity.json");
 
     BpmnAwareTests.assertThat(processInstance).isWaitingAt("viewLabDataFormActivity");
     completeTask("viewLabDataFormActivity", processInstanceId,
@@ -107,10 +107,25 @@ public class UpdateLabBpmnIT extends BaseBpmnIT {
 
     //then
     BpmnAwareTests.assertThat(processInstance)
-        .hasPassed("searchLabFormActivity", "viewLabDataFormActivity", "updateLabFormActivity")
+        .hasPassed("viewLabDataFormActivity", "updateLabFormActivity")
         .isEnded();
 
     assertSystemSignature(processInstanceId, "system_signature_ceph_key",
         "/json/update-lab/digitalSignatureCephContent.json");
+  }
+
+  private String startProcessInstanceAndGetId() throws JsonProcessingException {
+    saveStartFormDataToCeph();
+    return startProcessInstanceWithStartFormAndGetId("update-lab", START_FORM_CEPH_KEY,
+        testUserToken);
+  }
+
+  private void saveStartFormDataToCeph() {
+    var data = new LinkedHashMap<String, Object>();
+    data.put("subjectType", "LEGAL");
+    data.put("edrpou", "77777777");
+    data.put("subject", Map.of("subjectId", "activeSubject"));
+    data.put("laboratory", Map.of("laboratoryId", "d2943186-0f1f-4a77-9de9-a5a59c07db02"));
+    cephService.putFormData(START_FORM_CEPH_KEY, FormDataDto.builder().data(data).build());
   }
 }
