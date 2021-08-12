@@ -21,7 +21,6 @@ import org.springframework.http.HttpMethod;
 public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
 
   private static final String PROCESS_DEFINITION_ID = "create-app-expanse";
-  private static final String START_FORM_CEPH_KEY = "startFormCephKey";
 
   @Value("${camunda.system-variables.const_dataFactoryBaseUrl}")
   private String dataFactoryBaseUrl;

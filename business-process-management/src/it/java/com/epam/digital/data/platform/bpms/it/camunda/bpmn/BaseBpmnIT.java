@@ -52,6 +52,7 @@ public abstract class BaseBpmnIT extends BaseIT {
   private static final String MOCK_SERVER = "/mock-server";
   private static final String SETTINGS_MOCK_SERVER = "/user-settings-mock-server";
   protected static final String EXCERPT_SERVICE_MOCK_SERVER = "/excerpt-mock-service";
+  public static final String START_FORM_CEPH_KEY = "startFormCephKey";
 
   @Inject
   @Qualifier("digitalSignatureMockServer")
