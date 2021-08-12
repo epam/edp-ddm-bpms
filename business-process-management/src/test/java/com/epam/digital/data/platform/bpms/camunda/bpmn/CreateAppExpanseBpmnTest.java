@@ -3,9 +3,7 @@ package com.epam.digital.data.platform.bpms.camunda.bpmn;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.historyService;
 
-import com.epam.digital.data.platform.bpms.api.constant.Constants;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
-import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.epam.digital.data.platform.starter.errorhandling.dto.ErrorDetailDto;
 import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import java.util.LinkedHashMap;
@@ -591,18 +589,12 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
   }
 
   protected void startProcessInstanceWithStartForm(String labId) {
-    saveStartFormDataToCeph(labId);
-    startProcessInstance(PROCESS_DEFINITION_ID,
-        Map.of(Constants.BPMS_START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY,
-            "initiator", testUserName));
-  }
-
-  private void saveStartFormDataToCeph(String labId) {
     var data = new LinkedHashMap<String, Object>();
     data.put("laboratory", Map.of("laboratoryId", labId));
     data.put("edrpou", "77777777");
     data.put("subjectType", "LEGAL");
     data.put("subject", Map.of("subjectId", "activeSubject"));
-    cephService.putFormData(START_FORM_CEPH_KEY, FormDataDto.builder().data(data).build());
+
+    startProcessInstanceWithStartForm(PROCESS_DEFINITION_ID, data);
   }
 }
