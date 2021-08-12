@@ -17,6 +17,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
+import com.epam.digital.data.platform.bpms.api.constant.Constants;
 import com.epam.digital.data.platform.bpms.delegate.DefineBusinessProcessStatusDelegate;
 import com.epam.digital.data.platform.bpms.delegate.DefineProcessExcerptIdDelegate;
 import com.epam.digital.data.platform.bpms.delegate.UserDataValidationErrorDelegate;
@@ -50,6 +51,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -77,6 +79,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @RunWith(MockitoJUnitRunner.class)
 public abstract class BaseBpmnTest {
+
+  public static final String START_FORM_CEPH_KEY = "startFormCephKey";
 
   // init constants
   protected final String cephBucketName = "bucket";
@@ -343,6 +347,14 @@ public abstract class BaseBpmnTest {
         .readValue(TestUtils.getContent(cephContent));
 
     Assertions.assertThat(actual).isEqualTo(expected);
+  }
+
+  protected void startProcessInstanceWithStartForm(String processDefinitionId,
+      LinkedHashMap<String, Object> data) {
+    cephService.putFormData(START_FORM_CEPH_KEY, FormDataDto.builder().data(data).build());
+    startProcessInstance(processDefinitionId,
+        Map.of(Constants.BPMS_START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY,
+            "initiator", testUserName));
   }
 
   @RequiredArgsConstructor

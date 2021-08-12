@@ -1,7 +1,10 @@
 package com.epam.digital.data.platform.bpms.it.camunda.bpmn;
 
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
+import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.groovy.util.Maps;
 import org.camunda.bpm.engine.test.Deployment;
@@ -18,7 +21,7 @@ public class AddLabBpmnIT extends BaseBpmnIT {
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("laboratory-equal-edrpou-name-count")
-        .queryParams(Maps.of("name", "labName", "edrpou", "11111111"))
+        .queryParams(Maps.of("name", "labName", "edrpou", "77777777"))
         .response("[]")
         .build());
 
@@ -30,8 +33,9 @@ public class AddLabBpmnIT extends BaseBpmnIT {
         .build());
 
     //start process
-    var processInstance = runtimeService.startProcessInstanceByKey("add-lab");
-    var processInstanceId = processInstance.getId();
+    var processInstanceId = startProcessInstanceAndGetId();
+    var processInstance = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstanceId).list().get(0);
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
@@ -43,10 +47,11 @@ public class AddLabBpmnIT extends BaseBpmnIT {
         .build());
 
     BpmnAwareTests.assertThat(processInstance).isWaitingAt("addLabFormActivity");
-    completeTask("addLabFormActivity", processInstanceId, "/json/add-lab/Activity_1ne2ryq.json");
+    completeTask("addLabFormActivity", processInstanceId, "/json/add-lab/addLabFormActivity.json");
 
     BpmnAwareTests.assertThat(processInstance).isWaitingAt("signLabFormActivity");
-    completeTask("signLabFormActivity", processInstanceId, "/json/add-lab/Activity_0s05qmu.json");
+    completeTask("signLabFormActivity", processInstanceId,
+        "/json/add-lab/signLabFormActivity.json");
 
     //then
     BpmnAwareTests.assertThat(processInstance)
@@ -54,5 +59,19 @@ public class AddLabBpmnIT extends BaseBpmnIT {
 
     assertSystemSignature(processInstanceId, "system_signature_ceph_key",
         "/json/add-lab/digitalSignatureCephContent.json");
+  }
+
+  private String startProcessInstanceAndGetId() throws JsonProcessingException {
+    saveStartFormDataToCeph();
+    return startProcessInstanceWithStartFormAndGetId("add-lab", START_FORM_CEPH_KEY,
+        testUserToken);
+  }
+
+  private void saveStartFormDataToCeph() {
+    var data = new LinkedHashMap<String, Object>();
+    data.put("subjectType", "LEGAL");
+    data.put("edrpou", "77777777");
+    data.put("subject", Map.of("subjectId", "activeSubject"));
+    cephService.putFormData(START_FORM_CEPH_KEY, FormDataDto.builder().data(data).build());
   }
 }
