@@ -1,0 +1,18 @@
+{
+  "laboratoryId": "d2943186-0f1f-4a77-9de9-a5a59c07db02",
+  "headName": "Оніщенко К.Б.",
+  "edrpou": "23510933",
+  "phoneNumber": "044-454-10-23",
+  "notes": "",
+  "address": "вул. Ливарська, 1-А",
+  "kopfgId": "a790eb71-6015-4f40-995b-ad474e8eddca",
+  "koatuuId": "92cb1462-ec57-4b87-9e8d-594e0c322996",
+  "ownershipId": "19aab23b-1e49-4064-8f7e-39735ece4388",
+  "accreditationEndDate": "1993-11-01",
+  "name": "labName",
+  "accreditationFlag": true,
+  "premisesFile": {
+    "id": "cc1a9c9a-3603-4b83-8ac5-6e49921cdb22",
+    "checksum": "62e5b2d354bb6b9281981b03ef748b8cf896a6d28fc84f1013c9bfa1dc870223"
+  }
+}
