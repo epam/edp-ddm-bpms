@@ -20,4 +20,5 @@ public class TaskQueryDto {
   private String processInstanceId;
   private List<TaskQueryDto> orQueries;
   private List<String> processInstanceIdIn;
+  private List<SortingDto> sorting;
 }
