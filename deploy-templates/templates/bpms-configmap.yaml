@@ -7,7 +7,7 @@ data:
     spring.datasource.driver-class-name: org.postgresql.Driver
     spring.datasource.url: jdbc:postgresql://{{ .Values.db.url }}:{{ .Values.db.port }}/{{ .Values.db.defaultDatabase }}
     spring.zipkin.baseUrl: http://zipkin.istio-system:9411
-    camunda.bpm.job-execution.deployment-aware: true
+    camunda.bpm.job-execution.deployment-aware: false
     camunda.bpm.database.schema-update: true
     dso.url: http://digital-signature-ops:8080
     ceph.http-endpoint: https://s3-openshift-storage.{{ .Values.dnsWildcard }}
