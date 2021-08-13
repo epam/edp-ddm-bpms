@@ -1,6 +1,8 @@
 package com.epam.digital.data.platform.bpms.client;
 
 import com.epam.digital.data.platform.bpms.api.dto.ClaimTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.PaginationQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.TaskCountQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.TaskQueryDto;
 import com.epam.digital.data.platform.bpms.client.exception.ClientValidationException;
 import com.epam.digital.data.platform.bpms.client.exception.TaskNotFoundException;
@@ -13,6 +15,7 @@ import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,12 +31,12 @@ public interface CamundaTaskRestClient extends BaseFeignClient {
   /**
    * Method for getting the number of camunda user tasks
    *
-   * @param taskQueryDto object with search parameters
+   * @param taskCountQueryDto object with search parameters
    * @return the number of camunda user tasks
    */
   @PostMapping("/count")
   @ErrorHandling
-  CountResultDto getTaskCountByParams(@RequestBody TaskQueryDto taskQueryDto);
+  CountResultDto getTaskCountByParams(@RequestBody TaskCountQueryDto taskCountQueryDto);
 
   /**
    * Method for getting list of camunda user tasks
@@ -43,7 +46,8 @@ public interface CamundaTaskRestClient extends BaseFeignClient {
    */
   @PostMapping
   @ErrorHandling
-  List<TaskDto> getTasksByParams(@RequestBody TaskQueryDto taskQueryDto);
+  List<TaskDto> getTasksByParams(@RequestBody TaskQueryDto taskQueryDto, @SpringQueryMap
+      PaginationQueryDto paginationQueryDto);
 
   /**
    * Method for getting camunda user task by task identifier
