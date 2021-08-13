@@ -2,7 +2,8 @@
   "data": {
     "subjectName": "test user user",
     "subjectType": "LEGAL",
-    "subjectCode": "10101010"
+    "subjectCode": "10101010",
+    "absentEdrFlag": false
   },
   "signature": "userSignature"
 }
