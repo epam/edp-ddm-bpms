@@ -13,7 +13,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 
 import com.epam.digital.data.platform.bpms.api.dto.ClaimTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.TaskCountQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.TaskQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.PaginationQueryDto;
 import com.epam.digital.data.platform.bpms.client.exception.AuthorizationException;
 import com.epam.digital.data.platform.bpms.client.exception.TaskNotFoundException;
 import com.epam.digital.data.platform.starter.errorhandling.dto.ErrorDetailDto;
@@ -52,13 +54,14 @@ public class CamundaTaskRestClientIT extends BaseIT {
         )
     );
 
-    var taskCount = camundaTaskRestClient.getTaskCountByParams(TaskQueryDto.builder().build());
+    var taskCount = camundaTaskRestClient.getTaskCountByParams(TaskCountQueryDto.builder().build());
 
     assertThat(taskCount.getCount()).isOne();
   }
 
   @Test
   public void shouldReturnListOfTasks() throws JsonProcessingException {
+    var paginationQueryDto = PaginationQueryDto.builder().build();
     var taskDto = new TaskDto();
     taskDto.setAssignee("testAssignee");
     restClientWireMock.addStubMapping(
@@ -71,7 +74,8 @@ public class CamundaTaskRestClientIT extends BaseIT {
     );
 
     var tasksByParams = camundaTaskRestClient
-        .getTasksByParams(TaskQueryDto.builder().assignee("testAssignee").build());
+        .getTasksByParams(TaskQueryDto.builder().assignee("testAssignee").build(),
+            paginationQueryDto);
 
     assertThat(tasksByParams.size()).isOne();
     assertThat(tasksByParams.get(0).getAssignee()).isEqualTo("testAssignee");
@@ -169,6 +173,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
 
   @Test
   public void shouldReturnTasksByProcessInstanceIdIn() throws JsonProcessingException {
+    var paginationQueryDto = PaginationQueryDto.builder().build();
     var requestDto = TaskQueryDto.builder()
         .processInstanceIdIn(
             Lists.newArrayList("testProcessInstanceId", "testProcessInstanceId2")).build();
@@ -189,7 +194,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
         )
     );
 
-    var tasksByParams = camundaTaskRestClient.getTasksByParams(requestDto);
+    var tasksByParams = camundaTaskRestClient.getTasksByParams(requestDto, paginationQueryDto);
 
     assertThat(tasksByParams.size()).isEqualTo(2);
     assertThat(
@@ -202,6 +207,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
 
   @Test
   public void shouldReturnTasksByProcessInstanceId() throws JsonProcessingException {
+    var paginationQueryDto = PaginationQueryDto.builder().build();
     var requestDto = TaskQueryDto.builder().processInstanceId("testProcessInstanceId").build();
 
     var task = new TaskEntity();
@@ -219,7 +225,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
     );
 
     var tasksByParams = camundaTaskRestClient.getTasksByParams(TaskQueryDto.builder()
-        .processInstanceId("testProcessInstanceId").build());
+        .processInstanceId("testProcessInstanceId").build(), paginationQueryDto);
 
     assertThat(tasksByParams.size()).isOne();
     assertThat(tasksByParams.get(0).getProcessInstanceId()).isEqualTo("testProcessInstanceId");
@@ -254,6 +260,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
 
   @Test
   public void shouldReturnTasksByOrQueries() throws JsonProcessingException {
+    var paginationQueryDto = PaginationQueryDto.builder().build();
     String expectedBody = "{\"orQueries\":[{\"assignee\": \"testuser\",\"unassigned\": true}]}";
 
     var requestDto = TaskQueryDto.builder()
@@ -273,7 +280,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
                 .withStatus(200)
                 .withBody((objectMapper.writeValueAsString(List.of(TaskDto.fromEntity(task))))))));
 
-    List<TaskDto> tasks = camundaTaskRestClient.getTasksByParams(requestDto);
+    List<TaskDto> tasks = camundaTaskRestClient.getTasksByParams(requestDto, paginationQueryDto);
 
     assertThat(tasks).isNotEmpty();
     assertThat(tasks.get(0).getId()).isEqualTo("testId");
