@@ -3,16 +3,17 @@ package com.epam.digital.data.platform.bpms.client;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.epam.digital.data.platform.bpms.api.dto.HistoryTaskCountQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.HistoryTaskQueryDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import java.util.List;
 import org.assertj.core.util.Lists;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class HistoryTaskRestClientIT extends BaseIT {
 
   @Test
   public void shouldReturnHistoryTasks() throws JsonProcessingException {
-    TaskEntity task = new TaskEntity();
+    var task = new TaskEntity();
     task.setId("testId");
     restClientWireMock.addStubMapping(
         stubFor(get(urlPathEqualTo("/api/history/task"))
@@ -38,10 +39,27 @@ public class HistoryTaskRestClientIT extends BaseIT {
         )
     );
 
-    List<HistoricTaskInstanceEntity> tasksByParams = historyTaskRestClient
+    var tasksByParams = historyTaskRestClient
         .getHistoryTasksByParams(HistoryTaskQueryDto.builder().finished(true).build());
 
     assertThat(tasksByParams.size()).isOne();
     assertThat(tasksByParams.get(0).getId()).isEqualTo("testId");
+  }
+
+  @Test
+  public void shouldReturnTaskCount() throws JsonProcessingException {
+    restClientWireMock.addStubMapping(
+        stubFor(post(urlPathEqualTo("/api/history/task/count"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withStatus(200)
+                .withBody(objectMapper.writeValueAsString(new CountResultDto(1L))))
+        )
+    );
+
+    var historyTaskCount = historyTaskRestClient
+        .getHistoryTaskCountByParams(HistoryTaskCountQueryDto.builder().build());
+
+    assertThat(historyTaskCount.getCount()).isOne();
   }
 }
