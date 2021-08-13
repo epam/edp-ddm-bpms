@@ -8,6 +8,7 @@ import static org.junit.Assert.assertNotNull;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.google.common.io.ByteStreams;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +60,7 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
     var data = new LinkedHashMap<String, Object>();
     data.put("subjectType", subjectType);
     data.put("edrpou", subjectCode);
+    data.put("absentEdrFlag", false);
     cephService.putFormData(startFormCephKey, FormDataDto.builder().data(data).build());
 
     var processInstanceId = startProcessInstanceWithStartFormAndGetId("officer-create-subject-bp",
@@ -101,9 +103,9 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
   }
 
   @Test
-  public void testIndividualSubjectTypeHappyPath() throws Exception {
+  public void testEntrepreneurSubjectTypeHappyPath() throws Exception {
     var subjectName = "testSubjectName";
-    var subjectType = "INDIVIDUAL";
+    var subjectType = "ENTREPRENEUR";
     var subjectCode = "1010101010";
     var testUserToken = new String(ByteStreams
         .toByteArray(Objects.requireNonNull(
@@ -122,22 +124,26 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .requestBody(
-            "/json/officer-create-subject/dso/individual/subjectSystemSignatureRequest.json")
+            "/json/officer-create-subject/dso/entrepreneur2/subjectSystemSignatureRequest.json")
         .response("{\"signature\": \"userSignature\"}")
         .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject")
-        .requestBody("/json/officer-create-subject/data-factory/individual/postSubjectRequest.json")
+        .requestBody(
+            "/json/officer-create-subject/data-factory/entrepreneur2/postSubjectRequest.json")
         .response("{}")
         .build());
+
+    stubSearchSubjects("/xml/officer-create-subject/searchSubjectsEmptyResponse.xml");
 
     var startFormCephKey = "startFormCephKey";
     var data = new LinkedHashMap<String, Object>();
     data.put("subjectName", subjectName);
     data.put("subjectType", subjectType);
     data.put("rnokppCode", subjectCode);
+    data.put("absentEdrFlag", true);
     cephService.putFormData(startFormCephKey, FormDataDto.builder().data(data).build());
 
     var processInstanceId = startProcessInstanceWithStartFormAndGetId("officer-create-subject-bp",
@@ -154,11 +160,11 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
         "sign-subject-officer-create-subject-bp");
 
     completeTask(signSubjectTaskDefinitionKey, processInstanceId,
-        "/json/officer-create-subject/ceph/individual/sign-subject-officer-create-task.json");
+        "/json/officer-create-subject/ceph/entrepreneur2/sign-subject-officer-create-task.json");
 
     addCompleterUsernameVariable(signSubjectTaskDefinitionKey, testUserName);
     addExpectedCephContent(processInstanceId, signSubjectTaskDefinitionKey,
-        "/json/officer-create-subject/ceph/individual/sign-subject-officer-create-task.json");
+        "/json/officer-create-subject/ceph/entrepreneur2/sign-subject-officer-create-task.json");
 
     var processInstances = historyService().createHistoricProcessInstanceQuery()
         .superProcessInstanceId(processInstanceId).orderByProcessInstanceEndTime().asc()
@@ -170,7 +176,7 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
     addExpectedVariable("subject_system_signature_ceph_key", systemSignatureCephKey);
 
     assertSystemSignature(processInstanceId, "subject_system_signature_ceph_key",
-        "/json/officer-create-subject/dso/individual/subjectSignatureCephContent.json");
+        "/json/officer-create-subject/dso/entrepreneur2/subjectSignatureCephContent.json");
 
     addExpectedVariable("sys-var-process-completion-result", "Суб'єкт створено");
 
@@ -200,6 +206,7 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
     var data = new LinkedHashMap<String, Object>();
     data.put("subjectType", subjectType);
     data.put("edrpou", subjectCode);
+    data.put("absentEdrFlag", false);
     cephService.putFormData(startFormCephKey, FormDataDto.builder().data(data).build());
 
     var response = startProcessInstanceWithStartForm("officer-create-subject-bp",
@@ -239,6 +246,7 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
     var data = new LinkedHashMap<String, Object>();
     data.put("subjectType", subjectType);
     data.put("edrpou", subjectCode);
+    data.put("absentEdrFlag", false);
     cephService.putFormData(startFormCephKey, FormDataDto.builder().data(data).build());
 
     var response = startProcessInstanceWithStartForm("officer-create-subject-bp",
@@ -251,6 +259,125 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
     assertEquals("Статус суб'єкту скасовано або припинено", errors.get(0).get("message"));
     assertEquals("subjectCode", errors.get(0).get("field"));
     assertEquals(subjectCode, errors.get(0).get("value"));
+  }
+
+  @Test
+  public void testValidationErrorSubjectNotFound() throws IOException {
+    var subjectType = "LEGAL";
+    var subjectCode = "1010101010";
+    var testUserToken = new String(ByteStreams
+        .toByteArray(Objects.requireNonNull(
+            getClass().getResourceAsStream("/json/officer-create-subject/legalUserToken.txt"))));
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .resource("subject-equal-subject-type-equal-subject-code")
+        .queryParams(Map.of("subjectType", subjectType, "subjectCode", subjectCode))
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .response("[]")
+        .build());
+
+    stubSearchSubjects("/xml/officer-create-subject/searchSubjectsEmptyResponse.xml");
+
+    var startFormCephKey = "startFormCephKey";
+    var data = new LinkedHashMap<String, Object>();
+    data.put("subjectType", subjectType);
+    data.put("edrpou", subjectCode);
+    data.put("absentEdrFlag", false);
+    cephService.putFormData(startFormCephKey, FormDataDto.builder().data(data).build());
+
+    var response = startProcessInstanceWithStartForm("officer-create-subject-bp",
+        "startFormCephKey", testUserToken);
+
+    assertNotNull(response);
+    assertEquals(response.get("message"), "Validation error");
+    var errors = (List<Map>) ((Map) response.get("details")).get("errors");
+    assertEquals(1, errors.size());
+    assertEquals("Суб'єкта немає в ЄДР", errors.get(0).get("message"));
+    assertEquals("subjectCode", errors.get(0).get("field"));
+    assertEquals(subjectCode, errors.get(0).get("value"));
+  }
+
+  @Test
+  public void testAbsentEdrFlagTrueEdrResponseNotEmpty() throws IOException {
+    var subjectName = "testSubjectName";
+    var subjectType = "ENTREPRENEUR";
+    var subjectCode = "1010101010";
+    var testUserToken = new String(ByteStreams
+        .toByteArray(Objects.requireNonNull(
+            getClass().getResourceAsStream("/json/officer-create-subject/indUserToken.txt"))));
+    SecurityContextHolder.getContext().setAuthentication(
+        new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .resource("subject-equal-subject-type-equal-subject-code")
+        .queryParams(Map.of("subjectType", subjectType, "subjectCode", subjectCode))
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .response("[]")
+        .build());
+    stubDigitalSignatureRequest(StubData.builder()
+        .httpMethod(HttpMethod.POST)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .requestBody(
+            "/json/officer-create-subject/dso/entrepreneur/subjectSystemSignatureRequest.json")
+        .response("{\"signature\": \"userSignature\"}")
+        .build());
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.POST)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .requestBody("/json/officer-create-subject/data-factory/entrepreneur/postSubjectRequest.json")
+        .response("{}")
+        .build());
+
+    stubSearchSubjects("/xml/officer-create-subject/searchSubjectsEntrepreneurResponse.xml");
+
+    var startFormCephKey = "startFormCephKey";
+    var data = new LinkedHashMap<String, Object>();
+    data.put("subjectName", subjectName);
+    data.put("subjectType", subjectType);
+    data.put("rnokppCode", subjectCode);
+    data.put("absentEdrFlag", true);
+    cephService.putFormData(startFormCephKey, FormDataDto.builder().data(data).build());
+
+    var processInstanceId = startProcessInstanceWithStartFormAndGetId("officer-create-subject-bp",
+        "startFormCephKey", testUserToken);
+    var processInstance = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstanceId).singleResult();
+
+    addExpectedVariable("initiator", "testuser");
+    addExpectedVariable("const_dataFactoryBaseUrl", "http://localhost:8877/mock-server");
+    addExpectedVariable("start_form_ceph_key", startFormCephKey);
+
+    var signSubjectTaskDefinitionKey = "sign_subject_officer_create_subject_task";
+    assertWaitingActivity(processInstance, signSubjectTaskDefinitionKey,
+        "sign-subject-officer-create-subject-bp");
+
+    completeTask(signSubjectTaskDefinitionKey, processInstanceId,
+        "/json/officer-create-subject/ceph/entrepreneur/sign-subject-officer-create-task.json");
+
+    addCompleterUsernameVariable(signSubjectTaskDefinitionKey, testUserName);
+    addExpectedCephContent(processInstanceId, signSubjectTaskDefinitionKey,
+        "/json/officer-create-subject/ceph/entrepreneur/sign-subject-officer-create-task.json");
+
+    var processInstances = historyService().createHistoricProcessInstanceQuery()
+        .superProcessInstanceId(processInstanceId).orderByProcessInstanceEndTime().asc()
+        .list();
+    Assertions.assertThat(processInstances).hasSize(1);
+
+    var systemSignatureCephKey = "lowcode_" + processInstanceId + "_" +
+        processInstances.get(0).getId() + "_system_signature_ceph_key";
+    addExpectedVariable("subject_system_signature_ceph_key", systemSignatureCephKey);
+
+    assertSystemSignature(processInstanceId, "subject_system_signature_ceph_key",
+        "/json/officer-create-subject/dso/entrepreneur/subjectSignatureCephContent.json");
+
+    addExpectedVariable("sys-var-process-completion-result", "Суб'єкт створено");
+
+    assertThat(processInstance).isEnded();
+    assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
+    assertCephContent();
   }
 
 }
