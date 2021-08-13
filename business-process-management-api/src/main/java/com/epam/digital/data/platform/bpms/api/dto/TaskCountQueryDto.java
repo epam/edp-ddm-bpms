@@ -1,5 +1,6 @@
 package com.epam.digital.data.platform.bpms.api.dto;
 
+import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,4 +13,5 @@ public class TaskCountQueryDto {
 
   private String assignee;
   private Boolean unassigned;
+  private List<TaskCountQueryDto> orQueries;
 }
