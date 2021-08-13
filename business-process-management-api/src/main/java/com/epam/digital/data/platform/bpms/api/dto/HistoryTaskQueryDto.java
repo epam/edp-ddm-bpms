@@ -11,5 +11,10 @@ import lombok.Data;
 public class HistoryTaskQueryDto {
 
   private String taskAssignee;
-  private boolean finished;
+  private Boolean finished;
+  private String sortBy;
+  private String sortOrder;
+  private Integer firstResult;
+  private Integer maxResults;
+  private Boolean unassigned;
 }
