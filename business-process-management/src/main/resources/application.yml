@@ -8,6 +8,8 @@ camunda:
   admin-user-id: camunda
   admin-group-id: camunda-admin
   bpm:
+    job-execution:
+      deployment-aware: true
     generic-properties:
       properties:
         enableHistoricInstancePermissions: true
