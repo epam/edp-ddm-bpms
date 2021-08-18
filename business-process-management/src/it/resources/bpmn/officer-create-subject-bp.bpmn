@@ -177,7 +177,7 @@ return absentEdrFlagEdrExist || absentEdrFlagEdrNotExist || notAbsentEdrFlagEdrE
         }
 
         cephData['subjectType'] = submission('start_event').formData.prop('subjectType').value()
-        cephData['subjectCode'] = subjectCode.value
+        cephData['subjectCode'] = subjectCode
 		cephData['absentEdrFlag'] = absentEdrFlagEdrNotExist
 		
         execution.removeVariable('payload')
