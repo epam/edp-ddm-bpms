@@ -53,3 +53,31 @@ Create chart name and version as used by the chart label.
 {{- printf "%s%s" "https://" .Values.keycloak.host }}
 {{- end -}}
 
+{{- define "keycloak.urlPrefix" -}}
+{{- printf "%s%s%s" (include "keycloak.url" .) "/auth/realms/" .Release.Namespace -}}
+{{- end -}}
+
+{{- define "issuer.officer" -}}
+{{- printf "%s-%s" (include "keycloak.urlPrefix" .) .Values.keycloak.officerClient.realm -}}
+{{- end -}}
+
+{{- define "issuer.citizen" -}}
+{{- printf "%s-%s" (include "keycloak.urlPrefix" .) .Values.keycloak.citizenClient.realm -}}
+{{- end -}}
+
+{{- define "issuer.admin" -}}
+{{- printf "%s-%s" (include "keycloak.urlPrefix" .) .Values.keycloak.realms.admin -}}
+{{- end -}}
+
+{{- define "jwksUri.officer" -}}
+{{- printf "%s-%s%s" (include "keycloak.urlPrefix" .) .Values.keycloak.officerClient.realm .Values.keycloak.certificatesEndpoint -}}
+{{- end -}}
+
+{{- define "jwksUri.citizen" -}}
+{{- printf "%s-%s%s" (include "keycloak.urlPrefix" .) .Values.keycloak.citizenClient.realm .Values.keycloak.certificatesEndpoint -}}
+{{- end -}}
+
+{{- define "jwksUri.admin" -}}
+{{- printf "%s-%s%s" (include "keycloak.urlPrefix" .) .Values.keycloak.realms.admin .Values.keycloak.certificatesEndpoint -}}
+{{- end -}}
+

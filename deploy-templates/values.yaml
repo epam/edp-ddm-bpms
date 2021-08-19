@@ -89,6 +89,9 @@ keycloak:
         name: fullName
         protocol: openid-connect
         protocolMapper: oidc-usermodel-attribute-mapper
+  realms:
+    admin: admin
+  certificatesEndpoint: /protocol/openid-connect/certs
 
 trembitaExchangeGateway:
   userId: 'MDTUDDM'
