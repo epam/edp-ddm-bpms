@@ -113,10 +113,8 @@ spec:
             mountPath: {{ .Values.camundaVarsMountPath }}
           - name: {{ .Chart.Name }}-ceph-bucket-credentials
             mountPath: {{ .Values.cephSecretMountPath }}
-          {{ if (lookup "v1" "Secret" .Release.Namespace .Values.fileStorage.bucketName) }}
           - name: {{ .Values.fileStorage.bucketName }}-credentials
             mountPath: {{ .Values.fileStorageSecretMountPath }}
-          {{- end }}
           - name: {{ .Values.keycloak.citizenClient.secretName }}
             mountPath: {{ .Values.citizenKeycloakClientSecretsMountPath }}
           - name: {{ .Values.keycloak.officerClient.secretName }}
