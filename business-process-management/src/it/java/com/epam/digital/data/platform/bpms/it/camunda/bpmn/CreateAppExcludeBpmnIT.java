@@ -1,9 +1,14 @@
 package com.epam.digital.data.platform.bpms.it.camunda.bpmn;
 
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
+import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.groovy.util.Maps;
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.junit.Test;
@@ -11,15 +16,42 @@ import org.springframework.http.HttpMethod;
 
 public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
 
+  private static final String PROCESS_DEFINITION_ID = "create-app-exclude";
+
   @Test
   @Deployment(resources = {"bpmn/create-app-exclude.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void testHappyPath() throws IOException {
+    var laboratoryId = "d2943186-0f1f-4a77-9de9-a5a59c07db02";
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("last-laboratory-solution")
+        .queryParams(Maps.of("laboratoryId", laboratoryId))
+        .response("/json/create-app-exclude/lastLaboratorySolutionResponse.json")
+        .build());
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("application-type-equal-constant-code")
+        .queryParams(Maps.of("constantCode", "ADD"))
+        .response("/json/create-app-exclude/applicationTypeEqualConstantCodeAddResponse.json")
+        .build());
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("solution-type-equal-constant-code")
+        .queryParams(Maps.of("constantCode", "ADD"))
+        .response("/json/create-app-exclude/solutionTypeEqualConstantCodeAddResponse.json")
+        .build());
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("laboratory")
-        .resourceId("d2943186-0f1f-4a77-9de9-a5a59c07db02")
+        .resourceId(laboratoryId)
         .response("/json/create-app-exclude/laboratoryByIdResponse.json")
         .build());
 
@@ -54,13 +86,9 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
         .response("{\"signature\": \"test\"}")
         .build());
 
-    //start process
-    var processInstance = runtimeService.startProcessInstanceByKey("create-app-exclude");
-    var processInstanceId = processInstance.getId();
-
-    BpmnAwareTests.assertThat(processInstance).isWaitingAt("searchLabFormActivity");
-    completeTask("searchLabFormActivity", processInstanceId,
-        "/json/create-app-exclude/searchLabFormActivity.json");
+    var processInstanceId = startProcessInstanceWithFormAndGetId(laboratoryId);
+    var processInstance = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstanceId).list().get(0);
 
     BpmnAwareTests.assertThat(processInstance).isWaitingAt("addApplicationFormActivity");
     completeTask("addApplicationFormActivity", processInstanceId,
@@ -84,9 +112,9 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
 
     //then
     BpmnAwareTests.assertThat(processInstance)
-        .hasPassed("searchLabFormActivity", "addApplicationFormActivity",
-            "checkComplianceFormActivity", "addDecisionExcludeFormActivity",
-            "addLetterDataFormForExclusionActivity", "signAppExcludeFormActivity")
+        .hasPassed("addApplicationFormActivity", "checkComplianceFormActivity",
+            "addDecisionExcludeFormActivity", "addLetterDataFormForExclusionActivity",
+            "signAppExcludeFormActivity")
         .isEnded();
 
     assertSystemSignature(processInstanceId, "system_signature_ceph_key",
@@ -96,11 +124,37 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
   @Test
   @Deployment(resources = {"bpmn/create-app-exclude.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void testPathWithMistakes() throws IOException {
+    var laboratoryId = "d2943186-0f1f-4a77-9de9-a5a59c07db02";
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("last-laboratory-solution")
+        .queryParams(Maps.of("laboratoryId", laboratoryId))
+        .response("/json/create-app-exclude/lastLaboratorySolutionResponse.json")
+        .build());
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("application-type-equal-constant-code")
+        .queryParams(Maps.of("constantCode", "ADD"))
+        .response("/json/create-app-exclude/applicationTypeEqualConstantCodeAddResponse.json")
+        .build());
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("solution-type-equal-constant-code")
+        .queryParams(Maps.of("constantCode", "ADD"))
+        .response("/json/create-app-exclude/solutionTypeEqualConstantCodeAddResponse.json")
+        .build());
+
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("laboratory")
-        .resourceId("d2943186-0f1f-4a77-9de9-a5a59c07db02")
+        .resourceId(laboratoryId)
         .response("/json/create-app-exclude/laboratoryByIdResponse.json")
         .build());
 
@@ -136,12 +190,9 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
         .build());
 
     //start process
-    var processInstance = runtimeService.startProcessInstanceByKey("create-app-exclude");
-    var processInstanceId = processInstance.getId();
-
-    BpmnAwareTests.assertThat(processInstance).isWaitingAt("searchLabFormActivity");
-    completeTask("searchLabFormActivity", processInstanceId,
-        "/json/create-app-exclude/searchLabFormActivity.json");
+    var processInstanceId = startProcessInstanceWithFormAndGetId(laboratoryId);
+    var processInstance = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstanceId).list().get(0);
 
     BpmnAwareTests.assertThat(processInstance).isWaitingAt("addApplicationFormActivity");
     completeTask("addApplicationFormActivity", processInstanceId,
@@ -165,12 +216,71 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
 
     //then
     BpmnAwareTests.assertThat(processInstance)
-        .hasPassed("searchLabFormActivity", "addApplicationFormActivity",
-            "checkComplianceFormActivity", "addDecisionDenyFormActivity",
-            "addLetterDataFormForDenyActivity", "signAppDenyFormActivity")
+        .hasPassed("addApplicationFormActivity", "checkComplianceFormActivity",
+            "addDecisionDenyFormActivity", "addLetterDataFormForDenyActivity",
+            "signAppDenyFormActivity")
         .isEnded();
 
     assertSystemSignature(processInstanceId, "system_signature_ceph_key",
         "/json/create-app-exclude/digitalSignatureNoConsiderCephContent.json");
+  }
+
+  @Test
+  @Deployment(resources = "bpmn/create-app-exclude.bpmn")
+  public void testValidationError() throws IOException {
+    var laboratoryId = "d2943186-0f1f-4a77-9de9-a5a59c07db02";
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("last-laboratory-solution")
+        .queryParams(Maps.of("laboratoryId", laboratoryId))
+        .response("/json/create-app-exclude/lastLaboratorySolutionDenyResponse.json")
+        .build());
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("application-type-equal-constant-code")
+        .queryParams(Maps.of("constantCode", "ADD"))
+        .response("/json/create-app-exclude/applicationTypeEqualConstantCodeAddResponse.json")
+        .build());
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("solution-type-equal-constant-code")
+        .queryParams(Maps.of("constantCode", "ADD"))
+        .response("/json/create-app-exclude/solutionTypeEqualConstantCodeAddResponse.json")
+        .build());
+
+    var resultMap = startProcessInstanceForError(laboratoryId);
+
+    var errors = resultMap.get("details").get("errors");
+    Assertions.assertThat(errors).hasSize(1);
+    Assertions.assertThat(errors.get(0)).contains(Map.entry("field", "laboratory"),
+        Map.entry("message", "Заява на видалення вже створена"),
+        Map.entry("value", laboratoryId));
+  }
+
+  private String startProcessInstanceWithFormAndGetId(String labId) throws JsonProcessingException {
+    saveStartFormDataToCeph(labId);
+    return startProcessInstanceWithStartFormAndGetId(PROCESS_DEFINITION_ID, START_FORM_CEPH_KEY,
+        testUserToken);
+  }
+
+  private void saveStartFormDataToCeph(String labId) {
+    var data = new LinkedHashMap<String, Object>();
+    data.put("laboratory", Map.of("laboratoryId", labId));
+    cephService.putFormData(START_FORM_CEPH_KEY, FormDataDto.builder().data(data).build());
+  }
+
+  @SuppressWarnings("unchecked")
+  private Map<String, Map<String, List<Map<String, String>>>> startProcessInstanceForError(
+      String labId) throws JsonProcessingException {
+    saveStartFormDataToCeph(labId);
+    var resultMap = startProcessInstanceWithStartForm(PROCESS_DEFINITION_ID,
+        START_FORM_CEPH_KEY, testUserToken);
+    return (Map<String, Map<String, List<Map<String, String>>>>) resultMap;
   }
 }
