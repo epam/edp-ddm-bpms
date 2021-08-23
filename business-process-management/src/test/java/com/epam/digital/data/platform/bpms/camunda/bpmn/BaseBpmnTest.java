@@ -18,6 +18,8 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 import com.epam.digital.data.platform.bpms.api.constant.Constants;
+import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
+import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.delegate.DefineBusinessProcessStatusDelegate;
 import com.epam.digital.data.platform.bpms.delegate.DefineProcessExcerptIdDelegate;
 import com.epam.digital.data.platform.bpms.delegate.UserDataValidationErrorDelegate;
@@ -37,9 +39,11 @@ import com.epam.digital.data.platform.bpms.delegate.connector.ExcerptConnectorSt
 import com.epam.digital.data.platform.bpms.delegate.connector.UserSettingsConnectorReadDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.UserSettingsConnectorUpdateDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.keycloak.KeycloakAddRoleConnectorDelegate;
+import com.epam.digital.data.platform.bpms.delegate.connector.keycloak.KeycloakGetUsersConnectorDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.keycloak.KeycloakRemoveRoleConnectorDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.registry.SearchSubjectsEdrRegistryConnectorDelegate;
 import com.epam.digital.data.platform.bpms.delegate.dto.EdrRegistryConnectorResponse;
+import com.epam.digital.data.platform.bpms.delegate.dto.KeycloakUserDto;
 import com.epam.digital.data.platform.bpms.exception.handler.ConnectorResponseErrorHandler;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
 import com.epam.digital.data.platform.bpms.it.config.TestCephServiceImpl;
@@ -98,6 +102,8 @@ public abstract class BaseBpmnTest {
       mock(KeycloakAddRoleConnectorDelegate.class);
   protected final SearchSubjectsEdrRegistryConnectorDelegate searchSubjectsEdrRegistryConnectorDelegate = mock(
       SearchSubjectsEdrRegistryConnectorDelegate.class);
+  protected final KeycloakGetUsersConnectorDelegate keycloakGetUsersConnectorDelegate = mock(
+      KeycloakGetUsersConnectorDelegate.class);
 
   // init base classes for delegates
   protected ObjectMapper objectMapper;
@@ -154,12 +160,27 @@ public abstract class BaseBpmnTest {
     testUserToken = TestUtils.getContent("/json/testuserAccessToken.json");
     SecurityContextHolder.getContext().setAuthentication(
         new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
+    CamundaAssertionUtil.setCephService(cephService);
   }
 
   protected void completeTask(String taskDefinitionKey, String formData) {
     var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, currentProcessInstanceId);
     cephService.putContent(cephBucketName, cephKey, TestUtils.getContent(formData));
     complete(task(taskDefinitionKey));
+  }
+
+  protected void completeTask(CompleteActivityDto completeActivityDto) {
+    var activityDefinitionId = completeActivityDto.getActivityDefinitionId();
+    var cephKey = cephKeyProvider.generateKey(activityDefinitionId, currentProcessInstanceId);
+    cephService.putContent(cephBucketName, cephKey,
+        TestUtils.getContent(completeActivityDto.getExpectedFormData()));
+
+    addExpectedCephContent(activityDefinitionId, completeActivityDto.getExpectedFormData());
+
+    SecurityContextHolder.getContext().setAuthentication(
+        new UsernamePasswordAuthenticationToken(completeActivityDto.getCompleterUserName(),
+            completeActivityDto.getCompleterAccessToken()));
+    complete(task(activityDefinitionId));
   }
 
   protected void mockDataFactoryRequest(StubData stubData) {
@@ -219,7 +240,7 @@ public abstract class BaseBpmnTest {
 
   protected FormDataDto deserializeFormData(String formData) {
     try {
-      return this.objectMapper.readValue(formData, FormDataDto.class);
+      return this.objectMapper.readValue(TestUtils.getContent(formData), FormDataDto.class);
     } catch (JsonProcessingException ex) {
       throw new IllegalStateException("Couldn't deserialize form data", ex);
     }
@@ -232,7 +253,7 @@ public abstract class BaseBpmnTest {
   protected void addExpectedCephContent(String taskDefinitionKey, String cephContent) {
     var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, currentProcessInstanceId);
 
-    expectedCephStorage.put(cephKey, deserializeFormData(TestUtils.getContent(cephContent)));
+    expectedCephStorage.put(cephKey, deserializeFormData(cephContent));
   }
 
   protected void assertWaitingActivity(String taskDefinitionKey, String formKey) {
@@ -305,6 +326,7 @@ public abstract class BaseBpmnTest {
 
     Mocks.register("searchSubjectsEdrRegistryConnectorDelegate",
         searchSubjectsEdrRegistryConnectorDelegate);
+    Mocks.register("keycloakGetUsersConnectorDelegate", keycloakGetUsersConnectorDelegate);
 
     var excerptConnectorGenerateDelegate = new ExcerptConnectorGenerateDelegate(restTemplate,
         springAppName, excerptServiceBaseUrl, objectMapper);
@@ -324,6 +346,17 @@ public abstract class BaseBpmnTest {
               Spin.JSON(TestUtils.getContent(responseBody))).build());
       return null;
     }).when(searchSubjectsEdrRegistryConnectorDelegate).execute(any());
+  }
+
+  @SneakyThrows
+  protected void mockGetKeycloakUsersConnectorDelegate(String officerUsers) {
+    doAnswer(invocation -> {
+      var execution = (AbstractVariableScope) invocation.getArgument(0);
+      execution.setVariableLocal("usersByRole",
+          objectMapper.readerForListOf(KeycloakUserDto.class)
+              .readValue(TestUtils.getContent(officerUsers)));
+      return null;
+    }).when(keycloakGetUsersConnectorDelegate).execute(any());
   }
 
   @SneakyThrows
