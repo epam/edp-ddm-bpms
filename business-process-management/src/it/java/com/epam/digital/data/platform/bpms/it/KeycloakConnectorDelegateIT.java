@@ -110,12 +110,8 @@ public class KeycloakConnectorDelegateIT extends BaseIT {
   public void shouldGetUsersByRoleFromKeycloak() {
     var getUsersUrl = "/auth/admin/realms/officer-realm/roles/test-role-name/users";
     mockConnectToKeycloak(officerRealm);
-
-    keycloakMockServer.addStubMapping(
-        stubFor(get(urlPathEqualTo(getUsersUrl))
-            .willReturn(aResponse().withStatus(200)
-                .withHeader("Content-type", "application/json")
-                .withBody(convertJsonToString("/json/keycloak/keycloakUsersByDefinedRoleResponse.json")))));
+    mockKeycloakGetUsersByRole("test-role-name",
+        "/json/keycloak/keycloakUsersByDefinedRoleResponse.json");
 
     var processInstance = runtimeService.startProcessInstanceByKey("testGetUsersByDefinedRoleKey");
 
@@ -128,14 +124,11 @@ public class KeycloakConnectorDelegateIT extends BaseIT {
   public void shouldGetUsersByDefaultRoleFromKeycloak() {
     var getUsersUrl = "/auth/admin/realms/officer-realm/roles/officer/users";
     mockConnectToKeycloak(officerRealm);
+    mockKeycloakGetUsersByRole("officer",
+        "/json/keycloak/keycloakUsersByNotDefinedRoleResponse.json");
 
-    keycloakMockServer.addStubMapping(
-        stubFor(get(urlPathEqualTo(getUsersUrl))
-            .willReturn(aResponse().withStatus(200)
-                .withHeader("Content-type", "application/json")
-                .withBody(convertJsonToString("/json/keycloak/keycloakUsersByNotDefinedRoleResponse.json")))));
-
-    var processInstance = runtimeService.startProcessInstanceByKey("testGetUsersByNotDefinedRoleKey");
+    var processInstance = runtimeService.startProcessInstanceByKey(
+        "testGetUsersByNotDefinedRoleKey");
 
     keycloakMockServer.verify(1, getRequestedFor(urlEqualTo(getUsersUrl)));
     BpmnAwareTests.assertThat(processInstance).isEnded();

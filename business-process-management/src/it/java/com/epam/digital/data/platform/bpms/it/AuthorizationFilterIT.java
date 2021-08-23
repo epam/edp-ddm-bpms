@@ -55,12 +55,14 @@ public class AuthorizationFilterIT extends BaseIT {
     ProcessInstanceDto createdProcessInstance = postForObject(
         "api/process-definition/" + processDefinition.getId() + "/start", "{}",
         ProcessInstanceDto.class);
+    var processInstanceId = createdProcessInstance.getId();
 
     //get process-instance history by another user
     String testuser2Token = new String(ByteStreams
         .toByteArray(BaseIT.class.getResourceAsStream("/json/testuser2AccessToken.json")));
     HistoricProcessInstanceDto[] historyProcessInstanceDtos = getForObject(
-        "api/history/process-instance", HistoricProcessInstanceDto[].class, testuser2Token);
+        String.format("api/history/process-instance?processInstanceId=%s", processInstanceId),
+        HistoricProcessInstanceDto[].class, testuser2Token);
 
     assertThat(historyProcessInstanceDtos).isEmpty();
   }

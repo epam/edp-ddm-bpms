@@ -26,7 +26,9 @@ import javax.inject.Inject;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status.Family;
 import lombok.SneakyThrows;
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -130,15 +132,22 @@ public abstract class BaseIT {
     return objectMapper.readValue(jsonResponse, targetClass);
   }
 
-  protected void postForNoContent(String url, String body){
-    jerseyClient.target(String.format("http://localhost:%d/%s", port, url))
+  protected void postForNoContent(String url, String body) {
+    postForNoContent(url, body, validAccessToken);
+  }
+
+  protected void postForNoContent(String url, String body, String token) {
+    var response = jerseyClient.target(String.format("http://localhost:%d/%s", port, url))
         .request()
-        .header(TOKEN_HEADER, validAccessToken)
+        .header(TOKEN_HEADER, token)
         .post(Entity.entity(body, MediaType.APPLICATION_JSON));
+
+    Assertions.assertThat(response.getStatusInfo().getFamily()).isEqualTo(Family.SUCCESSFUL);
   }
 
   private void createAuthorizationsIfNotExists(String groupId) {
-    if (CollectionUtils.isEmpty(authorizationService.createAuthorizationQuery().groupIdIn(groupId).list())) {
+    if (CollectionUtils.isEmpty(
+        authorizationService.createAuthorizationQuery().groupIdIn(groupId).list())) {
       createAuthorization(Resources.PROCESS_DEFINITION,
           new Permission[]{ProcessDefinitionPermissions.CREATE_INSTANCE,
               ProcessDefinitionPermissions.READ}, groupId);
@@ -178,6 +187,15 @@ public abstract class BaseIT {
             .willReturn(aResponse().withStatus(200)
                 .withHeader("Content-type", "application/json")
                 .withBody(convertJsonToString(responseBody)))));
+  }
+
+  protected void mockKeycloakGetUsersByRole(String role, String response) {
+    var getUsersUrl = String.format("/auth/admin/realms/officer-realm/roles/%s/users", role);
+    keycloakMockServer.addStubMapping(
+        stubFor(get(urlPathEqualTo(getUsersUrl))
+            .willReturn(aResponse().withStatus(200)
+                .withHeader("Content-type", "application/json")
+                .withBody(convertJsonToString(response)))));
   }
 
   protected void mockKeycloakGetRole(String role, String responseBody, int status) {

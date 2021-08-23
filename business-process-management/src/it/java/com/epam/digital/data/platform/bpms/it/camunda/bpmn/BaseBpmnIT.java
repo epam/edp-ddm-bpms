@@ -16,6 +16,8 @@ import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.managem
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
 
 import com.epam.digital.data.platform.bpms.api.constant.Constants;
+import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
+import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.delegate.ceph.CephKeyProvider;
 import com.epam.digital.data.platform.bpms.it.BaseIT;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
@@ -29,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import javax.inject.Inject;
@@ -94,6 +97,7 @@ public abstract class BaseBpmnIT extends BaseIT {
     testUserToken = TestUtils.getContent("/json/testuserAccessToken.json");
     SecurityContextHolder.getContext().setAuthentication(
         new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
+    CamundaAssertionUtil.setCephService(cephService);
   }
 
   @After
@@ -107,9 +111,36 @@ public abstract class BaseBpmnIT extends BaseIT {
 
   protected void completeTask(String taskId, String processInstanceId, String formData) {
     var cephKey = cephKeyProvider.generateKey(taskId, processInstanceId);
-    cephService.putFormData(cephKey, deserializeFormData(TestUtils.getContent(formData)));
+    cephService.putFormData(cephKey, deserializeFormData(formData));
     String id = taskService.createTaskQuery().taskDefinitionKey(taskId).singleResult().getId();
     taskService.complete(id);
+  }
+
+  protected void completeTask(CompleteActivityDto completeActivityDto) {
+    var activityDefinitionId = completeActivityDto.getActivityDefinitionId();
+    saveFormDataToCeph(completeActivityDto);
+
+    var url = String.format("api/task/%s/complete", task(activityDefinitionId).getId());
+    postForNoContent(url, "{}", completeActivityDto.getCompleterAccessToken());
+  }
+
+  @SuppressWarnings("unchecked")
+  protected Map<String, Map<String, List<Map<String, String>>>> completeTaskWithError(
+      CompleteActivityDto completeActivityDto) throws JsonProcessingException {
+    var activityDefinitionId = completeActivityDto.getActivityDefinitionId();
+    saveFormDataToCeph(completeActivityDto);
+
+    var url = String.format("api/task/%s/complete", task(activityDefinitionId).getId());
+    return (Map<String, Map<String, List<Map<String, String>>>>) postForObject(url, "{}", Map.class,
+        completeActivityDto.getCompleterAccessToken());
+  }
+
+  private void saveFormDataToCeph(CompleteActivityDto completeActivityDto) {
+    var activityDefinitionId = completeActivityDto.getActivityDefinitionId();
+    var processInstanceId = completeActivityDto.getProcessInstanceId();
+    var cephKey = cephKeyProvider.generateKey(activityDefinitionId, processInstanceId);
+    cephService.putContent(cephBucketName, cephKey,
+        TestUtils.getContent(completeActivityDto.getExpectedFormData()));
   }
 
   protected void stubDataFactoryRequest(StubData data) {
@@ -208,7 +239,7 @@ public abstract class BaseBpmnIT extends BaseIT {
 
   protected FormDataDto deserializeFormData(String formData) {
     try {
-      return this.objectMapper.readValue(formData, FormDataDto.class);
+      return this.objectMapper.readValue(TestUtils.getContent(formData), FormDataDto.class);
     } catch (JsonProcessingException var4) {
       throw new IllegalStateException("Couldn't deserialize form data", var4);
     }
@@ -218,15 +249,24 @@ public abstract class BaseBpmnIT extends BaseIT {
       String cephContent) {
     var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, processInstanceId);
 
-    expectedCephStorage.put(cephKey, deserializeFormData(TestUtils.getContent(cephContent)));
+    expectedCephStorage.put(cephKey, deserializeFormData(cephContent));
   }
 
   protected void addExpectedVariable(String name, Object value) {
     expectedVariablesMap.put(name, value);
   }
 
-  protected void addCompleterUsernameVariable(String taskDefinitionId, Object value){
+  protected void addCompleterUsernameVariable(String taskDefinitionId, Object value) {
     expectedVariablesMap.put(String.format("%s_completer", taskDefinitionId), value);
+  }
+
+  @SuppressWarnings("unchecked")
+  protected Map<String, Map<String, List<Map<String, String>>>> startProcessInstanceWithError(
+      String processDefinitionKey, String token)
+      throws JsonProcessingException {
+    return (Map<String, Map<String, List<Map<String, String>>>>) postForObject(
+        String.format("api/process-definition/key/%s/start", processDefinitionKey),
+        "{}", Map.class, token);
   }
 
   protected String startProcessInstance(String processDefinitionKey, String token)
