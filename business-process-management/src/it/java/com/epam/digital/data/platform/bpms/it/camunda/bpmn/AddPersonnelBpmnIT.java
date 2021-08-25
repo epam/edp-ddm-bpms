@@ -1,11 +1,12 @@
 package com.epam.digital.data.platform.bpms.it.camunda.bpmn;
 
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
-import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
 
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
 import com.epam.digital.data.platform.bpms.it.util.TestUtils;
+import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.test.Deployment;
@@ -22,9 +23,6 @@ public class AddPersonnelBpmnIT extends BaseBpmnIT {
   @Deployment(resources = {"bpmn/add-personnel.bpmn"})
   public void test() throws IOException {
     var labId = "bb652d3f-a36f-465a-b7ba-232a5a1680c5";
-    var koatuuId = "bb652d3f-a36f-465a-b7ba-232a5a1680c4";
-    var ownershipId = "60c99b70-3644-4938-b785-027c25c13c87";
-    var kopfgId = "c54af316-4280-43fd-b49a-1e1f44ac374b";
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
@@ -32,13 +30,6 @@ public class AddPersonnelBpmnIT extends BaseBpmnIT {
         .resource("laboratory")
         .resourceId(labId)
         .response("/json/add-personnel/data-factory/findLaboratoryResponse.json")
-        .build());
-    stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
-        .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("koatuu")
-        .resourceId(koatuuId)
-        .response("/json/add-personnel/data-factory/findKoatuuResponse.json")
         .build());
 
     stubDigitalSignatureRequest(StubData.builder()
@@ -48,40 +39,15 @@ public class AddPersonnelBpmnIT extends BaseBpmnIT {
         .response("{\"signature\": \"test\"}")
         .build());
 
-    stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
-        .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("koatuu-equal-koatuu-id-name")
-        .queryParams(Map.of("koatuuId", koatuuId))
-        .response("/json/add-personnel/data-factory/koatuuEqualKoatuuIdName.json")
-        .build());
+    var startFormCephKey = "startFormCephKey";
+    var data = new LinkedHashMap<String, Object>();
+    data.put("laboratory", Map.of("laboratoryId", labId));
+    cephService.putFormData(startFormCephKey, FormDataDto.builder().data(data).build());
 
-    stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
-        .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("koatuu-obl-contains-name")
-        .queryParams(Map.of("name", "KoatuuObl"))
-        .response("/json/add-personnel/data-factory/koatuuOblContainsName.json")
-        .build());
-    stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
-        .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("ownership")
-        .resourceId(ownershipId)
-        .response("/json/add-personnel/data-factory/findOwnershipResponse.json")
-        .build());
-    stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
-        .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("kopfg")
-        .resourceId(kopfgId)
-        .response("/json/add-personnel/data-factory/findKopfgResponse.json")
-        .build());
-
-    var processInstance = runtimeService().startProcessInstanceByKey("add-personnel");
-    assertThat(processInstance).isStarted();
-
-    var processInstanceId = processInstance.getId();
+    var processInstanceId = startProcessInstanceWithStartFormAndGetId("add-personnel",
+        "startFormCephKey", testUserToken);
+    var processInstance = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstanceId).singleResult();
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
@@ -92,10 +58,6 @@ public class AddPersonnelBpmnIT extends BaseBpmnIT {
         .response("{}")
         .build());
 
-    String initiator = null;
-
-    var searchLabFormActivityDefinitionKey = "searchLabFormActivity";
-    var viewLabDataFormActivityDefinitionKey = "viewLabDataFormActivity";
     var addPersonnelFormActivityDefinitionKey = "addPersonnelFormActivity";
     var signPersonnelFormActivityDefinitionKey = "signPersonnelFormActivity";
 
@@ -103,37 +65,13 @@ public class AddPersonnelBpmnIT extends BaseBpmnIT {
     var systemSignatureCephKey = "lowcode_" + processInstanceId + "_" +
         systemSignatureCephKeyRefVarName + "_0";
 
-    expectedVariablesMap.put("initiator", initiator);
+    expectedVariablesMap.put("initiator", "testuser");
     expectedVariablesMap.put("const_dataFactoryBaseUrl", dataFactoryBaseUrl);
-    //search lab task
-    assertWaitingActivity(processInstance, searchLabFormActivityDefinitionKey,
-        "shared-search-lab");
-
-    completeTask(searchLabFormActivityDefinitionKey, processInstanceId,
-        "/json/add-personnel/form-data/searchLabFormActivity.json");
-
-    expectedVariablesMap.put("laboratoryId", labId);
-    addCompleterUsernameVariable(searchLabFormActivityDefinitionKey, testUserName);
-
-    addExpectedCephContent(processInstanceId, searchLabFormActivityDefinitionKey,
-        "/json/add-personnel/form-data/searchLabFormActivity.json");
-    addExpectedCephContent(processInstanceId, viewLabDataFormActivityDefinitionKey,
-        "/json/add-personnel/form-data/viewLabDataFormActivityPrepopulation.json");
-
-    //view lab data task
-    assertWaitingActivity(processInstance, viewLabDataFormActivityDefinitionKey,
-        "shared-view-lab-data");
-
-    completeTask(viewLabDataFormActivityDefinitionKey, processInstanceId,
-        "/json/add-personnel/form-data/viewLabDataFormActivity.json");
-
-    addCompleterUsernameVariable(viewLabDataFormActivityDefinitionKey, testUserName);
-
-    addExpectedCephContent(processInstanceId, viewLabDataFormActivityDefinitionKey,
-        "/json/add-personnel/form-data/viewLabDataFormActivity.json");
     addExpectedCephContent(processInstanceId, addPersonnelFormActivityDefinitionKey,
         "/json/add-personnel/form-data/addPersonnelFormActivityPrepopulation.json");
 
+    expectedVariablesMap.put("start_form_ceph_key", "startFormCephKey");
+    expectedVariablesMap.put("laboratoryId", labId);
     assertWaitingActivity(processInstance, addPersonnelFormActivityDefinitionKey,
         "add-personnel-bp-add-personnel");
 
