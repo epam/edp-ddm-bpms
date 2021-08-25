@@ -1,7 +1,9 @@
 package com.epam.digital.data.platform.bpms.it.camunda.bpmn;
 
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
+import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
@@ -13,12 +15,14 @@ public class UpdateStaffBpmnIT extends BaseBpmnIT {
   @Test
   @Deployment(resources = {"bpmn/update-personnel.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void test() throws IOException {
+    var staffId = "02e68684-1335-47f0-9bd6-17d937267527";
+    var labId = "3758f3e6-937a-4ef9-a8b6-c95671241abd";
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("staff")
-        .resourceId("02e68684-1335-47f0-9bd6-17d937267527")
+        .resourceId(staffId)
         .response("/json/update-staff/getStaffById.json")
         .build());
 
@@ -26,7 +30,7 @@ public class UpdateStaffBpmnIT extends BaseBpmnIT {
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("laboratory")
-        .resourceId("3758f3e6-937a-4ef9-a8b6-c95671241abd")
+        .resourceId(labId)
         .response("/json/update-staff/laboratoryByIdResponse.json")
         .build());
 
@@ -55,13 +59,15 @@ public class UpdateStaffBpmnIT extends BaseBpmnIT {
         .build());
 
     //start process
-    var processInstance = runtimeService.startProcessInstanceByKey("update-personnel-bp");
-    var processInstanceId = processInstance.getId();
-
-    BpmnAwareTests.assertThat(processInstance)
-        .isWaitingAt("Activity_update-personnel-bp-search-personnel");
-    completeTask("Activity_update-personnel-bp-search-personnel", processInstanceId,
-        "/json/update-staff/Activity_update-personnel-bp-search-personnel.json");
+    var startFormCephKey = "startFormCephKey";
+    var data = new LinkedHashMap<String, Object>();
+    data.put("staff", Map.of("staffId", staffId));
+    data.put("laboratory", Map.of("laboratoryId", labId));
+    cephService.putFormData(startFormCephKey, FormDataDto.builder().data(data).build());
+    var processInstanceId = startProcessInstanceWithStartFormAndGetId("update-personnel-bp",
+        "startFormCephKey", testUserToken);
+    var processInstance = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstanceId).singleResult();
 
     BpmnAwareTests.assertThat(processInstance)
         .isWaitingAt("Activity_update-personnel-bp-update-personnel");
@@ -76,7 +82,6 @@ public class UpdateStaffBpmnIT extends BaseBpmnIT {
     //then
     BpmnAwareTests.assertThat(processInstance)
         .hasPassed(
-            "Activity_update-personnel-bp-search-personnel",
             "Activity_update-personnel-bp-update-personnel",
             "Activity_update-personnel-bp-sign-personnel")
         .isEnded();
