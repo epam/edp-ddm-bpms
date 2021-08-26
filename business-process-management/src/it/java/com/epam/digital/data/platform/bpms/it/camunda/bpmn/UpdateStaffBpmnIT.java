@@ -59,13 +59,11 @@ public class UpdateStaffBpmnIT extends BaseBpmnIT {
         .build());
 
     //start process
-    var startFormCephKey = "startFormCephKey";
     var data = new LinkedHashMap<String, Object>();
     data.put("staff", Map.of("staffId", staffId));
     data.put("laboratory", Map.of("laboratoryId", labId));
-    cephService.putFormData(startFormCephKey, FormDataDto.builder().data(data).build());
     var processInstanceId = startProcessInstanceWithStartFormAndGetId("update-personnel-bp",
-        "startFormCephKey", testUserToken);
+        testUserToken, FormDataDto.builder().data(data).build());
     var processInstance = runtimeService.createProcessInstanceQuery()
         .processInstanceId(processInstanceId).singleResult();
 

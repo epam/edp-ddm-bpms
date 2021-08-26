@@ -8,6 +8,7 @@ import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
 import com.epam.digital.data.platform.bpms.camunda.dto.AssertWaitingActivityDto;
 import com.epam.digital.data.platform.bpms.it.config.TestCephServiceImpl;
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
+import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperties;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperty;
@@ -110,8 +112,10 @@ public final class CamundaAssertionUtil {
         .filter(userTask -> userTask.getId().equals(activityDefinitionId))
         .findFirst();
     Assertions.assertThat(taskDefinition).isNotEmpty();
-    return taskDefinition.get().getExtensionElements().getElementsQuery()
-        .filterByType(CamundaProperties.class).list().stream()
+    return taskDefinition.map(UserTask::getExtensionElements)
+        .map(ExtensionElements::getElementsQuery)
+        .map(query -> query.filterByType(CamundaProperties.class).list())
+        .orElse(Collections.emptyList()).stream()
         .flatMap(camundaProperties -> camundaProperties.getCamundaProperties().stream())
         .filter(camundaProperty -> Objects.nonNull(camundaProperty.getCamundaValue()))
         .collect(toMap(CamundaProperty::getCamundaName, CamundaProperty::getCamundaValue));

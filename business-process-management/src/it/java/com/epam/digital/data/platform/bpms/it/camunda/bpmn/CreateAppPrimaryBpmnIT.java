@@ -596,26 +596,25 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
   }
 
   private String startProcessInstanceAndGetId(String labId) throws JsonProcessingException {
-    saveStartFormDataToCeph(labId);
-    return startProcessInstanceWithStartFormAndGetId(PROCESS_DEFINITION_ID, START_FORM_CEPH_KEY,
-        testUserToken);
+    createFormData(labId);
+    return startProcessInstanceWithStartFormAndGetId(PROCESS_DEFINITION_ID, testUserToken,
+        createFormData(labId));
   }
 
-  private void saveStartFormDataToCeph(String labId) {
+  private FormDataDto createFormData(String labId) {
     var data = new LinkedHashMap<String, Object>();
     data.put("laboratory", Map.of("laboratoryId", labId));
     data.put("edrpou", "77777777");
     data.put("subjectType", "LEGAL");
     data.put("subject", Map.of("subjectId", "activeSubject"));
-    cephService.putFormData(START_FORM_CEPH_KEY, FormDataDto.builder().data(data).build());
+    return FormDataDto.builder().data(data).build();
   }
 
   @SuppressWarnings("unchecked")
   private Map<String, Map<String, List<Map<String, String>>>> startProcessInstanceForError(
       String labId) throws JsonProcessingException {
-    saveStartFormDataToCeph(labId);
     var resultMap = startProcessInstanceWithStartForm(PROCESS_DEFINITION_ID,
-        START_FORM_CEPH_KEY, testUserToken);
+        testUserToken, createFormData(labId));
     return (Map<String, Map<String, List<Map<String, String>>>>) resultMap;
   }
 }

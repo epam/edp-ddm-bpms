@@ -140,26 +140,24 @@ public class CitizenAddPersonnelBpmnIT extends BaseBpmnIT {
   }
 
   private String startProcessInstanceAndGetId(String labId) throws JsonProcessingException {
-    saveStartFormDataToCeph(labId);
-    return startProcessInstanceWithStartFormAndGetId(PROCESS_DEFINITION_ID, START_FORM_CEPH_KEY,
-        testUserToken);
+    return startProcessInstanceWithStartFormAndGetId(PROCESS_DEFINITION_ID, testUserToken,
+        startFormData(labId));
   }
 
   @SuppressWarnings("unchecked")
   private Map<String, Map<String, List<Map<String, String>>>> startProcessInstanceForError()
       throws JsonProcessingException {
-    saveStartFormDataToCeph("bb652d3f-a36f-465a-b7ba-232a5a1680c8");
     var resultMap = startProcessInstanceWithStartForm(PROCESS_DEFINITION_ID,
-        START_FORM_CEPH_KEY, testUserToken);
+        testUserToken, startFormData("bb652d3f-a36f-465a-b7ba-232a5a1680c8"));
     return (Map<String, Map<String, List<Map<String, String>>>>) resultMap;
   }
 
-  private void saveStartFormDataToCeph(String labId) {
+  private FormDataDto startFormData(String labId) {
     var data = new LinkedHashMap<String, Object>();
     data.put("laboratory", Map.of("laboratoryId", labId));
     data.put("edrpou", "77777777");
     data.put("subjectType", "LEGAL");
     data.put("subject", Map.of("subjectId", "activeSubject"));
-    cephService.putFormData(START_FORM_CEPH_KEY, FormDataDto.builder().data(data).build());
+    return FormDataDto.builder().data(data).build();
   }
 }
