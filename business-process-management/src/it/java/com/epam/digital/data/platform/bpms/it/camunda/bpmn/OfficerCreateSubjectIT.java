@@ -56,21 +56,19 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
 
     stubSearchSubjects("/xml/officer-create-subject/searchSubjectsResponse.xml");
 
-    var startFormCephKey = "startFormCephKey";
     var data = new LinkedHashMap<String, Object>();
     data.put("subjectType", subjectType);
     data.put("edrpou", subjectCode);
     data.put("absentEdrFlag", false);
-    cephService.putFormData(startFormCephKey, FormDataDto.builder().data(data).build());
 
     var processInstanceId = startProcessInstanceWithStartFormAndGetId("officer-create-subject-bp",
-        "startFormCephKey", testUserToken);
+        testUserToken, FormDataDto.builder().data(data).build());
     var processInstance = runtimeService.createProcessInstanceQuery()
         .processInstanceId(processInstanceId).singleResult();
 
     addExpectedVariable("initiator", "testuser");
     addExpectedVariable("const_dataFactoryBaseUrl", "http://localhost:8877/mock-server");
-    addExpectedVariable("start_form_ceph_key", startFormCephKey);
+    addExpectedVariable("start_form_ceph_key", START_FORM_CEPH_KEY);
 
     var signSubjectTaskDefinitionKey = "sign_subject_officer_create_subject_task";
     assertWaitingActivity(processInstance, signSubjectTaskDefinitionKey,
@@ -138,22 +136,20 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
 
     stubSearchSubjects("/xml/officer-create-subject/searchSubjectsEmptyResponse.xml");
 
-    var startFormCephKey = "startFormCephKey";
     var data = new LinkedHashMap<String, Object>();
     data.put("subjectName", subjectName);
     data.put("subjectType", subjectType);
     data.put("rnokppCode", subjectCode);
     data.put("absentEdrFlag", true);
-    cephService.putFormData(startFormCephKey, FormDataDto.builder().data(data).build());
 
     var processInstanceId = startProcessInstanceWithStartFormAndGetId("officer-create-subject-bp",
-        "startFormCephKey", testUserToken);
+        testUserToken, FormDataDto.builder().data(data).build());
     var processInstance = runtimeService.createProcessInstanceQuery()
         .processInstanceId(processInstanceId).singleResult();
 
     addExpectedVariable("initiator", "testuser");
     addExpectedVariable("const_dataFactoryBaseUrl", "http://localhost:8877/mock-server");
-    addExpectedVariable("start_form_ceph_key", startFormCephKey);
+    addExpectedVariable("start_form_ceph_key", START_FORM_CEPH_KEY);
 
     var signSubjectTaskDefinitionKey = "sign_subject_officer_create_subject_task";
     assertWaitingActivity(processInstance, signSubjectTaskDefinitionKey,
@@ -202,15 +198,13 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
             "/json/officer-create-subject/data-factory/subjectEqualSubjectTypeEqualSubjectCodeExistResponse.json")
         .build());
 
-    var startFormCephKey = "startFormCephKey";
     var data = new LinkedHashMap<String, Object>();
     data.put("subjectType", subjectType);
     data.put("edrpou", subjectCode);
     data.put("absentEdrFlag", false);
-    cephService.putFormData(startFormCephKey, FormDataDto.builder().data(data).build());
 
-    var response = startProcessInstanceWithStartForm("officer-create-subject-bp",
-        "startFormCephKey", testUserToken);
+    var response = startProcessInstanceWithStartForm("officer-create-subject-bp", testUserToken,
+        FormDataDto.builder().data(data).build());
 
     assertNotNull(response);
     assertEquals(response.get("message"), "Validation error");
@@ -242,15 +236,13 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
 
     stubSearchSubjects("/xml/officer-create-subject/searchSubjectsSuspendedStateResponse.xml");
 
-    var startFormCephKey = "startFormCephKey";
     var data = new LinkedHashMap<String, Object>();
     data.put("subjectType", subjectType);
     data.put("edrpou", subjectCode);
     data.put("absentEdrFlag", false);
-    cephService.putFormData(startFormCephKey, FormDataDto.builder().data(data).build());
 
     var response = startProcessInstanceWithStartForm("officer-create-subject-bp",
-        "startFormCephKey", testUserToken);
+        testUserToken, FormDataDto.builder().data(data).build());
 
     assertNotNull(response);
     assertEquals(response.get("message"), "Validation error");
@@ -279,15 +271,13 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
 
     stubSearchSubjects("/xml/officer-create-subject/searchSubjectsEmptyResponse.xml");
 
-    var startFormCephKey = "startFormCephKey";
     var data = new LinkedHashMap<String, Object>();
     data.put("subjectType", subjectType);
     data.put("edrpou", subjectCode);
     data.put("absentEdrFlag", false);
-    cephService.putFormData(startFormCephKey, FormDataDto.builder().data(data).build());
 
     var response = startProcessInstanceWithStartForm("officer-create-subject-bp",
-        "startFormCephKey", testUserToken);
+        testUserToken, FormDataDto.builder().data(data).build());
 
     assertNotNull(response);
     assertEquals(response.get("message"), "Validation error");
@@ -333,22 +323,20 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
 
     stubSearchSubjects("/xml/officer-create-subject/searchSubjectsEntrepreneurResponse.xml");
 
-    var startFormCephKey = "startFormCephKey";
     var data = new LinkedHashMap<String, Object>();
     data.put("subjectName", subjectName);
     data.put("subjectType", subjectType);
     data.put("rnokppCode", subjectCode);
     data.put("absentEdrFlag", true);
-    cephService.putFormData(startFormCephKey, FormDataDto.builder().data(data).build());
 
     var processInstanceId = startProcessInstanceWithStartFormAndGetId("officer-create-subject-bp",
-        "startFormCephKey", testUserToken);
+        testUserToken, FormDataDto.builder().data(data).build());
     var processInstance = runtimeService.createProcessInstanceQuery()
         .processInstanceId(processInstanceId).singleResult();
 
     addExpectedVariable("initiator", "testuser");
     addExpectedVariable("const_dataFactoryBaseUrl", "http://localhost:8877/mock-server");
-    addExpectedVariable("start_form_ceph_key", startFormCephKey);
+    addExpectedVariable("start_form_ceph_key", START_FORM_CEPH_KEY);
 
     var signSubjectTaskDefinitionKey = "sign_subject_officer_create_subject_task";
     assertWaitingActivity(processInstance, signSubjectTaskDefinitionKey,

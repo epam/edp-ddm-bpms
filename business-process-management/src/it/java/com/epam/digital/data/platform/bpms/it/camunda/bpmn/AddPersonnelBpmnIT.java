@@ -39,13 +39,11 @@ public class AddPersonnelBpmnIT extends BaseBpmnIT {
         .response("{\"signature\": \"test\"}")
         .build());
 
-    var startFormCephKey = "startFormCephKey";
     var data = new LinkedHashMap<String, Object>();
     data.put("laboratory", Map.of("laboratoryId", labId));
-    cephService.putFormData(startFormCephKey, FormDataDto.builder().data(data).build());
 
     var processInstanceId = startProcessInstanceWithStartFormAndGetId("add-personnel",
-        "startFormCephKey", testUserToken);
+        testUserToken, FormDataDto.builder().data(data).build());
     var processInstance = runtimeService.createProcessInstanceQuery()
         .processInstanceId(processInstanceId).singleResult();
 

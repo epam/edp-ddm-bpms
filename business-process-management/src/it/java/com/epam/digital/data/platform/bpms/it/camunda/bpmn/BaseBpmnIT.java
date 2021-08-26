@@ -279,20 +279,22 @@ public abstract class BaseBpmnIT extends BaseIT {
   }
 
   protected String startProcessInstanceWithStartFormAndGetId(String processDefinitionKey,
-      String startFormCephKey, String token) throws JsonProcessingException {
-    var result = startProcessInstanceWithStartForm(processDefinitionKey, startFormCephKey, token);
+      String token, FormDataDto formDataDto) throws JsonProcessingException {
+    var result = startProcessInstanceWithStartForm(processDefinitionKey, token, formDataDto);
     return (String) result.get("id");
   }
 
-  protected Map startProcessInstanceWithStartForm(String processDefinitionKey,
-      String startFormCephKey, String token) throws JsonProcessingException {
+  protected Map startProcessInstanceWithStartForm(String processDefinitionKey, String token,
+      FormDataDto formDataDto) throws JsonProcessingException {
+    cephService.putFormData(START_FORM_CEPH_KEY, formDataDto);
+
     var startProcessInstanceDto = new StartProcessInstanceDto();
     var variableValueDto = new VariableValueDto();
-    variableValueDto.setValue(startFormCephKey);
+    variableValueDto.setValue(START_FORM_CEPH_KEY);
     startProcessInstanceDto.setVariables(
         Map.of(Constants.BPMS_START_FORM_CEPH_KEY_VARIABLE_NAME, variableValueDto));
 
-     return postForObject(
+    return postForObject(
         String.format("api/process-definition/key/%s/start", processDefinitionKey),
         objectMapper.writeValueAsString(startProcessInstanceDto), Map.class, token);
   }

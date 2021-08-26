@@ -115,17 +115,12 @@ public class UpdateLabBpmnIT extends BaseBpmnIT {
   }
 
   private String startProcessInstanceAndGetId() throws JsonProcessingException {
-    saveStartFormDataToCeph();
-    return startProcessInstanceWithStartFormAndGetId("update-lab", START_FORM_CEPH_KEY,
-        testUserToken);
-  }
-
-  private void saveStartFormDataToCeph() {
     var data = new LinkedHashMap<String, Object>();
     data.put("subjectType", "LEGAL");
     data.put("edrpou", "77777777");
     data.put("subject", Map.of("subjectId", "activeSubject"));
     data.put("laboratory", Map.of("laboratoryId", "d2943186-0f1f-4a77-9de9-a5a59c07db02"));
-    cephService.putFormData(START_FORM_CEPH_KEY, FormDataDto.builder().data(data).build());
+    return startProcessInstanceWithStartFormAndGetId("update-lab", testUserToken,
+        FormDataDto.builder().data(data).build());
   }
 }
