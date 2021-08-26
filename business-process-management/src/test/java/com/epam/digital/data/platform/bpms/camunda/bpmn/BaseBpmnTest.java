@@ -33,6 +33,7 @@ import com.epam.digital.data.platform.bpms.delegate.connector.DataFactoryConnect
 import com.epam.digital.data.platform.bpms.delegate.connector.DataFactoryConnectorCreateDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.DataFactoryConnectorReadDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.DataFactoryConnectorSearchDelegate;
+import com.epam.digital.data.platform.bpms.delegate.connector.DataFactoryConnectorUpdateDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.DigitalSignatureConnectorDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.ExcerptConnectorGenerateDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.ExcerptConnectorStatusDelegate;
@@ -310,12 +311,15 @@ public abstract class BaseBpmnTest {
         dataFactoryUrl);
     var dataFactoryConnectorBatchReadDelegate = new DataFactoryConnectorBatchReadDelegate(
         restTemplate, springAppName, dataFactoryUrl);
+    var dataFactoryConnectorUpdateDelegate = new DataFactoryConnectorUpdateDelegate(restTemplate,
+        springAppName, dataFactoryUrl);
     Mocks.register("dataFactoryConnectorSearchDelegate", dataFactoryConnectorSearchDelegate);
     Mocks.register("dataFactoryConnectorCreateDelegate", dataFactoryConnectorCreateDelegate);
     Mocks.register("dataFactoryConnectorReadDelegate", dataFactoryConnectorReadDelegate);
     Mocks.register("dataFactoryConnectorBatchCreateDelegate",
         dataFactoryConnectorBatchCreateDelegate);
     Mocks.register("dataFactoryConnectorBatchReadDelegate", dataFactoryConnectorBatchReadDelegate);
+    Mocks.register("dataFactoryConnectorUpdateDelegate", dataFactoryConnectorUpdateDelegate);
 
     var userSettingsConnectorReadDelegate = new UserSettingsConnectorReadDelegate(restTemplate,
         springAppName, userSettingsBaseUrl);
@@ -383,11 +387,17 @@ public abstract class BaseBpmnTest {
   }
 
   protected void startProcessInstanceWithStartForm(String processDefinitionId,
-      LinkedHashMap<String, Object> data) {
-    cephService.putFormData(START_FORM_CEPH_KEY, FormDataDto.builder().data(data).build());
+      FormDataDto formData) {
+    cephService.putFormData(START_FORM_CEPH_KEY, formData);
     startProcessInstance(processDefinitionId,
         Map.of(Constants.BPMS_START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY,
             "initiator", testUserName));
+  }
+
+  protected void startProcessInstanceWithStartForm(String processDefinitionId,
+      LinkedHashMap<String, Object> data) {
+    startProcessInstanceWithStartForm(processDefinitionId,
+        FormDataDto.builder().data(data).build());
   }
 
   @RequiredArgsConstructor

@@ -59,13 +59,11 @@ public class ReadLabDataIT extends BaseBpmnIT {
         .build());
 
     //start process
-    var startFormCephKey = "startFormCephKey";
     var data = new LinkedHashMap<String, Object>();
     data.put("laboratory", Map.of("laboratoryId", "d2943186-0f1f-4a77-9de9-a5a59c07db02"));
-    cephService.putFormData(startFormCephKey, FormDataDto.builder().data(data).build());
 
     var processInstanceId = startProcessInstanceWithStartFormAndGetId("read-lab",
-        startFormCephKey, testUserToken);
+        testUserToken, FormDataDto.builder().data(data).build());
     var processInstance = runtimeService.createProcessInstanceQuery()
         .processInstanceId(processInstanceId).singleResult();
 
