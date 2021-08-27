@@ -99,7 +99,6 @@ public class CitizenAddPersonnelBpmnIT extends BaseBpmnIT {
             "/json/citizen-add-personnel/form-data/signCitizenPersonnelFormActivity.json")
         .build());
 
-
     addExpectedVariable("signCitizenPersonnelFormActivity_completer", testUserName);
     addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT,
         "Дані про кадровий склад внесені");
