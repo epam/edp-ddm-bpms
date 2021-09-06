@@ -12,7 +12,10 @@ import org.springframework.http.HttpStatus;
 public class CamundaCommunicationException extends RestSystemException {
 
   @FeignExceptionConstructor
-  public CamundaCommunicationException(SystemErrorDto errorDto) {
-    super(errorDto, HttpStatus.INTERNAL_SERVER_ERROR);
+  public CamundaCommunicationException() {
+    super(SystemErrorDto.builder()
+        .message("Camunda communication error")
+        .code("CAMUNDA_COMMUNICATION_ERROR")
+        .build(), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
