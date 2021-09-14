@@ -1,0 +1,34 @@
+{
+  "registrationSource": "електроннаПодача",
+  "registrationNo": "123",
+  "acceptedBy": "Сидоренко Василь Леонідович",
+  "solutionDate": "09-08-2021",
+  "letterNo": "666",
+  "letterDate": "09-08-2021",
+  "notes": "smth noted",
+  "factors": [
+    "FactorsPhys1",
+    "laborfact1",
+    "biofactors",
+    "factorPesticide",
+    "chemfactgost1",
+    "chemfacthyge1",
+    "chemfactobrv1",
+    "chemfactodovilni1"
+  ],
+  "applicationTypeId": "addApplication",
+  "solutionTypeId": "ADD=SUCCESS",
+  "laboratoryId": "bb652d3f-a36f-465a-b7ba-232a5a1680c5",
+  "zvtFile": {
+    "id": "1",
+    "checksum": "1a"
+  },
+  "zvtCertificateFile": {
+    "id": "2",
+    "checksum": "2a"
+  },
+  "reagentFile": {
+    "id": "3",
+    "checksum": "3a"
+  }
+}
