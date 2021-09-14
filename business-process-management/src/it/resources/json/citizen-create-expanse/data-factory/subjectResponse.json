@@ -1,0 +1,8 @@
+{
+  "subjectName": "string",
+  "subjectId": "activeSubject",
+  "absentEdrFlag": false,
+  "subjectCode": "string",
+  "subjectStatus": "SUSPENDING",
+  "subjectType": "LEGAL"
+}

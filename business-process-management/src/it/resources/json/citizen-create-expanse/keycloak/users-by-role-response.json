@@ -1,0 +1,24 @@
+[
+  {
+    "id": "1",
+    "createdTimestamp": 1618403768879,
+    "username": "officerusername",
+    "enabled": true,
+    "totp": false,
+    "emailVerified": false,
+    "firstName": "officer",
+    "lastName": "officer",
+    "email": "test_user@test.com",
+    "attributes": {
+      "drfo": [
+        "1212121202"
+      ],
+      "fullName": [
+        "officer officer"
+      ]
+    },
+    "disableableCredentialTypes": [],
+    "requiredActions": [],
+    "notBefore": 0
+  }
+]
