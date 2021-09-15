@@ -53,6 +53,11 @@ public class TestCephServiceImpl implements CephService, FormDataCephService {
     storage.remove(key);
   }
 
+  @Override
+  public boolean doesObjectExist(String s, String s1) {
+    return false;
+  }
+
   @SneakyThrows
   @Override
   public Optional<FormDataDto> getFormData(String key) {
