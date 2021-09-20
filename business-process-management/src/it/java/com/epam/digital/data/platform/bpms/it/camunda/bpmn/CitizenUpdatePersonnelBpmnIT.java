@@ -25,6 +25,14 @@ public class CitizenUpdatePersonnelBpmnIT extends BaseBpmnIT {
   @Test
   @Deployment(resources = {"bpmn/citizen-update-personnel.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void testUpdateCitizenPersonnel() throws IOException {
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
+
     stubSearchSubjects("/xml/citizen-update-personnel/searchSubjectsActiveResponse.xml");
 
     stubDataFactoryRequest(StubData.builder()
@@ -138,6 +146,13 @@ public class CitizenUpdatePersonnelBpmnIT extends BaseBpmnIT {
   @Test
   @Deployment(resources = {"bpmn/citizen-update-personnel.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void testValidationError() throws JsonProcessingException {
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
     stubSearchSubjects("/xml/citizen-update-personnel/searchSubjectsCancelledResponse.xml");
     var startFormData = deserializeFormData(
         "/json/citizen-update-personnel/form-data/startFormDataActivity.json");
