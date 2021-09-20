@@ -30,6 +30,14 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
     var addLetterDataActivityDefinitionKey = "Activity_shared-add-letter-data";
     var signAppIncludeActivityDefinitionKey = "Activity_shared-sign-app-include";
 
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
+
     mockEdrResponse("/json/create-app/edr/searchSubjectsActiveResponse.json");
 
     mockDataFactoryRequest(StubData.builder()
@@ -207,6 +215,14 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
     var addLetterDataActivityDefinitionKey = "Activity_1eujure";
     var signAppDenyActivityDefinitionKey = "Activity_shared-sign-app-deny";
 
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
+
     mockEdrResponse("/json/create-app/edr/searchSubjectsDisabledResponse.json");
 
     mockDataFactoryRequest(StubData.builder()
@@ -360,6 +376,14 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
   public void testValidationError() {
     var labId = "bb652d3f-a36f-465a-b7ba-232a5a1680c4";
 
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
+
     mockEdrResponse("/json/create-app/edr/searchSubjectsActiveResponse.json");
 
     mockDataFactoryRequest(StubData.builder()
@@ -419,6 +443,14 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
     var labId = "bb652d3f-a36f-465a-b7ba-232a5a1680c4";
 
     var addApplicationActivityDefinitionKey = "Activity_shared-add-application";
+
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
 
     mockEdrResponse("/json/create-app/edr/searchSubjectsActiveResponse.json");
 
@@ -481,6 +513,14 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
   public void testAppAlreadyCreated() {
     var labId = "bb652d3f-a36f-465a-b7ba-232a5a1680c4";
 
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
+
     mockEdrResponse("/json/create-app/edr/searchSubjectsActiveResponse.json");
 
     mockDataFactoryRequest(StubData.builder()
@@ -527,6 +567,14 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
     var addApplicationActivityDefinitionKey = "Activity_shared-add-application";
     var addFactorsActivityDefinitionKey = "Activity_shared-add-factors";
     var checkComplianceActivityDefinitionKey = "Activity_shared-check-complience";
+
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
 
     mockEdrResponse("/json/create-app/edr/searchSubjectsDisabledResponse.json");
 
@@ -590,10 +638,9 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
 
   protected void startProcessInstanceWithStartForm(String labId) {
     var data = new LinkedHashMap<String, Object>();
-    data.put("laboratory", Map.of("laboratoryId", labId));
+    data.put("laboratory", Map.of("laboratoryId", labId, "subjectId", "activeSubject"));
     data.put("edrpou", "77777777");
     data.put("subjectType", "LEGAL");
-    data.put("subject", Map.of("subjectId", "activeSubject"));
 
     startProcessInstanceWithStartForm(PROCESS_DEFINITION_ID, data);
   }

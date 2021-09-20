@@ -28,6 +28,14 @@ public class CitizenAddPersonnelBpmnIT extends BaseBpmnIT {
   public void happyPathTest() throws IOException {
     var labId = "bb652d3f-a36f-465a-b7ba-232a5a1680c8";
 
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
+
     stubSearchSubjects("/xml/citizen-add-personnel/searchSubjectsActiveResponse.xml");
 
     stubDataFactoryRequest(StubData.builder()
@@ -113,6 +121,14 @@ public class CitizenAddPersonnelBpmnIT extends BaseBpmnIT {
   @Test
   @Deployment(resources = "bpmn/citizen-add-personnel.bpmn")
   public void validationErrorTest() throws JsonProcessingException {
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
+
     stubSearchSubjects("/xml/citizen-add-personnel/searchSubjectsCancelledResponse.xml");
 
     var resultMap = startProcessInstanceForError();
@@ -153,10 +169,9 @@ public class CitizenAddPersonnelBpmnIT extends BaseBpmnIT {
 
   private FormDataDto startFormData(String labId) {
     var data = new LinkedHashMap<String, Object>();
-    data.put("laboratory", Map.of("laboratoryId", labId));
+    data.put("laboratory", Map.of("laboratoryId", labId, "subjectId", "activeSubject"));
     data.put("edrpou", "77777777");
     data.put("subjectType", "LEGAL");
-    data.put("subject", Map.of("subjectId", "activeSubject"));
     return FormDataDto.builder().data(data).build();
   }
 }
