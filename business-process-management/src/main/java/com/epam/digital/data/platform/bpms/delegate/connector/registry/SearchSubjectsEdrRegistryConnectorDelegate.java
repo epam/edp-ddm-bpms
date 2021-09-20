@@ -1,14 +1,14 @@
 package com.epam.digital.data.platform.bpms.delegate.connector.registry;
 
+import com.epam.digital.data.platform.bpms.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.bpms.delegate.dto.EdrRegistryConnectorResponse;
 import com.epam.digital.data.platform.starter.trembita.integration.dto.SubjectInfoDto;
 import com.epam.digital.data.platform.starter.trembita.integration.service.EdrRemoteService;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.spin.Spin;
 import org.springframework.util.CollectionUtils;
 
@@ -16,9 +16,10 @@ import org.springframework.util.CollectionUtils;
  * The class represents an implementation of {@link JavaDelegate} that is used to search subjects in
  * EDR registry.
  */
-@Slf4j
 @RequiredArgsConstructor
-public class SearchSubjectsEdrRegistryConnectorDelegate implements JavaDelegate {
+public class SearchSubjectsEdrRegistryConnectorDelegate extends BaseJavaDelegate {
+
+  public static final String DELEGATE_NAME = "searchSubjectsEdrRegistryConnectorDelegate";
 
   protected static final String EDR_CODE_VARIABLE = "code";
   protected static final String RESPONSE_VARIABLE = "response";
@@ -33,10 +34,10 @@ public class SearchSubjectsEdrRegistryConnectorDelegate implements JavaDelegate 
 
     var response = edrRemoteService.searchSubjects(code, authorizationToken);
     var connectorResponse = prepareConnectorResponse(response);
-    log.debug("Edr Registry Search Subjects response: {}", connectorResponse);
 
-    ((AbstractVariableScope) execution)
-        .setVariableLocalTransient(RESPONSE_VARIABLE, connectorResponse);
+    setTransientResult(execution, RESPONSE_VARIABLE, connectorResponse);
+    logDelegateExecution(execution, Set.of(EDR_CODE_VARIABLE, AUTHORIZATION_TOKEN_VARIABLE),
+        Set.of(RESPONSE_VARIABLE));
   }
 
   private EdrRegistryConnectorResponse prepareConnectorResponse(List<SubjectInfoDto> response) {
@@ -44,6 +45,11 @@ public class SearchSubjectsEdrRegistryConnectorDelegate implements JavaDelegate 
         .responseBody(Spin.JSON(response))
         .statusCode(CollectionUtils.isEmpty(response) ? 404 : 200)
         .build();
+  }
+
+  @Override
+  public String getDelegateName() {
+    return DELEGATE_NAME;
   }
 }
 

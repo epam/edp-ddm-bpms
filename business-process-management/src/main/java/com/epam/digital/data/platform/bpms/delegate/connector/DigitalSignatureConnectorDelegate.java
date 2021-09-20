@@ -1,9 +1,8 @@
 package com.epam.digital.data.platform.bpms.delegate.connector;
 
 import com.epam.digital.data.platform.bpms.delegate.dto.DataFactoryConnectorResponse;
-import com.epam.digital.data.platform.starter.logger.annotation.Logging;
+import java.util.Set;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.spin.json.SpinJsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,9 +17,10 @@ import org.springframework.web.util.UriComponentsBuilder;
  * The class represents an implementation of {@link BaseConnectorDelegate} that is used for digital
  * signature of data
  */
-@Component("digitalSignatureConnectorDelegate")
-@Logging
+@Component(DigitalSignatureConnectorDelegate.DELEGATE_NAME)
 public class DigitalSignatureConnectorDelegate extends BaseConnectorDelegate {
+
+  public static final String DELEGATE_NAME = "digitalSignatureConnectorDelegate";
 
   private final String dsoBaseUrl;
 
@@ -37,8 +37,8 @@ public class DigitalSignatureConnectorDelegate extends BaseConnectorDelegate {
     var payload = (SpinJsonNode) execution.getVariable(PAYLOAD_VARIABLE);
     var response = performPost(execution, payload.toString());
 
-    ((AbstractVariableScope) execution)
-        .setVariableLocalTransient(RESPONSE_VARIABLE, response.getResponseBody());
+    setTransientResult(execution, RESPONSE_VARIABLE, response.getResponseBody());
+    logDelegateExecution(execution, Set.of(PAYLOAD_VARIABLE), Set.of());
   }
 
   private DataFactoryConnectorResponse performPost(DelegateExecution execution, String body) {
@@ -53,5 +53,10 @@ public class DigitalSignatureConnectorDelegate extends BaseConnectorDelegate {
     getAccessToken(execution)
         .ifPresent(xAccessToken -> headers.add("X-Access-Token", xAccessToken));
     return headers;
+  }
+
+  @Override
+  public String getDelegateName() {
+    return DELEGATE_NAME;
   }
 }

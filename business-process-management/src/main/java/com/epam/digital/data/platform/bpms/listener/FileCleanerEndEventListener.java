@@ -29,6 +29,8 @@ public class FileCleanerEndEventListener implements ExecutionListener {
       if (!keys.isEmpty()) {
         s3FileStorageCephService.delete(keys);
       }
+      log.debug("Deleted next files from ceph - {}. ProcessDefinitionId={}, processInstanceId={}",
+          keys, execution.getProcessDefinitionId(), processInstanceId);
     } catch (RuntimeException ex) {
       log.warn(
           "Error while deleting documents, processDefinitionId={}, processInstanceId={}, files prefix={}",

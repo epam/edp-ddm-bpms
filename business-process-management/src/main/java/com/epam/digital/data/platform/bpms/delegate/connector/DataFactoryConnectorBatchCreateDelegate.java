@@ -2,8 +2,8 @@ package com.epam.digital.data.platform.bpms.delegate.connector;
 
 import com.epam.digital.data.platform.bpms.delegate.dto.DataFactoryConnectorResponse;
 import com.epam.digital.data.platform.integration.ceph.service.CephService;
-import com.epam.digital.data.platform.starter.logger.annotation.Logging;
 import java.util.Map;
+import java.util.Set;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.spin.Spin;
@@ -19,9 +19,10 @@ import org.springframework.web.util.UriComponentsBuilder;
  * The class represents an implementation of {@link BaseConnectorDelegate} that is used to execute
  * data batch creation in Data Factory
  */
-@Component("dataFactoryConnectorBatchCreateDelegate")
-@Logging
+@Component(DataFactoryConnectorBatchCreateDelegate.DELEGATE_NAME)
 public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelegate {
+
+  public static final String DELEGATE_NAME = "dataFactoryConnectorBatchCreateDelegate";
 
   private final String dataFactoryBaseUrl;
   private final DigitalSignatureConnectorDelegate digitalSignatureConnectorDelegate;
@@ -48,7 +49,9 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelega
 
     var response = executeBatchCreateOperation(execution, payload, resource);
 
-    ((AbstractVariableScope) execution).setVariableLocalTransient(RESPONSE_VARIABLE, response);
+    setTransientResult(execution, RESPONSE_VARIABLE, response);
+    logDelegateExecution(execution, Set.of(RESOURCE_VARIABLE, PAYLOAD_VARIABLE),
+        Set.of(RESPONSE_VARIABLE));
   }
 
   private DataFactoryConnectorResponse executeBatchCreateOperation(DelegateExecution execution,
@@ -100,5 +103,10 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelega
         .toUri();
 
     perform(RequestEntity.post(uri).headers(getHeaders(delegateExecution)).body(body));
+  }
+
+  @Override
+  public String getDelegateName() {
+    return DELEGATE_NAME;
   }
 }

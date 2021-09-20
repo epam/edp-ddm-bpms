@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
@@ -18,6 +19,7 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperty;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TaskPropertyServiceImpl implements TaskPropertyService {
@@ -28,9 +30,11 @@ public class TaskPropertyServiceImpl implements TaskPropertyService {
 
   @Override
   public Map<String, String> getTaskProperty(String taskId) {
+    log.info("Getting task {} properties", taskId);
     Map<String, String> taskProperties = new HashMap<>();
     var properties = getCamundaProperties(taskId);
     properties.forEach(pr -> taskProperties.put(pr.getCamundaName(), pr.getCamundaValue()));
+    log.info("Found {} properties for task {}", taskProperties.size(), taskId);
     return taskProperties;
   }
 

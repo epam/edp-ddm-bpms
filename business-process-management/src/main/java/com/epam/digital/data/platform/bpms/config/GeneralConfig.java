@@ -12,6 +12,7 @@ import com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory;
 import com.epam.digital.data.platform.integration.ceph.config.CephConfig;
 import com.epam.digital.data.platform.integration.ceph.service.S3ObjectCephService;
 import com.epam.digital.data.platform.integration.ceph.service.impl.S3ObjectCephServiceImpl;
+import java.util.Collection;
 import java.util.stream.Stream;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,6 +25,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.client.BufferingClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.jdbc.support.DatabaseStartupValidator;
 import org.springframework.web.client.RestTemplate;
 
@@ -38,8 +42,14 @@ import org.springframework.web.client.RestTemplate;
 public class GeneralConfig {
 
   @Bean
-  public RestTemplate restTemplate(ConnectorResponseErrorHandler responseErrorHandler) {
-    return new RestTemplateBuilder().errorHandler(responseErrorHandler).build();
+  public RestTemplate restTemplate(Collection<ClientHttpRequestInterceptor> interceptors,
+      ConnectorResponseErrorHandler responseErrorHandler) {
+    return new RestTemplateBuilder()
+        .requestFactory(
+            () -> new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()))
+        .interceptors(interceptors)
+        .errorHandler(responseErrorHandler)
+        .build();
   }
 
   @Bean

@@ -1,14 +1,13 @@
 package com.epam.digital.data.platform.bpms.delegate.ceph;
 
 import com.epam.digital.data.platform.bpms.api.constant.Constants;
+import com.epam.digital.data.platform.bpms.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.epam.digital.data.platform.integration.ceph.service.FormDataCephService;
-import com.epam.digital.data.platform.starter.logger.annotation.Logging;
 import java.util.LinkedHashMap;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.spin.Spin;
 import org.springframework.stereotype.Component;
 
@@ -17,10 +16,12 @@ import org.springframework.stereotype.Component;
  * service for start form, map the formData to {@link org.camunda.spin.json.SpinJsonNode} and return
  * it.
  */
-@Component("getStartFormDataFromCephDelegate")
-@Logging
+@Component(GetStartFormDataFromCephDelegate.DELEGATE_NAME)
 @RequiredArgsConstructor
-public class GetStartFormDataFromCephDelegate implements JavaDelegate {
+public class GetStartFormDataFromCephDelegate extends BaseJavaDelegate {
+
+  public static final String DELEGATE_NAME = "getStartFormDataFromCephDelegate";
+  private static final String FORM_DATA_PARAMETER = "formData";
 
   private final FormDataCephService cephService;
 
@@ -31,7 +32,13 @@ public class GetStartFormDataFromCephDelegate implements JavaDelegate {
         .map(FormDataDto::getData)
         .orElse(new LinkedHashMap<>());
 
-    ((AbstractVariableScope) execution)
-        .setVariableLocalTransient("formData", Spin.JSON(formData));
+    setTransientResult(execution, FORM_DATA_PARAMETER, Spin.JSON(formData));
+    logDelegateExecution(execution, Set.of(Constants.BPMS_START_FORM_CEPH_KEY_VARIABLE_NAME),
+        Set.of(FORM_DATA_PARAMETER));
+  }
+
+  @Override
+  public String getDelegateName() {
+    return DELEGATE_NAME;
   }
 }

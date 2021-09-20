@@ -1,8 +1,11 @@
 package com.epam.digital.data.platform.bpms.delegate.connector.keycloak;
 
+import com.epam.digital.data.platform.bpms.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.bpms.exception.KeycloakNotFoundException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.keycloak.admin.client.Keycloak;
@@ -18,7 +21,11 @@ import org.springframework.beans.factory.annotation.Value;
  * The class represents an implementation of {@link JavaDelegate} that is used to provide common
  * logic for working with the keycloak client to perform operations with user role
  */
-public abstract class BaseKeycloakRoleConnectorDelegate implements JavaDelegate {
+@Slf4j
+public abstract class BaseKeycloakRoleConnectorDelegate extends BaseJavaDelegate {
+
+  private static final String USER_NAME_PARAMETER = "user_name";
+  private static final String ROLE_PARAMETER = "role";
 
   @Value("${keycloak.citizen.realm}")
   private String realm;
@@ -28,10 +35,11 @@ public abstract class BaseKeycloakRoleConnectorDelegate implements JavaDelegate 
 
   @Override
   public void execute(DelegateExecution execution) {
-    var userName = (String) execution.getVariable("user_name");
-    var role = (String) execution.getVariable("role");
+    log.debug("Started getting keycloak roles for realm {}", realm);
+    var userName = (String) execution.getVariable(USER_NAME_PARAMETER);
+    var role = (String) execution.getVariable(ROLE_PARAMETER);
 
-    var userRepresentation = getUserRepresentation(keycloak, userName);
+    var userRepresentation = getUserRepresentation(userName);
 
     var realmResource = keycloak.realm(realm);
     var roleRepresentation = getRoleRepresentation(realmResource, role);
@@ -39,6 +47,7 @@ public abstract class BaseKeycloakRoleConnectorDelegate implements JavaDelegate 
     var userResource = realmResource.users().get(userId);
     var roleScopeResource = userResource.roles().realmLevel();
     performOperationWithRole(roleScopeResource, Collections.singletonList(roleRepresentation));
+    logDelegateExecution(execution, Set.of(USER_NAME_PARAMETER, ROLE_PARAMETER), Set.of());
   }
 
   protected abstract void performOperationWithRole(RoleScopeResource roleScopeResource,
@@ -52,15 +61,13 @@ public abstract class BaseKeycloakRoleConnectorDelegate implements JavaDelegate 
     }
   }
 
-  private UserRepresentation getUserRepresentation(Keycloak keycloak, String userName) {
-    var userRepresentation = keycloak.realm(realm).users().search(userName)
+  private UserRepresentation getUserRepresentation(String userName) {
+    log.debug("Finding user {} in keycloak realm {}", userName, realm);
+    return keycloak.realm(realm).users().search(userName)
         .stream()
         .filter(user -> userName.equals(user.getUsername()))
-        .findFirst();
-    if (userRepresentation.isPresent()) {
-      return userRepresentation.get();
-    } else {
-      throw new KeycloakNotFoundException("Keycloak user not found!");
-    }
+        .findFirst()
+        .orElseThrow(
+            () -> new KeycloakNotFoundException("Keycloak user not found!"));
   }
 }

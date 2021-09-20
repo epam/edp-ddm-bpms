@@ -5,8 +5,8 @@ import com.epam.digital.data.platform.bpms.delegate.dto.DataFactoryConnectorResp
 import com.epam.digital.data.platform.excerpt.model.ExcerptEventDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
+import java.util.Set;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
@@ -18,8 +18,10 @@ import org.springframework.web.util.UriComponentsBuilder;
  * The class represents an implementation of {@link BaseConnectorDelegate} that is used for excerpt
  * generation
  */
-@Component
+@Component(ExcerptConnectorGenerateDelegate.DELEGATE_NAME)
 public class ExcerptConnectorGenerateDelegate extends BaseConnectorDelegate {
+
+  public static final String DELEGATE_NAME = "excerptConnectorGenerateDelegate";
 
   public static final String EXCERPT_TYPE_VAR = "excerptType";
   public static final String EXCERPT_INPUT_DATA_VAR = "excerptInputData";
@@ -43,16 +45,19 @@ public class ExcerptConnectorGenerateDelegate extends BaseConnectorDelegate {
   public void execute(DelegateExecution execution) throws Exception {
     var excerptType = (String) execution.getVariable(EXCERPT_TYPE_VAR);
     var excerptInputData = (Map<String, Object>) execution.getVariable(EXCERPT_INPUT_DATA_VAR);
-    var requiresSystemSignature = Boolean.valueOf(
+    var requiresSystemSignature = Boolean.parseBoolean(
         (String) execution.getVariable(REQUIRES_SYSTEM_SIGNATURE_VAR));
 
     var requestBody = new ExcerptEventDto(null, excerptType, excerptInputData,
         requiresSystemSignature);
 
     var response = performPost(execution, objectMapper.writeValueAsString(requestBody));
-    execution.setVariable(Constants.SYS_VAR_PROCESS_EXCERPT_ID,
+    setResult(execution, Constants.SYS_VAR_PROCESS_EXCERPT_ID,
         response.getResponseBody().prop("excerptIdentifier").value());
-    ((AbstractVariableScope) execution).setVariableLocalTransient(RESPONSE_VARIABLE, response);
+    setTransientResult(execution, RESPONSE_VARIABLE, response);
+    logDelegateExecution(execution,
+        Set.of(EXCERPT_TYPE_VAR, EXCERPT_INPUT_DATA_VAR, REQUIRES_SYSTEM_SIGNATURE_VAR),
+        Set.of(Constants.SYS_VAR_PROCESS_EXCERPT_ID, RESPONSE_VARIABLE));
   }
 
   private DataFactoryConnectorResponse performPost(DelegateExecution delegateExecution,
@@ -60,5 +65,10 @@ public class ExcerptConnectorGenerateDelegate extends BaseConnectorDelegate {
     var uri = UriComponentsBuilder.fromHttpUrl(excerptServiceBaseUrl).pathSegment(RESOURCE_EXCERPTS)
         .build().toUri();
     return perform(RequestEntity.post(uri).headers(getHeaders(delegateExecution)).body(body));
+  }
+
+  @Override
+  public String getDelegateName() {
+    return DELEGATE_NAME;
   }
 }

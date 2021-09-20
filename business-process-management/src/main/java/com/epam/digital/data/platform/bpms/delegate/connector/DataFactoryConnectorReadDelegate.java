@@ -1,9 +1,8 @@
 package com.epam.digital.data.platform.bpms.delegate.connector;
 
 import com.epam.digital.data.platform.bpms.delegate.dto.DataFactoryConnectorResponse;
-import com.epam.digital.data.platform.starter.logger.annotation.Logging;
+import java.util.Set;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
@@ -15,9 +14,10 @@ import org.springframework.web.util.UriComponentsBuilder;
  * The class represents an implementation of {@link BaseConnectorDelegate} that is used to read data
  * from Data Factory
  */
-@Component("dataFactoryConnectorReadDelegate")
-@Logging
+@Component(DataFactoryConnectorReadDelegate.DELEGATE_NAME)
 public class DataFactoryConnectorReadDelegate extends BaseConnectorDelegate {
+
+  public static final String DELEGATE_NAME = "dataFactoryConnectorReadDelegate";
 
   private final String dataFactoryBaseUrl;
 
@@ -36,7 +36,9 @@ public class DataFactoryConnectorReadDelegate extends BaseConnectorDelegate {
 
     var response = performGet(execution, resource, id);
 
-    ((AbstractVariableScope) execution).setVariableLocalTransient(RESPONSE_VARIABLE, response);
+    setTransientResult(execution, RESPONSE_VARIABLE, response);
+    logDelegateExecution(execution, Set.of(RESOURCE_VARIABLE, RESOURCE_ID_VARIABLE),
+        Set.of(RESOURCE_ID_VARIABLE));
   }
 
   protected DataFactoryConnectorResponse performGet(DelegateExecution delegateExecution,
@@ -45,5 +47,10 @@ public class DataFactoryConnectorReadDelegate extends BaseConnectorDelegate {
         .pathSegment(resourceId).build().toUri();
 
     return perform(RequestEntity.get(uri).headers(getHeaders(delegateExecution)).build());
+  }
+
+  @Override
+  public String getDelegateName() {
+    return DELEGATE_NAME;
   }
 }

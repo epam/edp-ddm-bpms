@@ -25,18 +25,13 @@ spring:
       enabled: true
     baggage:
       correlation-enabled: true
-      correlation-fields: x-request-id
-      remote-fields: x-request-id, x-access-token
+      correlation-fields: x-request-id, X-Primary-Request-URL
+      remote-fields: x-request-id, x-access-token, X-Primary-Request-URL
   datasource:
     hikari:
       minimum-idle: 5
       maximum-pool-size: 20
       max-lifetime: 600000
-  cloud:
-    discovery:
-      client:
-        health-indicator:
-          enabled: false
 
 # Configuration => prometheus.yml:
 #   scrape_configs:
@@ -62,11 +57,28 @@ management:
       enabled: true
     kafka:
       enabled: false
-    kubernetes:
-      enabled: false
 
 ceph:
   bucket: ${CEPH_BUCKET_NAME:bucket}
 
 user-settings-service-api:
   url: http://user-settings-service-api:8080
+
+platform:
+  logging:
+    aspect:
+      enabled: false
+    primary-url:
+      enabled: true
+
+logbook:
+  feign:
+    enabled: true
+  info-logging:
+    enabled: true
+  strategy: request-body-on-debug
+  exclude:
+    - /actuator/**
+  obfuscate:
+    headers:
+      - x-access-token
