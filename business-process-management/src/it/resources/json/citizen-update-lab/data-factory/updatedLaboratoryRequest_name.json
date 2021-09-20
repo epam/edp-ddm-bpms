@@ -16,5 +16,6 @@
   "premisesFile": {
     "id": "fileId",
     "checksum": "checksum"
-  }
+  },
+  "accreditationFile": null
 }

@@ -37,6 +37,14 @@ public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
     var addLetterDataActivityDefinitionKey = "Activity_shared-add-letter-data";
     var signAppIncludeActivityDefinitionKey = "Activity_shared-sign-app-include";
 
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
+
     stubSearchSubjects("/xml/create-app/searchSubjectsActiveResponse.xml");
 
     stubDataFactoryRequest(StubData.builder()
@@ -211,6 +219,14 @@ public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
     var addLetterDataActivityDefinitionKey = "Activity_1eujure";
     var signAppDenyActivityDefinitionKey = "Activity_shared-sign-app-deny";
 
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
+
     stubSearchSubjects("/xml/create-app/searchSubjectsDisabledResponse.xml");
 
     stubDataFactoryRequest(StubData.builder()
@@ -371,6 +387,14 @@ public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
   public void testValidationError() throws IOException {
     var labId = "bb652d3f-a36f-465a-b7ba-232a5a1680c4";
 
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
+
     stubSearchSubjects("/xml/create-app/searchSubjectsActiveResponse.xml");
 
     stubDataFactoryRequest(StubData.builder()
@@ -429,6 +453,14 @@ public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
     var labId = "bb652d3f-a36f-465a-b7ba-232a5a1680c4";
 
     var addApplicationActivityDefinitionKey = "Activity_shared-add-application";
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
 
     stubSearchSubjects("/xml/create-app/searchSubjectsActiveResponse.xml");
 
@@ -493,6 +525,14 @@ public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
   public void testAppIsNotCreated() throws IOException {
     var labId = "bb652d3f-a36f-465a-b7ba-232a5a1680c4";
 
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
+
     stubSearchSubjects("/xml/create-app/searchSubjectsActiveResponse.xml");
 
     stubDataFactoryRequest(StubData.builder()
@@ -537,6 +577,14 @@ public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
     var addApplicationActivityDefinitionKey = "Activity_shared-add-application";
     var addFactorsActivityDefinitionKey = "Activity_shared-add-factors";
     var checkComplianceActivityDefinitionKey = "Activity_shared-check-complience";
+
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
 
     stubSearchSubjects("/xml/create-app/searchSubjectsDisabledResponse.xml");
 
@@ -610,10 +658,9 @@ public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
 
   private FormDataDto createFormData(String labId) {
     var data = new LinkedHashMap<String, Object>();
-    data.put("laboratory", Map.of("laboratoryId", labId));
+    data.put("laboratory", Map.of("laboratoryId", labId,"subjectId", "activeSubject"));
     data.put("edrpou", "77777777");
     data.put("subjectType", "LEGAL");
-    data.put("subject", Map.of("subjectId", "activeSubject"));
     return FormDataDto.builder().data(data).build();
   }
 
