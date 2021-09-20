@@ -22,7 +22,7 @@ public class InitiatorTokenStartEventListener implements ExecutionListener {
   @Override
   public void notify(DelegateExecution execution) {
     var variableScope = (AbstractVariableScope) execution;
-    var token = (String) null;
+    String token = null;
 
     var auth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -33,5 +33,8 @@ public class InitiatorTokenStartEventListener implements ExecutionListener {
     }
 
     variableScope.setVariableLocalTransient(INITIATOR_TOKEN_VAR_NAME, token);
+    log.debug("Setting initiator access token {}={}. ProcessDefinitionId={}, processInstanceId={}",
+        INITIATOR_TOKEN_VAR_NAME, token, execution.getProcessDefinitionId(),
+        execution.getProcessInstanceId());
   }
 }

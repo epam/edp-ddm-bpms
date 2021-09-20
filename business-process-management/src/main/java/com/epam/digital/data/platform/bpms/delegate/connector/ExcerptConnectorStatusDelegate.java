@@ -2,8 +2,8 @@ package com.epam.digital.data.platform.bpms.delegate.connector;
 
 import com.epam.digital.data.platform.bpms.delegate.dto.DataFactoryConnectorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Set;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
@@ -15,9 +15,10 @@ import org.springframework.web.util.UriComponentsBuilder;
  * The class represents an implementation of {@link BaseConnectorDelegate} that is used for getting
  * excerpt status
  */
-@Component
+@Component(ExcerptConnectorStatusDelegate.DELEGATE_NAME)
 public class ExcerptConnectorStatusDelegate extends BaseConnectorDelegate {
 
+  public static final String DELEGATE_NAME = "excerptConnectorStatusDelegate";
   public static final String EXCERPT_ID_VAR = "excerptIdentifier";
 
   private final String excerptServiceBaseUrl;
@@ -36,7 +37,8 @@ public class ExcerptConnectorStatusDelegate extends BaseConnectorDelegate {
     var excerptIdentifier = (String) execution.getVariable(EXCERPT_ID_VAR);
 
     var response = performGet(execution, excerptIdentifier);
-    ((AbstractVariableScope) execution).setVariableLocalTransient(RESPONSE_VARIABLE, response);
+    setTransientResult(execution, RESPONSE_VARIABLE, response);
+    logDelegateExecution(execution, Set.of(EXCERPT_ID_VAR), Set.of(RESPONSE_VARIABLE));
   }
 
   protected DataFactoryConnectorResponse performGet(DelegateExecution delegateExecution,
@@ -44,5 +46,10 @@ public class ExcerptConnectorStatusDelegate extends BaseConnectorDelegate {
     var uri = UriComponentsBuilder.fromHttpUrl(excerptServiceBaseUrl).pathSegment(RESOURCE_EXCERPTS)
         .pathSegment(id).pathSegment("status").build().toUri();
     return perform(RequestEntity.get(uri).headers(getHeaders(delegateExecution)).build());
+  }
+
+  @Override
+  public String getDelegateName() {
+    return DELEGATE_NAME;
   }
 }

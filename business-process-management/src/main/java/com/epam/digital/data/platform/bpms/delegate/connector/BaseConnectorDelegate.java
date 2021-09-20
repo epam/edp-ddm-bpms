@@ -1,12 +1,12 @@
 package com.epam.digital.data.platform.bpms.delegate.connector;
 
 import com.epam.digital.data.platform.bpms.api.dto.enums.PlatformHttpHeader;
+import com.epam.digital.data.platform.bpms.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.bpms.delegate.dto.DataFactoryConnectorResponse;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -14,7 +14,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.spin.Spin;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -22,8 +21,7 @@ import org.springframework.web.client.RestTemplate;
  * logic for working with the data factory for all delegates
  */
 @RequiredArgsConstructor
-@Slf4j
-public abstract class BaseConnectorDelegate implements JavaDelegate {
+public abstract class BaseConnectorDelegate extends BaseJavaDelegate {
 
   protected static final String RESOURCE_SETTINGS = "settings";
   protected static final String RESOURCE_VARIABLE = "resource";
@@ -42,9 +40,7 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
    * @return response from data factory
    */
   protected DataFactoryConnectorResponse perform(RequestEntity<?> requestEntity) {
-    logRequest(requestEntity);
     var httpResponse = restTemplate.exchange(requestEntity, String.class);
-    logResponse(httpResponse);
 
     var spin = Objects.isNull(httpResponse.getBody()) ? null : Spin.JSON(httpResponse.getBody());
     return DataFactoryConnectorResponse.builder()
@@ -108,23 +104,5 @@ public abstract class BaseConnectorDelegate implements JavaDelegate {
   protected Optional<String> getAccessToken(DelegateExecution delegateExecution) {
     var xAccessToken = (String) delegateExecution.getVariable("x_access_token");
     return Optional.ofNullable(xAccessToken);
-  }
-
-  private void logRequest(RequestEntity<?> request) {
-    if (log.isDebugEnabled()) {
-      log.debug("Sending {} request to {} with request payload - {} and headers - {}",
-          request.getMethod(), request.getUrl(), request.getBody(), request.getHeaders());
-      return;
-    }
-    log.info("Sending {} request to {}", request.getMethod(), request.getUrl());
-  }
-
-  private void logResponse(ResponseEntity<?> response) {
-    if (log.isDebugEnabled()) {
-      log.debug("Received {} status code with response body - {}", response.getStatusCode(),
-          response.getBody());
-      return;
-    }
-    log.info("Received {} status code", response.getStatusCode());
   }
 }

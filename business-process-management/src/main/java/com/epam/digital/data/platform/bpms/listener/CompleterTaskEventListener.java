@@ -36,6 +36,11 @@ public class CompleterTaskEventListener implements TaskListener {
     var completerVarResultToken = String.format(COMPLETER_VAR_TOKEN_FORMAT, taskDefinitionKey);
     variableScope.setVariable(completerVarResultName, completerName);
     variableScope.setVariableLocalTransient(completerVarResultToken, completerToken);
+    log.debug("Setting task completer variables:\n"
+            + "Task definition key - {}\n"
+            + "User name {} - {}\n"
+            + "Access token {} - {}", taskDefinitionKey, completerVarResultName, completerName,
+        completerVarResultToken, completerToken);
   }
 
   private AbstractVariableScope getRootExecution(DelegateTask delegateTask) {

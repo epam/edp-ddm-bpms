@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -18,10 +19,11 @@ import org.springframework.stereotype.Component;
  * The class represents an implementation of {@link JavaDelegate} that is used to throw a user data
  * validation exception with details based on user input.
  */
-@Component("userDataValidationErrorDelegate")
+@Component(UserDataValidationErrorDelegate.DELEGATE_NAME)
 @RequiredArgsConstructor
-public class UserDataValidationErrorDelegate implements JavaDelegate {
+public class UserDataValidationErrorDelegate extends BaseJavaDelegate {
 
+  public static final String DELEGATE_NAME = "userDataValidationErrorDelegate";
   private static final String VAR_VALIDATION_ERRORS = "validationErrors";
 
   private final ObjectMapper objectMapper;
@@ -35,7 +37,11 @@ public class UserDataValidationErrorDelegate implements JavaDelegate {
                 .stream().map(this::readValidationErrorValue).collect(Collectors.toList())
             : Collections.emptyList();
 
-    throw new ValidationException(createUserDataValidationErrorDto(validationErrorDtos));
+    try {
+      throw new ValidationException(createUserDataValidationErrorDto(validationErrorDtos));
+    } finally {
+      logDelegateExecution(execution, Set.of(VAR_VALIDATION_ERRORS), Set.of());
+    }
   }
 
   private ErrorDetailDto readValidationErrorValue(String value) {
@@ -53,5 +59,10 @@ public class UserDataValidationErrorDelegate implements JavaDelegate {
         .message("Validation error")
         .details(new ErrorsListDto(validationErrorDtos))
         .build();
+  }
+
+  @Override
+  public String getDelegateName() {
+    return DELEGATE_NAME;
   }
 }

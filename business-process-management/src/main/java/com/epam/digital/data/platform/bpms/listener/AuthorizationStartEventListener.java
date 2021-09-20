@@ -30,7 +30,7 @@ public class AuthorizationStartEventListener implements ExecutionListener {
 
   @Override
   public void notify(DelegateExecution execution) throws Exception {
-    log.info("AuthorizationStartEventListener started...");
+    log.debug("AuthorizationStartEventListener started...");
     var optionalCamundaImpersonation = camundaImpersonationFactory.getCamundaImpersonation();
     if (optionalCamundaImpersonation.isEmpty()) {
       return;
@@ -47,7 +47,7 @@ public class AuthorizationStartEventListener implements ExecutionListener {
     } finally {
       camundaImpersonation.revertToSelf();
     }
-    log.info("AuthorizationStartEventListener finished...");
+    log.debug("AuthorizationStartEventListener finished...");
   }
 
   private void addPermissionForProcessInstances(ProcessEngine processEngine,

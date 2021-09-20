@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import org.camunda.spin.json.SpinJsonNode;
 
 /**
@@ -12,6 +13,7 @@ import org.camunda.spin.json.SpinJsonNode;
  */
 @Builder
 @Getter
+@ToString
 public class DataFactoryConnectorResponse implements Serializable {
 
   private final int statusCode;
