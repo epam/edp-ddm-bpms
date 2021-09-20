@@ -12,7 +12,7 @@ public class CamundaDelegatesConfig {
 
   @ConditionalOnProperty(prefix = "trembita-exchange-gateway",
       value = {"client.x-road-instance", "registries.edr-registry.x-road-instance"})
-  @Bean(name = "searchSubjectsEdrRegistryConnectorDelegate")
+  @Bean(name = SearchSubjectsEdrRegistryConnectorDelegate.DELEGATE_NAME)
   public SearchSubjectsEdrRegistryConnectorDelegate searchSubjectsEdrRegistryConnectorDelegate(
       EdrRemoteService edrRemoteService) {
     return new SearchSubjectsEdrRegistryConnectorDelegate(edrRemoteService);
@@ -20,7 +20,7 @@ public class CamundaDelegatesConfig {
 
   @ConditionalOnProperty(prefix = "trembita-exchange-gateway",
       value = {"client.x-road-instance", "registries.edr-registry.x-road-instance"})
-  @Bean(name = "subjectDetailEdrRegistryConnectorDelegate")
+  @Bean(name = SubjectDetailEdrRegistryConnectorDelegate.DELEGATE_NAME)
   public SubjectDetailEdrRegistryConnectorDelegate subjectDetailEdrRegistryConnectorDelegate(
       EdrRemoteService edrRemoteService) {
     return new SubjectDetailEdrRegistryConnectorDelegate(edrRemoteService);

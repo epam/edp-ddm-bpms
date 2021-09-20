@@ -52,7 +52,14 @@ public class PutFormDataToCephTaskListener implements TaskListener {
     var formData = (SpinJsonNode) variableLocal;
     var data = objectMapper.convertValue(formData.unwrap(), FORM_DATA_TYPE);
     var formDataDto = FormDataDto.builder().data(data).build();
-
+    log.debug("Putting form-data to ceph.\n"
+            + "Task-definition-key - {}\n"
+            + "Ceph-key - {}\n"
+            + "Form-data - {}\n"
+            + "Process-definition-id - {}\n"
+            + "Process-instance-id - {}",
+        taskDefinitionKey, cephKey, formData, delegateTask.getProcessDefinitionId(),
+        processInstanceId);
     formDataCephService.putFormData(cephKey, formDataDto);
   }
 

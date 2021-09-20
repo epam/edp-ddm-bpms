@@ -1,8 +1,9 @@
 package com.epam.digital.data.platform.bpms.delegate.connector.keycloak;
 
+import com.epam.digital.data.platform.bpms.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.bpms.delegate.dto.KeycloakUserDto;
-import com.epam.digital.data.platform.starter.logger.annotation.Logging;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -17,9 +18,10 @@ import org.springframework.stereotype.Component;
  * The class represents an implementation of {@link JavaDelegate} that is used to get the list of
  * users from keycloak by role.
  */
-@Component("keycloakGetUsersConnectorDelegate")
-@Logging
-public class KeycloakGetUsersConnectorDelegate implements JavaDelegate {
+@Component(KeycloakGetUsersConnectorDelegate.DELEGATE_NAME)
+public class KeycloakGetUsersConnectorDelegate extends BaseJavaDelegate {
+
+  public static final String DELEGATE_NAME = "keycloakGetUsersConnectorDelegate";
 
   private static final String DEFAULT_ROLE = "officer";
   private static final String ROLE_NAME_VAR = "role_name";
@@ -50,11 +52,17 @@ public class KeycloakGetUsersConnectorDelegate implements JavaDelegate {
         .map(entry -> new KeycloakUserDto(entry.getKey(), entry.getValue()))
         .collect(Collectors.toList());
 
-    execution.setVariable(RESULT_NAME_VAR, usersByRole);
+    setResult(execution, RESULT_NAME_VAR, usersByRole);
+    logDelegateExecution(execution, Set.of(ROLE_NAME_VAR), Set.of(RESULT_NAME_VAR));
   }
 
   private boolean hasFullNameAttribute(UserRepresentation user) {
     var attribute = user.getAttributes();
     return Objects.nonNull(attribute) && Objects.nonNull(attribute.get(ATTRIBUTE_NAME));
+  }
+
+  @Override
+  public String getDelegateName() {
+    return DELEGATE_NAME;
   }
 }

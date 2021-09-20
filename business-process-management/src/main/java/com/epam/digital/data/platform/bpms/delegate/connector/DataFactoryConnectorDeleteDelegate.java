@@ -1,9 +1,8 @@
 package com.epam.digital.data.platform.bpms.delegate.connector;
 
 import com.epam.digital.data.platform.bpms.delegate.dto.DataFactoryConnectorResponse;
-import com.epam.digital.data.platform.starter.logger.annotation.Logging;
+import java.util.Set;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
@@ -15,9 +14,10 @@ import org.springframework.web.util.UriComponentsBuilder;
  * The class represents an implementation of {@link BaseConnectorDelegate} that is used to delete
  * data in Data Factory
  */
-@Component("dataFactoryConnectorDeleteDelegate")
-@Logging
+@Component(DataFactoryConnectorDeleteDelegate.DELEGATE_NAME)
 public class DataFactoryConnectorDeleteDelegate extends BaseConnectorDelegate {
+
+  public static final String DELEGATE_NAME = "dataFactoryConnectorDeleteDelegate";
 
   private final String dataFactoryBaseUrl;
 
@@ -36,7 +36,9 @@ public class DataFactoryConnectorDeleteDelegate extends BaseConnectorDelegate {
 
     var response = performDelete(execution, resource, id);
 
-    ((AbstractVariableScope) execution).setVariableLocalTransient(RESPONSE_VARIABLE, response);
+    setTransientResult(execution, RESPONSE_VARIABLE, response);
+    logDelegateExecution(execution, Set.of(RESOURCE_VARIABLE, RESOURCE_ID_VARIABLE),
+        Set.of(RESPONSE_VARIABLE));
   }
 
   private DataFactoryConnectorResponse performDelete(DelegateExecution delegateExecution,
@@ -45,5 +47,10 @@ public class DataFactoryConnectorDeleteDelegate extends BaseConnectorDelegate {
         .pathSegment(resourceId).build().toUri();
 
     return perform(RequestEntity.delete(uri).headers(getHeaders(delegateExecution)).build());
+  }
+
+  @Override
+  public String getDelegateName() {
+    return DELEGATE_NAME;
   }
 }

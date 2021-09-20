@@ -1,9 +1,8 @@
 package com.epam.digital.data.platform.bpms.delegate.connector;
 
 import com.epam.digital.data.platform.bpms.delegate.dto.DataFactoryConnectorResponse;
-import com.epam.digital.data.platform.starter.logger.annotation.Logging;
+import java.util.Set;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.spin.json.SpinJsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,9 +15,10 @@ import org.springframework.web.util.UriComponentsBuilder;
  * The class represents an implementation of {@link BaseConnectorDelegate} that is used to create
  * data in Data Factory
  */
-@Component("dataFactoryConnectorCreateDelegate")
-@Logging
+@Component(DataFactoryConnectorCreateDelegate.DELEGATE_NAME)
 public class DataFactoryConnectorCreateDelegate extends BaseConnectorDelegate {
+
+  public static final String DELEGATE_NAME = "dataFactoryConnectorCreateDelegate";
 
   private final String dataFactoryBaseUrl;
 
@@ -37,7 +37,9 @@ public class DataFactoryConnectorCreateDelegate extends BaseConnectorDelegate {
 
     var response = performPost(execution, resource, payload.toString());
 
-    ((AbstractVariableScope) execution).setVariableLocalTransient(RESPONSE_VARIABLE, response);
+    setTransientResult(execution, RESPONSE_VARIABLE, response);
+    logDelegateExecution(execution, Set.of(RESOURCE_VARIABLE, PAYLOAD_VARIABLE),
+        Set.of(RESPONSE_VARIABLE));
   }
 
   private DataFactoryConnectorResponse performPost(DelegateExecution delegateExecution,
@@ -46,5 +48,10 @@ public class DataFactoryConnectorCreateDelegate extends BaseConnectorDelegate {
         .toUri();
 
     return perform(RequestEntity.post(uri).headers(getHeaders(delegateExecution)).body(body));
+  }
+
+  @Override
+  public String getDelegateName() {
+    return DELEGATE_NAME;
   }
 }
