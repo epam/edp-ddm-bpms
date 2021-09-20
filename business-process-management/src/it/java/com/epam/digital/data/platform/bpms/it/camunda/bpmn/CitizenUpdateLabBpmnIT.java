@@ -37,6 +37,14 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
   @Test
   @Deployment(resources = {"bpmn/citizen-update-lab.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void happyPathTest() throws JsonProcessingException {
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
+
     stubSearchSubjects("/xml/citizen-update-lab/searchSubjectsActiveResponse.xml");
 
     stubDataFactoryRequest(StubData.builder()
@@ -241,6 +249,14 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
   @Test
   @Deployment(resources = {"bpmn/citizen-update-lab.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void labNotUniqueTest() throws JsonProcessingException {
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
+
     stubSearchSubjects("/xml/citizen-update-lab/searchSubjectsActiveResponse.xml");
 
     stubDataFactoryRequest(StubData.builder()
@@ -406,6 +422,14 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
   @Test
   @Deployment(resources = {"bpmn/citizen-update-lab.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void labDuplicateValidationException() throws JsonProcessingException {
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
+
     stubSearchSubjects("/xml/citizen-update-lab/searchSubjectsActiveResponse.xml");
 
     stubDataFactoryRequest(StubData.builder()
@@ -523,6 +547,14 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
   @SuppressWarnings("unchecked")
   @Deployment(resources = {"bpmn/citizen-update-lab.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void subjectDisabledValidationException() throws JsonProcessingException {
+    stubDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
+
     stubSearchSubjects("/xml/citizen-update-lab/searchSubjectsCancelledResponse.xml");
 
     var startFormData = deserializeFormData("/json/citizen-update-lab/form-data/start_event.json");

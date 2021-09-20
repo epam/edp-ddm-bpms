@@ -750,10 +750,9 @@ public class CitizenCreateAppExpanse extends BaseBpmnIT {
 
   private FormDataDto createFormData(String labId) {
     var data = new LinkedHashMap<String, Object>();
-    data.put("laboratory", Map.of("laboratoryId", labId));
+    data.put("laboratory", Map.of("laboratoryId", labId, "subjectId", "activeSubject"));
     data.put("edrpou", "77777777");
     data.put("subjectType", "LEGAL");
-    data.put("subject", Map.of("subjectId", "activeSubject"));
     return FormDataDto.builder().data(data).build();
   }
 

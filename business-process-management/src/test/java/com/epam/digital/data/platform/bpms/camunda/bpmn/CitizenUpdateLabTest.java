@@ -37,6 +37,14 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
   @Test
   @Deployment(resources = {"bpmn/citizen-update-lab.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void happyPathTest() {
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
+
     mockEdrResponse("/json/citizen-update-lab/edr/searchSubjectsActiveResponse.json");
 
     mockDataFactoryRequest(StubData.builder()
@@ -245,6 +253,14 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
   @Test
   @Deployment(resources = {"bpmn/citizen-update-lab.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void labNotUniqueTest() {
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
+
     mockEdrResponse("/json/citizen-update-lab/edr/searchSubjectsActiveResponse.json");
 
     mockDataFactoryRequest(StubData.builder()
@@ -408,6 +424,14 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
   @Test
   @Deployment(resources = {"bpmn/citizen-update-lab.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void labDuplicateValidationException() {
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
+
     mockEdrResponse("/json/citizen-update-lab/edr/searchSubjectsActiveResponse.json");
 
     mockDataFactoryRequest(StubData.builder()
@@ -521,6 +545,14 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
   @Test
   @Deployment(resources = {"bpmn/citizen-update-lab.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void subjectDisabledValidationException() {
+    mockDataFactoryRequest(StubData.builder()
+        .httpMethod(HttpMethod.GET)
+        .headers(Map.of("X-Access-Token", testUserToken))
+        .resource("subject")
+        .resourceId("activeSubject")
+        .response("/json/common/data-factory/subjectResponse.json")
+        .build());
+
     mockEdrResponse("/json/citizen-update-lab/edr/searchSubjectsDisabledResponse.json");
 
     var startFormData = deserializeFormData("/json/citizen-update-lab/form-data/start_event.json");
