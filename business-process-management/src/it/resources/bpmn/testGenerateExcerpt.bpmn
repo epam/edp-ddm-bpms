@@ -26,8 +26,7 @@
     <bpmn:scriptTask id="Activity_1gmvuxx" name="Assert" scriptFormat="groovy">
       <bpmn:incoming>Flow_0swlvzi</bpmn:incoming>
       <bpmn:outgoing>Flow_1ysx8zv</bpmn:outgoing>
-      <bpmn:script>assert response.responseBody.prop('excerptIdentifier').value().equals('d564f2ab-eec6-11eb-9efa-0a580a820439')
-assert execution.getVariable('sys-var-process-excerpt-id').equals('d564f2ab-eec6-11eb-9efa-0a580a820439')</bpmn:script>
+      <bpmn:script>assert response.responseBody.prop('excerptIdentifier').value().equals('d564f2ab-eec6-11eb-9efa-0a580a820439')</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:scriptTask id="Activity_1iskvcy" name="Prepare input data" scriptFormat="groovy" camunda:resultVariable="payload">
       <bpmn:incoming>Flow_1oi0ew9</bpmn:incoming>
