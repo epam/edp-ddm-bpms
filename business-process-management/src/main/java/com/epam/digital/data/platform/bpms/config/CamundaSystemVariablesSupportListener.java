@@ -3,6 +3,7 @@ package com.epam.digital.data.platform.bpms.config;
 import com.epam.digital.data.platform.bpms.listener.AuthorizationStartEventListener;
 import com.epam.digital.data.platform.bpms.listener.CompleterTaskEventListener;
 import com.epam.digital.data.platform.bpms.listener.FileCleanerEndEventListener;
+import com.epam.digital.data.platform.bpms.listener.FormDataCleanerEndEventListener;
 import com.epam.digital.data.platform.bpms.listener.InitiatorTokenStartEventListener;
 import com.epam.digital.data.platform.bpms.listener.PutFormDataToCephTaskListener;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class CamundaSystemVariablesSupportListener extends AbstractBpmnParseList
   private final CompleterTaskEventListener completerTaskEventListener;
   private final PutFormDataToCephTaskListener putFormDataToCephTaskListener;
   private final FileCleanerEndEventListener fileCleanerEndEventListener;
+  private final FormDataCleanerEndEventListener formDataCleanerEndEventListener;
 
   @Override
   public void parseStartEvent(Element startEventElement, ScopeImpl scope,
@@ -53,5 +55,6 @@ public class CamundaSystemVariablesSupportListener extends AbstractBpmnParseList
   @Override
   public void parseEndEvent(Element endEventElement, ScopeImpl scope, ActivityImpl endActivity) {
     endActivity.addListener(ExecutionListener.EVENTNAME_END, fileCleanerEndEventListener);
+    endActivity.addListener(ExecutionListener.EVENTNAME_END, formDataCleanerEndEventListener);
   }
 }

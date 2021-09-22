@@ -245,7 +245,6 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
 
     mockServer.verify();
   }
@@ -416,7 +415,6 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
 
     mockServer.verify();
   }

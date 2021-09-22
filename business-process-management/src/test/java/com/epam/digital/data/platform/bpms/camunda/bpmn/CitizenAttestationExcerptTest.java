@@ -139,7 +139,6 @@ public class CitizenAttestationExcerptTest extends BaseBpmnTest {
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
     mockServer.verify();
   }
 
@@ -268,7 +267,6 @@ public class CitizenAttestationExcerptTest extends BaseBpmnTest {
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
     mockServer.verify();
   }
 
@@ -396,7 +394,6 @@ public class CitizenAttestationExcerptTest extends BaseBpmnTest {
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
     mockServer.verify();
   }
 
@@ -538,7 +535,6 @@ public class CitizenAttestationExcerptTest extends BaseBpmnTest {
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
 
     mockServer.verify();
   }
@@ -629,7 +625,6 @@ public class CitizenAttestationExcerptTest extends BaseBpmnTest {
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
 
     mockServer.verify();
   }
@@ -674,7 +669,6 @@ public class CitizenAttestationExcerptTest extends BaseBpmnTest {
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
 
     mockServer.verify();
   }
@@ -709,7 +703,6 @@ public class CitizenAttestationExcerptTest extends BaseBpmnTest {
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
 
     mockServer.verify();
   }

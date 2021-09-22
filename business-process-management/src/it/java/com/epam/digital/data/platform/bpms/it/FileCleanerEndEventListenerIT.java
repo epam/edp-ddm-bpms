@@ -12,7 +12,7 @@ public class FileCleanerEndEventListenerIT extends BaseIT {
 
   @Test
   @Deployment(resources = "bpmn/file_cleaner_listener.bpmn")
-  public void testInitiatorAccessToken() {
+  public void testFileCleanerEndEventListener() {
     var contentType = "application/pdf";
     var userMetadata = new HashMap<String, String>();
     var data = new ByteArrayInputStream(new byte[]{1});
@@ -23,15 +23,15 @@ public class FileCleanerEndEventListenerIT extends BaseIT {
         .singleResult().getId();
     var key = generateCephFileKey(processInstanceId, "file1.pdf");
     var key2 = generateCephFileKey(processInstanceId, "file2.pdf");
-    testS3ObjectCephService.put(key, contentType, userMetadata, data);
-    testS3ObjectCephService.put(key2, contentType, userMetadata, data);
+    cephService.put(key, contentType, userMetadata, data);
+    cephService.put(key2, contentType, userMetadata, data);
 
-    assertThat(testS3ObjectCephService.getStorage().size()).isEqualTo(2);
+    assertThat(cephService.getStorage()).hasSize(2);
 
     taskService.complete(taskId);
 
     BpmnAwareTests.assertThat(processInstance).isEnded();
-    assertThat(testS3ObjectCephService.getStorage()).isEmpty();
+    assertThat(cephService.getStorage()).isEmpty();
   }
 
   private String generateCephFileKey(String processInstanceId, String fileName) {

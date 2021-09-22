@@ -173,7 +173,6 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
 
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
 
     assertSystemSignature(processInstanceId, "subject_system_signature_ceph_key",
         "/json/citizen-onboarding/dso/indSubjectSignatureCephContent.json");
@@ -291,7 +290,6 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
 
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
 
     assertSystemSignature(processInstanceId, "subject_settings_system_signature_ceph_key",
         "/json/citizen-onboarding/dso/subjectProfileSignatureCephContent.json");
@@ -413,7 +411,6 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
 
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
 
     assertSystemSignature(processInstanceId, "subject_settings_system_signature_ceph_key",
         "/json/citizen-onboarding/dso/subjectProfileSignatureCephContent.json");
