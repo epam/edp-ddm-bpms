@@ -184,6 +184,7 @@ public abstract class BaseIT {
     keycloakMockServer.addStubMapping(
         stubFor(get(urlPathEqualTo("/auth/admin/realms/citizen-realm/users"))
             .withQueryParam("username", equalTo(userName))
+            .withQueryParam("exact", equalTo(Boolean.TRUE.toString()))
             .willReturn(aResponse().withStatus(200)
                 .withHeader("Content-type", "application/json")
                 .withBody(convertJsonToString(responseBody)))));

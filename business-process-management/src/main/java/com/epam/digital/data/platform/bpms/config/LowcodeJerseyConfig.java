@@ -4,7 +4,7 @@ import com.epam.digital.data.platform.bpms.controller.StartFormController;
 import com.epam.digital.data.platform.bpms.controller.TaskPropertyController;
 import com.epam.digital.data.platform.bpms.exception.mapper.CamundaRestExceptionMapper;
 import com.epam.digital.data.platform.bpms.exception.mapper.CamundaSystemExceptionMapper;
-import com.epam.digital.data.platform.bpms.exception.mapper.KeycloakNotFoundExceptionMapper;
+import com.epam.digital.data.platform.bpms.exception.mapper.KeycloakExceptionMapper;
 import com.epam.digital.data.platform.bpms.exception.mapper.TaskAlreadyInCompletionExceptionMapper;
 import com.epam.digital.data.platform.bpms.exception.mapper.UserDataValidationExceptionMapper;
 import org.camunda.bpm.spring.boot.starter.rest.CamundaJerseyResourceConfig;
@@ -26,6 +26,6 @@ public class LowcodeJerseyConfig extends CamundaJerseyResourceConfig {
     register(CamundaSystemExceptionMapper.class);
     register(CamundaRestExceptionMapper.class);
     register(TaskAlreadyInCompletionExceptionMapper.class);
-    register(KeycloakNotFoundExceptionMapper.class);
+    register(KeycloakExceptionMapper.class);
   }
 }

@@ -39,9 +39,9 @@ import com.epam.digital.data.platform.bpms.delegate.connector.ExcerptConnectorGe
 import com.epam.digital.data.platform.bpms.delegate.connector.ExcerptConnectorStatusDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.UserSettingsConnectorReadDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.UserSettingsConnectorUpdateDelegate;
-import com.epam.digital.data.platform.bpms.delegate.connector.keycloak.KeycloakAddRoleConnectorDelegate;
-import com.epam.digital.data.platform.bpms.delegate.connector.keycloak.KeycloakGetUsersConnectorDelegate;
-import com.epam.digital.data.platform.bpms.delegate.connector.keycloak.KeycloakRemoveRoleConnectorDelegate;
+import com.epam.digital.data.platform.bpms.delegate.connector.keycloak.citizen.KeycloakAddCitizenRoleConnectorDelegate;
+import com.epam.digital.data.platform.bpms.delegate.connector.keycloak.officer.KeycloakGetOfficerUsersConnectorDelegate;
+import com.epam.digital.data.platform.bpms.delegate.connector.keycloak.citizen.KeycloakRemoveCitizenRoleConnectorDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.registry.SearchSubjectsEdrRegistryConnectorDelegate;
 import com.epam.digital.data.platform.bpms.delegate.dto.EdrRegistryConnectorResponse;
 import com.epam.digital.data.platform.bpms.delegate.dto.KeycloakUserDto;
@@ -97,14 +97,14 @@ public abstract class BaseBpmnTest {
 
   // init mocks
   protected final MessageResolver messageResolver = mock(MessageResolver.class);
-  protected final KeycloakRemoveRoleConnectorDelegate keycloakRemoveRoleConnectorDelegate =
-      mock(KeycloakRemoveRoleConnectorDelegate.class);
-  protected final KeycloakAddRoleConnectorDelegate keycloakAddRoleConnectorDelegate =
-      mock(KeycloakAddRoleConnectorDelegate.class);
+  protected final KeycloakRemoveCitizenRoleConnectorDelegate keycloakRemoveRoleConnectorDelegate =
+      mock(KeycloakRemoveCitizenRoleConnectorDelegate.class);
+  protected final KeycloakAddCitizenRoleConnectorDelegate keycloakAddRoleConnectorDelegate =
+      mock(KeycloakAddCitizenRoleConnectorDelegate.class);
   protected final SearchSubjectsEdrRegistryConnectorDelegate searchSubjectsEdrRegistryConnectorDelegate = mock(
       SearchSubjectsEdrRegistryConnectorDelegate.class);
-  protected final KeycloakGetUsersConnectorDelegate keycloakGetUsersConnectorDelegate = mock(
-      KeycloakGetUsersConnectorDelegate.class);
+  protected final KeycloakGetOfficerUsersConnectorDelegate keycloakGetUsersConnectorDelegate = mock(
+      KeycloakGetOfficerUsersConnectorDelegate.class);
 
   // init base classes for delegates
   protected ObjectMapper objectMapper;
