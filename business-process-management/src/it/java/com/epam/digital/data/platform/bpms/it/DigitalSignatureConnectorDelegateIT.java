@@ -39,7 +39,7 @@ public class DigitalSignatureConnectorDelegateIT extends BaseIT {
     cephService.putFormData(cephKey, FormDataDto.builder().accessToken(validAccessToken)
         .data(new LinkedHashMap<>()).build());
 
-    String taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionTask").singleResult().getId();
+    String taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionTaskForDso").singleResult().getId();
     taskService.complete(taskId);
 
     BpmnAwareTests.assertThat(processInstance).isEnded();

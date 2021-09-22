@@ -224,7 +224,7 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
         stubFor(post(urlPathEqualTo("/mock-server/test"))
             .withHeader("X-Access-Token", equalTo(validAccessToken))
             .withHeader("X-Digital-Signature",
-                matching("lowcode-.*-secure-sys-var-ref-task-form-data-test_token"))
+                matching("process/.*/task/test_token"))
             .withHeader("X-Digital-Signature-Derived",
                 matching("lowcode_.*_system_signature_ceph_key_0"))
             .withRequestBody(
@@ -242,7 +242,7 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
         stubFor(post(urlPathEqualTo("/mock-server/test"))
             .withHeader("X-Access-Token", equalTo(validAccessToken))
             .withHeader("X-Digital-Signature",
-                matching("lowcode-.*-secure-sys-var-ref-task-form-data-test_token"))
+                matching("process/.*/task/test_token"))
             .withHeader("X-Digital-Signature-Derived",
                 matching("lowcode_.*_system_signature_ceph_key_1"))
             .withRequestBody(

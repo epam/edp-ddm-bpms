@@ -88,7 +88,6 @@ public abstract class BaseBpmnIT extends BaseIT {
 
   @Before
   public void init() {
-    cephService.clearStorage();
     expectedVariablesMap.clear();
     expectedCephStorage.clear();
     runtimeService.createProcessInstanceQuery().list().forEach(

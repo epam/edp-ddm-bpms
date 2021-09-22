@@ -92,7 +92,6 @@ public class AddPersonnelBpmnTest extends BaseBpmnTest {
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
 
     mockServer.verify();
   }

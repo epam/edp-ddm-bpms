@@ -97,7 +97,6 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
 
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
   }
 
   @Test
@@ -178,7 +177,6 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
 
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
   }
 
   @Test
@@ -365,7 +363,6 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
 
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
   }
 
 }

@@ -68,8 +68,7 @@ public final class CamundaAssertionUtil {
   }
 
   public static String generateCephKey(String activityDefinitionId, String processInstanceId) {
-    return String.format("lowcode-%s-secure-sys-var-ref-task-form-data-%s", processInstanceId,
-        activityDefinitionId);
+    return String.format("process/%s/task/%s", processInstanceId, activityDefinitionId);
   }
 
   public static void assertCephContains(String cephKey, FormDataDto cephContent) {

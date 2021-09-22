@@ -16,6 +16,7 @@ import java.util.Objects;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.spin.Spin;
 import org.junit.Before;
@@ -73,7 +74,17 @@ public class CephJavaDelegatesIT extends BaseIT {
     var processInstance = runtimeService
         .startProcessInstanceByKey("testCephFormDataDelegates_key", "key", vars);
 
-    assertTrue(processInstance.isEnded());
+    var expectedCephKey = cephKeyProvider.generateKey("userTask", processInstance.getProcessInstanceId());
+
+    var data = cephService.getFormData(expectedCephKey);
+    assertThat(data).isNotEmpty();
+    assertThat(data.get().getData().get("name")).isEqualTo("value ek");
+
+    var taskId = taskService.createTaskQuery().taskDefinitionKey("waitCheckPutFormData")
+        .singleResult().getId();
+    taskService.complete(taskId);
+
+    BpmnAwareTests.assertThat(processInstance).isEnded();
 
     var resultVariables = historyService.createHistoricVariableInstanceQuery()
         .processInstanceId(processInstance.getId()).list().stream()
@@ -81,13 +92,7 @@ public class CephJavaDelegatesIT extends BaseIT {
         .collect(toMap(HistoricVariableInstance::getName, HistoricVariableInstance::getValue,
             (o1, o2) -> o1));
 
-    var expectedCephKey = "lowcode-" + processInstance.getProcessInstanceId()
-        + "-secure-sys-var-ref-task-form-data-userTask";
     assertThat(resultVariables).doesNotContainKey("formDataOutput");
-
-    var data = cephService.getFormData(expectedCephKey);
-    assertThat(data).isNotEmpty();
-    assertThat(data.get().getData().get("name")).isEqualTo("value ek");
   }
 
   @Test
