@@ -21,26 +21,5 @@
       "impersonate": true,
       "manage": true
     }
-  },
-  {
-    "id": "a92fe003-a2f2-4d5e-bf48-2b2c7daf5a39",
-    "createdTimestamp": 1619104273304,
-    "username": "testuser2",
-    "enabled": true,
-    "totp": false,
-    "emailVerified": false,
-    "firstName": "testuser2",
-    "lastName": "testuser2",
-    "email": "testuser2@testuser2.com",
-    "disableableCredentialTypes": [],
-    "requiredActions": [],
-    "notBefore": 0,
-    "access": {
-      "manageGroupMembership": true,
-      "view": true,
-      "mapRoles": true,
-      "impersonate": true,
-      "manage": true
-    }
   }
 ]
