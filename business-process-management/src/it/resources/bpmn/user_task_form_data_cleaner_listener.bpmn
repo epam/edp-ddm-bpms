@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0jlyz4p" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:process id="userTaskFormDataCleanerListenerKey" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="start">
+      <bpmn:outgoing>Flow_0xamec9</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0xamec9" sourceRef="StartEvent_1" targetRef="userTaskFormDataCleanerListenerId1" />
+    <bpmn:sequenceFlow id="Flow_1f3bbdv" sourceRef="userTaskFormDataCleanerListenerId1" targetRef="userTaskFormDataCleanerListenerId2" />
+    <bpmn:endEvent id="Event_14ldl01" name="end">
+      <bpmn:incoming>Flow_0glrdff</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0glrdff" sourceRef="userTaskFormDataCleanerListenerId2" targetRef="Event_14ldl01" />
+    <bpmn:userTask id="userTaskFormDataCleanerListenerId1" name="Waiting first task for form data cleaner listener">
+      <bpmn:incoming>Flow_0xamec9</bpmn:incoming>
+      <bpmn:outgoing>Flow_1f3bbdv</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="userTaskFormDataCleanerListenerId2" name="Waiting second task for form data cleaner listener">
+      <bpmn:incoming>Flow_1f3bbdv</bpmn:incoming>
+      <bpmn:outgoing>Flow_0glrdff</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="userTaskFormDataCleanerListenerKey">
+      <bpmndi:BPMNEdge id="Flow_0xamec9_di" bpmnElement="Flow_0xamec9">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1f3bbdv_di" bpmnElement="Flow_1f3bbdv">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="430" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0glrdff_di" bpmnElement="Flow_0glrdff">
+        <di:waypoint x="530" y="117" />
+        <di:waypoint x="592" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="142" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_14ldl01_di" bpmnElement="Event_14ldl01">
+        <dc:Bounds x="592" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="601" y="142" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0tav3cc_di" bpmnElement="userTaskFormDataCleanerListenerId1">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0yjgl52_di" bpmnElement="userTaskFormDataCleanerListenerId2">
+        <dc:Bounds x="430" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

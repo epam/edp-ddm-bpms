@@ -11,6 +11,7 @@ import com.epam.digital.data.platform.bpms.config.CamundaSystemVariablesSupportL
 import com.epam.digital.data.platform.bpms.listener.AuthorizationStartEventListener;
 import com.epam.digital.data.platform.bpms.listener.CompleterTaskEventListener;
 import com.epam.digital.data.platform.bpms.listener.FileCleanerEndEventListener;
+import com.epam.digital.data.platform.bpms.listener.FormDataCleanerEndEventListener;
 import com.epam.digital.data.platform.bpms.listener.InitiatorTokenStartEventListener;
 import com.epam.digital.data.platform.bpms.listener.PutFormDataToCephTaskListener;
 import java.util.List;
@@ -50,6 +51,8 @@ public class CamundaSystemVariablesSupportListenerTest {
   @Mock
   private FileCleanerEndEventListener fileCleanerEndEventListener;
   @Mock
+  private FormDataCleanerEndEventListener formDataCleanerEndEventListener;
+  @Mock
   private TaskDefinition taskDefinition;
 
   private CamundaSystemVariablesSupportListener camundaSystemVariablesSupportListener;
@@ -58,7 +61,8 @@ public class CamundaSystemVariablesSupportListenerTest {
   public void init() {
     camundaSystemVariablesSupportListener = new CamundaSystemVariablesSupportListener(
         camundaProperties, authorizationStartEventListener, initiatorTokenStartEventListener,
-        completerTaskEventListener, putFormDataToCephTaskListener, fileCleanerEndEventListener);
+        completerTaskEventListener, putFormDataToCephTaskListener, fileCleanerEndEventListener,
+        formDataCleanerEndEventListener);
   }
 
   @Test
@@ -99,7 +103,7 @@ public class CamundaSystemVariablesSupportListenerTest {
     camundaSystemVariablesSupportListener.parseEndEvent(null, null, activity);
 
     ArgumentCaptor<ExecutionListener> captor = ArgumentCaptor.forClass(ExecutionListener.class);
-    verify(activity, times(1))
+    verify(activity, times(2))
         .addListener(eq(ExecutionListener.EVENTNAME_END), captor.capture());
   }
 }

@@ -1,6 +1,5 @@
 package com.epam.digital.data.platform.bpms.it.config;
 
-import com.epam.digital.data.platform.integration.ceph.service.S3ObjectCephService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,11 +19,5 @@ public class TestCephConfig {
   @Primary
   public TestCephServiceImpl cephService() {
     return new TestCephServiceImpl(cephBucketName, objectMapper);
-  }
-
-  @Bean
-  @Primary
-  public S3ObjectCephService s3ObjectCephServiceTest() {
-    return new TestS3ObjectCephServiceImpl();
   }
 }

@@ -82,6 +82,12 @@ public class GeneralConfig {
   }
 
   @Bean
+  public S3ObjectCephService s3FormDataStorageCephService(
+      @Value("${ceph.bucket}") String cephBucketName,  AmazonS3 cephAmazonS3) {
+    return new S3ObjectCephServiceImpl(cephBucketName, cephAmazonS3);
+  }
+
+  @Bean
   public AmazonS3 cephAmazonFileStorageS3(
       @Value("${ceph.http-endpoint}") String cephHttpEndpoint,
       @Value("${ceph.file-storage-access-key}") String cephAccessKey,

@@ -65,7 +65,6 @@ public class AddLabBpmnTest extends BaseBpmnTest {
 
     assertSystemSignature("system_signature_ceph_key",
         "/json/add-lab/digitalSignatureCephContent.json");
-    assertCephContent();
 
     mockServer.verify();
   }

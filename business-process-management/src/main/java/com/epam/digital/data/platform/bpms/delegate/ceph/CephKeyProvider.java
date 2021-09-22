@@ -8,8 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CephKeyProvider {
 
-  private static final String TASK_FORM_DATA_STRING_FORMAT = "secure-sys-var-ref-task-form-data-%s";
-  private static final String TASK_FORM_DATA_VALUE_FORMAT = "lowcode-%s-%s";
+  private static final String TASK_FORM_DATA_CEPH_KEY_FORMAT = "process/%s/task/%s";
 
   /**
    * Method for generating the ceph key, uses task definition key and process instance identifier to
@@ -20,7 +19,6 @@ public class CephKeyProvider {
    * @return generated ceph key
    */
   public String generateKey(String taskDefinitionKey, String processInstanceId) {
-    var taskFormDataVariableName = String.format(TASK_FORM_DATA_STRING_FORMAT, taskDefinitionKey);
-    return String.format(TASK_FORM_DATA_VALUE_FORMAT, processInstanceId, taskFormDataVariableName);
+    return String.format(TASK_FORM_DATA_CEPH_KEY_FORMAT, processInstanceId, taskDefinitionKey);
   }
 }

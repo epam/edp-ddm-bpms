@@ -20,7 +20,7 @@ public class CephKeyProviderTest {
 
   @Test
   public void testGeneratingCephKey() {
-    var expectedKey = "lowcode-testProcessInstanceId-secure-sys-var-ref-task-form-data-testTaskDefinitionKey";
+    var expectedKey = "process/testProcessInstanceId/task/testTaskDefinitionKey";
     var taskDefinitionKey = "testTaskDefinitionKey";
     var processInstanceId = "testProcessInstanceId";
 

@@ -12,8 +12,6 @@
     <constructor-arg value="bucket"/>
     <constructor-arg ref="objectMapper"/>
   </bean>
-  <bean id="s3ObjectCephServiceTest"
-    class="com.epam.digital.data.platform.bpms.it.config.TestS3ObjectCephServiceImpl"/>
   <bean id="camundaAdminImpersonationFactory"
     class="com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory">
     <constructor-arg value="administratorUserId"/>
@@ -38,7 +36,11 @@
   </bean>
   <bean id="fileCleanerEndEventListener"
     class="com.epam.digital.data.platform.bpms.listener.FileCleanerEndEventListener">
-    <constructor-arg ref="s3ObjectCephServiceTest"/>
+    <constructor-arg ref="cephService"/>
+  </bean>
+  <bean id="formDataCleanerEndEventListener"
+    class="com.epam.digital.data.platform.bpms.listener.FormDataCleanerEndEventListener">
+    <constructor-arg ref="cephService"/>
   </bean>
 
   <bean id="processEngineConfiguration"
@@ -84,6 +86,7 @@
           <constructor-arg ref="completerListener"/>
           <constructor-arg ref="putFormDataToCephListener"/>
           <constructor-arg ref="fileCleanerEndEventListener"/>
+          <constructor-arg ref="formDataCleanerEndEventListener"/>
         </bean>
       </list>
     </property>
