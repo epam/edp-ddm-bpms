@@ -23,10 +23,10 @@
     <bpmn:scriptTask id="Activity_0ifoty5" name="Check users" scriptFormat="groovy">
       <bpmn:incoming>Flow_1svsc5e</bpmn:incoming>
       <bpmn:outgoing>Flow_1i6fo6c</bpmn:outgoing>
-      <bpmn:script>assert usersOutput.get(0).userName.equals('testUser4')
-assert usersOutput.get(0).fullName.equals('Test4 User4')
-assert usersOutput.get(1).userName.equals('testUser3')
-assert usersOutput.get(1).fullName.equals('Test3 User3')</bpmn:script>
+      <bpmn:script>assert usersOutput.get(0).userName.equals('testUser3')
+assert usersOutput.get(0).fullName.equals('Test3 User3')
+assert usersOutput.get(1).userName.equals('testUser4')
+assert usersOutput.get(1).fullName.equals('Test4 User4')</bpmn:script>
     </bpmn:scriptTask>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">

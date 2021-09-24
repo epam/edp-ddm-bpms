@@ -2,14 +2,14 @@ package com.epam.digital.data.platform.bpms.exception.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.epam.digital.data.platform.bpms.exception.KeycloakNotFoundException;
+import com.epam.digital.data.platform.bpms.exception.KeycloakException;
 import com.epam.digital.data.platform.starter.errorhandling.BaseRestExceptionHandler;
 import com.epam.digital.data.platform.starter.errorhandling.dto.SystemErrorDto;
 import org.junit.Test;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 
-public class KeycloakNotFoundExceptionMapperTest {
+public class KeycloakExceptionMapperTest {
 
   @Test
   public void testKeycloakNotFoundExceptionMapper() {
@@ -18,8 +18,8 @@ public class KeycloakNotFoundExceptionMapperTest {
     var message = "message";
     MDC.put(BaseRestExceptionHandler.TRACE_ID_KEY, traceId);
 
-    var response = new KeycloakNotFoundExceptionMapper()
-        .toResponse(new KeycloakNotFoundException(message));
+    var response = new KeycloakExceptionMapper()
+        .toResponse(new KeycloakException(message));
 
     assertThat(response.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     assertThat(response.getEntity()).isEqualTo(SystemErrorDto.builder()
