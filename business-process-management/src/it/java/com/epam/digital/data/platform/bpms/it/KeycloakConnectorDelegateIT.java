@@ -12,7 +12,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 
-import com.epam.digital.data.platform.bpms.exception.KeycloakNotFoundException;
+import com.epam.digital.data.platform.bpms.exception.KeycloakException;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.junit.Test;
@@ -20,13 +20,13 @@ import org.junit.Test;
 public class KeycloakConnectorDelegateIT extends BaseIT {
 
   private static final String RESPONSE_BODY_ROLE = "/json/keycloak/keycloakRoleResponse.json";
-  private static final String RESPONSE_BODY_USERS = "/json/keycloak/keycloakUsersResponse.json";
+  private static final String RESPONSE_BODY_USER = "/json/keycloak/keycloakUserResponse.json";
 
   @Test
   @Deployment(resources = {"bpmn/connector/testAddRoleKeycloak.bpmn"})
   public void shouldAddRealmRoleToKeycloak() {
     mockConnectToKeycloak(citizenRealm);
-    mockKeycloakGetUsers("testuser", RESPONSE_BODY_USERS);
+    mockKeycloakGetUsers("testuser", RESPONSE_BODY_USER);
     mockKeycloakGetRole("citizen", RESPONSE_BODY_ROLE, 200);
     mockKeycloakAddRole("7004ebde-68cf-4e25-bb76-b1642a3814e5",
         "/json/keycloak/keycloakRequestBodyRoles.json");
@@ -45,7 +45,7 @@ public class KeycloakConnectorDelegateIT extends BaseIT {
   @Deployment(resources = {"bpmn/connector/testRemoveRoleKeycloak.bpmn"})
   public void shouldRemoveRealmRoleFromKeycloak() {
     mockConnectToKeycloak(citizenRealm);
-    mockKeycloakGetUsers("testuser", RESPONSE_BODY_USERS);
+    mockKeycloakGetUsers("testuser", RESPONSE_BODY_USER);
     mockKeycloakGetRole("citizen", RESPONSE_BODY_ROLE, 200);
     mockKeycloakDeleteRole("7004ebde-68cf-4e25-bb76-b1642a3814e5",
         "/json/keycloak/keycloakRequestBodyRoles.json");
@@ -64,14 +64,13 @@ public class KeycloakConnectorDelegateIT extends BaseIT {
   @Deployment(resources = {"bpmn/connector/testAddRoleKeycloak.bpmn"})
   public void shouldGetExceptionWhenRoleNotFound() {
     mockConnectToKeycloak(citizenRealm);
-    mockKeycloakGetUsers("testuser", RESPONSE_BODY_USERS);
     mockKeycloakGetRole("citizen", "", 404);
 
-    var ex = assertThrows(KeycloakNotFoundException.class, () -> runtimeService
+    var ex = assertThrows(KeycloakException.class, () -> runtimeService
         .startProcessInstanceByKey("testAddRoleKeycloak_key"));
 
     assertThat(ex).isNotNull();
-    assertThat(ex.getMessage()).isEqualTo("Keycloak role not found!");
+    assertThat(ex.getMessage()).isEqualTo("Couldn't find role citizen in realm citizen-realm");
   }
 
   @Test
@@ -79,12 +78,13 @@ public class KeycloakConnectorDelegateIT extends BaseIT {
   public void shouldGetExceptionWhenUserNotFound() {
     mockConnectToKeycloak(citizenRealm);
     mockKeycloakGetUsers("testuser", "[]");
+    mockKeycloakGetRole("citizen", RESPONSE_BODY_ROLE, 200);
 
-    var ex = assertThrows(KeycloakNotFoundException.class, () -> runtimeService
+    var ex = assertThrows(KeycloakException.class, () -> runtimeService
         .startProcessInstanceByKey("testAddRoleKeycloak_key"));
 
     assertThat(ex).isNotNull();
-    assertThat(ex.getMessage()).isEqualTo("Keycloak user not found!");
+    assertThat(ex.getMessage()).isEqualTo("Found 0 users with name testuser in realm citizen-realm, but expect one");
   }
 
   @Test
