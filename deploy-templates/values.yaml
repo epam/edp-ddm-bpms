@@ -73,3 +73,5 @@ trembitaExchangeGateway:
       member-class: 'GOV'
       member-code: '00015622'
       subsystem-code: '2_MJU_EDR_prod'
+
+deployProfile: prod

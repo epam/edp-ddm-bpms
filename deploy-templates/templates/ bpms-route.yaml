@@ -1,4 +1,4 @@
-{{- if eq .Values.ingress.platform "openshift" }}
+{{- if eq .Values.deployProfile "dev" }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
