@@ -12,9 +12,15 @@ import com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory;
 import com.epam.digital.data.platform.integration.ceph.config.CephConfig;
 import com.epam.digital.data.platform.integration.ceph.service.S3ObjectCephService;
 import com.epam.digital.data.platform.integration.ceph.service.impl.S3ObjectCephServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collection;
 import java.util.stream.Stream;
 import javax.sql.DataSource;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.rest.TaskRestService;
+import org.camunda.bpm.engine.rest.history.HistoricTaskInstanceRestService;
+import org.camunda.bpm.engine.rest.impl.TaskRestServiceImpl;
+import org.camunda.bpm.engine.rest.impl.history.HistoricTaskInstanceRestServiceImpl;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -83,7 +89,7 @@ public class GeneralConfig {
 
   @Bean
   public S3ObjectCephService s3FormDataStorageCephService(
-      @Value("${ceph.bucket}") String cephBucketName,  AmazonS3 cephAmazonS3) {
+      @Value("${ceph.bucket}") String cephBucketName, AmazonS3 cephAmazonS3) {
     return new S3ObjectCephServiceImpl(cephBucketName, cephAmazonS3);
   }
 
@@ -113,5 +119,16 @@ public class GeneralConfig {
       @Value("${camunda.admin-user-id}") String administratorUserId,
       @Value("${camunda.admin-group-id}") String administratorGroupName) {
     return new CamundaImpersonationFactory(administratorUserId, administratorGroupName);
+  }
+
+  @Bean
+  public TaskRestService taskRestService(ObjectMapper objectMapper) {
+    return new TaskRestServiceImpl(null, objectMapper);
+  }
+
+  @Bean
+  public HistoricTaskInstanceRestService historicTaskInstanceRestService(ObjectMapper objectMapper,
+      ProcessEngine processEngine) {
+    return new HistoricTaskInstanceRestServiceImpl(objectMapper, processEngine);
   }
 }
