@@ -44,51 +44,16 @@ keycloak:
     realm: citizen-portal
     public: false
     secretName: keycloak-realm-admin-citizen-client-secret
-    serviceAccount:
-      clientRoles:
-      - clientId: realm-management
-        roles: ["realm-admin"]
   officerClient:
     clientName: realm-admin
     realm: officer-portal
     public: false
     secretName: keycloak-realm-admin-officer-client-secret
-    serviceAccount:
-      clientRoles:
-      - clientId: realm-management
-        roles: ["realm-admin"]
   systemUserClient:
     clientName: system-user
     realm: citizen-portal
     public: false
     secretName: keycloak-system-user-citizen-client-secret
-    protocolMappers:
-      - config:
-          access.token.claim: 'true'
-          aggregate.attrs: 'false'
-          claim.name: drfo
-          id.token.claim: 'true'
-          jsonType.label: String
-          multivalued: 'false'
-          name: drfo
-          user.attribute: drfo
-          userinfo.token.claim: 'true'
-        name: drfo
-        protocol: openid-connect
-        protocolMapper: oidc-usermodel-attribute-mapper
-      - config:
-          access.token.claim: 'true'
-          aggregate.attrs: 'false'
-          claim.name: fullName
-          id.token.claim: 'true'
-          jsonType.label: String
-          multivalued: 'false'
-          name: fullName
-          user.attribute: fullName
-          userinfo.token.claim: 'true'
-        name: fullName
-        protocol: openid-connect
-        protocolMapper: oidc-usermodel-attribute-mapper
   realms:
     admin: admin
   certificatesEndpoint: /protocol/openid-connect/certs
