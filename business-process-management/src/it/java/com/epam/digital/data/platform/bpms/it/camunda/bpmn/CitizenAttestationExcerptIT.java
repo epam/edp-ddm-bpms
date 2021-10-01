@@ -1,5 +1,6 @@
 package com.epam.digital.data.platform.bpms.it.camunda.bpmn;
 
+import static com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil.processInstance;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
@@ -9,6 +10,9 @@ import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertT
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.historyService;
 
 import com.epam.digital.data.platform.bpms.api.constant.Constants;
+import com.epam.digital.data.platform.bpms.camunda.dto.AssertWaitingActivityDto;
+import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
+import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
 import com.epam.digital.data.platform.bpms.it.util.TestUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -17,10 +21,16 @@ import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public class CitizenAttestationExcerptIT extends BaseBpmnIT {
+
+  private static final String PROCESS_DEFINITION_KEY = "citizen-attestation-excerpt";
+
+  @Value("${camunda.system-variables.const_dataFactoryBaseUrl}")
+  private String dataFactoryBaseUrl;
 
   @Before
   public void setUp() {
@@ -37,6 +47,7 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
   @Deployment(resources = {"bpmn/citizen-attestation-excerpt.bpmn",
       "bpmn/system-signature-bp.bpmn", "bpmn/check-excerpt-status.bpmn"})
   public void citizenAttestationExcerptHappyPathTest() throws JsonProcessingException {
+    stubSearchSubjects("/xml/citizen-attestation-excerpt/searchSubjectsActiveResponse.xml");
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -44,7 +55,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .queryParams(Map.of("subjectType", "LEGAL", "subjectCode", "01010101"))
         .response("/json/citizen-attestation-excerpt/data-factory/searchSubjectsResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -52,9 +62,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .resourceId("subjectId1")
         .response("/json/citizen-attestation-excerpt/data-factory/subjectResponse.json")
         .build());
-
-    stubSearchSubjects("/xml/citizen-attestation-excerpt/searchSubjectsActiveResponse.xml");
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -62,7 +69,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .resourceId("laboratory1")
         .response("/json/citizen-attestation-excerpt/data-factory/laboratoryResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -71,7 +77,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .response(
             "/json/citizen-attestation-excerpt/data-factory/lastLaboratorySolutionAddResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -79,7 +84,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .queryParams(Map.of("constantCode", "ADD"))
         .response("/json/citizen-attestation-excerpt/data-factory/addApplicationResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -87,14 +91,12 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .queryParams(Map.of("constantCode", "ADD"))
         .response("/json/citizen-attestation-excerpt/data-factory/addSolutionTypeResponse.json")
         .build());
-
     stubDigitalSignatureRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .requestBody("/json/citizen-attestation-excerpt/dso/systemSignatureRequest.json")
         .response("{\"signature\": \"signature\"}")
         .build());
-
     stubExcerptServiceRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -102,7 +104,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .requestBody("/json/citizen-attestation-excerpt/data-factory/generateExcerptRequest.json")
         .response("{\"excerptIdentifier\":\"d564f2ab-eec6-11eb-9efa-0a580a820439\"}")
         .build());
-
     stubExcerptServiceRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", TestUtils.getContent("/json/testuser2AccessToken.json")))
@@ -112,37 +113,46 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .build());
 
     var processInstanceId = startProcessInstance("citizen-attestation-excerpt", testUserToken);
-    var processInstance = runtimeService.createProcessInstanceQuery()
-        .processInstanceId(processInstanceId).list().get(0);
+    var processInstance = processInstance(processInstanceId);
 
-    addExpectedVariable("initiator", testUserName);
-    addExpectedVariable("subjectId", "subjectId1");
-    addExpectedVariable("subjectName", "lab owner");
-    addExpectedVariable("const_dataFactoryBaseUrl", "http://localhost:8877/mock-server");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("searchLabFormActivity")
+        .formKey("citizen-attestation-excerpt-bp-choose-lab")
+        .assignee(testUserName)
+        .expectedVariables(Map.of("initiator", testUserName, "const_dataFactoryBaseUrl",
+            dataFactoryBaseUrl, "subjectId", "subjectId1", "subjectName", "lab owner"))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("searchLabFormActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData(
+            "/json/citizen-attestation-excerpt/form-data/searchLabFormActivity.json")
+        .build());
 
-    var searchLabFormDefinitionKey = "searchLabFormActivity";
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("signAttestationExcerptActivity")
+        .formKey("citizen-attestation-excerpt-bp-sign-excerpt")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(deserializeFormData(
+            "/json/citizen-attestation-excerpt/form-data/signAttestationExcerptActivityPrePopulation.json"))
+        .expectedVariables(
+            Map.of("searchLabFormActivity_completer", testUserName, "solutionDate", "09-08-2021"))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("signAttestationExcerptActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData(
+            "/json/citizen-attestation-excerpt/form-data/signAttestationExcerptActivity.json")
+        .build());
 
-    assertWaitingActivity(processInstance, searchLabFormDefinitionKey,
-        "citizen-attestation-excerpt-bp-choose-lab");
-
-    completeTask(searchLabFormDefinitionKey, processInstanceId,
-        "/json/citizen-attestation-excerpt/form-data/searchLabFormActivity.json");
-
-    addExpectedVariable("searchLabFormActivity_completer", testUserName);
-    addExpectedVariable("solutionDate", "09-08-2021");
-    addExpectedCephContent(processInstanceId, searchLabFormDefinitionKey,
-        "/json/citizen-attestation-excerpt/form-data/searchLabFormActivity.json");
-
-    var signAttestationExcerptDefinitionKey = "signAttestationExcerptActivity";
-    addExpectedCephContent(processInstanceId, signAttestationExcerptDefinitionKey,
-        "/json/citizen-attestation-excerpt/form-data/signAttestationExcerptActivityPrePopulation.json");
-    assertWaitingActivity(processInstance, signAttestationExcerptDefinitionKey,
-        "citizen-attestation-excerpt-bp-sign-excerpt");
-
-    completeTask(signAttestationExcerptDefinitionKey, processInstanceId,
-        "/json/citizen-attestation-excerpt/form-data/signAttestationExcerptActivity.json");
-    addExpectedCephContent(processInstanceId, signAttestationExcerptDefinitionKey,
-        "/json/citizen-attestation-excerpt/form-data/signAttestationExcerptActivity.json");
     assertThat(processInstance).isWaitingAt("checkExcerptStatusActivity");
 
     var processInstances = historyService().createHistoricProcessInstanceQuery()
@@ -176,7 +186,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .queryParams(Map.of("subjectType", "LEGAL", "subjectCode", "01010101"))
         .response("/json/citizen-attestation-excerpt/data-factory/searchSubjectsResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -184,7 +193,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .resourceId("subjectId1")
         .response("/json/citizen-attestation-excerpt/data-factory/absentSubjectResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -192,7 +200,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .resourceId("laboratory1")
         .response("/json/citizen-attestation-excerpt/data-factory/laboratoryResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -201,7 +208,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .response(
             "/json/citizen-attestation-excerpt/data-factory/lastLaboratorySolutionAddResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -209,7 +215,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .queryParams(Map.of("constantCode", "ADD"))
         .response("/json/citizen-attestation-excerpt/data-factory/addApplicationResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -217,7 +222,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .queryParams(Map.of("constantCode", "ADD"))
         .response("/json/citizen-attestation-excerpt/data-factory/addSolutionTypeResponse.json")
         .build());
-
     stubDigitalSignatureRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -225,7 +229,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
             "/json/citizen-attestation-excerpt/dso/absentSubjectSystemSignatureRequest.json")
         .response("{\"signature\": \"signature\"}")
         .build());
-
     stubExcerptServiceRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -234,7 +237,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
             "/json/citizen-attestation-excerpt/data-factory/absentSubjectGenerateExcerptRequest.json")
         .response("{\"excerptIdentifier\":\"d564f2ab-eec6-11eb-9efa-0a580a820439\"}")
         .build());
-
     stubExcerptServiceRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", TestUtils.getContent("/json/testuser2AccessToken.json")))
@@ -244,37 +246,46 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .build());
 
     var processInstanceId = startProcessInstance("citizen-attestation-excerpt", testUserToken);
-    var processInstance = runtimeService.createProcessInstanceQuery()
-        .processInstanceId(processInstanceId).list().get(0);
+    var processInstance = processInstance(processInstanceId);
 
-    addExpectedVariable("initiator", testUserName);
-    addExpectedVariable("subjectId", "subjectId1");
-    addExpectedVariable("subjectName", "absent subject name");
-    addExpectedVariable("const_dataFactoryBaseUrl", "http://localhost:8877/mock-server");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("searchLabFormActivity")
+        .formKey("citizen-attestation-excerpt-bp-choose-lab")
+        .assignee(testUserName)
+        .expectedVariables(Map.of("initiator", testUserName, "const_dataFactoryBaseUrl",
+            dataFactoryBaseUrl, "subjectId", "subjectId1", "subjectName", "absent subject name"))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("searchLabFormActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData(
+            "/json/citizen-attestation-excerpt/form-data/searchLabFormActivity.json")
+        .build());
 
-    var searchLabFormDefinitionKey = "searchLabFormActivity";
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("signAttestationExcerptActivity")
+        .formKey("citizen-attestation-excerpt-bp-sign-excerpt")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(deserializeFormData(
+            "/json/citizen-attestation-excerpt/form-data/signAttestationExcerptActivityPrePopulation.json"))
+        .expectedVariables(
+            Map.of("searchLabFormActivity_completer", testUserName, "solutionDate", "09-08-2021"))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("signAttestationExcerptActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData(
+            "/json/citizen-attestation-excerpt/form-data/signAttestationExcerptActivity.json")
+        .build());
 
-    assertWaitingActivity(processInstance, searchLabFormDefinitionKey,
-        "citizen-attestation-excerpt-bp-choose-lab");
-
-    completeTask(searchLabFormDefinitionKey, processInstanceId,
-        "/json/citizen-attestation-excerpt/form-data/searchLabFormActivity.json");
-
-    addExpectedVariable("searchLabFormActivity_completer", testUserName);
-    addExpectedVariable("solutionDate", "09-08-2021");
-    addExpectedCephContent(processInstanceId, searchLabFormDefinitionKey,
-        "/json/citizen-attestation-excerpt/form-data/searchLabFormActivity.json");
-
-    var signAttestationExcerptDefinitionKey = "signAttestationExcerptActivity";
-    addExpectedCephContent(processInstanceId, signAttestationExcerptDefinitionKey,
-        "/json/citizen-attestation-excerpt/form-data/signAttestationExcerptActivityPrePopulation.json");
-    assertWaitingActivity(processInstance, signAttestationExcerptDefinitionKey,
-        "citizen-attestation-excerpt-bp-sign-excerpt");
-
-    completeTask(signAttestationExcerptDefinitionKey, processInstanceId,
-        "/json/citizen-attestation-excerpt/form-data/signAttestationExcerptActivity.json");
-    addExpectedCephContent(processInstanceId, signAttestationExcerptDefinitionKey,
-        "/json/citizen-attestation-excerpt/form-data/signAttestationExcerptActivity.json");
     assertThat(processInstance).isWaitingAt("checkExcerptStatusActivity");
 
     var processInstances = historyService().createHistoricProcessInstanceQuery()
@@ -301,6 +312,7 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
   @Deployment(resources = {"bpmn/citizen-attestation-excerpt.bpmn",
       "bpmn/system-signature-bp.bpmn", "bpmn/check-excerpt-status.bpmn"})
   public void citizenAttestationExcerptGenerationFailedTest() throws JsonProcessingException {
+    stubSearchSubjects("/xml/citizen-attestation-excerpt/searchSubjectsActiveResponse.xml");
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -308,7 +320,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .queryParams(Map.of("subjectType", "LEGAL", "subjectCode", "01010101"))
         .response("/json/citizen-attestation-excerpt/data-factory/searchSubjectsResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -316,9 +327,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .resourceId("subjectId1")
         .response("/json/citizen-attestation-excerpt/data-factory/subjectResponse.json")
         .build());
-
-    stubSearchSubjects("/xml/citizen-attestation-excerpt/searchSubjectsActiveResponse.xml");
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -326,7 +334,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .resourceId("laboratory1")
         .response("/json/citizen-attestation-excerpt/data-factory/laboratoryResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -335,7 +342,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .response(
             "/json/citizen-attestation-excerpt/data-factory/lastLaboratorySolutionAddResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -343,7 +349,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .queryParams(Map.of("constantCode", "ADD"))
         .response("/json/citizen-attestation-excerpt/data-factory/addApplicationResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -351,14 +356,12 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .queryParams(Map.of("constantCode", "ADD"))
         .response("/json/citizen-attestation-excerpt/data-factory/addSolutionTypeResponse.json")
         .build());
-
     stubDigitalSignatureRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .requestBody("/json/citizen-attestation-excerpt/dso/systemSignatureRequest.json")
         .response("{\"signature\": \"signature\"}")
         .build());
-
     stubExcerptServiceRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -366,7 +369,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .requestBody("/json/citizen-attestation-excerpt/data-factory/generateExcerptRequest.json")
         .response("{\"excerptIdentifier\":\"d564f2ab-eec6-11eb-9efa-0a580a820439\"}")
         .build());
-
     stubExcerptServiceRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", TestUtils.getContent("/json/testuser2AccessToken.json")))
@@ -376,37 +378,46 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .build());
 
     var processInstanceId = startProcessInstance("citizen-attestation-excerpt", testUserToken);
-    var processInstance = runtimeService.createProcessInstanceQuery()
-        .processInstanceId(processInstanceId).list().get(0);
+    var processInstance = processInstance(processInstanceId);
 
-    addExpectedVariable("initiator", testUserName);
-    addExpectedVariable("subjectId", "subjectId1");
-    addExpectedVariable("subjectName", "lab owner");
-    addExpectedVariable("const_dataFactoryBaseUrl", "http://localhost:8877/mock-server");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("searchLabFormActivity")
+        .formKey("citizen-attestation-excerpt-bp-choose-lab")
+        .assignee(testUserName)
+        .expectedVariables(Map.of("initiator", testUserName, "const_dataFactoryBaseUrl",
+            dataFactoryBaseUrl, "subjectId", "subjectId1", "subjectName", "lab owner"))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("searchLabFormActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData(
+            "/json/citizen-attestation-excerpt/form-data/searchLabFormActivity.json")
+        .build());
 
-    var searchLabFormDefinitionKey = "searchLabFormActivity";
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("signAttestationExcerptActivity")
+        .formKey("citizen-attestation-excerpt-bp-sign-excerpt")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(deserializeFormData(
+            "/json/citizen-attestation-excerpt/form-data/signAttestationExcerptActivityPrePopulation.json"))
+        .expectedVariables(
+            Map.of("searchLabFormActivity_completer", testUserName, "solutionDate", "09-08-2021"))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("signAttestationExcerptActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData(
+            "/json/citizen-attestation-excerpt/form-data/signAttestationExcerptActivity.json")
+        .build());
 
-    assertWaitingActivity(processInstance, searchLabFormDefinitionKey,
-        "citizen-attestation-excerpt-bp-choose-lab");
-
-    completeTask(searchLabFormDefinitionKey, processInstanceId,
-        "/json/citizen-attestation-excerpt/form-data/searchLabFormActivity.json");
-
-    addExpectedVariable("searchLabFormActivity_completer", testUserName);
-    addExpectedVariable("solutionDate", "09-08-2021");
-    addExpectedCephContent(processInstanceId, searchLabFormDefinitionKey,
-        "/json/citizen-attestation-excerpt/form-data/searchLabFormActivity.json");
-
-    var signAttestationExcerptDefinitionKey = "signAttestationExcerptActivity";
-    addExpectedCephContent(processInstanceId, signAttestationExcerptDefinitionKey,
-        "/json/citizen-attestation-excerpt/form-data/signAttestationExcerptActivityPrePopulation.json");
-    assertWaitingActivity(processInstance, signAttestationExcerptDefinitionKey,
-        "citizen-attestation-excerpt-bp-sign-excerpt");
-
-    completeTask(signAttestationExcerptDefinitionKey, processInstanceId,
-        "/json/citizen-attestation-excerpt/form-data/signAttestationExcerptActivity.json");
-    addExpectedCephContent(processInstanceId, signAttestationExcerptDefinitionKey,
-        "/json/citizen-attestation-excerpt/form-data/signAttestationExcerptActivity.json");
     assertThat(processInstance).isWaitingAt("checkExcerptStatusActivity");
 
     var processInstances = historyService().createHistoricProcessInstanceQuery()
@@ -430,6 +441,7 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
   @Deployment(resources = {"bpmn/citizen-attestation-excerpt.bpmn",
       "bpmn/system-signature-bp.bpmn", "bpmn/check-excerpt-status.bpmn"})
   public void citizenAttestationExcerptGenerationTimeoutTest() throws JsonProcessingException {
+    stubSearchSubjects("/xml/citizen-attestation-excerpt/searchSubjectsActiveResponse.xml");
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -437,7 +449,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .queryParams(Map.of("subjectType", "LEGAL", "subjectCode", "01010101"))
         .response("/json/citizen-attestation-excerpt/data-factory/searchSubjectsResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -445,9 +456,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .resourceId("subjectId1")
         .response("/json/citizen-attestation-excerpt/data-factory/subjectResponse.json")
         .build());
-
-    stubSearchSubjects("/xml/citizen-attestation-excerpt/searchSubjectsActiveResponse.xml");
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -455,7 +463,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .resourceId("laboratory1")
         .response("/json/citizen-attestation-excerpt/data-factory/laboratoryResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -464,7 +471,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .response(
             "/json/citizen-attestation-excerpt/data-factory/lastLaboratorySolutionAddResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -472,7 +478,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .queryParams(Map.of("constantCode", "ADD"))
         .response("/json/citizen-attestation-excerpt/data-factory/addApplicationResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -480,14 +485,12 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .queryParams(Map.of("constantCode", "ADD"))
         .response("/json/citizen-attestation-excerpt/data-factory/addSolutionTypeResponse.json")
         .build());
-
     stubDigitalSignatureRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .requestBody("/json/citizen-attestation-excerpt/dso/systemSignatureRequest.json")
         .response("{\"signature\": \"signature\"}")
         .build());
-
     stubExcerptServiceRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -495,7 +498,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .requestBody("/json/citizen-attestation-excerpt/data-factory/generateExcerptRequest.json")
         .response("{\"excerptIdentifier\":\"d564f2ab-eec6-11eb-9efa-0a580a820439\"}")
         .build());
-
     stubExcerptServiceRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", TestUtils.getContent("/json/testuser2AccessToken.json")))
@@ -505,37 +507,46 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .build());
 
     var processInstanceId = startProcessInstance("citizen-attestation-excerpt", testUserToken);
-    var processInstance = runtimeService.createProcessInstanceQuery()
-        .processInstanceId(processInstanceId).list().get(0);
+    var processInstance = processInstance(processInstanceId);
 
-    addExpectedVariable("initiator", testUserName);
-    addExpectedVariable("subjectId", "subjectId1");
-    addExpectedVariable("subjectName", "lab owner");
-    addExpectedVariable("const_dataFactoryBaseUrl", "http://localhost:8877/mock-server");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("searchLabFormActivity")
+        .formKey("citizen-attestation-excerpt-bp-choose-lab")
+        .assignee(testUserName)
+        .expectedVariables(Map.of("initiator", testUserName, "const_dataFactoryBaseUrl",
+            dataFactoryBaseUrl, "subjectId", "subjectId1", "subjectName", "lab owner"))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("searchLabFormActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData(
+            "/json/citizen-attestation-excerpt/form-data/searchLabFormActivity.json")
+        .build());
 
-    var searchLabFormDefinitionKey = "searchLabFormActivity";
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("signAttestationExcerptActivity")
+        .formKey("citizen-attestation-excerpt-bp-sign-excerpt")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(deserializeFormData(
+            "/json/citizen-attestation-excerpt/form-data/signAttestationExcerptActivityPrePopulation.json"))
+        .expectedVariables(
+            Map.of("searchLabFormActivity_completer", testUserName, "solutionDate", "09-08-2021"))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("signAttestationExcerptActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData(
+            "/json/citizen-attestation-excerpt/form-data/signAttestationExcerptActivity.json")
+        .build());
 
-    assertWaitingActivity(processInstance, searchLabFormDefinitionKey,
-        "citizen-attestation-excerpt-bp-choose-lab");
-
-    completeTask(searchLabFormDefinitionKey, processInstanceId,
-        "/json/citizen-attestation-excerpt/form-data/searchLabFormActivity.json");
-
-    addExpectedVariable("searchLabFormActivity_completer", testUserName);
-    addExpectedVariable("solutionDate", "09-08-2021");
-    addExpectedCephContent(processInstanceId, searchLabFormDefinitionKey,
-        "/json/citizen-attestation-excerpt/form-data/searchLabFormActivity.json");
-
-    var signAttestationExcerptDefinitionKey = "signAttestationExcerptActivity";
-    addExpectedCephContent(processInstanceId, signAttestationExcerptDefinitionKey,
-        "/json/citizen-attestation-excerpt/form-data/signAttestationExcerptActivityPrePopulation.json");
-    assertWaitingActivity(processInstance, signAttestationExcerptDefinitionKey,
-        "citizen-attestation-excerpt-bp-sign-excerpt");
-
-    completeTask(signAttestationExcerptDefinitionKey, processInstanceId,
-        "/json/citizen-attestation-excerpt/form-data/signAttestationExcerptActivity.json");
-    addExpectedCephContent(processInstanceId, signAttestationExcerptDefinitionKey,
-        "/json/citizen-attestation-excerpt/form-data/signAttestationExcerptActivity.json");
     assertThat(processInstance).isWaitingAt("checkExcerptStatusActivity");
 
     var processInstances = historyService().createHistoricProcessInstanceQuery()
@@ -565,6 +576,7 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
   @Deployment(resources = {"bpmn/citizen-attestation-excerpt.bpmn",
       "bpmn/system-signature-bp.bpmn", "bpmn/check-excerpt-status.bpmn"})
   public void citizenAttestationExcerptApplicationNotAddedTest() throws JsonProcessingException {
+    stubSearchSubjects("/xml/citizen-attestation-excerpt/searchSubjectsActiveResponse.xml");
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -572,7 +584,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .queryParams(Map.of("subjectType", "LEGAL", "subjectCode", "01010101"))
         .response("/json/citizen-attestation-excerpt/data-factory/searchSubjectsResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -580,9 +591,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .resourceId("subjectId1")
         .response("/json/citizen-attestation-excerpt/data-factory/subjectResponse.json")
         .build());
-
-    stubSearchSubjects("/xml/citizen-attestation-excerpt/searchSubjectsActiveResponse.xml");
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -590,7 +598,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .resourceId("laboratory1")
         .response("/json/citizen-attestation-excerpt/data-factory/laboratoryResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -599,7 +606,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .response(
             "/json/citizen-attestation-excerpt/data-factory/lastLaboratorySolutionRefuseResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -607,7 +613,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .queryParams(Map.of("constantCode", "ADD"))
         .response("/json/citizen-attestation-excerpt/data-factory/addApplicationResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -617,34 +622,42 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .build());
 
     var processInstanceId = startProcessInstance("citizen-attestation-excerpt", testUserToken);
-    var processInstance = runtimeService.createProcessInstanceQuery()
-        .processInstanceId(processInstanceId).list().get(0);
+    var processInstance = processInstance(processInstanceId);
 
-    addExpectedVariable("initiator", testUserName);
-    addExpectedVariable("subjectId", "subjectId1");
-    addExpectedVariable("subjectName", "lab owner");
-    addExpectedVariable("const_dataFactoryBaseUrl", "http://localhost:8877/mock-server");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("searchLabFormActivity")
+        .formKey("citizen-attestation-excerpt-bp-choose-lab")
+        .assignee(testUserName)
+        .expectedVariables(Map.of("initiator", testUserName, "const_dataFactoryBaseUrl",
+            dataFactoryBaseUrl, "subjectId", "subjectId1", "subjectName", "lab owner"))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("searchLabFormActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData(
+            "/json/citizen-attestation-excerpt/form-data/searchLabFormActivity.json")
+        .build());
 
-    var searchLabFormDefinitionKey = "searchLabFormActivity";
-
-    assertWaitingActivity(processInstance, searchLabFormDefinitionKey,
-        "citizen-attestation-excerpt-bp-choose-lab");
-
-    completeTask(searchLabFormDefinitionKey, processInstanceId,
-        "/json/citizen-attestation-excerpt/form-data/searchLabFormActivity.json");
-
-    addExpectedVariable("searchLabFormActivity_completer", testUserName);
-    addExpectedCephContent(processInstanceId, searchLabFormDefinitionKey,
-        "/json/citizen-attestation-excerpt/form-data/searchLabFormActivity.json");
-
-    var noAttestationErrorDefinitionKey = "noAttestationErrorActivity";
-    assertWaitingActivity(processInstance, noAttestationErrorDefinitionKey,
-        "citizen-attestation-excerpt-bp-no-attestation-error");
-
-    completeTask(noAttestationErrorDefinitionKey, processInstanceId,
-        "/json/citizen-attestation-excerpt/form-data/emptyFormData.json");
-    addExpectedCephContent(processInstanceId, noAttestationErrorDefinitionKey,
-        "/json/citizen-attestation-excerpt/form-data/emptyFormData.json");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("noAttestationErrorActivity")
+        .formKey("citizen-attestation-excerpt-bp-no-attestation-error")
+        .assignee(testUserName)
+        .expectedVariables(Map.of("searchLabFormActivity_completer", testUserName))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("noAttestationErrorActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData(
+            "/json/citizen-attestation-excerpt/form-data/emptyFormData.json")
+        .build());
 
     addExpectedVariable("noAttestationErrorActivity_completer", testUserName);
     addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT, "Витяг не сформовано");
@@ -657,6 +670,7 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
   @Deployment(resources = {"bpmn/citizen-attestation-excerpt.bpmn",
       "bpmn/system-signature-bp.bpmn", "bpmn/check-excerpt-status.bpmn"})
   public void citizenAttestationExcerptSubjectInEdrCancelledTest() throws JsonProcessingException {
+    stubSearchSubjects("/xml/citizen-attestation-excerpt/searchSubjectsCancelledResponse.xml");
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -664,7 +678,6 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .queryParams(Map.of("subjectType", "LEGAL", "subjectCode", "01010101"))
         .response("/json/citizen-attestation-excerpt/data-factory/searchSubjectsResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -673,23 +686,25 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .response("/json/citizen-attestation-excerpt/data-factory/subjectResponse.json")
         .build());
 
-    stubSearchSubjects("/xml/citizen-attestation-excerpt/searchSubjectsCancelledResponse.xml");
+    var processInstanceId = startProcessInstance(PROCESS_DEFINITION_KEY, testUserToken);
+    var processInstance = processInstance(processInstanceId);
 
-    var processInstanceId = startProcessInstance("citizen-attestation-excerpt", testUserToken);
-    var processInstance = runtimeService.createProcessInstanceQuery()
-        .processInstanceId(processInstanceId).list().get(0);
-
-    addExpectedVariable("initiator", testUserName);
-    addExpectedVariable("const_dataFactoryBaseUrl", "http://localhost:8877/mock-server");
-
-    var noAttestationErrorDefinitionKey = "subjectStatusErrorActivity";
-    assertWaitingActivity(processInstance, noAttestationErrorDefinitionKey,
-        "citizen-attestation-excerpt-bp-status-error");
-
-    completeTask(noAttestationErrorDefinitionKey, processInstanceId,
-        "/json/citizen-attestation-excerpt/form-data/emptyFormData.json");
-    addExpectedCephContent(processInstanceId, noAttestationErrorDefinitionKey,
-        "/json/citizen-attestation-excerpt/form-data/emptyFormData.json");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("subjectStatusErrorActivity")
+        .formKey("citizen-attestation-excerpt-bp-status-error")
+        .assignee(testUserName)
+        .expectedVariables(
+            Map.of("initiator", testUserName, "const_dataFactoryBaseUrl", dataFactoryBaseUrl))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("subjectStatusErrorActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData("/json/citizen-attestation-excerpt/form-data/emptyFormData.json")
+        .build());
 
     addExpectedVariable("subjectStatusErrorActivity_completer", testUserName);
     addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT, "Витяг не сформовано");
@@ -712,20 +727,24 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .build());
 
     var processInstanceId = startProcessInstance("citizen-attestation-excerpt", testUserToken);
-    var processInstance = runtimeService.createProcessInstanceQuery()
-        .processInstanceId(processInstanceId).list().get(0);
+    var processInstance = processInstance(processInstanceId);
 
-    addExpectedVariable("initiator", testUserName);
-    addExpectedVariable("const_dataFactoryBaseUrl", "http://localhost:8877/mock-server");
-
-    var subjectNotFoundDefinitionKey = "subjectNotFoundActivity";
-    assertWaitingActivity(processInstance, subjectNotFoundDefinitionKey,
-        "citizen-attestation-excerpt-bp-no-subject-error");
-
-    completeTask(subjectNotFoundDefinitionKey, processInstanceId,
-        "/json/citizen-attestation-excerpt/form-data/emptyFormData.json");
-    addExpectedCephContent(processInstanceId, subjectNotFoundDefinitionKey,
-        "/json/citizen-attestation-excerpt/form-data/emptyFormData.json");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("subjectNotFoundActivity")
+        .formKey("citizen-attestation-excerpt-bp-no-subject-error")
+        .assignee(testUserName)
+        .expectedVariables(
+            Map.of("initiator", testUserName, "const_dataFactoryBaseUrl", dataFactoryBaseUrl))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("subjectNotFoundActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData("/json/citizen-attestation-excerpt/form-data/emptyFormData.json")
+        .build());
 
     addExpectedVariable("subjectNotFoundActivity_completer", testUserName);
     addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT, "Витяг не сформовано");

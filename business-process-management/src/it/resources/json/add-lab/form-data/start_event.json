@@ -1,0 +1,9 @@
+{
+  "data": {
+    "subjectType": "LEGAL",
+    "edrpou": "77777777",
+    "subject": {
+      "subjectId": "activeSubject"
+    }
+  }
+}

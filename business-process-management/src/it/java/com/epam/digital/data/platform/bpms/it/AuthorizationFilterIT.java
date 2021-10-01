@@ -134,16 +134,18 @@ public class AuthorizationFilterIT extends BaseIT {
     ProcessDefinitionDto processDefinition = Stream.of(processDefinitionDtos)
         .filter(pd -> "testInitSystemVariablesProcess_key".equals(pd.getKey())).findFirst().get();
     //create process instance
-    postForObject("api/process-definition/" + processDefinition.getId() + "/start", "{}",
+    ProcessInstanceDto processInstance = postForObject(
+        "api/process-definition/" + processDefinition.getId() + "/start", "{}",
         ProcessInstanceDto.class);
 
     //get user tasks by another user
     String testuser2Token = new String(ByteStreams
         .toByteArray(BaseIT.class.getResourceAsStream("/json/testuser2AccessToken.json")));
-    TaskDto[] historyProcessInstanceDtos = getForObject(
-        "api/task", TaskDto[].class, testuser2Token);
+    TaskDto[] userTasks = getForObject(
+        String.format("api/task?processInstanceId=%s", processInstance.getId()), TaskDto[].class,
+        testuser2Token);
 
-    assertThat(historyProcessInstanceDtos).isEmpty();
+    assertThat(userTasks).isEmpty();
   }
 
   @Test

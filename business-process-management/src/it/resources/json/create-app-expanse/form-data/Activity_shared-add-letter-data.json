@@ -1,0 +1,10 @@
+{
+  "data": {
+    "name": "labName",
+    "registrationNo": "1234567890-primary-add",
+    "solutionName": "Внести до інформаційного переліку",
+    "receivedBy": "receiver",
+    "certifiedBy": "multipass",
+    "notes": "smth noted"
+  }
+}

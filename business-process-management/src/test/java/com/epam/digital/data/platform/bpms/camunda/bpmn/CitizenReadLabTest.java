@@ -73,7 +73,6 @@ public class CitizenReadLabTest extends BaseBpmnTest {
             "/json/citizen-read-lab/form-data/viewLabDataCitizenActivity.json"))
         .expectedVariables(Map.of("initiator", "testuser"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(currentProcessInstanceId)
         .activityDefinitionId("viewLabDataCitizenActivity")
@@ -88,7 +87,6 @@ public class CitizenReadLabTest extends BaseBpmnTest {
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-
     mockServer.verify();
   }
 }

@@ -8,10 +8,8 @@ import com.epam.digital.data.platform.bpms.camunda.dto.AssertWaitingActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
-import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.test.Deployment;
@@ -32,9 +30,7 @@ public class CitizenUpdatePersonnelBpmnIT extends BaseBpmnIT {
         .resourceId("activeSubject")
         .response("/json/common/data-factory/subjectResponse.json")
         .build());
-
     stubSearchSubjects("/xml/citizen-update-personnel/searchSubjectsActiveResponse.xml");
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -42,7 +38,6 @@ public class CitizenUpdatePersonnelBpmnIT extends BaseBpmnIT {
         .resourceId("02e68684-1335-47f0-9bd6-17d937267527")
         .response("/json/citizen-update-personnel/data-factory/searchStaffResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -50,7 +45,6 @@ public class CitizenUpdatePersonnelBpmnIT extends BaseBpmnIT {
         .resourceId("3fa85f64-5717-4562-b3fc-2c963f66afa6")
         .response("/json/citizen-update-personnel/data-factory/searchLabResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -58,7 +52,6 @@ public class CitizenUpdatePersonnelBpmnIT extends BaseBpmnIT {
         .resourceId("cc974d44-362c-4caf-8a99-67780635ca68")
         .response("/json/citizen-update-personnel/data-factory/readStaffStatusResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -66,7 +59,6 @@ public class CitizenUpdatePersonnelBpmnIT extends BaseBpmnIT {
         .resourceId("3fa85f64-5717-4562-b3fc-2c963f66afa6")
         .response("/json/citizen-update-personnel/data-factory/readResearchResponse.json")
         .build());
-
     stubDigitalSignatureRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -101,7 +93,6 @@ public class CitizenUpdatePersonnelBpmnIT extends BaseBpmnIT {
             "/json/citizen-update-personnel/form-data/citizenPersonnelFormActivity.json"))
         .expectedVariables(Map.of("initiator", testUserName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("updateCitizenPersonnelFormActivity")
@@ -122,7 +113,6 @@ public class CitizenUpdatePersonnelBpmnIT extends BaseBpmnIT {
         .expectedVariables(Map.of("updateCitizenPersonnelFormActivity_completer", testUserName))
         .extensionElements(Map.of("eSign", "true", "ENTREPRENEUR", "true", "LEGAL", "true"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("signUpdatedCitizenPersonnelFormActivity")
@@ -140,7 +130,6 @@ public class CitizenUpdatePersonnelBpmnIT extends BaseBpmnIT {
         "/json/citizen-update-personnel/dso/systemSignatureCephContent.json");
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
   }
 
   @Test
@@ -154,23 +143,16 @@ public class CitizenUpdatePersonnelBpmnIT extends BaseBpmnIT {
         .response("/json/common/data-factory/subjectResponse.json")
         .build());
     stubSearchSubjects("/xml/citizen-update-personnel/searchSubjectsCancelledResponse.xml");
+
     var startFormData = deserializeFormData(
         "/json/citizen-update-personnel/form-data/startFormDataActivity.json");
-
-    var resultMap = startProcessInstanceWithStartFormForError(startFormData);
+    var resultMap = startProcessInstanceWithStartFormForError(PROCESS_DEFINITION_ID, testUserToken,
+        startFormData);
 
     var errors = resultMap.get("details").get("errors");
     Assertions.assertThat(errors).hasSize(1);
     Assertions.assertThat(errors.get(0)).contains(Map.entry("field", ""),
         Map.entry("message", "Суб'єкт скасовано або припинено"),
         Map.entry("value", ""));
-  }
-
-  @SuppressWarnings("unchecked")
-  private Map<String, Map<String, List<Map<String, String>>>> startProcessInstanceWithStartFormForError(
-      FormDataDto formDataDto) throws JsonProcessingException {
-    var resultMap = startProcessInstanceWithStartForm(PROCESS_DEFINITION_ID, testUserToken,
-        formDataDto);
-    return (Map<String, Map<String, List<Map<String, String>>>>) resultMap;
   }
 }

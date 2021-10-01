@@ -1,21 +1,27 @@
 package com.epam.digital.data.platform.bpms.it.camunda.bpmn;
 
+import static com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil.processInstance;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.historyService;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import com.epam.digital.data.platform.bpms.api.constant.Constants;
+import com.epam.digital.data.platform.bpms.camunda.dto.AssertWaitingActivityDto;
+import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
+import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
+import com.epam.digital.data.platform.bpms.it.BaseIT;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
-import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.google.common.io.ByteStreams;
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,63 +29,80 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @Deployment(resources = {"bpmn/officer-create-subject-bp.bpmn", "bpmn/system-signature-bp.bpmn"})
 public class OfficerCreateSubjectIT extends BaseBpmnIT {
 
+  private static final String PROCESS_DEFINITION_KEY = "officer-create-subject-bp";
+  private static final String LEGAL_SUBJECT_TYPE = "LEGAL";
+  private static final String LEGAL_SUBJECT_CODE = "10101010";
+  private static final String ENTREPRENEUR_SUBJECT_TYPE = "ENTREPRENEUR";
+  private static final String ENTREPRENEUR_SUBJECT_CODE = "1010101010";
+
+  @Value("${camunda.system-variables.const_dataFactoryBaseUrl}")
+  private String dataFactoryBaseUrl;
+  private static String legalUserToken;
+  private static String indUserToken;
+
+  @BeforeClass
+  public static void setup() throws IOException {
+    legalUserToken = new String(ByteStreams.toByteArray(Objects.requireNonNull(
+        BaseIT.class.getResourceAsStream("/json/officer-create-subject/legalUserToken.txt"))));
+
+    indUserToken = new String(ByteStreams.toByteArray(Objects.requireNonNull(
+        BaseIT.class.getResourceAsStream("/json/officer-create-subject/indUserToken.txt"))));
+  }
+
   @Test
   public void testHappyPath() throws Exception {
-    var subjectType = "LEGAL";
-    var subjectCode = "10101010";
-    var testUserToken = new String(ByteStreams
-        .toByteArray(Objects.requireNonNull(
-            getClass().getResourceAsStream("/json/officer-create-subject/legalUserToken.txt"))));
     SecurityContextHolder.getContext().setAuthentication(
-        new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
+        new UsernamePasswordAuthenticationToken(testUserName, legalUserToken));
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .resource("subject-equal-subject-type-equal-subject-code")
-        .queryParams(Map.of("subjectType", subjectType, "subjectCode", subjectCode))
-        .headers(Map.of("X-Access-Token", testUserToken))
+        .queryParams(Map.of("subjectType", LEGAL_SUBJECT_TYPE, "subjectCode", LEGAL_SUBJECT_CODE))
+        .headers(Map.of("X-Access-Token", legalUserToken))
         .response("[]")
         .build());
     stubDigitalSignatureRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
-        .headers(Map.of("X-Access-Token", testUserToken))
+        .headers(Map.of("X-Access-Token", legalUserToken))
         .requestBody("/json/officer-create-subject/dso/subjectSystemSignatureRequest.json")
         .response("{\"signature\": \"userSignature\"}")
         .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
-        .headers(Map.of("X-Access-Token", testUserToken))
+        .headers(Map.of("X-Access-Token", legalUserToken))
         .resource("subject")
         .requestBody("/json/officer-create-subject/data-factory/postSubjectRequest.json")
         .response("{}")
         .build());
-
     stubSearchSubjects("/xml/officer-create-subject/searchSubjectsResponse.xml");
 
-    var data = new LinkedHashMap<String, Object>();
-    data.put("subjectType", subjectType);
-    data.put("edrpou", subjectCode);
-    data.put("absentEdrFlag", false);
+    var data = deserializeFormData("/json/officer-create-subject/ceph/start_event_legal.json");
+    var processInstanceId = startProcessInstanceWithStartFormAndGetId(PROCESS_DEFINITION_KEY,
+        legalUserToken, data);
+    var processInstance = processInstance(processInstanceId);
 
-    var processInstanceId = startProcessInstanceWithStartFormAndGetId("officer-create-subject-bp",
-        testUserToken, FormDataDto.builder().data(data).build());
-    var processInstance = runtimeService.createProcessInstanceQuery()
-        .processInstanceId(processInstanceId).singleResult();
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("sign_subject_officer_create_subject_task")
+        .formKey("sign-subject-officer-create-subject-bp")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(deserializeFormData(
+            "/json/officer-create-subject/ceph/sign-subject-officer-create-task.json"))
+        .expectedVariables(Map.of("initiator", testUserName, "const_dataFactoryBaseUrl",
+            dataFactoryBaseUrl, "start_form_ceph_key", START_FORM_CEPH_KEY))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("sign_subject_officer_create_subject_task")
+        .completerUserName(testUserName)
+        .completerAccessToken(legalUserToken)
+        .expectedFormData(
+            "/json/officer-create-subject/ceph/sign-subject-officer-create-task.json")
+        .build());
 
-    addExpectedVariable("initiator", "testuser");
-    addExpectedVariable("const_dataFactoryBaseUrl", "http://localhost:8877/mock-server");
-    addExpectedVariable("start_form_ceph_key", START_FORM_CEPH_KEY);
-
-    var signSubjectTaskDefinitionKey = "sign_subject_officer_create_subject_task";
-    assertWaitingActivity(processInstance, signSubjectTaskDefinitionKey,
-        "sign-subject-officer-create-subject-bp");
-
-    completeTask(signSubjectTaskDefinitionKey, processInstanceId,
-        "/json/officer-create-subject/ceph/sign-subject-officer-create-task.json");
-
-    addCompleterUsernameVariable(signSubjectTaskDefinitionKey, testUserName);
-    addExpectedCephContent(processInstanceId, signSubjectTaskDefinitionKey,
-        "/json/officer-create-subject/ceph/sign-subject-officer-create-task.json");
+    addExpectedVariable("sign_subject_officer_create_subject_task_completer", testUserName);
+    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT, "Суб'єкт створено");
 
     var processInstances = historyService().createHistoricProcessInstanceQuery()
         .superProcessInstanceId(processInstanceId).orderByProcessInstanceEndTime().asc()
@@ -92,74 +115,68 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
 
     assertSystemSignature(processInstanceId, "subject_system_signature_ceph_key",
         "/json/officer-create-subject/dso/subjectSignatureCephContent.json");
-
-    addExpectedVariable("sys-var-process-completion-result", "Суб'єкт створено");
-
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
   }
 
   @Test
   public void testEntrepreneurSubjectTypeHappyPath() throws Exception {
-    var subjectName = "testSubjectName";
-    var subjectType = "ENTREPRENEUR";
-    var subjectCode = "1010101010";
-    var testUserToken = new String(ByteStreams
-        .toByteArray(Objects.requireNonNull(
-            getClass().getResourceAsStream("/json/officer-create-subject/indUserToken.txt"))));
     SecurityContextHolder.getContext().setAuthentication(
-        new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
+        new UsernamePasswordAuthenticationToken(testUserName, indUserToken));
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .resource("subject-equal-subject-type-equal-subject-code")
-        .queryParams(Map.of("subjectType", subjectType, "subjectCode", subjectCode))
-        .headers(Map.of("X-Access-Token", testUserToken))
+        .queryParams(Map.of("subjectType", ENTREPRENEUR_SUBJECT_TYPE, "subjectCode",
+            ENTREPRENEUR_SUBJECT_CODE))
+        .headers(Map.of("X-Access-Token", indUserToken))
         .response("[]")
         .build());
     stubDigitalSignatureRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
-        .headers(Map.of("X-Access-Token", testUserToken))
+        .headers(Map.of("X-Access-Token", indUserToken))
         .requestBody(
             "/json/officer-create-subject/dso/entrepreneur2/subjectSystemSignatureRequest.json")
         .response("{\"signature\": \"userSignature\"}")
         .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
-        .headers(Map.of("X-Access-Token", testUserToken))
+        .headers(Map.of("X-Access-Token", indUserToken))
         .resource("subject")
         .requestBody(
             "/json/officer-create-subject/data-factory/entrepreneur2/postSubjectRequest.json")
         .response("{}")
         .build());
-
     stubSearchSubjects("/xml/officer-create-subject/searchSubjectsEmptyResponse.xml");
 
-    var data = new LinkedHashMap<String, Object>();
-    data.put("subjectName", subjectName);
-    data.put("subjectType", subjectType);
-    data.put("rnokppCode", subjectCode);
-    data.put("absentEdrFlag", true);
+    var data = deserializeFormData(
+        "/json/officer-create-subject/ceph/start_event_entrepreneur.json");
+    var processInstanceId = startProcessInstanceWithStartFormAndGetId(PROCESS_DEFINITION_KEY,
+        indUserToken, data);
+    var processInstance = processInstance(processInstanceId);
 
-    var processInstanceId = startProcessInstanceWithStartFormAndGetId("officer-create-subject-bp",
-        testUserToken, FormDataDto.builder().data(data).build());
-    var processInstance = runtimeService.createProcessInstanceQuery()
-        .processInstanceId(processInstanceId).singleResult();
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("sign_subject_officer_create_subject_task")
+        .formKey("sign-subject-officer-create-subject-bp")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(deserializeFormData(
+            "/json/officer-create-subject/ceph/entrepreneur2/sign-subject-officer-create-task.json"))
+        .expectedVariables(Map.of("initiator", testUserName, "const_dataFactoryBaseUrl",
+            dataFactoryBaseUrl, "start_form_ceph_key", START_FORM_CEPH_KEY))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("sign_subject_officer_create_subject_task")
+        .completerUserName(testUserName)
+        .completerAccessToken(indUserToken)
+        .expectedFormData(
+            "/json/officer-create-subject/ceph/entrepreneur2/sign-subject-officer-create-task.json")
+        .build());
 
-    addExpectedVariable("initiator", "testuser");
-    addExpectedVariable("const_dataFactoryBaseUrl", "http://localhost:8877/mock-server");
-    addExpectedVariable("start_form_ceph_key", START_FORM_CEPH_KEY);
-
-    var signSubjectTaskDefinitionKey = "sign_subject_officer_create_subject_task";
-    assertWaitingActivity(processInstance, signSubjectTaskDefinitionKey,
-        "sign-subject-officer-create-subject-bp");
-
-    completeTask(signSubjectTaskDefinitionKey, processInstanceId,
-        "/json/officer-create-subject/ceph/entrepreneur2/sign-subject-officer-create-task.json");
-
-    addCompleterUsernameVariable(signSubjectTaskDefinitionKey, testUserName);
-    addExpectedCephContent(processInstanceId, signSubjectTaskDefinitionKey,
-        "/json/officer-create-subject/ceph/entrepreneur2/sign-subject-officer-create-task.json");
+    addExpectedVariable("sign_subject_officer_create_subject_task_completer", testUserName);
+    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT, "Суб'єкт створено");
 
     var processInstances = historyService().createHistoricProcessInstanceQuery()
         .superProcessInstanceId(processInstanceId).orderByProcessInstanceEndTime().asc()
@@ -172,180 +189,140 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
 
     assertSystemSignature(processInstanceId, "subject_system_signature_ceph_key",
         "/json/officer-create-subject/dso/entrepreneur2/subjectSignatureCephContent.json");
-
-    addExpectedVariable("sys-var-process-completion-result", "Суб'єкт створено");
-
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
   }
 
   @Test
   public void testValidationErrorSubjectCreated() throws Exception {
-    var subjectType = "LEGAL";
-    var subjectCode = "1010101010";
-    var testUserToken = new String(ByteStreams
-        .toByteArray(Objects.requireNonNull(
-            getClass().getResourceAsStream("/json/officer-create-subject/legalUserToken.txt"))));
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .resource("subject-equal-subject-type-equal-subject-code")
-        .queryParams(Map.of("subjectType", subjectType, "subjectCode", subjectCode))
-        .headers(Map.of("X-Access-Token", testUserToken))
+        .queryParams(Map.of("subjectType", LEGAL_SUBJECT_TYPE, "subjectCode", LEGAL_SUBJECT_CODE))
+        .headers(Map.of("X-Access-Token", legalUserToken))
         .response(
             "/json/officer-create-subject/data-factory/subjectEqualSubjectTypeEqualSubjectCodeExistResponse.json")
         .build());
 
-    var data = new LinkedHashMap<String, Object>();
-    data.put("subjectType", subjectType);
-    data.put("edrpou", subjectCode);
-    data.put("absentEdrFlag", false);
-
-    var response = startProcessInstanceWithStartForm("officer-create-subject-bp", testUserToken,
-        FormDataDto.builder().data(data).build());
+    var data = deserializeFormData("/json/officer-create-subject/ceph/start_event_legal.json");
+    var response = startProcessInstanceWithStartForm(PROCESS_DEFINITION_KEY, legalUserToken, data);
 
     assertNotNull(response);
-    assertEquals(response.get("message"), "Validation error");
+    assertEquals("Validation error", response.get("message"));
     var errors = (List<Map>) ((Map) response.get("details")).get("errors");
     assertEquals(2, errors.size());
     assertEquals("Такий суб'єкт вже існує", errors.get(0).get("message"));
     assertEquals("subjectType", errors.get(0).get("field"));
-    assertEquals(subjectType, errors.get(0).get("value"));
+    assertEquals(LEGAL_SUBJECT_TYPE, errors.get(0).get("value"));
     assertEquals("Такий суб'єкт вже існує", errors.get(1).get("message"));
     assertEquals("subjectCode", errors.get(1).get("field"));
-    assertEquals(subjectCode, errors.get(1).get("value"));
+    assertEquals(LEGAL_SUBJECT_CODE, errors.get(1).get("value"));
   }
 
   @Test
   public void testValidationErrorSubjectHasCanceledOrSuspendedState() throws Exception {
-    var subjectType = "LEGAL";
-    var subjectCode = "1010101010";
-    var testUserToken = new String(ByteStreams
-        .toByteArray(Objects.requireNonNull(
-            getClass().getResourceAsStream("/json/officer-create-subject/legalUserToken.txt"))));
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .resource("subject-equal-subject-type-equal-subject-code")
-        .queryParams(Map.of("subjectType", subjectType, "subjectCode", subjectCode))
-        .headers(Map.of("X-Access-Token", testUserToken))
+        .queryParams(Map.of("subjectType", LEGAL_SUBJECT_TYPE, "subjectCode", LEGAL_SUBJECT_CODE))
+        .headers(Map.of("X-Access-Token", legalUserToken))
         .response("[]")
         .build());
-
     stubSearchSubjects("/xml/officer-create-subject/searchSubjectsSuspendedStateResponse.xml");
 
-    var data = new LinkedHashMap<String, Object>();
-    data.put("subjectType", subjectType);
-    data.put("edrpou", subjectCode);
-    data.put("absentEdrFlag", false);
-
-    var response = startProcessInstanceWithStartForm("officer-create-subject-bp",
-        testUserToken, FormDataDto.builder().data(data).build());
+    var data = deserializeFormData("/json/officer-create-subject/ceph/start_event_legal.json");
+    var response = startProcessInstanceWithStartForm(PROCESS_DEFINITION_KEY, legalUserToken, data);
 
     assertNotNull(response);
-    assertEquals(response.get("message"), "Validation error");
+    assertEquals("Validation error", response.get("message"));
     var errors = (List<Map>) ((Map) response.get("details")).get("errors");
     assertEquals(1, errors.size());
     assertEquals("Статус суб'єкту скасовано або припинено", errors.get(0).get("message"));
     assertEquals("subjectCode", errors.get(0).get("field"));
-    assertEquals(subjectCode, errors.get(0).get("value"));
+    assertEquals(LEGAL_SUBJECT_CODE, errors.get(0).get("value"));
   }
 
   @Test
   public void testValidationErrorSubjectNotFound() throws IOException {
-    var subjectType = "LEGAL";
-    var subjectCode = "1010101010";
-    var testUserToken = new String(ByteStreams
-        .toByteArray(Objects.requireNonNull(
-            getClass().getResourceAsStream("/json/officer-create-subject/legalUserToken.txt"))));
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .resource("subject-equal-subject-type-equal-subject-code")
-        .queryParams(Map.of("subjectType", subjectType, "subjectCode", subjectCode))
-        .headers(Map.of("X-Access-Token", testUserToken))
+        .queryParams(Map.of("subjectType", LEGAL_SUBJECT_TYPE, "subjectCode", LEGAL_SUBJECT_CODE))
+        .headers(Map.of("X-Access-Token", legalUserToken))
         .response("[]")
         .build());
-
     stubSearchSubjects("/xml/officer-create-subject/searchSubjectsEmptyResponse.xml");
 
-    var data = new LinkedHashMap<String, Object>();
-    data.put("subjectType", subjectType);
-    data.put("edrpou", subjectCode);
-    data.put("absentEdrFlag", false);
-
-    var response = startProcessInstanceWithStartForm("officer-create-subject-bp",
-        testUserToken, FormDataDto.builder().data(data).build());
+    var data = deserializeFormData("/json/officer-create-subject/ceph/start_event_legal.json");
+    var response = startProcessInstanceWithStartForm(PROCESS_DEFINITION_KEY, legalUserToken, data);
 
     assertNotNull(response);
-    assertEquals(response.get("message"), "Validation error");
+    assertEquals("Validation error", response.get("message"));
     var errors = (List<Map>) ((Map) response.get("details")).get("errors");
     assertEquals(1, errors.size());
     assertEquals("Суб'єкта немає в ЄДР", errors.get(0).get("message"));
     assertEquals("subjectCode", errors.get(0).get("field"));
-    assertEquals(subjectCode, errors.get(0).get("value"));
+    assertEquals(LEGAL_SUBJECT_CODE, errors.get(0).get("value"));
   }
 
   @Test
   public void testAbsentEdrFlagTrueEdrResponseNotEmpty() throws IOException {
-    var subjectName = "testSubjectName";
-    var subjectType = "ENTREPRENEUR";
-    var subjectCode = "1010101010";
-    var testUserToken = new String(ByteStreams
-        .toByteArray(Objects.requireNonNull(
-            getClass().getResourceAsStream("/json/officer-create-subject/indUserToken.txt"))));
     SecurityContextHolder.getContext().setAuthentication(
-        new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
+        new UsernamePasswordAuthenticationToken(testUserName, indUserToken));
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .resource("subject-equal-subject-type-equal-subject-code")
-        .queryParams(Map.of("subjectType", subjectType, "subjectCode", subjectCode))
-        .headers(Map.of("X-Access-Token", testUserToken))
+        .queryParams(Map.of("subjectType", ENTREPRENEUR_SUBJECT_TYPE, "subjectCode",
+            ENTREPRENEUR_SUBJECT_CODE))
+        .headers(Map.of("X-Access-Token", indUserToken))
         .response("[]")
         .build());
     stubDigitalSignatureRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
-        .headers(Map.of("X-Access-Token", testUserToken))
+        .headers(Map.of("X-Access-Token", indUserToken))
         .requestBody(
             "/json/officer-create-subject/dso/entrepreneur/subjectSystemSignatureRequest.json")
         .response("{\"signature\": \"userSignature\"}")
         .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
-        .headers(Map.of("X-Access-Token", testUserToken))
+        .headers(Map.of("X-Access-Token", indUserToken))
         .resource("subject")
-        .requestBody("/json/officer-create-subject/data-factory/entrepreneur/postSubjectRequest.json")
+        .requestBody(
+            "/json/officer-create-subject/data-factory/entrepreneur/postSubjectRequest.json")
         .response("{}")
         .build());
-
     stubSearchSubjects("/xml/officer-create-subject/searchSubjectsEntrepreneurResponse.xml");
 
-    var data = new LinkedHashMap<String, Object>();
-    data.put("subjectName", subjectName);
-    data.put("subjectType", subjectType);
-    data.put("rnokppCode", subjectCode);
-    data.put("absentEdrFlag", true);
+    var data = deserializeFormData(
+        "/json/officer-create-subject/ceph/start_event_entrepreneur.json");
+    var processInstanceId = startProcessInstanceWithStartFormAndGetId(PROCESS_DEFINITION_KEY,
+        indUserToken, data);
+    var processInstance = processInstance(processInstanceId);
 
-    var processInstanceId = startProcessInstanceWithStartFormAndGetId("officer-create-subject-bp",
-        testUserToken, FormDataDto.builder().data(data).build());
-    var processInstance = runtimeService.createProcessInstanceQuery()
-        .processInstanceId(processInstanceId).singleResult();
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("sign_subject_officer_create_subject_task")
+        .formKey("sign-subject-officer-create-subject-bp")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(deserializeFormData(
+            "/json/officer-create-subject/ceph/entrepreneur/sign-subject-officer-create-task-flag-false.json"))
+        .expectedVariables(Map.of("initiator", testUserName, "const_dataFactoryBaseUrl",
+            dataFactoryBaseUrl, "start_form_ceph_key", START_FORM_CEPH_KEY))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("sign_subject_officer_create_subject_task")
+        .completerUserName(testUserName)
+        .completerAccessToken(indUserToken)
+        .expectedFormData(
+            "/json/officer-create-subject/ceph/entrepreneur/sign-subject-officer-create-task-flag-false.json")
+        .build());
 
-    addExpectedVariable("initiator", "testuser");
-    addExpectedVariable("const_dataFactoryBaseUrl", "http://localhost:8877/mock-server");
-    addExpectedVariable("start_form_ceph_key", START_FORM_CEPH_KEY);
-
-    var signSubjectTaskDefinitionKey = "sign_subject_officer_create_subject_task";
-    assertWaitingActivity(processInstance, signSubjectTaskDefinitionKey,
-        "sign-subject-officer-create-subject-bp");
-
-    completeTask(signSubjectTaskDefinitionKey, processInstanceId,
-        "/json/officer-create-subject/ceph/entrepreneur/sign-subject-officer-create-task.json");
-
-    addCompleterUsernameVariable(signSubjectTaskDefinitionKey, testUserName);
-    addExpectedCephContent(processInstanceId, signSubjectTaskDefinitionKey,
-        "/json/officer-create-subject/ceph/entrepreneur/sign-subject-officer-create-task.json");
+    addExpectedVariable("sign_subject_officer_create_subject_task_completer", testUserName);
+    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT, "Суб'єкт створено");
 
     var processInstances = historyService().createHistoricProcessInstanceQuery()
         .superProcessInstanceId(processInstanceId).orderByProcessInstanceEndTime().asc()
@@ -358,11 +335,7 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
 
     assertSystemSignature(processInstanceId, "subject_system_signature_ceph_key",
         "/json/officer-create-subject/dso/entrepreneur/subjectSignatureCephContent.json");
-
-    addExpectedVariable("sys-var-process-completion-result", "Суб'єкт створено");
-
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
   }
-
 }

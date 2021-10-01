@@ -9,8 +9,6 @@ import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
 import com.epam.digital.data.platform.bpms.it.util.TestUtils;
-import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -96,7 +94,6 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
         .expectedVariables(Map.of("initiator", citizenUserName))
         .extensionElements(Map.of("eSign", "true", "ENTREPRENEUR", "true", "LEGAL", "true"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("citizenSignActivity")
@@ -116,7 +113,6 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
         .expectedVariables(Map.of("citizenSignActivity_completer", citizenUserName,
             "officerUsers", Collections.emptyList()))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("dispatchTaskActivity")
@@ -133,7 +129,6 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
         .assignee(officerUserName)
         .expectedVariables(Map.of("dispatchTaskActivity_completer", headOfficerName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("addApplicationFormActivity")
@@ -153,7 +148,6 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
             "/json/citizen-create-app-exclude/form-data/addApplicationFormActivity.json"))
         .expectedVariables(Map.of("addApplicationFormActivity_completer", officerUserName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("checkComplianceFormActivity")
@@ -173,7 +167,6 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
             "/json/citizen-create-app-exclude/form-data/checkComplianceFormActivity.json"))
         .expectedVariables(Map.of("checkComplianceFormActivity_completer", officerUserName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("officerSignFormActivity")
@@ -194,7 +187,6 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
             "/json/citizen-create-app-exclude/form-data/checkComplianceFormActivity.json"))
         .expectedVariables(Map.of("officerSignFormActivity_completer", officerUserName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("headOfficerAgreeActivity")
@@ -214,7 +206,6 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
             "/json/citizen-create-app-exclude/form-data/headOfficerNotAgreeActivity.json"))
         .expectedVariables(Map.of("addApplicationFormActivity_completer", officerUserName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("checkComplianceFormActivity")
@@ -234,7 +225,6 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
             "/json/citizen-create-app-exclude/form-data/checkComplianceFormActivity.json"))
         .expectedVariables(Map.of("checkComplianceFormActivity_completer", officerUserName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("officerSignFormActivity")
@@ -255,7 +245,6 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
             "/json/citizen-create-app-exclude/form-data/checkComplianceFormActivity.json"))
         .expectedVariables(Map.of("officerSignFormActivity_completer", officerUserName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("headOfficerAgreeActivity")
@@ -275,7 +264,6 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
             "/json/citizen-create-app-exclude/form-data/addDecisionExcludeFormActivityPrePopulation.json"))
         .expectedVariables(Map.of("headOfficerAgreeActivity_completer", headOfficerName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("addDecisionExcludeFormActivity")
@@ -295,7 +283,6 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
             "/json/citizen-create-app-exclude/form-data/signAppExcludeFormActivity.json"))
         .expectedVariables(Map.of("addDecisionExcludeFormActivity_completer", headOfficerName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("signAppExcludeFormActivity")
@@ -311,7 +298,6 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
 
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
   }
 
   @Test
@@ -366,7 +352,6 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
         .expectedVariables(Map.of("initiator", citizenUserName))
         .extensionElements(Map.of("eSign", "true", "ENTREPRENEUR", "true", "LEGAL", "true"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("citizenSignActivity")
@@ -386,7 +371,6 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
         .expectedVariables(Map.of("citizenSignActivity_completer", citizenUserName,
             "officerUsers", Collections.emptyList()))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("dispatchTaskActivity")
@@ -403,7 +387,6 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
         .assignee(officerUserName)
         .expectedVariables(Map.of("dispatchTaskActivity_completer", headOfficerName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("addApplicationFormActivity")
@@ -423,7 +406,6 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
             "/json/citizen-create-app-exclude/form-data/addApplicationFormActivity.json"))
         .expectedVariables(Map.of("addApplicationFormActivity_completer", officerUserName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("checkComplianceFormActivity")
@@ -443,7 +425,6 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
             "/json/citizen-create-app-exclude/form-data/checkComplianceWithErrorFormActivity.json"))
         .expectedVariables(Map.of("checkComplianceFormActivity_completer", officerUserName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("officerSignFormActivity")
@@ -463,7 +444,6 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
             "/json/citizen-create-app-exclude/form-data/addDecisionDenyFormActivityPrePopulation.json"))
         .expectedVariables(Map.of("officerSignFormActivity_completer", officerUserName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("addDecisionDenyFormActivity")
@@ -483,7 +463,6 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
             "/json/citizen-create-app-exclude/form-data/signAppDenyFormActivity.json"))
         .expectedVariables(Map.of("addDecisionDenyFormActivity_completer", headOfficerName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("signAppDenyFormActivity")
@@ -499,7 +478,6 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
 
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
   }
 
   @Test
@@ -516,7 +494,8 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
 
     var startFormData = deserializeFormData(
         "/json/citizen-create-app-exclude/form-data/startFormDataActivity.json");
-    var resultMap = startProcessInstanceForError(startFormData);
+    var resultMap = startProcessInstanceWithStartFormForError(PROCESS_DEFINITION_ID,
+        citizenToken, startFormData);
 
     var errors = resultMap.get("details").get("errors");
     Assertions.assertThat(errors).hasSize(1);
@@ -551,13 +530,5 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
         .response(
             "/json/citizen-create-app-exclude/data-factory/solutionTypeEqualConstantCodeAddResponse.json")
         .build());
-  }
-
-  @SuppressWarnings("unchecked")
-  private Map<String, Map<String, List<Map<String, String>>>> startProcessInstanceForError(
-      FormDataDto startFormData) throws JsonProcessingException {
-    var resultMap = startProcessInstanceWithStartForm(PROCESS_DEFINITION_ID, citizenToken,
-        startFormData);
-    return (Map<String, Map<String, List<Map<String, String>>>>) resultMap;
   }
 }
