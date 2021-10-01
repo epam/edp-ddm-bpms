@@ -1,0 +1,19 @@
+{
+  "laboratoryId": "3758f3e6-937a-4ef9-a8b6-c95671241abd",
+  "denyInfolistInclusionFlag": true,
+  "koatuuId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "ownershipId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "edrpou": "13171992",
+  "accreditationFlag": true,
+  "accreditationEndDate": "2021-03-04",
+  "infolistInclusionDate": "2021-03-04",
+  "infolistInclusionFlag": true,
+  "headName": "string",
+  "phoneNumber": "string",
+  "notes": "string",
+  "infolistExclusionFlag": true,
+  "address": "string",
+  "kopfgId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "infolistExclusionDate": "2021-03-04",
+  "name": "labName"
+}

@@ -1,20 +1,23 @@
 package com.epam.digital.data.platform.bpms.it.camunda.bpmn;
 
+import static com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil.processInstance;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 
+import com.epam.digital.data.platform.bpms.api.constant.Constants;
+import com.epam.digital.data.platform.bpms.camunda.dto.AssertWaitingActivityDto;
+import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
+import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
-import com.epam.digital.data.platform.bpms.it.util.TestUtils;
-import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 
 public class AddPersonnelBpmnIT extends BaseBpmnIT {
+
+  private static final String PROCESS_DEFINITION_KEY = "add-personnel";
 
   @Value("${camunda.system-variables.const_dataFactoryBaseUrl}")
   private String dataFactoryBaseUrl;
@@ -31,7 +34,6 @@ public class AddPersonnelBpmnIT extends BaseBpmnIT {
         .resourceId(labId)
         .response("/json/add-personnel/data-factory/findLaboratoryResponse.json")
         .build());
-
     stubDigitalSignatureRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -39,13 +41,10 @@ public class AddPersonnelBpmnIT extends BaseBpmnIT {
         .response("{\"signature\": \"test\"}")
         .build());
 
-    var data = new LinkedHashMap<String, Object>();
-    data.put("laboratory", Map.of("laboratoryId", labId));
-
-    var processInstanceId = startProcessInstanceWithStartFormAndGetId("add-personnel",
-        testUserToken, FormDataDto.builder().data(data).build());
-    var processInstance = runtimeService.createProcessInstanceQuery()
-        .processInstanceId(processInstanceId).singleResult();
+    var startFormData = deserializeFormData("/json/add-personnel/form-data/start_event.json");
+    var processInstanceId = startProcessInstanceWithStartFormAndGetId(PROCESS_DEFINITION_KEY,
+        testUserToken, startFormData);
+    var processInstance = processInstance(processInstanceId);
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
@@ -56,54 +55,49 @@ public class AddPersonnelBpmnIT extends BaseBpmnIT {
         .response("{}")
         .build());
 
-    var addPersonnelFormActivityDefinitionKey = "addPersonnelFormActivity";
-    var signPersonnelFormActivityDefinitionKey = "signPersonnelFormActivity";
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("addPersonnelFormActivity")
+        .formKey("add-personnel-bp-add-personnel")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(deserializeFormData(
+            "/json/add-personnel/form-data/addPersonnelFormActivityPrepopulation.json"))
+        .expectedVariables(
+            Map.of("initiator", testUserName, "const_dataFactoryBaseUrl", dataFactoryBaseUrl))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("addPersonnelFormActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData("/json/add-personnel/form-data/addPersonnelFormActivity.json")
+        .build());
 
-    var systemSignatureCephKeyRefVarName = "system_signature_ceph_key";
-    var systemSignatureCephKey = "lowcode_" + processInstanceId + "_" +
-        systemSignatureCephKeyRefVarName + "_0";
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("signPersonnelFormActivity")
+        .formKey("add-personnel-bp-sign-personnel")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(deserializeFormData(
+            "/json/add-personnel/form-data/signPersonnelFormActivityPrepopulation.json"))
+        .expectedVariables(Map.of("addPersonnelFormActivity_completer", testUserName))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("signPersonnelFormActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData("/json/add-personnel/form-data/signPersonnelFormActivity.json")
+        .build());
 
-    expectedVariablesMap.put("initiator", "testuser");
-    expectedVariablesMap.put("const_dataFactoryBaseUrl", dataFactoryBaseUrl);
-    addExpectedCephContent(processInstanceId, addPersonnelFormActivityDefinitionKey,
-        "/json/add-personnel/form-data/addPersonnelFormActivityPrepopulation.json");
+    addExpectedVariable("signPersonnelFormActivity_completer", testUserName);
+    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT,
+        "Дані про кадровий склад внесені");
 
-    expectedVariablesMap.put("start_form_ceph_key", "startFormCephKey");
-    expectedVariablesMap.put("laboratoryId", labId);
-    assertWaitingActivity(processInstance, addPersonnelFormActivityDefinitionKey,
-        "add-personnel-bp-add-personnel");
-
-    completeTask(addPersonnelFormActivityDefinitionKey, processInstanceId,
-        "/json/add-personnel/form-data/addPersonnelFormActivity.json");
-
-    addCompleterUsernameVariable(addPersonnelFormActivityDefinitionKey, testUserName);
-
-    addExpectedCephContent(processInstanceId, addPersonnelFormActivityDefinitionKey,
-        "/json/add-personnel/form-data/addPersonnelFormActivity.json");
-    addExpectedCephContent(processInstanceId, signPersonnelFormActivityDefinitionKey,
-        "/json/add-personnel/form-data/signPersonnelFormActivityPrepopulation.json");
-
-    assertWaitingActivity(processInstance, signPersonnelFormActivityDefinitionKey,
-        "add-personnel-bp-sign-personnel");
-
-    completeTask(signPersonnelFormActivityDefinitionKey, processInstanceId,
-        "/json/add-personnel/form-data/signPersonnelFormActivity.json");
-
-    expectedVariablesMap.put("x_digital_signature_derived_ceph_key", systemSignatureCephKey);
-    expectedVariablesMap
-        .put("sys-var-process-completion-result", "Дані про кадровий склад внесені");
-    addCompleterUsernameVariable(signPersonnelFormActivityDefinitionKey, testUserName);
-
-    addExpectedCephContent(processInstanceId, signPersonnelFormActivityDefinitionKey,
-        "/json/add-personnel/form-data/signPersonnelFormActivity.json");
-
-    String signature = cephService.getContent(cephBucketName, systemSignatureCephKey).get();
-    Map<String, Object> signatureMap = objectMapper.readerForMapOf(Object.class)
-        .readValue(signature);
-    Map<String, Object> expectedSignatureMap = objectMapper.readerForMapOf(Object.class)
-        .readValue(TestUtils.getContent("/json/add-personnel/dso/systemSignatureCephContent.json"));
-    Assertions.assertThat(signatureMap).isEqualTo(expectedSignatureMap);
-
+    assertSystemSignatureBathCreationForOneOperation(processInstanceId,
+        "/json/add-personnel/dso/systemSignatureCephContent.json");
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
   }

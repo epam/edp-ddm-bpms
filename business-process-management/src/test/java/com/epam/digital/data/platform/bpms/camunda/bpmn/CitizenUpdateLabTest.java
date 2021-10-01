@@ -44,9 +44,7 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
         .resourceId("activeSubject")
         .response("/json/common/data-factory/subjectResponse.json")
         .build());
-
     mockEdrResponse("/json/citizen-update-lab/edr/searchSubjectsActiveResponse.json");
-
     mockDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -96,16 +94,13 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
         .queryParams(Map.of("edrpou", "01010101", "name", "updatedLabName"))
         .response("[]")
         .build());
-
     mockGetKeycloakUsersConnectorDelegate("[]");
-
     mockDigitalSignatureSign(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testuser2Token))
         .requestBody("/json/citizen-update-lab/dso/dsoRequest_nameUnique.json")
         .response("{\"signature\": \"systemSignature\"}")
         .build());
-
     mockDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.PUT)
         .headers(Map.of("X-Access-Token", testuser2Token))
@@ -128,7 +123,6 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
             "/json/citizen-update-lab/form-data/viewLabDataCitizenActivity.json"))
         .expectedVariables(Map.of("initiator", "testuser"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(currentProcessInstanceId)
         .activityDefinitionId("viewLabDataCitizenActivity")
@@ -148,7 +142,6 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
         .expectedVariables(Map.of("viewLabDataCitizenActivity_completer", "testuser",
             "laboratoryId", "laboratoryToUpdate"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(currentProcessInstanceId)
         .activityDefinitionId("updateLabCitizenActivity")
@@ -169,7 +162,6 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
         .expectedVariables(Map.of("updateLabCitizenActivity_completer", "testuser"))
         .extensionElements(Map.of("eSign", "true", "ENTREPRENEUR", "true", "LEGAL", "true"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(currentProcessInstanceId)
         .activityDefinitionId("signLabCitizenActivity")
@@ -188,7 +180,6 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
         .expectedVariables(Map.of("signLabCitizenActivity_completer", "testuser",
             "officerUsers", Collections.emptyList()))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .activityDefinitionId("dispatchTaskActivity")
         .completerUserName(taskDispatcherUserName)
@@ -207,7 +198,6 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
         .expectedVariables(Map.of("dispatchTaskActivity_completer", taskDispatcherUserName,
             "officerAssignee", testuser2UserName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .activityDefinitionId("checkLabOfficerActivity")
         .completerUserName(testuser2UserName)
@@ -227,7 +217,6 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
         .expectedVariables(Map.of("checkLabOfficerActivity_completer", testuser2UserName))
         .extensionElements(Map.of("eSign", "true"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .activityDefinitionId("signLabOfficerActivity")
         .completerUserName(testuser2UserName)
@@ -245,7 +234,6 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-
     mockServer.verify();
   }
 
@@ -259,9 +247,7 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
         .resourceId("activeSubject")
         .response("/json/common/data-factory/subjectResponse.json")
         .build());
-
     mockEdrResponse("/json/citizen-update-lab/edr/searchSubjectsActiveResponse.json");
-
     mockDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -304,7 +290,6 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
         .resourceId("labToUpdateKopfg")
         .response("/json/citizen-update-lab/data-factory/labToUpdateKopfg.json")
         .build());
-
     mockGetKeycloakUsersConnectorDelegate("[]");
 
     var startFormData = deserializeFormData("/json/citizen-update-lab/form-data/start_event.json");
@@ -320,7 +305,6 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
             "/json/citizen-update-lab/form-data/viewLabDataCitizenActivity.json"))
         .expectedVariables(Map.of("initiator", "testuser"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(currentProcessInstanceId)
         .activityDefinitionId("viewLabDataCitizenActivity")
@@ -340,7 +324,6 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
         .expectedVariables(Map.of("viewLabDataCitizenActivity_completer", "testuser",
             "laboratoryId", "laboratoryToUpdate"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(currentProcessInstanceId)
         .activityDefinitionId("updateLabCitizenActivity")
@@ -361,7 +344,6 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
         .expectedVariables(Map.of("updateLabCitizenActivity_completer", "testuser"))
         .extensionElements(Map.of("eSign", "true", "ENTREPRENEUR", "true", "LEGAL", "true"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(currentProcessInstanceId)
         .activityDefinitionId("signLabCitizenActivity")
@@ -381,7 +363,6 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
         .expectedVariables(Map.of("signLabCitizenActivity_completer", "testuser",
             "officerUsers", Collections.emptyList()))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .activityDefinitionId("dispatchTaskActivity")
         .completerUserName(taskDispatcherUserName)
@@ -400,7 +381,6 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
         .expectedVariables(Map.of("dispatchTaskActivity_completer", taskDispatcherUserName,
             "officerAssignee", testuser2UserName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .activityDefinitionId("checkLabOfficerActivity")
         .completerUserName(testuser2UserName)
@@ -415,7 +395,6 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-
     mockServer.verify();
   }
 
@@ -429,9 +408,7 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
         .resourceId("activeSubject")
         .response("/json/common/data-factory/subjectResponse.json")
         .build());
-
     mockEdrResponse("/json/citizen-update-lab/edr/searchSubjectsActiveResponse.json");
-
     mockDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -495,7 +472,6 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
             "/json/citizen-update-lab/form-data/viewLabDataCitizenActivity.json"))
         .expectedVariables(Map.of("initiator", "testuser"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(currentProcessInstanceId)
         .activityDefinitionId("viewLabDataCitizenActivity")
@@ -515,7 +491,6 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
         .expectedVariables(Map.of("viewLabDataCitizenActivity_completer", "testuser",
             "laboratoryId", "laboratoryToUpdate"))
         .build());
-
     var ex = assertThrows(ValidationException.class,
         () -> completeTask(CompleteActivityDto.builder()
             .processInstanceId(currentProcessInstanceId)
@@ -550,7 +525,6 @@ public class CitizenUpdateLabTest extends BaseBpmnTest {
         .resourceId("activeSubject")
         .response("/json/common/data-factory/subjectResponse.json")
         .build());
-
     mockEdrResponse("/json/citizen-update-lab/edr/searchSubjectsDisabledResponse.json");
 
     var startFormData = deserializeFormData("/json/citizen-update-lab/form-data/start_event.json");

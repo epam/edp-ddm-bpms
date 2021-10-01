@@ -70,7 +70,6 @@ public class CitizenReadLabBpmnIT extends BaseBpmnIT {
             "/json/citizen-read-lab/form-data/viewLabDataCitizenActivity.json"))
         .expectedVariables(Map.of("initiator", "testuser"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("viewLabDataCitizenActivity")
@@ -85,6 +84,5 @@ public class CitizenReadLabBpmnIT extends BaseBpmnIT {
 
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
   }
 }
