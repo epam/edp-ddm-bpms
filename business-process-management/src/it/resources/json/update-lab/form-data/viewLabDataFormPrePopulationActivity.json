@@ -1,0 +1,37 @@
+{
+  "data": {
+    "laboratoryId": "d2943186-0f1f-4a77-9de9-a5a59c07db02",
+    "headName": "Оніщенко К.Б.",
+    "edrpou": "23510933",
+    "phoneNumber": "044-454-10-23",
+    "notes": "",
+    "address": "вул. Ливарська, 1-А",
+    "accreditationEndDate": "1993-11-01",
+    "name":"labName",
+    "accreditationFlag":true,
+    "oblast": {
+      "koatuuId": "92cb1462-ec57-4b87-9e8d-594e0c322997",
+      "code": "8000000000",
+      "name": "КИЇВСЬКА ОБЛАСТЬ"
+    },
+    "koatuu": {
+      "level2": "8000000000",
+      "category": null,
+      "koatuuId": "92cb1462-ec57-4b87-9e8d-594e0c322996",
+      "code": "8000000000",
+      "level1": "8000000000",
+      "name": "М.КИЇВ",
+      "type": "НП"
+    },
+    "ownership": {
+      "ownershipId": "19aab23b-1e49-4064-8f7e-39735ece4388",
+      "code": "code",
+      "name": "ownership"
+    },
+    "kopfg": {
+      "kopfgId": "c54af316-4280-43fd-b49a-1e1f44ac374b",
+      "code": "code1",
+      "name": "kopfg"
+    }
+  }
+}

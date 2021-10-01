@@ -1,0 +1,10 @@
+{
+  "data": {
+    "subjectType": "LEGAL",
+    "edrpou": "77777777",
+    "laboratory": {
+      "laboratoryId": "bb652d3f-a36f-465a-b7ba-232a5a1680c8",
+      "subjectId": "activeSubject"
+    }
+  }
+}

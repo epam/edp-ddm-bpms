@@ -1,0 +1,24 @@
+{
+  "data":{
+    "name":"labName",
+    "registrationNo":"123123123",
+    "solutionName":"Виключити з інформаційного переліку",
+    "receivedBy":"gggggg",
+    "certifiedBy":"fffffff",
+    "notes":"",
+    "submit":true,
+    "solutionDate":"1999-10-02",
+    "exclusionOrderNo":"44444",
+    "exclusionOrderDate":"2000-09-01",
+    "letterNo":"666",
+    "letterDate":"1995-07-04",
+    "healthMinistryLetterNumber":"1123123",
+    "healthMinistryLetterDate":"2007-06-11",
+    "initiated":"держпраці",
+    "errorCheckFlag":false,
+    "edrpou":"23510933",
+    "registrationSource":"держпраці",
+    "createdDate":"1999-11-12",
+    "acceptedBy":"jogn doe"
+  }
+}

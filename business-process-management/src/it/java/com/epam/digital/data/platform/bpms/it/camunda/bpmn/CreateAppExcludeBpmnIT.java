@@ -1,22 +1,27 @@
 package com.epam.digital.data.platform.bpms.it.camunda.bpmn;
 
+import static com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil.processInstance;
+
+import com.epam.digital.data.platform.bpms.camunda.dto.AssertWaitingActivityDto;
+import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
+import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
-import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import org.apache.groovy.util.Maps;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 
 public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
 
-  private static final String PROCESS_DEFINITION_ID = "create-app-exclude";
+  private static final String PROCESS_DEFINITION_KEY = "create-app-exclude";
+
+  @Value("${camunda.system-variables.const_dataFactoryBaseUrl}")
+  private String dataFactoryBaseUrl;
 
   @Test
   @Deployment(resources = {"bpmn/create-app-exclude.bpmn", "bpmn/system-signature-bp.bpmn"})
@@ -28,89 +33,159 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("last-laboratory-solution")
         .queryParams(Maps.of("laboratoryId", laboratoryId))
-        .response("/json/create-app-exclude/lastLaboratorySolutionResponse.json")
+        .response("/json/create-app-exclude/data-factory/lastLaboratorySolutionResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("application-type-equal-constant-code")
         .queryParams(Maps.of("constantCode", "ADD"))
-        .response("/json/create-app-exclude/applicationTypeEqualConstantCodeAddResponse.json")
+        .response(
+            "/json/create-app-exclude/data-factory/applicationTypeEqualConstantCodeAddResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("solution-type-equal-constant-code")
         .queryParams(Maps.of("constantCode", "ADD"))
-        .response("/json/create-app-exclude/solutionTypeEqualConstantCodeAddResponse.json")
+        .response(
+            "/json/create-app-exclude/data-factory/solutionTypeEqualConstantCodeAddResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("laboratory")
         .resourceId(laboratoryId)
-        .response("/json/create-app-exclude/laboratoryByIdResponse.json")
+        .response("/json/create-app-exclude/data-factory/laboratoryByIdResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("solution-type-equal-constant-code")
         .queryParams(Maps.of("constantCode", "EXCLUDE"))
-        .response("/json/create-app-exclude/solutionTypeEqualConstantCodeResponse.json")
+        .response(
+            "/json/create-app-exclude/data-factory/solutionTypeEqualConstantCodeResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("application-type-equal-constant-code")
         .queryParams(Maps.of("constantCode", "EXCLUDE"))
-        .response("/json/create-app-exclude/applicationTypeEqualConstantCodeResponse.json")
+        .response(
+            "/json/create-app-exclude/data-factory/applicationTypeEqualConstantCodeResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("registration")
-        .requestBody("/json/create-app-exclude/addRegistrationBody.json")
+        .requestBody("/json/create-app-exclude/data-factory/addRegistrationBody.json")
         .response("{}")
         .build());
-
     stubDigitalSignatureRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .requestBody("/json/create-app-exclude/digitalSignatureRequestBody.json")
+        .requestBody("/json/create-app-exclude/dso/digitalSignatureRequestBody.json")
         .response("{\"signature\": \"test\"}")
         .build());
 
-    var processInstanceId = startProcessInstanceWithFormAndGetId(laboratoryId);
-    var processInstance = runtimeService.createProcessInstanceQuery()
-        .processInstanceId(processInstanceId).list().get(0);
+    var startFormData = deserializeFormData(
+        "/json/create-app-exclude/form-data/startFormDataActivity.json");
+    var processInstanceId = startProcessInstanceWithStartFormAndGetId(PROCESS_DEFINITION_KEY,
+        testUserToken, startFormData);
+    var processInstance = processInstance(processInstanceId);
 
-    BpmnAwareTests.assertThat(processInstance).isWaitingAt("addApplicationFormActivity");
-    completeTask("addApplicationFormActivity", processInstanceId,
-        "/json/create-app-exclude/addApplicationFormActivity.json");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("addApplicationFormActivity")
+        .formKey("shared-add-application")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(deserializeFormData(
+            "/json/create-app-exclude/form-data/addApplicationFormActivityPrePopulation.json"))
+        .expectedVariables(
+            Map.of("initiator", testUserName, "const_dataFactoryBaseUrl", dataFactoryBaseUrl))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("addApplicationFormActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData("/json/create-app-exclude/form-data/addApplicationFormActivity.json")
+        .build());
 
-    BpmnAwareTests.assertThat(processInstance).isWaitingAt("checkComplianceFormActivity");
-    completeTask("checkComplianceFormActivity", processInstanceId,
-        "/json/create-app-exclude/checkComplianceFormActivity.json");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("checkComplianceFormActivity")
+        .formKey("create-app-exclude-bp-check-compliance")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(deserializeFormData(
+            "/json/create-app-exclude/form-data/addApplicationFormActivity.json"))
+        .expectedVariables(Map.of("addApplicationFormActivity_completer", testUserName))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("checkComplianceFormActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData("/json/create-app-exclude/form-data/checkComplianceFormActivity.json")
+        .build());
 
-    BpmnAwareTests.assertThat(processInstance).isWaitingAt("addDecisionExcludeFormActivity");
-    completeTask("addDecisionExcludeFormActivity", processInstanceId,
-        "/json/create-app-exclude/addDecisionExcludeFormActivity.json");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("addDecisionExcludeFormActivity")
+        .formKey("create-app-exclude-bp-add-decision-exclude")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(deserializeFormData(
+            "/json/create-app-exclude/form-data/addDecisionExcludeFormActivityPrePopulation.json"))
+        .expectedVariables(Map.of("checkComplianceFormActivity_completer", testUserName))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("addDecisionExcludeFormActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData("/json/create-app-exclude/form-data/addDecisionExcludeFormActivity.json")
+        .build());
 
-    BpmnAwareTests.assertThat(processInstance).isWaitingAt("addLetterDataFormForExclusionActivity");
-    completeTask("addLetterDataFormForExclusionActivity", processInstanceId,
-        "/json/create-app-exclude/addLetterDataFormForExclusionActivity.json");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("addLetterDataFormForExclusionActivity")
+        .formKey("shared-add-letter-data")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(deserializeFormData(
+            "/json/create-app-exclude/form-data/addLetterDataFormForExclusionActivityPrePopulation.json"))
+        .expectedVariables(Map.of("addDecisionExcludeFormActivity_completer", testUserName))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("addLetterDataFormForExclusionActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData(
+            "/json/create-app-exclude/form-data/addLetterDataFormForExclusionActivity.json")
+        .build());
 
-    BpmnAwareTests.assertThat(processInstance).isWaitingAt("signAppExcludeFormActivity");
-    completeTask("signAppExcludeFormActivity", processInstanceId,
-        "/json/create-app-exclude/signAppExcludeFormActivity.json");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("signAppExcludeFormActivity")
+        .formKey("create-app-exclude-bp-sign-app-exclude")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(deserializeFormData(
+            "/json/create-app-exclude/form-data/signAppExcludeFormActivity.json"))
+        .expectedVariables(Map.of("addLetterDataFormForExclusionActivity_completer", testUserName))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("signAppExcludeFormActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData("/json/create-app-exclude/form-data/signAppExcludeFormActivity.json")
+        .build());
 
-    //then
     BpmnAwareTests.assertThat(processInstance)
         .hasPassed("addApplicationFormActivity", "checkComplianceFormActivity",
             "addDecisionExcludeFormActivity", "addLetterDataFormForExclusionActivity",
@@ -118,103 +193,172 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
         .isEnded();
 
     assertSystemSignature(processInstanceId, "system_signature_ceph_key",
-        "/json/create-app-exclude/digitalSignatureCephContent.json");
+        "/json/create-app-exclude/dso/digitalSignatureCephContent.json");
   }
 
   @Test
   @Deployment(resources = {"bpmn/create-app-exclude.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void testPathWithMistakes() throws IOException {
     var laboratoryId = "d2943186-0f1f-4a77-9de9-a5a59c07db02";
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("last-laboratory-solution")
         .queryParams(Maps.of("laboratoryId", laboratoryId))
-        .response("/json/create-app-exclude/lastLaboratorySolutionResponse.json")
+        .response("/json/create-app-exclude/data-factory/lastLaboratorySolutionResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("application-type-equal-constant-code")
         .queryParams(Maps.of("constantCode", "ADD"))
-        .response("/json/create-app-exclude/applicationTypeEqualConstantCodeAddResponse.json")
+        .response(
+            "/json/create-app-exclude/data-factory/applicationTypeEqualConstantCodeAddResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("solution-type-equal-constant-code")
         .queryParams(Maps.of("constantCode", "ADD"))
-        .response("/json/create-app-exclude/solutionTypeEqualConstantCodeAddResponse.json")
+        .response(
+            "/json/create-app-exclude/data-factory/solutionTypeEqualConstantCodeAddResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("laboratory")
         .resourceId(laboratoryId)
-        .response("/json/create-app-exclude/laboratoryByIdResponse.json")
+        .response("/json/create-app-exclude/data-factory/laboratoryByIdResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("solution-type-equal-constant-code")
         .queryParams(Maps.of("constantCode", "WO_CONSIDER"))
-        .response("/json/create-app-exclude/solutionTypeEqualConstantCodeWoConsiderResponse.json")
+        .response(
+            "/json/create-app-exclude/data-factory/solutionTypeEqualConstantCodeWoConsiderResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("application-type-equal-constant-code")
         .queryParams(Maps.of("constantCode", "EXCLUDE"))
-        .response("/json/create-app-exclude/applicationTypeEqualConstantCodeResponse.json")
+        .response(
+            "/json/create-app-exclude/data-factory/applicationTypeEqualConstantCodeResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("registration")
-        .requestBody("/json/create-app-exclude/addRegistrationNoConsiderBody.json")
+        .requestBody("/json/create-app-exclude/data-factory/addRegistrationNoConsiderBody.json")
         .response("{}")
         .build());
-
     stubDigitalSignatureRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .requestBody("/json/create-app-exclude/digitalSignatureNoConsiderRequestBody.json")
+        .requestBody("/json/create-app-exclude/dso/digitalSignatureNoConsiderRequestBody.json")
         .response("{\"signature\": \"test\"}")
         .build());
 
-    //start process
-    var processInstanceId = startProcessInstanceWithFormAndGetId(laboratoryId);
-    var processInstance = runtimeService.createProcessInstanceQuery()
-        .processInstanceId(processInstanceId).list().get(0);
+    var startFormData = deserializeFormData(
+        "/json/create-app-exclude/form-data/startFormDataActivity.json");
+    var processInstanceId = startProcessInstanceWithStartFormAndGetId(PROCESS_DEFINITION_KEY,
+        testUserToken, startFormData);
+    var processInstance = processInstance(processInstanceId);
 
-    BpmnAwareTests.assertThat(processInstance).isWaitingAt("addApplicationFormActivity");
-    completeTask("addApplicationFormActivity", processInstanceId,
-        "/json/create-app-exclude/addApplicationFormActivity.json");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("addApplicationFormActivity")
+        .formKey("shared-add-application")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(deserializeFormData(
+            "/json/create-app-exclude/form-data/addApplicationFormActivityPrePopulation.json"))
+        .expectedVariables(
+            Map.of("initiator", testUserName, "const_dataFactoryBaseUrl", dataFactoryBaseUrl))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("addApplicationFormActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData("/json/create-app-exclude/form-data/addApplicationFormActivity.json")
+        .build());
 
-    BpmnAwareTests.assertThat(processInstance).isWaitingAt("checkComplianceFormActivity");
-    completeTask("checkComplianceFormActivity", processInstanceId,
-        "/json/create-app-exclude/noConsiderCheckComplianceFormActivity.json");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("checkComplianceFormActivity")
+        .formKey("create-app-exclude-bp-check-compliance")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(deserializeFormData(
+            "/json/create-app-exclude/form-data/addApplicationFormActivity.json"))
+        .expectedVariables(Map.of("addApplicationFormActivity_completer", testUserName))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("checkComplianceFormActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData(
+            "/json/create-app-exclude/form-data/noConsiderCheckComplianceFormActivity.json")
+        .build());
 
-    BpmnAwareTests.assertThat(processInstance).isWaitingAt("addDecisionDenyFormActivity");
-    completeTask("addDecisionDenyFormActivity", processInstanceId,
-        "/json/create-app-exclude/addDecisionDenyFormActivity.json");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("addDecisionDenyFormActivity")
+        .formKey("shared-add-decision-deny")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(deserializeFormData(
+            "/json/create-app-exclude/form-data/addDecisionDenyFormActivityPrePopulation.json"))
+        .expectedVariables(Map.of("checkComplianceFormActivity_completer", testUserName))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("addDecisionDenyFormActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData("/json/create-app-exclude/form-data/addDecisionDenyFormActivity.json")
+        .build());
 
-    BpmnAwareTests.assertThat(processInstance).isWaitingAt("addLetterDataFormForDenyActivity");
-    completeTask("addLetterDataFormForDenyActivity", processInstanceId,
-        "/json/create-app-exclude/addLetterDataFormForDenyActivity.json");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("addLetterDataFormForDenyActivity")
+        .formKey("shared-add-letter-data")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(deserializeFormData(
+            "/json/create-app-exclude/form-data/addLetterDataFormForDenyActivityPrePopulation.json"))
+        .expectedVariables(Map.of("addDecisionDenyFormActivity_completer", testUserName))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("addLetterDataFormForDenyActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData(
+            "/json/create-app-exclude/form-data/addLetterDataFormForDenyActivity.json")
+        .build());
 
-    BpmnAwareTests.assertThat(processInstance).isWaitingAt("signAppDenyFormActivity");
-    completeTask("signAppDenyFormActivity", processInstanceId,
-        "/json/create-app-exclude/signAppDenyFormActivity.json");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("signAppDenyFormActivity")
+        .formKey("create-app-exclude-bp-sign-app-deny")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(deserializeFormData(
+            "/json/create-app-exclude/form-data/signAppDenyFormActivity.json"))
+        .expectedVariables(Map.of("addLetterDataFormForDenyActivity_completer", testUserName))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("signAppDenyFormActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData("/json/create-app-exclude/form-data/signAppDenyFormActivity.json")
+        .build());
 
-    //then
     BpmnAwareTests.assertThat(processInstance)
         .hasPassed("addApplicationFormActivity", "checkComplianceFormActivity",
             "addDecisionDenyFormActivity", "addLetterDataFormForDenyActivity",
@@ -222,7 +366,7 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
         .isEnded();
 
     assertSystemSignature(processInstanceId, "system_signature_ceph_key",
-        "/json/create-app-exclude/digitalSignatureNoConsiderCephContent.json");
+        "/json/create-app-exclude/dso/digitalSignatureNoConsiderCephContent.json");
   }
 
   @Test
@@ -235,50 +379,34 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("last-laboratory-solution")
         .queryParams(Maps.of("laboratoryId", laboratoryId))
-        .response("/json/create-app-exclude/lastLaboratorySolutionDenyResponse.json")
+        .response("/json/create-app-exclude/data-factory/lastLaboratorySolutionDenyResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("application-type-equal-constant-code")
         .queryParams(Maps.of("constantCode", "ADD"))
-        .response("/json/create-app-exclude/applicationTypeEqualConstantCodeAddResponse.json")
+        .response(
+            "/json/create-app-exclude/data-factory/applicationTypeEqualConstantCodeAddResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("solution-type-equal-constant-code")
         .queryParams(Maps.of("constantCode", "ADD"))
-        .response("/json/create-app-exclude/solutionTypeEqualConstantCodeAddResponse.json")
+        .response(
+            "/json/create-app-exclude/data-factory/solutionTypeEqualConstantCodeAddResponse.json")
         .build());
 
-    var resultMap = startProcessInstanceForError(laboratoryId);
+    var startFormData = deserializeFormData(
+        "/json/create-app-exclude/form-data/startFormDataActivity.json");
+    var resultMap = startProcessInstanceWithStartFormForError(PROCESS_DEFINITION_KEY, testUserToken,
+        startFormData);
 
     var errors = resultMap.get("details").get("errors");
     Assertions.assertThat(errors).hasSize(1);
     Assertions.assertThat(errors.get(0)).contains(Map.entry("field", "laboratory"),
         Map.entry("message", "Заява на видалення вже створена"),
         Map.entry("value", laboratoryId));
-  }
-
-  private String startProcessInstanceWithFormAndGetId(String labId) throws JsonProcessingException {
-    return startProcessInstanceWithStartFormAndGetId(PROCESS_DEFINITION_ID, testUserToken,
-        startFormData(labId));
-  }
-
-  private FormDataDto startFormData(String labId) {
-    var data = new LinkedHashMap<String, Object>();
-    data.put("laboratory", Map.of("laboratoryId", labId));
-    return FormDataDto.builder().data(data).build();
-  }
-
-  @SuppressWarnings("unchecked")
-  private Map<String, Map<String, List<Map<String, String>>>> startProcessInstanceForError(
-      String labId) throws JsonProcessingException {
-    var resultMap = startProcessInstanceWithStartForm(PROCESS_DEFINITION_ID, testUserToken,
-        startFormData(labId));
-    return (Map<String, Map<String, List<Map<String, String>>>>) resultMap;
   }
 }

@@ -3,7 +3,9 @@ package com.epam.digital.data.platform.bpms.it;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import com.epam.digital.data.platform.bpms.api.dto.HistoryUserTaskDto;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.junit.Test;
 
 public class HistoricTaskControllerIT extends BaseIT {
@@ -21,12 +23,16 @@ public class HistoricTaskControllerIT extends BaseIT {
         .getId();
     postForNoContent(String.format("api/task/%s/complete", taskId), "{}");
 
-    var result = postForObject("api/extended/history/task",
+    var historyUserTasks = postForObject("api/extended/history/task",
         "{\"assignee\": \"testuser\", \"finished\": true}", HistoryUserTaskDto[].class);
 
+    var result = Arrays.stream(historyUserTasks)
+        .filter(historyUserTaskDto -> processId.equals(historyUserTaskDto.getProcessInstanceId()))
+        .collect(Collectors.toList());
+
     assertThat(result).isNotNull();
-    assertThat(result[0].getAssignee()).isEqualTo("testuser");
-    assertThat(result[0].getEndTime()).isNotNull();
-    assertThat(result[0].getProcessDefinitionName()).isNotNull();
+    assertThat(result.get(0).getAssignee()).isEqualTo("testuser");
+    assertThat(result.get(0).getEndTime()).isNotNull();
+    assertThat(result.get(0).getProcessDefinitionName()).isNotNull();
   }
 }

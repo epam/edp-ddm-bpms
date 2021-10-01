@@ -40,8 +40,8 @@ import com.epam.digital.data.platform.bpms.delegate.connector.ExcerptConnectorSt
 import com.epam.digital.data.platform.bpms.delegate.connector.UserSettingsConnectorReadDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.UserSettingsConnectorUpdateDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.keycloak.citizen.KeycloakAddCitizenRoleConnectorDelegate;
-import com.epam.digital.data.platform.bpms.delegate.connector.keycloak.officer.KeycloakGetOfficerUsersConnectorDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.keycloak.citizen.KeycloakRemoveCitizenRoleConnectorDelegate;
+import com.epam.digital.data.platform.bpms.delegate.connector.keycloak.officer.KeycloakGetOfficerUsersConnectorDelegate;
 import com.epam.digital.data.platform.bpms.delegate.connector.registry.SearchSubjectsEdrRegistryConnectorDelegate;
 import com.epam.digital.data.platform.bpms.delegate.dto.EdrRegistryConnectorResponse;
 import com.epam.digital.data.platform.bpms.delegate.dto.KeycloakUserDto;
@@ -56,7 +56,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -376,14 +375,25 @@ public abstract class BaseBpmnTest {
     Assertions.assertThat(signatureCephKey)
         .matches("lowcode_" + currentProcessInstanceId + "_.+_system_signature_ceph_key");
 
-    var cephDoc = cephService.getContent(cephBucketName, signatureCephKey);
-    Assertions.assertThat(cephDoc).isPresent();
+    assertSignature(signatureCephKey, cephContent);
+  }
 
-    var actual = objectMapper.readerForMapOf(Object.class).readValue(cephDoc.get());
-    var expected = objectMapper.readerForMapOf(Object.class)
+  protected void assertSystemSignatureBathCreationForOneOperation(String processInstanceId,
+      String cephContent) {
+    var systemSignatureCephKey = String
+        .format("lowcode_%s_system_signature_ceph_key_0", processInstanceId);
+    assertSignature(systemSignatureCephKey, cephContent);
+  }
+
+  @SneakyThrows
+  private void assertSignature(String systemSignatureCephKey, String cephContent) {
+    var signature = cephService.getContent(cephBucketName, systemSignatureCephKey);
+    Assertions.assertThat(signature).isNotEmpty();
+
+    var signatureMap = objectMapper.readerForMapOf(Object.class).readValue(signature.get());
+    var expectedSignatureMap = objectMapper.readerForMapOf(Object.class)
         .readValue(TestUtils.getContent(cephContent));
-
-    Assertions.assertThat(actual).isEqualTo(expected);
+    Assertions.assertThat(signatureMap).isEqualTo(expectedSignatureMap);
   }
 
   protected void startProcessInstanceWithStartForm(String processDefinitionId,
@@ -392,12 +402,6 @@ public abstract class BaseBpmnTest {
     startProcessInstance(processDefinitionId,
         Map.of(Constants.BPMS_START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY,
             "initiator", testUserName));
-  }
-
-  protected void startProcessInstanceWithStartForm(String processDefinitionId,
-      LinkedHashMap<String, Object> data) {
-    startProcessInstanceWithStartForm(processDefinitionId,
-        FormDataDto.builder().data(data).build());
   }
 
   @RequiredArgsConstructor

@@ -1,10 +1,14 @@
 package com.epam.digital.data.platform.bpms.it.camunda.bpmn;
 
+import static com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil.processInstance;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
+
+import com.epam.digital.data.platform.bpms.api.constant.Constants;
+import com.epam.digital.data.platform.bpms.camunda.dto.AssertWaitingActivityDto;
+import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
+import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
-import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.groovy.util.Maps;
 import org.camunda.bpm.engine.test.Deployment;
@@ -14,26 +18,25 @@ import org.springframework.http.HttpMethod;
 
 public class UpdateLabBpmnIT extends BaseBpmnIT {
 
+  private static final String PROCESS_DEFINITION_ID = "update-lab";
+
   @Test
   @Deployment(resources = {"bpmn/update-lab.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void test() throws IOException {
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("laboratory")
         .resourceId("d2943186-0f1f-4a77-9de9-a5a59c07db02")
-        .response("/json/update-lab/laboratoryByIdResponse.json")
+        .response("/json/update-lab/data-factory/laboratoryByIdResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("koatuu")
         .resourceId("92cb1462-ec57-4b87-9e8d-594e0c322996")
-        .response("/json/update-lab/koatuuByIdResponse.json")
+        .response("/json/update-lab/data-factory/koatuuByIdResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -41,86 +44,120 @@ public class UpdateLabBpmnIT extends BaseBpmnIT {
         .queryParams(Maps.of("name", "labName", "edrpou", "23510933"))
         .response("[]")
         .build());
-
     stubDigitalSignatureRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .requestBody("/json/update-lab/digitalSignatureRequestBody.json")
+        .requestBody("/json/update-lab/dso/digitalSignatureRequestBody.json")
         .response("{\"signature\": \"test\"}")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("koatuu-equal-koatuu-id-name")
         .queryParams(Map.of("koatuuId", "92cb1462-ec57-4b87-9e8d-594e0c322996"))
-        .response("/json/update-lab/koatuuEqualKoatuuIdName.json")
+        .response("/json/update-lab/data-factory/koatuuEqualKoatuuIdName.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("koatuu")
         .resourceId("92cb1462-ec57-4b87-9e8d-594e0c322997")
-        .response("/json/update-lab/koatuuOblByIdResponse.json")
+        .response("/json/update-lab/data-factory/koatuuOblByIdResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("ownership")
         .resourceId("19aab23b-1e49-4064-8f7e-39735ece4388")
-        .response("/json/update-lab/findOwnershipResponse.json")
+        .response("/json/update-lab/data-factory/findOwnershipResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("kopfg")
         .resourceId("a790eb71-6015-4f40-995b-ad474e8eddca")
-        .response("/json/update-lab/findKopfgResponse.json")
+        .response("/json/update-lab/data-factory/findKopfgResponse.json")
         .build());
 
-    //start process
-    var processInstanceId = startProcessInstanceAndGetId();
-    var processInstance = runtimeService.createProcessInstanceQuery()
-        .processInstanceId(processInstanceId).list().get(0);
+    var data = deserializeFormData("/json/update-lab/form-data/start_event.json");
+    var processInstanceId = startProcessInstanceWithStartFormAndGetId(PROCESS_DEFINITION_ID,
+        testUserToken, data);
+    var processInstance = processInstance(processInstanceId);
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.PUT)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("laboratory")
         .resourceId("d2943186-0f1f-4a77-9de9-a5a59c07db02")
-        .requestBody("/json/update-lab/updateLabRequestBody.json")
+        .requestBody("/json/update-lab/data-factory/updateLabRequestBody.json")
         .response("{}")
         .build());
 
-    BpmnAwareTests.assertThat(processInstance).isWaitingAt("viewLabDataFormActivity");
-    completeTask("viewLabDataFormActivity", processInstanceId,
-        "/json/update-lab/viewLabDataFormActivity.json");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_ID)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("viewLabDataFormActivity")
+        .formKey("shared-view-lab-data")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(
+            deserializeFormData("/json/update-lab/form-data/viewLabDataFormPrePopulationActivity.json"))
+        .expectedVariables(Map.of("initiator", testUserName))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("viewLabDataFormActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData("/json/update-lab/form-data/viewLabDataFormActivity.json")
+        .build());
 
-    BpmnAwareTests.assertThat(processInstance).isWaitingAt("updateLabFormActivity");
-    completeTask("updateLabFormActivity", processInstanceId,
-        "/json/update-lab/updateLabFormActivity.json");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_ID)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("updateLabFormActivity")
+        .formKey("update-lab-bp-change-lab-data")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(
+            deserializeFormData("/json/update-lab/form-data/viewLabDataFormActivity.json"))
+        .expectedVariables(
+            Map.of("viewLabDataFormActivity_completer", testUserName))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("updateLabFormActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData("/json/update-lab/form-data/updateLabFormActivity.json")
+        .build());
 
-    BpmnAwareTests.assertThat(processInstance).isWaitingAt("signLabFormActivity");
-    completeTask("signLabFormActivity", processInstanceId,
-        "/json/update-lab/signLabFormActivity.json");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_ID)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("signLabFormActivity")
+        .formKey("shared-sign-lab")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(
+            deserializeFormData("/json/update-lab/form-data/updateLabFormActivity.json"))
+        .expectedVariables(
+            Map.of("updateLabFormActivity_completer", testUserName))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("signLabFormActivity")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData("/json/update-lab/form-data/signLabFormActivity.json")
+        .build());
 
-    //then
-    BpmnAwareTests.assertThat(processInstance)
-        .hasPassed("viewLabDataFormActivity", "updateLabFormActivity")
-        .isEnded();
+    addExpectedVariable("signLabFormActivity_completer", testUserName);
+    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT,
+        "Дані про лабораторію оновлені");
 
     assertSystemSignature(processInstanceId, "system_signature_ceph_key",
-        "/json/update-lab/digitalSignatureCephContent.json");
-  }
-
-  private String startProcessInstanceAndGetId() throws JsonProcessingException {
-    var data = new LinkedHashMap<String, Object>();
-    data.put("subjectType", "LEGAL");
-    data.put("edrpou", "77777777");
-    data.put("subject", Map.of("subjectId", "activeSubject"));
-    data.put("laboratory", Map.of("laboratoryId", "d2943186-0f1f-4a77-9de9-a5a59c07db02"));
-    return startProcessInstanceWithStartFormAndGetId("update-lab", testUserToken,
-        FormDataDto.builder().data(data).build());
+        "/json/update-lab/dso/digitalSignatureCephContent.json");
+    BpmnAwareTests.assertThat(processInstance)
+        .hasPassed("viewLabDataFormActivity", "updateLabFormActivity", "signLabFormActivity")
+        .isEnded();
+    assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
   }
 }

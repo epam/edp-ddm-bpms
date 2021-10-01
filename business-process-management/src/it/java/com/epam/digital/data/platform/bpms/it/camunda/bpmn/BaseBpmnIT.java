@@ -244,19 +244,8 @@ public abstract class BaseBpmnIT extends BaseIT {
     }
   }
 
-  protected void addExpectedCephContent(String processInstanceId, String taskDefinitionKey,
-      String cephContent) {
-    var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, processInstanceId);
-
-    expectedCephStorage.put(cephKey, deserializeFormData(cephContent));
-  }
-
   protected void addExpectedVariable(String name, Object value) {
     expectedVariablesMap.put(name, value);
-  }
-
-  protected void addCompleterUsernameVariable(String taskDefinitionId, Object value) {
-    expectedVariablesMap.put(String.format("%s_completer", taskDefinitionId), value);
   }
 
   @SuppressWarnings("unchecked")
@@ -266,6 +255,15 @@ public abstract class BaseBpmnIT extends BaseIT {
     return (Map<String, Map<String, List<Map<String, String>>>>) postForObject(
         String.format("api/process-definition/key/%s/start", processDefinitionKey),
         "{}", Map.class, token);
+  }
+
+  @SuppressWarnings("unchecked")
+  protected Map<String, Map<String, List<Map<String, String>>>> startProcessInstanceWithStartFormForError(
+      String processDefinitionKey, String token, FormDataDto formDataDto)
+      throws JsonProcessingException {
+    var resultMap = startProcessInstanceWithStartForm(processDefinitionKey, token,
+        formDataDto);
+    return (Map<String, Map<String, List<Map<String, String>>>>) resultMap;
   }
 
   protected String startProcessInstance(String processDefinitionKey, String token)
@@ -307,7 +305,6 @@ public abstract class BaseBpmnIT extends BaseIT {
     assertCephContent();
   }
 
-  @SneakyThrows
   protected void assertSystemSignature(String processInstanceId, String variableName,
       String cephContent) {
     var variables = historyService().createHistoricVariableInstanceQuery()
@@ -321,19 +318,58 @@ public abstract class BaseBpmnIT extends BaseIT {
     Assertions.assertThat(signatureCephKey)
         .matches("lowcode_" + processInstanceId + "_.+_system_signature_ceph_key");
 
-    var cephDoc = cephService.getContent(cephBucketName, signatureCephKey);
-    Assertions.assertThat(cephDoc).isPresent();
+    assertSignature(signatureCephKey, cephContent);
+  }
 
-    var actual = objectMapper.readerForMapOf(Object.class).readValue(cephDoc.get());
-    var expected = objectMapper.readerForMapOf(Object.class)
+  protected void assertSystemSignatureBathCreationForOneOperation(String processInstanceId,
+      String cephContent) {
+    var systemSignatureCephKey = String
+        .format("lowcode_%s_system_signature_ceph_key_0", processInstanceId);
+    assertSignature(systemSignatureCephKey, cephContent);
+  }
+
+  @SneakyThrows
+  private void assertSignature(String systemSignatureCephKey, String cephContent) {
+    var signature = cephService.getContent(cephBucketName, systemSignatureCephKey);
+    Assertions.assertThat(signature).isNotEmpty();
+
+    var signatureMap = objectMapper.readerForMapOf(Object.class).readValue(signature.get());
+    var expectedSignatureMap = objectMapper.readerForMapOf(Object.class)
         .readValue(TestUtils.getContent(cephContent));
-
-    Assertions.assertThat(actual).isEqualTo(expected);
+    Assertions.assertThat(signatureMap).isEqualTo(expectedSignatureMap);
   }
 
   protected void executeWaitingJob(String activityDefinitionId) {
     var jobs = managementService().createJobQuery().activityId(activityDefinitionId).list();
     Assertions.assertThat(jobs).hasSize(1);
     jobs.forEach(job -> managementService().executeJob(job.getId()));
+  }
+
+
+  @SneakyThrows
+  protected String addFieldToFormDataAndReturn(String form, String fieldName, Object filedValue) {
+    var formData = TestUtils.getContent(form);
+    var formDataMap = objectMapper.readValue(formData, Map.class);
+    ((Map) formDataMap.get("data")).put(fieldName, filedValue);
+    return objectMapper.writeValueAsString(formDataMap);
+  }
+
+  @SneakyThrows
+  protected String addFiledToJson(String json, String fieldName, Object filedValue) {
+    var data = TestUtils.getContent(json);
+    var formDataMap = objectMapper.readValue(data, Map.class);
+    formDataMap.put(fieldName, filedValue);
+    return objectMapper.writeValueAsString(formDataMap);
+  }
+
+  @SneakyThrows
+  protected String addFiledToSignatureFormData(String json, String fieldName, Object filedValue) {
+    var data = TestUtils.getContent(json);
+    var jsonDataMap = objectMapper.readValue(data, Map.class);
+    var dataMap = objectMapper.readValue((String) jsonDataMap.get("data"), Map.class);
+    dataMap.put(fieldName, filedValue);
+    var dataMapStr = objectMapper.writeValueAsString(dataMap);
+    jsonDataMap.put("data", dataMapStr);
+    return objectMapper.writeValueAsString(jsonDataMap);
   }
 }

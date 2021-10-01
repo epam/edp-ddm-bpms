@@ -1,0 +1,54 @@
+{
+  "data": {
+    "name": "labName",
+    "registrationNo": "1234567890-primary-add",
+    "FactorsPhys": [
+      {
+        "factorId": "FactorsPhys1",
+        "name": "string"
+      }
+    ],
+    "laborfact": [
+      {
+        "factorId": "laborfact1",
+        "name": "string"
+      }
+    ],
+    "biofactors": [
+      {
+        "factorId": "biofactors",
+        "name": "string"
+      }
+    ],
+    "chemfactgost": [
+      {
+        "factorId": "chemfactgost1",
+        "name": "string"
+      }
+    ],
+    "chemfacthyge": [
+      {
+        "factorId": "chemfacthyge1",
+        "name": "string"
+      }
+    ],
+    "chemfactobrv": [
+      {
+        "factorId": "chemfactobrv1",
+        "name": "string"
+      }
+    ],
+    "chemfactodovilni": [
+      {
+        "factorId": "chemfactodovilni1",
+        "name": "string"
+      }
+    ],
+    "factorPesticide": [
+      {
+        "factorId": "factorPesticide",
+        "name": "string"
+      }
+    ]
+  }
+}

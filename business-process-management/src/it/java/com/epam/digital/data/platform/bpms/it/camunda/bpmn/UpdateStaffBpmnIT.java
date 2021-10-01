@@ -1,9 +1,14 @@
 package com.epam.digital.data.platform.bpms.it.camunda.bpmn;
 
+import static com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil.processInstance;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
+
+import com.epam.digital.data.platform.bpms.api.constant.Constants;
+import com.epam.digital.data.platform.bpms.camunda.dto.AssertWaitingActivityDto;
+import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
+import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
-import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
@@ -12,79 +17,102 @@ import org.springframework.http.HttpMethod;
 
 public class UpdateStaffBpmnIT extends BaseBpmnIT {
 
+  private static final String PROCESS_DEFINITION_ID = "update-personnel-bp";
+
   @Test
   @Deployment(resources = {"bpmn/update-personnel.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void test() throws IOException {
-    var staffId = "02e68684-1335-47f0-9bd6-17d937267527";
-    var labId = "3758f3e6-937a-4ef9-a8b6-c95671241abd";
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("staff")
-        .resourceId(staffId)
-        .response("/json/update-staff/getStaffById.json")
+        .resourceId("02e68684-1335-47f0-9bd6-17d937267527")
+        .response("/json/update-staff/data-factory/getStaffById.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("laboratory")
-        .resourceId(labId)
-        .response("/json/update-staff/laboratoryByIdResponse.json")
+        .resourceId("3758f3e6-937a-4ef9-a8b6-c95671241abd")
+        .response("/json/update-staff/data-factory/laboratoryByIdResponse.json")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("staff-status")
         .resourceId("cc974d44-362c-4caf-8a99-67780635ca68")
-        .response("/json/update-staff/getStaffStatusById.json")
+        .response("/json/update-staff/data-factory/getStaffStatusById.json")
         .build());
-
     stubDigitalSignatureRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .requestBody("/json/update-staff/digitalSignatureRequestBody.json")
+        .requestBody("/json/update-staff/dso/digitalSignatureRequestBody.json")
         .response("{\"signature\": \"test\"}")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.PUT)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("staff")
         .resourceId("02e68684-1335-47f0-9bd6-17d937267527")
-        .requestBody("/json/update-staff/updateStaffRequestBody.json")
-        .response("/json/update-staff/updateStaffRequestBody.json")
+        .requestBody("/json/update-staff/data-factory/updateStaffRequestBody.json")
+        .response("/json/update-staff/data-factory/updateStaffRequestBody.json")
         .build());
 
-    //start process
-    var data = new LinkedHashMap<String, Object>();
-    data.put("staff", Map.of("staffId", staffId));
-    data.put("laboratory", Map.of("laboratoryId", labId));
-    var processInstanceId = startProcessInstanceWithStartFormAndGetId("update-personnel-bp",
-        testUserToken, FormDataDto.builder().data(data).build());
-    var processInstance = runtimeService.createProcessInstanceQuery()
-        .processInstanceId(processInstanceId).singleResult();
+    var data = deserializeFormData("/json/update-staff/form-data/start_event.json");
+    var processInstanceId = startProcessInstanceWithStartFormAndGetId(PROCESS_DEFINITION_ID,
+        testUserToken, data);
+    var processInstance = processInstance(processInstanceId);
 
-    BpmnAwareTests.assertThat(processInstance)
-        .isWaitingAt("Activity_update-personnel-bp-update-personnel");
-    completeTask("Activity_update-personnel-bp-update-personnel", processInstanceId,
-        "/json/update-staff/Activity_update-personnel-bp-update-personnel.json");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_ID)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("Activity_update-personnel-bp-update-personnel")
+        .formKey("update-personnel-bp-update-personnel")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(deserializeFormData(
+            "/json/update-staff/form-data/updatePersonnelPrePopulation.json"))
+        .expectedVariables(Map.of("initiator", testUserName))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("Activity_update-personnel-bp-update-personnel")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData(
+            "/json/update-staff/form-data/Activity_update-personnel-bp-update-personnel.json")
+        .build());
 
-    BpmnAwareTests.assertThat(processInstance)
-        .isWaitingAt("Activity_update-personnel-bp-sign-personnel");
-    completeTask("Activity_update-personnel-bp-sign-personnel", processInstanceId,
-        "/json/update-staff/Activity_update-personnel-bp-sign-personnel.json");
+    CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
+        .processDefinitionKey(PROCESS_DEFINITION_ID)
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("Activity_update-personnel-bp-sign-personnel")
+        .formKey("update-personnel-bp-sign-personnel")
+        .assignee(testUserName)
+        .expectedFormDataPrePopulation(deserializeFormData(
+            "/json/update-staff/form-data/Activity_update-personnel-bp-update-personnel.json"))
+        .expectedVariables(
+            Map.of("Activity_update-personnel-bp-update-personnel_completer", testUserName))
+        .build());
+    completeTask(CompleteActivityDto.builder()
+        .processInstanceId(processInstanceId)
+        .activityDefinitionId("Activity_update-personnel-bp-sign-personnel")
+        .completerUserName(testUserName)
+        .completerAccessToken(testUserToken)
+        .expectedFormData(
+            "/json/update-staff/form-data/Activity_update-personnel-bp-sign-personnel.json")
+        .build());
 
-    //then
+    addExpectedVariable("Activity_update-personnel-bp-sign-personnel_completer", testUserName);
+    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT,
+        "Дані про кадровий склад оновлені");
+
+    assertSystemSignature(processInstanceId, "system_signature_ceph_key",
+        "/json/update-staff/dso/digitalSignatureCephContent.json");
     BpmnAwareTests.assertThat(processInstance)
         .hasPassed(
             "Activity_update-personnel-bp-update-personnel",
             "Activity_update-personnel-bp-sign-personnel")
         .isEnded();
-
-    assertSystemSignature(processInstanceId, "system_signature_ceph_key",
-        "/json/update-staff/digitalSignatureCephContent.json");
+    assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
   }
 }

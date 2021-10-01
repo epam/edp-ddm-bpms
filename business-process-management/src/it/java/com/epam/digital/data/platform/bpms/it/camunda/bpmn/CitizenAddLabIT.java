@@ -21,6 +21,8 @@ import org.springframework.http.HttpMethod;
 
 public class CitizenAddLabIT extends BaseBpmnIT {
 
+  private static final String PROCESS_DEFINITION_KEY = "citizen-add-lab";
+
   private final String taskDispatcherUserName = "taskdispatcher";
   private String taskDispatcherToken;
 
@@ -60,7 +62,7 @@ public class CitizenAddLabIT extends BaseBpmnIT {
         .response("{\"signature\": \"test\"}")
         .build());
 
-    var processInstanceId = startProcessInstance("citizen-add-lab", testUserToken);
+    var processInstanceId = startProcessInstance(PROCESS_DEFINITION_KEY, testUserToken);
     var processInstance = processInstance(processInstanceId);
 
     stubDataFactoryRequest(StubData.builder()
@@ -74,7 +76,7 @@ public class CitizenAddLabIT extends BaseBpmnIT {
         .build());
 
     CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
-        .processDefinitionKey("citizen-add-lab")
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
         .processInstanceId(processInstanceId)
         .activityDefinitionId("addLabCitizenActivity")
         .formKey("citizen-add-lab-bp-add-lab")
@@ -83,7 +85,6 @@ public class CitizenAddLabIT extends BaseBpmnIT {
             "/json/citizen-add-lab/form-data/addLabCitizenActivityPrePopulation.json"))
         .expectedVariables(Map.of("initiator", "testuser"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("addLabCitizenActivity")
@@ -93,7 +94,7 @@ public class CitizenAddLabIT extends BaseBpmnIT {
         .build());
 
     CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
-        .processDefinitionKey("citizen-add-lab")
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
         .processInstanceId(processInstanceId)
         .activityDefinitionId("signLabCitizenActivity")
         .formKey("shared-citizen-sign-lab")
@@ -103,7 +104,6 @@ public class CitizenAddLabIT extends BaseBpmnIT {
         .expectedVariables(Map.of("addLabCitizenActivity_completer", "testuser"))
         .extensionElements(Map.of("eSign", "true", "ENTREPRENEUR", "true", "LEGAL", "true"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("signLabCitizenActivity")
@@ -113,7 +113,7 @@ public class CitizenAddLabIT extends BaseBpmnIT {
         .build());
 
     CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
-        .processDefinitionKey("citizen-add-lab")
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
         .processInstanceId(processInstanceId)
         .activityDefinitionId("dispatchTaskActivity")
         .formKey("shared-dispatch-task")
@@ -122,7 +122,6 @@ public class CitizenAddLabIT extends BaseBpmnIT {
         .expectedVariables(Map.of("signLabCitizenActivity_completer", "testuser",
             "officerUsers", Collections.emptyList(), "subjectId", "activeSubject"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("dispatchTaskActivity")
@@ -132,7 +131,7 @@ public class CitizenAddLabIT extends BaseBpmnIT {
         .build());
 
     CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
-        .processDefinitionKey("citizen-add-lab")
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
         .processInstanceId(processInstanceId)
         .activityDefinitionId("checkLabOfficerActivity")
         .formKey("shared-officer-check-lab")
@@ -142,7 +141,6 @@ public class CitizenAddLabIT extends BaseBpmnIT {
         .expectedVariables(Map.of("dispatchTaskActivity_completer", taskDispatcherUserName,
             "officerAssignee", testuser2UserName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("checkLabOfficerActivity")
@@ -152,7 +150,7 @@ public class CitizenAddLabIT extends BaseBpmnIT {
         .build());
 
     CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
-        .processDefinitionKey("citizen-add-lab")
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
         .processInstanceId(processInstanceId)
         .activityDefinitionId("signLabOfficerActivity")
         .formKey("shared-officer-sign-lab")
@@ -161,7 +159,6 @@ public class CitizenAddLabIT extends BaseBpmnIT {
             "/json/citizen-add-lab/form-data/signLabOfficerActivityPrePopulation.json"))
         .expectedVariables(Map.of("checkLabOfficerActivity_completer", testuser2UserName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("signLabOfficerActivity")
@@ -178,7 +175,6 @@ public class CitizenAddLabIT extends BaseBpmnIT {
 
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
   }
 
   @Test
@@ -201,11 +197,11 @@ public class CitizenAddLabIT extends BaseBpmnIT {
         .build());
     mockKeycloakGetUsersByRole("officer", "[]");
 
-    var processInstanceId = startProcessInstance("citizen-add-lab", testUserToken);
+    var processInstanceId = startProcessInstance(PROCESS_DEFINITION_KEY, testUserToken);
     var processInstance = processInstance(processInstanceId);
 
     CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
-        .processDefinitionKey("citizen-add-lab")
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
         .processInstanceId(processInstanceId)
         .activityDefinitionId("addLabCitizenActivity")
         .formKey("citizen-add-lab-bp-add-lab")
@@ -214,7 +210,6 @@ public class CitizenAddLabIT extends BaseBpmnIT {
             "/json/citizen-add-lab/form-data/addLabCitizenActivityPrePopulation.json"))
         .expectedVariables(Map.of("initiator", "testuser"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("addLabCitizenActivity")
@@ -224,7 +219,7 @@ public class CitizenAddLabIT extends BaseBpmnIT {
         .build());
 
     CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
-        .processDefinitionKey("citizen-add-lab")
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
         .processInstanceId(processInstanceId)
         .activityDefinitionId("signLabCitizenActivity")
         .formKey("shared-citizen-sign-lab")
@@ -234,7 +229,6 @@ public class CitizenAddLabIT extends BaseBpmnIT {
         .expectedVariables(Map.of("addLabCitizenActivity_completer", "testuser"))
         .extensionElements(Map.of("eSign", "true", "ENTREPRENEUR", "true", "LEGAL", "true"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("signLabCitizenActivity")
@@ -244,7 +238,7 @@ public class CitizenAddLabIT extends BaseBpmnIT {
         .build());
 
     CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
-        .processDefinitionKey("citizen-add-lab")
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
         .processInstanceId(processInstanceId)
         .activityDefinitionId("dispatchTaskActivity")
         .formKey("shared-dispatch-task")
@@ -253,7 +247,6 @@ public class CitizenAddLabIT extends BaseBpmnIT {
         .expectedVariables(Map.of("signLabCitizenActivity_completer", "testuser",
             "officerUsers", Collections.emptyList(), "subjectId", "activeSubject"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("dispatchTaskActivity")
@@ -263,7 +256,7 @@ public class CitizenAddLabIT extends BaseBpmnIT {
         .build());
 
     CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
-        .processDefinitionKey("citizen-add-lab")
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
         .processInstanceId(processInstanceId)
         .activityDefinitionId("checkLabOfficerActivity")
         .formKey("shared-officer-check-lab")
@@ -273,7 +266,6 @@ public class CitizenAddLabIT extends BaseBpmnIT {
         .expectedVariables(Map.of("dispatchTaskActivity_completer", taskDispatcherUserName,
             "officerAssignee", testuser2UserName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .activityDefinitionId("checkLabOfficerActivity")
         .completerUserName(testuser2UserName)
@@ -287,7 +279,6 @@ public class CitizenAddLabIT extends BaseBpmnIT {
 
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
   }
 
   @Test
@@ -305,7 +296,7 @@ public class CitizenAddLabIT extends BaseBpmnIT {
     var processInstanceId = startProcessInstance("citizen-add-lab", testUserToken);
 
     CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
-        .processDefinitionKey("citizen-add-lab")
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
         .processInstanceId(processInstanceId)
         .activityDefinitionId("addLabCitizenActivity")
         .formKey("citizen-add-lab-bp-add-lab")
@@ -314,7 +305,6 @@ public class CitizenAddLabIT extends BaseBpmnIT {
             "/json/citizen-add-lab/form-data/addLabCitizenActivityPrePopulation.json"))
         .expectedVariables(Map.of("initiator", "testuser"))
         .build());
-
     var result = completeTaskWithError(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("addLabCitizenActivity")
@@ -324,7 +314,7 @@ public class CitizenAddLabIT extends BaseBpmnIT {
         .build());
 
     CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
-        .processDefinitionKey("citizen-add-lab")
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
         .processInstanceId(processInstanceId)
         .activityDefinitionId("addLabCitizenActivity")
         .formKey("citizen-add-lab-bp-add-lab")
@@ -345,7 +335,7 @@ public class CitizenAddLabIT extends BaseBpmnIT {
   public void disabledSubjectTest() throws JsonProcessingException {
     stubSearchSubjects("/xml/citizen-add-lab/searchSubjectsCancelledResponse.xml");
 
-    var result = startProcessInstanceWithError("citizen-add-lab", testUserToken);
+    var result = startProcessInstanceWithError(PROCESS_DEFINITION_KEY, testUserToken);
 
     var errors = result.get("details").get("errors");
     Assertions.assertThat(errors).hasSize(1);

@@ -82,7 +82,6 @@ public class CitizenAddLabBpmnTest extends BaseBpmnTest {
             "/json/citizen-add-lab/form-data/addLabCitizenActivityPrePopulation.json"))
         .expectedVariables(Map.of("initiator", "testuser"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .activityDefinitionId("addLabCitizenActivity")
         .completerUserName(testUserName)
@@ -101,7 +100,6 @@ public class CitizenAddLabBpmnTest extends BaseBpmnTest {
         .expectedVariables(Map.of("addLabCitizenActivity_completer", "testuser"))
         .extensionElements(Map.of("eSign", "true", "ENTREPRENEUR", "true", "LEGAL", "true"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .activityDefinitionId("signLabCitizenActivity")
         .completerUserName(testUserName)
@@ -119,7 +117,6 @@ public class CitizenAddLabBpmnTest extends BaseBpmnTest {
         .expectedVariables(Map.of("signLabCitizenActivity_completer", "testuser",
             "officerUsers", Collections.emptyList(), "subjectId", "activeSubject"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .activityDefinitionId("dispatchTaskActivity")
         .completerUserName(taskDispatcherUserName)
@@ -138,7 +135,6 @@ public class CitizenAddLabBpmnTest extends BaseBpmnTest {
         .expectedVariables(Map.of("dispatchTaskActivity_completer", taskDispatcherUserName,
             "officerAssignee", testuser2UserName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .activityDefinitionId("checkLabOfficerActivity")
         .completerUserName(testuser2UserName)
@@ -157,7 +153,6 @@ public class CitizenAddLabBpmnTest extends BaseBpmnTest {
         .expectedVariables(Map.of("checkLabOfficerActivity_completer", testuser2UserName))
         .extensionElements(Map.of("eSign", "true"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .activityDefinitionId("signLabOfficerActivity")
         .completerUserName(testuser2UserName)
@@ -165,15 +160,14 @@ public class CitizenAddLabBpmnTest extends BaseBpmnTest {
         .expectedFormData("/json/citizen-add-lab/form-data/signLabOfficerActivityUnique.json")
         .build());
 
-    assertSystemSignature("system_signature_ceph_key",
-        "/json/citizen-add-lab/dso/digitalSignatureCephContent.json");
-
     addExpectedVariable("signLabOfficerActivity_completer", testuser2UserName);
     addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT, "Лабораторія створена");
 
+    assertSystemSignature("system_signature_ceph_key",
+        "/json/citizen-add-lab/dso/digitalSignatureCephContent.json");
+
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-
     mockServer.verify();
   }
 
@@ -209,7 +203,6 @@ public class CitizenAddLabBpmnTest extends BaseBpmnTest {
             "/json/citizen-add-lab/form-data/addLabCitizenActivityPrePopulation.json"))
         .expectedVariables(Map.of("initiator", "testuser"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .activityDefinitionId("addLabCitizenActivity")
         .completerUserName(testUserName)
@@ -228,7 +221,6 @@ public class CitizenAddLabBpmnTest extends BaseBpmnTest {
         .expectedVariables(Map.of("addLabCitizenActivity_completer", "testuser"))
         .extensionElements(Map.of("eSign", "true", "ENTREPRENEUR", "true", "LEGAL", "true"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .activityDefinitionId("signLabCitizenActivity")
         .completerUserName(testUserName)
@@ -246,7 +238,6 @@ public class CitizenAddLabBpmnTest extends BaseBpmnTest {
         .expectedVariables(Map.of("signLabCitizenActivity_completer", "testuser",
             "officerUsers", Collections.emptyList(), "subjectId", "activeSubject"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .activityDefinitionId("dispatchTaskActivity")
         .completerUserName(taskDispatcherUserName)
@@ -265,7 +256,6 @@ public class CitizenAddLabBpmnTest extends BaseBpmnTest {
         .expectedVariables(Map.of("dispatchTaskActivity_completer", taskDispatcherUserName,
             "officerAssignee", testuser2UserName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .activityDefinitionId("checkLabOfficerActivity")
         .completerUserName(testuser2UserName)
@@ -279,7 +269,6 @@ public class CitizenAddLabBpmnTest extends BaseBpmnTest {
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-
     mockServer.verify();
   }
 
@@ -328,7 +317,6 @@ public class CitizenAddLabBpmnTest extends BaseBpmnTest {
 
     Assertions.assertThat(ex.getDetails().getErrors()).hasSize(1)
         .contains(new ErrorDetailDto("Дані про цю лабораторію вже присутні", "name", "labName"));
-
     mockServer.verify();
   }
 

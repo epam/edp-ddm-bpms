@@ -44,9 +44,7 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         .resourceId("activeSubject")
         .response("/json/common/data-factory/subjectResponse.json")
         .build());
-
     stubSearchSubjects("/xml/citizen-update-lab/searchSubjectsActiveResponse.xml");
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -89,16 +87,13 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         .queryParams(Map.of("edrpou", "01010101", "name", "updatedLabName"))
         .response("[]")
         .build());
-
     mockKeycloakGetUsersByRole("officer", "[]");
-
     stubDigitalSignatureRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testuser2Token))
         .requestBody("/json/citizen-update-lab/dso/dsoRequest_nameUnique.json")
         .response("{\"signature\": \"systemSignature\"}")
         .build());
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.PUT)
         .headers(Map.of("X-Access-Token", testuser2Token))
@@ -123,7 +118,6 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
             "/json/citizen-update-lab/form-data/viewLabDataCitizenActivity.json"))
         .expectedVariables(Map.of("initiator", "testuser"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("viewLabDataCitizenActivity")
@@ -143,7 +137,6 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         .expectedVariables(Map.of("viewLabDataCitizenActivity_completer", "testuser",
             "laboratoryId", "laboratoryToUpdate"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("updateLabCitizenActivity")
@@ -164,7 +157,6 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         .expectedVariables(Map.of("updateLabCitizenActivity_completer", "testuser"))
         .extensionElements(Map.of("eSign", "true", "ENTREPRENEUR", "true", "LEGAL", "true"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("signLabCitizenActivity")
@@ -183,7 +175,6 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         .expectedVariables(Map.of("signLabCitizenActivity_completer", "testuser",
             "officerUsers", Collections.emptyList()))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("dispatchTaskActivity")
@@ -203,7 +194,6 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         .expectedVariables(Map.of("dispatchTaskActivity_completer", taskDispatcherUserName,
             "officerAssignee", testuser2UserName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("checkLabOfficerActivity")
@@ -224,7 +214,6 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         .expectedVariables(Map.of("checkLabOfficerActivity_completer", testuser2UserName))
         .extensionElements(Map.of("eSign", "true"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("signLabOfficerActivity")
@@ -243,7 +232,6 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
 
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
   }
 
   @Test
@@ -256,9 +244,7 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         .resourceId("activeSubject")
         .response("/json/common/data-factory/subjectResponse.json")
         .build());
-
     stubSearchSubjects("/xml/citizen-update-lab/searchSubjectsActiveResponse.xml");
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -301,7 +287,6 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         .resourceId("labToUpdateKopfg")
         .response("/json/citizen-update-lab/data-factory/labToUpdateKopfg.json")
         .build());
-
     mockKeycloakGetUsersByRole("officer", "[]");
 
     var startFormData = deserializeFormData("/json/citizen-update-lab/form-data/start_event.json");
@@ -319,7 +304,6 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
             "/json/citizen-update-lab/form-data/viewLabDataCitizenActivity.json"))
         .expectedVariables(Map.of("initiator", "testuser"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("viewLabDataCitizenActivity")
@@ -339,7 +323,6 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         .expectedVariables(Map.of("viewLabDataCitizenActivity_completer", "testuser",
             "laboratoryId", "laboratoryToUpdate"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("updateLabCitizenActivity")
@@ -360,7 +343,6 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         .expectedVariables(Map.of("updateLabCitizenActivity_completer", "testuser"))
         .extensionElements(Map.of("eSign", "true", "ENTREPRENEUR", "true", "LEGAL", "true"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("signLabCitizenActivity")
@@ -380,7 +362,6 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         .expectedVariables(Map.of("signLabCitizenActivity_completer", "testuser",
             "officerUsers", Collections.emptyList()))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("dispatchTaskActivity")
@@ -400,7 +381,6 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         .expectedVariables(Map.of("dispatchTaskActivity_completer", taskDispatcherUserName,
             "officerAssignee", testuser2UserName))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("checkLabOfficerActivity")
@@ -416,7 +396,6 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
 
     assertThat(processInstance).isEnded();
     assertThat(processInstance).variables().containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
   }
 
   @Test
@@ -429,9 +408,7 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         .resourceId("activeSubject")
         .response("/json/common/data-factory/subjectResponse.json")
         .build());
-
     stubSearchSubjects("/xml/citizen-update-lab/searchSubjectsActiveResponse.xml");
-
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -496,7 +473,6 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
             "/json/citizen-update-lab/form-data/viewLabDataCitizenActivity.json"))
         .expectedVariables(Map.of("initiator", "testuser"))
         .build());
-
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("viewLabDataCitizenActivity")
@@ -516,7 +492,6 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         .expectedVariables(Map.of("viewLabDataCitizenActivity_completer", "testuser",
             "laboratoryId", "laboratoryToUpdate"))
         .build());
-
     var result = completeTaskWithError(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
         .activityDefinitionId("updateLabCitizenActivity")
@@ -554,7 +529,6 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         .resourceId("activeSubject")
         .response("/json/common/data-factory/subjectResponse.json")
         .build());
-
     stubSearchSubjects("/xml/citizen-update-lab/searchSubjectsCancelledResponse.xml");
 
     var startFormData = deserializeFormData("/json/citizen-update-lab/form-data/start_event.json");

@@ -1,0 +1,21 @@
+{
+  "data": {
+    "name": "labName",
+    "registrationNo": "123123123",
+    "initiated": "держпраці",
+    "errorCheckFlag": true,
+    "submit": true,
+    "edrpou": "23510933",
+    "registrationSource": "держпраці",
+    "createdDate": "1999-11-12",
+    "acceptedBy": "jogn doe",
+    "regComplianceFlag": true,
+    "regRefusalReason": {
+      "refusalReasonId": "testRegRefusalReasonId"
+    },
+    "healthMinistryLetterComplianceFlag": true,
+    "healthMinistryLetterComplianceReason": {
+      "refusalReasonId": "testHealthMinistryLetterComplianceReasonId"
+    }
+  }
+}
