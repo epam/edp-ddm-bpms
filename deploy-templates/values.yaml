@@ -18,6 +18,8 @@ prometheusScrapePath: "/actuator/prometheus"
 readinessPath: "/actuator/health/readiness"
 livenessPath: "/actuator/health/liveness"
 
+javaOpts: "-Xms768m -Xmx768m -Duser.timezone=UTC"
+
 db:
   url: citus-master
   port: 5432
@@ -35,8 +37,6 @@ fileStorage:
 
 monitoring:
   namespace: openshift-monitoring
-
-javaOpts: "-Duser.timezone=UTC"
 
 keycloak:
   citizenClient:
