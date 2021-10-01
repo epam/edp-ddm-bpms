@@ -62,7 +62,7 @@ spec:
             path: {{ .Values.livenessPath }}
             port: {{ .Values.port }}
           failureThreshold: 10
-          initialDelaySeconds: 15
+          initialDelaySeconds: 65
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 5
@@ -71,17 +71,17 @@ spec:
             path: {{ .Values.readinessPath }}
             port: {{ .Values.port }}
           failureThreshold: 10
-          initialDelaySeconds: 15
+          initialDelaySeconds: 65
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 5
         resources:
           limits:
             cpu: '1'
-            memory: 2Gi
+            memory: 1Gi
           requests:
             cpu: '1'
-            memory: 2Gi
+            memory: 1Gi
         env:
           - name: CEPH_BUCKET_HOST
             valueFrom:
