@@ -82,3 +82,11 @@ logbook:
   obfuscate:
     headers:
       - x-access-token
+
+decorator:
+  datasource:
+    enabled: false
+    sleuth:
+      enabled: false
+    p6spy:
+      enable-logging: false
