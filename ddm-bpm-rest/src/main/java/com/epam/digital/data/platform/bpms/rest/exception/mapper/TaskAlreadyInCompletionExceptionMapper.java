@@ -9,6 +9,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
  * The class represents an implementation of {@link ExceptionMapper<TaskAlreadyInCompletionException>}
  * that is used to map {@link TaskAlreadyInCompletionException} to 409-CONFLICT response
  */
+@Slf4j
 @Provider
 @Component
 @RequiredArgsConstructor
@@ -37,7 +39,7 @@ public class TaskAlreadyInCompletionExceptionMapper implements
         .message(exception.getMessage())
         .localizedMessage(localizedMessage)
         .build();
-
+    log.error("User task already in completion", exception);
     return Response.status(Status.CONFLICT).entity(systemErrorDto).build();
   }
 }

@@ -5,6 +5,7 @@ import com.epam.digital.data.platform.starter.errorhandling.dto.SystemErrorDto;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.rest.exception.ExceptionHandlerHelper;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.slf4j.MDC;
@@ -13,6 +14,7 @@ import org.slf4j.MDC;
  * The class represents an implementation of {@link ExceptionMapper<RestException>} that is used to
  * map camunda {@link RestException} to response
  */
+@Slf4j
 public class CamundaRestExceptionMapper implements ExceptionMapper<RestException> {
 
   @Override
@@ -25,7 +27,7 @@ public class CamundaRestExceptionMapper implements ExceptionMapper<RestException
         .message(errorDto.getMessage())
         .localizedMessage(throwable.getLocalizedMessage())
         .build();
-
+    log.error("Camunda rest communication error", throwable);
     return Response.status(ExceptionHandlerHelper.getInstance().getStatus(throwable))
         .entity(systemErrorDto).type(MediaType.APPLICATION_JSON).build();
   }
