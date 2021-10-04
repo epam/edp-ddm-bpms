@@ -37,7 +37,7 @@ public class ConnectorResponseErrorHandler extends DefaultResponseErrorHandler {
       throws IOException {
     if (isValidationException(method, response.getStatusCode())) {
       var exception = validationException(response);
-      log.info("Request failed with validationException with code {}, message - {} and "
+      log.warn("Request failed with validationException with code {}, message - {} and "
           + "details - {}", exception.getCode(), exception.getMessage(), exception.getDetails());
       throw exception;
     }

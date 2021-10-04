@@ -26,6 +26,7 @@ public class KeycloakExceptionMapper implements ExceptionMapper<KeycloakExceptio
         .code(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR))
         .message(ex.getMessage())
         .build();
+    log.error("Keycloak communication error", ex);
     return Response.status(Status.INTERNAL_SERVER_ERROR).entity(systemErrorDto)
         .type(MediaType.APPLICATION_JSON).build();
   }
