@@ -189,6 +189,14 @@
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
     </dependency>
+
+    <!-- After releasing Spring sleuth 3.1.0 this can be replaced by direct p6spy dependency -->
+    <dependency>
+      <groupId>com.github.gavlyukovskiy</groupId>
+      <artifactId>p6spy-spring-boot-starter</artifactId>
+      <version>${p6spy-spring-boot-starter.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
