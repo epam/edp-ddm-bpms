@@ -1,5 +1,7 @@
 package com.epam.digital.data.platform.bpms.config;
 
+import com.epam.digital.data.platform.bpms.service.KeycloakClientService;
+import com.epam.digital.data.platform.bpms.service.KeycloakClientServiceImpl;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
@@ -51,5 +53,15 @@ public class KeycloakClientConfig {
         .clientId(officerClientId)
         .clientSecret(officerClientSecret)
         .build();
+  }
+
+  @Bean("citizen-keycloak-service")
+  public KeycloakClientService citizenKeycloakService() {
+    return new KeycloakClientServiceImpl(citizenRealm, citizenKeycloak());
+  }
+
+  @Bean("officer-keycloak-service")
+  public KeycloakClientService officerKeycloakService() {
+    return new KeycloakClientServiceImpl(officerRealm, officerKeycloak());
   }
 }
