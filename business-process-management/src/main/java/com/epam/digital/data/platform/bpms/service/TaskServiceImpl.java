@@ -39,8 +39,8 @@ public class TaskServiceImpl implements TaskService {
 
     var result = taskDtos.stream().map(t -> toUserTaskDto(t, processDefinitionsIdAndNameMap))
         .collect(Collectors.toList());
-    log.info("Found {} tasks, task ids - {}", result.size(), result.stream().map(
-        UserTaskDto::getId).collect(Collectors.joining(", ")));
+    log.info("Found {} user tasks", result.size());
+    log.debug("Found user task list - {}", result);
     return result;
   }
 

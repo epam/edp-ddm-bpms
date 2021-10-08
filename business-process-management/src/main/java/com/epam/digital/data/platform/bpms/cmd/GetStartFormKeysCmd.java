@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
@@ -20,6 +21,7 @@ import org.springframework.util.CollectionUtils;
 /**
  * Command for retrieving start or form keys by process definition ids.
  */
+@Slf4j
 @EqualsAndHashCode
 public class GetStartFormKeysCmd implements Command<Map<String, String>> {
 
@@ -40,6 +42,7 @@ public class GetStartFormKeysCmd implements Command<Map<String, String>> {
     var processDefinitionList = processEngine.getRepositoryService().createProcessDefinitionQuery()
         .processDefinitionIdIn(processDefinitionIds.toArray(new String[0]))
         .list();
+    log.trace("Found process definitions {}", processDefinitionList);
 
     var deploymentCache = processEngineConfiguration.getDeploymentCache();
 
