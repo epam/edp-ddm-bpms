@@ -41,8 +41,8 @@ public class HistoricTaskServiceImpl implements HistoricTaskService {
     var result = historicTaskInstanceDtos.stream()
         .map(historicTask -> toHistoryUserTaskDto(historicTask, processDefinitionsIdAndNameMap))
         .collect(Collectors.toList());
-    log.info("Found {} user tasks. Task ids - {}", result.size(),
-        result.stream().map(HistoryUserTaskDto::getId).collect(Collectors.joining(", ")));
+    log.info("Found {} historic user tasks", result.size());
+    log.debug("Found historic task list - {}", result);
     return result;
   }
 
