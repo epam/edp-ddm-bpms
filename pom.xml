@@ -31,7 +31,7 @@
     <ddm-ceph-client.version>1.4.0</ddm-ceph-client.version>
     <ddm-starter-actuator.version>1.4.0</ddm-starter-actuator.version>
     <ddm-starter-error-handler.version>1.4.0</ddm-starter-error-handler.version>
-    <ddm-starter-juel-function.version>1.5.1-SNAPSHOT</ddm-starter-juel-function.version>
+    <ddm-starter-juel-function.version>1.5.2-SNAPSHOT</ddm-starter-juel-function.version>
     <ddm-starter-localization.version>1.2.0</ddm-starter-localization.version>
     <ddm-starter-logging.version>1.5.0-SNAPSHOT</ddm-starter-logging.version>
     <ddm-starter-security.version>1.2.1</ddm-starter-security.version>
