@@ -80,10 +80,10 @@
         <bean class="org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin"/>
         <bean class="org.camunda.spin.plugin.impl.SpinProcessEnginePlugin"/>
         <bean
-          class="com.epam.digital.data.platform.bpms.scripting.StaticJavaFunctionsProcessEnginePlugin">
+          class="com.epam.digital.data.platform.el.juel.scripting.StaticJavaFunctionsProcessEnginePlugin">
           <constructor-arg index="0">
             <bean
-              class="com.epam.digital.data.platform.bpms.scripting.groovy.StaticJavaFunctionsGroovyScriptEnvResolver"/>
+              class="com.epam.digital.data.platform.el.juel.scripting.groovy.StaticJavaFunctionsGroovyScriptEnvResolver"/>
           </constructor-arg>
         </bean>
       </list>
