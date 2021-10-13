@@ -10,7 +10,7 @@ data:
     camunda.bpm.job-execution.deployment-aware: false
     camunda.bpm.database.schema-update: true
     dso.url: http://digital-signature-ops:8080
-    ceph.http-endpoint: http://s3.openshift-storage.svc:80
+    ceph.http-endpoint: http://s3.openshift-storage.svc.cluster.local
     keycloak.url: {{ template "keycloak.url" . }}/auth
     keycloak.citizen.realm: {{ template "keycloak.citizenTargetRealm" . }}
     keycloak.citizen.client-id: {{ .Values.keycloak.citizenClient.clientName }}

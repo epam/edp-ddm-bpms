@@ -30,7 +30,7 @@ spring:
   datasource:
     hikari:
       minimum-idle: 5
-      maximum-pool-size: 20
+      maximum-pool-size: 50
       max-lifetime: 600000
 
 # Configuration => prometheus.yml:
