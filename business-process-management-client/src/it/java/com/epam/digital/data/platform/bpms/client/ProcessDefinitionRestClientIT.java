@@ -99,6 +99,27 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
   }
 
   @Test
+  public void shouldReturnOneProcessDefinitionByKey() throws JsonProcessingException {
+    var processDefinitionEntity = new ProcessDefinitionEntity();
+    processDefinitionEntity.setId("testId");
+    processDefinitionEntity.setKey("testKey");
+    var processDefinitionDto = ProcessDefinitionDto.fromProcessDefinition(processDefinitionEntity);
+    restClientWireMock.addStubMapping(
+        stubFor(get(urlEqualTo("/api/process-definition/key/testKey"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withStatus(200)
+                .withBody(objectMapper.writeValueAsString(processDefinitionDto))
+            ))
+    );
+
+    var processDefinition = processDefinitionRestClient.getProcessDefinitionByKey("testKey");
+
+    assertThat(processDefinition.getId()).isEqualTo("testId");
+    assertThat(processDefinition.getKey()).isEqualTo("testKey");
+  }
+
+  @Test
   public void shouldReturn404OnMissingProcessDefinition() throws JsonProcessingException {
     var errorDto = new SystemErrorDto("testTraceId", "type", "error", "testLocalizedMsg");
     restClientWireMock.addStubMapping(
@@ -210,6 +231,24 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
     );
 
     var result = processDefinitionRestClient.getStartForm("testId");
+
+    assertThat(result.getKey()).isEqualTo(formDto.getKey());
+  }
+
+  @Test
+  public void shouldReturnStartFormByProcessDefinitionKey() throws JsonProcessingException {
+    var formDto = new FormDto();
+    formDto.setKey("testStartFormKey");
+    restClientWireMock.addStubMapping(
+        stubFor(get(urlPathEqualTo("/api/process-definition/key/testKey/startForm"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withStatus(200)
+                .withBody(objectMapper.writeValueAsString(formDto)))
+        )
+    );
+
+    var result = processDefinitionRestClient.getStartFormByKey("testKey");
 
     assertThat(result.getKey()).isEqualTo(formDto.getKey());
   }

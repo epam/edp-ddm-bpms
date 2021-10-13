@@ -64,6 +64,18 @@ public interface ProcessDefinitionRestClient extends BaseFeignClient {
   ProcessDefinitionDto getProcessDefinition(@PathVariable("id") String id);
 
   /**
+   * Method for getting camunda process definition by key
+   *
+   * @param key process definition key
+   * @return a camunda process definition
+   */
+  @GetMapping("/key/{key}")
+  @ErrorHandling(codeSpecific = {
+      @ErrorCodes(codes = {404}, generate = ProcessDefinitionNotFoundException.class)
+  })
+  ProcessDefinitionDto getProcessDefinitionByKey(@PathVariable("key") String key);
+
+  /**
    * Method for starting process instance by process definition id
    *
    * @param id                      process definition identifier
@@ -92,7 +104,23 @@ public interface ProcessDefinitionRestClient extends BaseFeignClient {
       @PathVariable("key") String key,
       @RequestBody StartProcessInstanceDto startProcessInstanceDto);
 
+  /**
+   * Method for getting start form by process definition id
+   *
+   * @param id process definition identifier
+   * @return start form representation
+   */
   @GetMapping("/{id}/startForm")
   @ErrorHandling
   FormDto getStartForm(@PathVariable("id") String id);
+
+  /**
+   * Method for getting start form by process definition key
+   *
+   * @param key process definition key
+   * @return start form representation
+   */
+  @GetMapping("/key/{key}/startForm")
+  @ErrorHandling
+  FormDto getStartFormByKey(@PathVariable("key") String key);
 }
