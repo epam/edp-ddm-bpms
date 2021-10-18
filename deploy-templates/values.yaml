@@ -31,6 +31,7 @@ ingress: # expose the service with a route or an ingress depending on platform t
 
 ceph:
   bucketName: lowcode-form-data-storage
+  host: ${CEPH_BUCKET_HOST}
 
 fileStorage:
   bucketName: lowcode-file-storage
