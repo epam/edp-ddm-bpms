@@ -52,11 +52,9 @@ public class PutFormDataToCephTaskListener implements TaskListener {
     log.debug("Putting form-data to ceph.\n"
             + "Task-definition-key - {}\n"
             + "Ceph-key - {}\n"
-            + "Form-data - {}\n"
             + "Process-definition-id - {}\n"
             + "Process-instance-id - {}",
-        taskDefinitionKey, cephKey, formData, delegateTask.getProcessDefinitionId(),
-        processInstanceId);
+        taskDefinitionKey, cephKey, delegateTask.getProcessDefinitionId(), processInstanceId);
     formDataCephService.putFormData(cephKey, formDataDto);
   }
 
