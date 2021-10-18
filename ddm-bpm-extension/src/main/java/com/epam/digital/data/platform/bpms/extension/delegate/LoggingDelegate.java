@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component("loggingDelegate")
+@Deprecated
 public class LoggingDelegate implements JavaDelegate {
 
   @Override

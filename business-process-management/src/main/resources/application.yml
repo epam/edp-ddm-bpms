@@ -76,7 +76,7 @@ logbook:
     enabled: true
   info-logging:
     enabled: true
-  strategy: request-body-on-debug
+  strategy: without-body
   exclude:
     - /actuator/**
   obfuscate:
