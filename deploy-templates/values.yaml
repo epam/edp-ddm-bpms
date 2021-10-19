@@ -1,3 +1,6 @@
+global:
+  disableRequestsLimits: false
+
 image:
   name: business-process-management
   version: latest

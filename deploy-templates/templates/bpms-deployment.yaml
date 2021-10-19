@@ -75,6 +75,7 @@ spec:
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 5
+        {{- if not .Values.global.disableRequestsLimits }}
         resources:
           limits:
             cpu: '1'
@@ -82,6 +83,7 @@ spec:
           requests:
             cpu: '1'
             memory: 2Gi
+        {{- end }}
         env:
           - name: CEPH_BUCKET_HOST
             valueFrom:
