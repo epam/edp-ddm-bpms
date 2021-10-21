@@ -21,11 +21,11 @@
   <bean id="camundaProperties"
     class="com.epam.digital.data.platform.bpms.config.CamundaProperties"/>
   <bean id="authListener"
-    class="com.epam.digital.data.platform.bpms.listener.AuthorizationStartEventListener">
+    class="com.epam.digital.data.platform.bpms.security.listener.AuthorizationStartEventListener">
     <constructor-arg ref="camundaAdminImpersonationFactory"/>
   </bean>
   <bean id="initiatorListener"
-    class="com.epam.digital.data.platform.bpms.listener.InitiatorTokenStartEventListener"/>
+    class="com.epam.digital.data.platform.bpms.security.listener.InitiatorTokenStartEventListener"/>
   <bean id="completerListener"
     class="com.epam.digital.data.platform.bpms.listener.CompleterTaskEventListener"/>
   <bean id="putFormDataToCephListener"
@@ -81,12 +81,14 @@
         <bean
           class="com.epam.digital.data.platform.bpms.config.CamundaSystemVariablesSupportListener">
           <constructor-arg ref="camundaProperties"/>
-          <constructor-arg ref="authListener"/>
-          <constructor-arg ref="initiatorListener"/>
           <constructor-arg ref="completerListener"/>
           <constructor-arg ref="putFormDataToCephListener"/>
           <constructor-arg ref="fileCleanerEndEventListener"/>
           <constructor-arg ref="formDataCleanerEndEventListener"/>
+        </bean>
+        <bean class="com.epam.digital.data.platform.bpms.security.config.BpmSecuritySupportListener">
+          <constructor-arg ref="authListener"/>
+          <constructor-arg ref="initiatorListener"/>
         </bean>
       </list>
     </property>

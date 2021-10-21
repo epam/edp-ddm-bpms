@@ -1,10 +1,8 @@
 package com.epam.digital.data.platform.bpms.config;
 
-import com.epam.digital.data.platform.bpms.listener.AuthorizationStartEventListener;
 import com.epam.digital.data.platform.bpms.listener.CompleterTaskEventListener;
 import com.epam.digital.data.platform.bpms.listener.FileCleanerEndEventListener;
 import com.epam.digital.data.platform.bpms.listener.FormDataCleanerEndEventListener;
-import com.epam.digital.data.platform.bpms.listener.InitiatorTokenStartEventListener;
 import com.epam.digital.data.platform.bpms.listener.PutFormDataToCephTaskListener;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
@@ -25,8 +23,6 @@ import org.springframework.stereotype.Component;
 public class CamundaSystemVariablesSupportListener extends AbstractBpmnParseListener {
 
   private final CamundaProperties systemProperties;
-  private final AuthorizationStartEventListener authorizationStartEventListener;
-  private final InitiatorTokenStartEventListener initiatorTokenStartEventListener;
   private final CompleterTaskEventListener completerTaskEventListener;
   private final PutFormDataToCephTaskListener putFormDataToCephTaskListener;
   private final FileCleanerEndEventListener fileCleanerEndEventListener;
@@ -38,10 +34,6 @@ public class CamundaSystemVariablesSupportListener extends AbstractBpmnParseList
     startEventActivity.addListener(ExecutionListener.EVENTNAME_START,
         (ExecutionListener) execution ->
             systemProperties.getSystemVariables().forEach(execution::setVariable));
-    startEventActivity.addListener(ExecutionListener.EVENTNAME_START,
-        authorizationStartEventListener);
-    startEventActivity.addListener(ExecutionListener.EVENTNAME_START,
-        initiatorTokenStartEventListener);
   }
 
   @Override
