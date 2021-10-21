@@ -1,4 +1,4 @@
-package com.epam.digital.data.platform.bpms.listener;
+package com.epam.digital.data.platform.bpms.security.listener;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +20,7 @@ public class InitiatorTokenStartEventListener implements ExecutionListener {
   public static final String INITIATOR_TOKEN_VAR_NAME = "initiator_access_token";
 
   @Override
+  @SuppressWarnings("findbugs:BC_UNCONFIRMED_CAST")
   public void notify(DelegateExecution execution) {
     var variableScope = (AbstractVariableScope) execution;
     String token = null;

@@ -1,4 +1,4 @@
-package com.epam.digital.data.platform.bpms.listener;
+package com.epam.digital.data.platform.bpms.security.listener;
 
 import static org.mockito.Mockito.verify;
 
