@@ -43,4 +43,3 @@ public class CamundaImpersonation {
     processEngine.getIdentityService().setAuthentication(impersonator);
   }
 }
-

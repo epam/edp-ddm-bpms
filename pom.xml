@@ -16,6 +16,7 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>ddm-bpm-security</module>
     <module>business-process-management</module>
     <module>business-process-management-api</module>
     <module>business-process-management-client</module>
