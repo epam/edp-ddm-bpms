@@ -7,12 +7,10 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.epam.digital.data.platform.bpms.exception.handler.ConnectorResponseErrorHandler;
 import com.epam.digital.data.platform.integration.ceph.config.CephConfig;
 import com.epam.digital.data.platform.integration.ceph.service.S3ObjectCephService;
 import com.epam.digital.data.platform.integration.ceph.service.impl.S3ObjectCephServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Collection;
 import java.util.stream.Stream;
 import javax.sql.DataSource;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -24,16 +22,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
 import org.springframework.boot.jdbc.DatabaseDriver;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.client.BufferingClientHttpRequestFactory;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.jdbc.support.DatabaseStartupValidator;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * The class represents a holder for beans of the general configuration. Each method produces a bean
@@ -44,17 +37,6 @@ import org.springframework.web.client.RestTemplate;
 @EnableAspectJAutoProxy
 @Import(CephConfig.class)
 public class GeneralConfig {
-
-  @Bean
-  public RestTemplate restTemplate(Collection<ClientHttpRequestInterceptor> interceptors,
-      ConnectorResponseErrorHandler responseErrorHandler) {
-    return new RestTemplateBuilder()
-        .requestFactory(
-            () -> new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()))
-        .interceptors(interceptors)
-        .errorHandler(responseErrorHandler)
-        .build();
-  }
 
   @Bean
   public DatabaseStartupValidator databaseStartupValidator(DataSource dataSource,

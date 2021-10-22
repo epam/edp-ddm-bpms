@@ -3,7 +3,7 @@ package com.epam.digital.data.platform.bpms.camunda.bpmn.config;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 
-import com.epam.digital.data.platform.bpms.el.TransientVariableScopeElResolver;
+import com.epam.digital.data.platform.bpms.engine.el.TransientVariableScopeElResolver;
 import com.epam.digital.data.platform.bpms.it.util.TestUtils;
 import com.epam.digital.data.platform.el.juel.AbstractApplicationContextAwareJuelFunction;
 import com.epam.digital.data.platform.el.juel.CompleterJuelFunction;

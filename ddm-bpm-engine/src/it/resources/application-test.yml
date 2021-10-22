@@ -1,0 +1,3 @@
+camunda:
+  system-variables:
+    const_dataFactoryBaseUrl: http://localhost:8877/mock-server
