@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: ddm-bpm-extension
+
+camunda:
+  system-variables:
+    const_dataFactoryBaseUrl: http://localhost:8877/mock-server
+dso:
+  url: http://localhost:8081
+
+ceph:
+  http-endpoint: http://localhost:8100
+  access-key: access-key
+  secret-key: secret-key
+  bucket: bucket
+
+user-settings-service-api:
+  url: http://localhost:8878/user-settings-mock-server
+excerpt-service-api:
+  url: http://localhost:9999/excerpt-mock-service
+
+keycloak:
+  url: http://localhost:8200/auth
+  citizen:
+    realm: citizen-realm
+    client-id: citizen-client-id
+    client-secret: citizen-client-secret
+  officer:
+    realm: officer-realm
+    client-id: officer-client-id
+    client-secret: officer-client-secret
+  system-user:
+    realm: system-user-realm
+    client-id: system-user-client-id
+    client-secret: system-user-client-secret
+
+trembita-exchange-gateway:
+  url: http://localhost:7788/trembita-mock-server
+  client:
+    x-road-instance: CLIENT-TEST
+  registries:
+    edr-registry:
+      x-road-instance: EDR-TEST

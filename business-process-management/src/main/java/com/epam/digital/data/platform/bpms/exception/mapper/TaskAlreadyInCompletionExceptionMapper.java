@@ -1,6 +1,6 @@
 package com.epam.digital.data.platform.bpms.exception.mapper;
 
-import com.epam.digital.data.platform.bpms.exception.TaskAlreadyInCompletionException;
+import com.epam.digital.data.platform.bpms.engine.exception.TaskAlreadyInCompletionException;
 import com.epam.digital.data.platform.starter.errorhandling.BaseRestExceptionHandler;
 import com.epam.digital.data.platform.starter.errorhandling.dto.SystemErrorDto;
 import com.epam.digital.data.platform.starter.localization.MessageResolver;

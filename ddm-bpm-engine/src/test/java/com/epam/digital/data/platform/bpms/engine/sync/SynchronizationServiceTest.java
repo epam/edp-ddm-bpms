@@ -1,0 +1,64 @@
+package com.epam.digital.data.platform.bpms.engine.sync;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import lombok.SneakyThrows;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
+
+@RunWith(MockitoJUnitRunner.class)
+public class SynchronizationServiceTest {
+
+  private final SynchronizationService service = new SynchronizationService();
+  private final ExecutorService threadPool = Executors.newFixedThreadPool(2);
+
+  @Test
+  public void testConsistentOperations() throws ExecutionException, InterruptedException {
+    var list = new ArrayList<Integer>();
+
+    threadPool.execute(() -> service.execute(1, () -> {
+      sleep(300);
+      list.add(1);
+    }));
+    sleep(100);
+    var result = threadPool.submit(() -> service.evaluate(1, () -> {
+      list.add(2);
+      return 2;
+    })).get();
+
+    assertThat(result).isEqualTo(2);
+    assertThat(list.get(0)).isEqualTo(1);
+    assertThat(list.get(1)).isEqualTo(2);
+  }
+
+  @Test
+  public void testThrowsIfLocked() throws ExecutionException, InterruptedException {
+    var list = new ArrayList<Integer>();
+
+    var future1 = threadPool.submit(() -> service.executeOrThrow(1, () -> {
+      sleep(300);
+      list.add(1);
+    }, RuntimeException::new));
+    sleep(100);
+    var future2 = threadPool.submit(
+        () -> service.evaluateOrThrow(1, () -> "result", () -> new RuntimeException("error")));
+    var exception = assertThrows(ExecutionException.class, future2::get);
+
+    future1.get();
+
+    assertThat(exception.getCause()).isInstanceOf(RuntimeException.class);
+    assertThat(exception.getCause().getMessage()).isEqualTo("error");
+    assertThat(list).hasSize(1).contains(1);
+  }
+
+  @SneakyThrows
+  private void sleep(int millis) {
+    Thread.sleep(millis);
+  }
+}

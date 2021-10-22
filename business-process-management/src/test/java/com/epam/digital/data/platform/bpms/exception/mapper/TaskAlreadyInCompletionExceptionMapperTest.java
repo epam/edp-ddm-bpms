@@ -3,7 +3,7 @@ package com.epam.digital.data.platform.bpms.exception.mapper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import com.epam.digital.data.platform.bpms.exception.TaskAlreadyInCompletionException;
+import com.epam.digital.data.platform.bpms.engine.exception.TaskAlreadyInCompletionException;
 import com.epam.digital.data.platform.starter.errorhandling.BaseRestExceptionHandler;
 import com.epam.digital.data.platform.starter.errorhandling.dto.SystemErrorDto;
 import com.epam.digital.data.platform.starter.localization.MessageResolver;
