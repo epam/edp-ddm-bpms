@@ -22,19 +22,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CamundaSystemVariablesSupportListener extends AbstractBpmnParseListener {
 
-  private final CamundaProperties systemProperties;
   private final CompleterTaskEventListener completerTaskEventListener;
   private final PutFormDataToCephTaskListener putFormDataToCephTaskListener;
   private final FileCleanerEndEventListener fileCleanerEndEventListener;
   private final FormDataCleanerEndEventListener formDataCleanerEndEventListener;
-
-  @Override
-  public void parseStartEvent(Element startEventElement, ScopeImpl scope,
-      ActivityImpl startEventActivity) {
-    startEventActivity.addListener(ExecutionListener.EVENTNAME_START,
-        (ExecutionListener) execution ->
-            systemProperties.getSystemVariables().forEach(execution::setVariable));
-  }
 
   @Override
   public void parseUserTask(Element userTaskElement, ScopeImpl scope, ActivityImpl activity) {

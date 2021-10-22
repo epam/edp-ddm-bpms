@@ -20,6 +20,8 @@
     <module>business-process-management</module>
     <module>business-process-management-api</module>
     <module>business-process-management-client</module>
+    <module>ddm-bpm-extension</module>
+    <module>ddm-bpm-engine</module>
   </modules>
 
   <properties>

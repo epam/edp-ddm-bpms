@@ -1,6 +1,6 @@
 package com.epam.digital.data.platform.bpms.exception.mapper;
 
-import com.epam.digital.data.platform.bpms.exception.KeycloakException;
+import com.epam.digital.data.platform.bpms.extension.exception.KeycloakException;
 import com.epam.digital.data.platform.starter.errorhandling.BaseRestExceptionHandler;
 import com.epam.digital.data.platform.starter.errorhandling.dto.SystemErrorDto;
 import javax.ws.rs.core.MediaType;
@@ -12,7 +12,7 @@ import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 
 /**
- * The class represents an implementation of {@link ExceptionMapper<  KeycloakException  >} that is
+ * The class represents an implementation of {@link ExceptionMapper<KeycloakException>} that is
  * used to map exception {@link KeycloakException} to response
  */
 @Slf4j

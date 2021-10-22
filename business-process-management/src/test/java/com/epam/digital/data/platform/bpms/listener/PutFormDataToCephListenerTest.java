@@ -7,7 +7,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.epam.digital.data.platform.bpms.delegate.ceph.CephKeyProvider;
+import com.epam.digital.data.platform.bpms.extension.delegate.ceph.CephKeyProvider;
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.epam.digital.data.platform.integration.ceph.service.FormDataCephService;
 import com.fasterxml.jackson.core.type.TypeReference;

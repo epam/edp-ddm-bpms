@@ -5,7 +5,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.epam.digital.data.platform.bpms.api.dto.StartFormQueryDto;
-import com.epam.digital.data.platform.bpms.service.BatchFormService;
+import com.epam.digital.data.platform.bpms.engine.service.BatchFormService;
 import java.util.HashMap;
 import java.util.Set;
 import org.junit.Test;

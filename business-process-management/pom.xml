@@ -13,6 +13,7 @@
 
   <properties>
     <camunda.bpm.assert.version>7.0.0</camunda.bpm.assert.version>
+    <sonar.coverage.exclusions>**/digital/data/platform/bpms/dto/**/*</sonar.coverage.exclusions>
   </properties>
 
   <dependencies>
@@ -24,6 +25,18 @@
     <dependency>
       <groupId>com.epam.digital.data.platform</groupId>
       <artifactId>business-process-management-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.epam.digital.data.platform</groupId>
+      <artifactId>ddm-bpm-engine</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.epam.digital.data.platform</groupId>
+      <artifactId>ddm-bpm-extension</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -94,12 +107,6 @@
     </dependency>
 
     <dependency>
-      <artifactId>keycloak-admin-client</artifactId>
-      <groupId>org.keycloak</groupId>
-      <version>13.0.1</version>
-    </dependency>
-
-    <dependency>
       <groupId>com.epam.digital.data.platform</groupId>
       <artifactId>excerpt-model</artifactId>
       <version>${excerpt-model.version}</version>
@@ -124,12 +131,6 @@
       <groupId>com.epam.digital.data.platform</groupId>
       <artifactId>ddm-starter-logger</artifactId>
       <version>${ddm-starter-logging.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>29.0-jre</version>
     </dependency>
 
     <!--Camunda dependencies-->
@@ -185,6 +186,7 @@
       <artifactId>groovy-jsr223</artifactId>
       <version>${groovy.version}</version>
     </dependency>
+
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>

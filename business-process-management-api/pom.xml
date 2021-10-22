@@ -11,7 +11,10 @@
   </parent>
 
   <properties>
-    <sonar.coverage.exclusions>**/digital/data/platform/bpms/api/dto/**/*</sonar.coverage.exclusions>
+    <sonar.coverage.exclusions>
+      **/digital/data/platform/bpms/api/dto/**/*,
+      **/digital/data/platform/bpms/api/constant/**/*
+    </sonar.coverage.exclusions>
   </properties>
 
   <artifactId>business-process-management-api</artifactId>

@@ -6,7 +6,7 @@
 
   <bean id="objectMapper" class="com.fasterxml.jackson.databind.ObjectMapper"/>
   <bean id="cephKeyProvider"
-    class="com.epam.digital.data.platform.bpms.delegate.ceph.CephKeyProvider"/>
+    class="com.epam.digital.data.platform.bpms.extension.delegate.ceph.CephKeyProvider"/>
   <bean id="cephService"
     class="com.epam.digital.data.platform.bpms.it.config.TestCephServiceImpl">
     <constructor-arg value="bucket"/>
@@ -19,7 +19,7 @@
   </bean>
 
   <bean id="camundaProperties"
-    class="com.epam.digital.data.platform.bpms.config.CamundaProperties"/>
+    class="com.epam.digital.data.platform.bpms.engine.config.CamundaProperties"/>
   <bean id="authListener"
     class="com.epam.digital.data.platform.bpms.security.listener.AuthorizationStartEventListener">
     <constructor-arg ref="camundaAdminImpersonationFactory"/>
@@ -80,7 +80,6 @@
       <list>
         <bean
           class="com.epam.digital.data.platform.bpms.config.CamundaSystemVariablesSupportListener">
-          <constructor-arg ref="camundaProperties"/>
           <constructor-arg ref="completerListener"/>
           <constructor-arg ref="putFormDataToCephListener"/>
           <constructor-arg ref="fileCleanerEndEventListener"/>
@@ -89,6 +88,10 @@
         <bean class="com.epam.digital.data.platform.bpms.security.config.BpmSecuritySupportListener">
           <constructor-arg ref="authListener"/>
           <constructor-arg ref="initiatorListener"/>
+        </bean>
+        <bean
+          class="com.epam.digital.data.platform.bpms.engine.config.CamundaEngineSystemVariablesSupportListener">
+          <constructor-arg ref="camundaProperties"/>
         </bean>
       </list>
     </property>

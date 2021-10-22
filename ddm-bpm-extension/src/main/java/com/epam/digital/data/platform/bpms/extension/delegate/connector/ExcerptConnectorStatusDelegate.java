@@ -1,0 +1,57 @@
+package com.epam.digital.data.platform.bpms.extension.delegate.connector;
+
+import com.epam.digital.data.platform.bpms.extension.delegate.dto.DataFactoryConnectorResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Set;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.RequestEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
+/**
+ * The class represents an implementation of {@link BaseConnectorDelegate} that is used for getting
+ * excerpt status
+ */
+@Component(ExcerptConnectorStatusDelegate.DELEGATE_NAME)
+public class ExcerptConnectorStatusDelegate extends BaseConnectorDelegate {
+
+  public static final String DELEGATE_NAME = "excerptConnectorStatusDelegate";
+  public static final String EXCERPT_ID_VAR = "excerptIdentifier";
+
+  private final String excerptServiceBaseUrl;
+
+  @Autowired
+  public ExcerptConnectorStatusDelegate(RestTemplate restTemplate,
+      @Value("${spring.application.name}") String springAppName,
+      @Value("${excerpt-service-api.url}") String excerptServiceBaseUrl,
+      ObjectMapper objectMapper) {
+    super(restTemplate, springAppName);
+    this.excerptServiceBaseUrl = excerptServiceBaseUrl;
+  }
+
+  @Override
+  public void execute(DelegateExecution execution) throws Exception {
+    logStartDelegateExecution();
+    var excerptIdentifier = (String) execution.getVariable(EXCERPT_ID_VAR);
+
+    logProcessExecution("get excerpt status on resource", RESOURCE_EXCERPTS);
+    var response = performGet(execution, excerptIdentifier);
+    setTransientResult(execution, RESPONSE_VARIABLE, response);
+    logDelegateExecution(execution, Set.of(EXCERPT_ID_VAR), Set.of(RESPONSE_VARIABLE));
+  }
+
+  protected DataFactoryConnectorResponse performGet(DelegateExecution delegateExecution,
+      String id) {
+    var uri = UriComponentsBuilder.fromHttpUrl(excerptServiceBaseUrl).pathSegment(RESOURCE_EXCERPTS)
+        .pathSegment(id).pathSegment("status").build().toUri();
+    return perform(RequestEntity.get(uri).headers(getHeaders(delegateExecution)).build());
+  }
+
+  @Override
+  public String getDelegateName() {
+    return DELEGATE_NAME;
+  }
+}
