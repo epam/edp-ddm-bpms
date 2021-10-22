@@ -60,6 +60,7 @@ keycloak:
     secretName: keycloak-system-user-citizen-client-secret
   realms:
     admin: admin
+    external: external-system
   certificatesEndpoint: /protocol/openid-connect/certs
 
 trembitaExchangeGateway:
