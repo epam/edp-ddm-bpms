@@ -1,7 +1,9 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloak.citizen;
 
+import com.epam.digital.data.platform.bpms.extension.service.KeycloakClientService;
 import org.keycloak.admin.client.resource.RoleScopeResource;
 import org.keycloak.representations.idm.RoleRepresentation;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -13,6 +15,11 @@ public class KeycloakRemoveCitizenRoleConnectorDelegate extends
     BaseKeycloakCitizenRoleConnectorDelegate {
 
   public static final String DELEGATE_NAME = "keycloakRemoveRoleConnectorDelegate";
+
+  protected KeycloakRemoveCitizenRoleConnectorDelegate(
+      @Qualifier("citizen-keycloak-service") KeycloakClientService keycloakClientService) {
+    super(keycloakClientService);
+  }
 
   @Override
   protected void performOperationWithRole(RoleScopeResource roleScopeResource,

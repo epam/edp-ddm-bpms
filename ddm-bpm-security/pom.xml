@@ -7,7 +7,7 @@
   <parent>
     <groupId>com.epam.digital.data.platform</groupId>
     <artifactId>business-process-management-parent</artifactId>
-    <version>1.5.0-SNAPSHOT</version>
+    <version>1.5.1-SNAPSHOT</version>
   </parent>
 
   <name>ddm-bpm-security</name>
@@ -18,6 +18,11 @@
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>com.epam.digital.data.platform</groupId>
+      <artifactId>ddm-bpm-data-accessor</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>

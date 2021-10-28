@@ -1,7 +1,10 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.DataFactoryConnectorResponse;
-import java.util.Set;
+import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
+import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
+import java.util.Objects;
+import lombok.Getter;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.spin.json.SpinJsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +27,10 @@ public class DigitalSignatureConnectorDelegate extends BaseConnectorDelegate {
 
   private final String dsoBaseUrl;
 
+  @Getter
+  @SystemVariable(name = "response", isTransient = true)
+  private NamedVariableAccessor<SpinJsonNode> dsoResponseVariable;
+
   @Autowired
   public DigitalSignatureConnectorDelegate(RestTemplate restTemplate,
       @Value("${spring.application.name}") String springAppName,
@@ -33,18 +40,17 @@ public class DigitalSignatureConnectorDelegate extends BaseConnectorDelegate {
   }
 
   @Override
-  public void execute(DelegateExecution execution) {
+  public void executeInternal(DelegateExecution execution) {
     logStartDelegateExecution();
-    var payload = (SpinJsonNode) execution.getVariable(PAYLOAD_VARIABLE);
+    var payload = payloadVariable.from(execution).getOptional();
 
     logProcessExecution("sign data");
-    var response = performPost(execution, payload.toString());
+    var response = performPost(execution, payload.map(Objects::toString).orElse(null));
 
-    setTransientResult(execution, RESPONSE_VARIABLE, response.getResponseBody());
-    logDelegateExecution(execution, Set.of(PAYLOAD_VARIABLE), Set.of());
+    dsoResponseVariable.on(execution).set(response.getResponseBody());
   }
 
-  private DataFactoryConnectorResponse performPost(DelegateExecution execution, String body) {
+  private ConnectorResponse performPost(DelegateExecution execution, String body) {
     var uri = UriComponentsBuilder.fromHttpUrl(dsoBaseUrl).pathSegment("api", "eseal", "sign")
         .build().toUri();
     return perform(RequestEntity.post(uri).headers(getHeadersForSign(execution)).body(body));

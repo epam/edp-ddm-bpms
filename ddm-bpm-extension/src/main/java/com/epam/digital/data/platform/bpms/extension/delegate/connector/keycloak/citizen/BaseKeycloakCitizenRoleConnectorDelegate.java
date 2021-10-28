@@ -1,6 +1,8 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloak.citizen;
 
-import java.util.Set;
+import com.epam.digital.data.platform.bpms.extension.service.KeycloakClientService;
+import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.keycloak.admin.client.resource.RoleScopeResource;
@@ -13,14 +15,20 @@ import org.keycloak.representations.idm.RoleRepresentation;
 public abstract class BaseKeycloakCitizenRoleConnectorDelegate extends
     BaseKeycloakCitizenConnectorDelegate {
 
-  private static final String USER_NAME_PARAMETER = "user_name";
-  private static final String ROLE_PARAMETER = "role";
+  @SystemVariable(name = "user_name")
+  private NamedVariableAccessor<String> userNameVariable;
+  @SystemVariable(name = "role")
+  private NamedVariableAccessor<String> roleVariable;
+
+  protected BaseKeycloakCitizenRoleConnectorDelegate(KeycloakClientService keycloakClientService) {
+    super(keycloakClientService);
+  }
 
   @Override
-  public void execute(DelegateExecution execution) {
+  public void executeInternal(DelegateExecution execution) {
     logStartDelegateExecution();
-    var userName = (String) execution.getVariable(USER_NAME_PARAMETER);
-    var role = (String) execution.getVariable(ROLE_PARAMETER);
+    var userName = userNameVariable.from(execution).get();
+    var role = roleVariable.from(execution).get();
 
     logProcessExecution("get realm resource");
     var realmResource = keycloakClientService.getRealmResource();
@@ -34,7 +42,6 @@ public abstract class BaseKeycloakCitizenRoleConnectorDelegate extends
         .getRoleScopeResource(realmResource, userRepresentation.getId());
 
     performOperationWithRole(roleScopeResource, roleRepresentation);
-    logDelegateExecution(execution, Set.of(USER_NAME_PARAMETER, ROLE_PARAMETER), Set.of());
   }
 
   protected abstract void performOperationWithRole(RoleScopeResource roleScopeResource,

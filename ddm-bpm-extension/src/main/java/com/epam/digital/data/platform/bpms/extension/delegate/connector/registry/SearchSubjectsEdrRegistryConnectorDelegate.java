@@ -1,12 +1,11 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.connector.registry;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.dto.EdrRegistryConnectorResponse;
+import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.starter.trembita.integration.dto.SubjectInfoDto;
 import com.epam.digital.data.platform.starter.trembita.integration.service.EdrRemoteService;
 import java.util.List;
-import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.spin.Spin;
@@ -16,30 +15,28 @@ import org.springframework.util.CollectionUtils;
  * The class represents an implementation of {@link JavaDelegate} that is used to search subjects in
  * EDR registry.
  */
-@RequiredArgsConstructor
-public class SearchSubjectsEdrRegistryConnectorDelegate extends BaseJavaDelegate {
+public class SearchSubjectsEdrRegistryConnectorDelegate extends BaseEdrRegistryConnectorDelegate {
 
   public static final String DELEGATE_NAME = "searchSubjectsEdrRegistryConnectorDelegate";
 
-  protected static final String EDR_CODE_VARIABLE = "code";
-  protected static final String RESPONSE_VARIABLE = "response";
-  protected static final String AUTHORIZATION_TOKEN_VARIABLE = "authorizationToken";
+  @SystemVariable(name = "code")
+  private NamedVariableAccessor<String> codeVariable;
 
-  private final EdrRemoteService edrRemoteService;
+  public SearchSubjectsEdrRegistryConnectorDelegate(EdrRemoteService edrRemoteService) {
+    super(edrRemoteService);
+  }
 
   @Override
-  public void execute(DelegateExecution execution) throws Exception {
+  public void executeInternal(DelegateExecution execution) throws Exception {
     logStartDelegateExecution();
-    var code = (String) execution.getVariable(EDR_CODE_VARIABLE);
-    var authorizationToken = (String) execution.getVariable(AUTHORIZATION_TOKEN_VARIABLE);
+    var code = codeVariable.from(execution).get();
+    var authorizationToken = authorizationTokenVariable.from(execution).get();
 
     logProcessExecution("search subjects by code", code);
     var response = edrRemoteService.searchSubjects(code, authorizationToken);
     var connectorResponse = prepareConnectorResponse(response);
 
-    setTransientResult(execution, RESPONSE_VARIABLE, connectorResponse);
-    logDelegateExecution(execution, Set.of(EDR_CODE_VARIABLE, AUTHORIZATION_TOKEN_VARIABLE),
-        Set.of(RESPONSE_VARIABLE));
+    responseVariable.on(execution).set(connectorResponse);
   }
 
   private EdrRegistryConnectorResponse prepareConnectorResponse(List<SubjectInfoDto> response) {

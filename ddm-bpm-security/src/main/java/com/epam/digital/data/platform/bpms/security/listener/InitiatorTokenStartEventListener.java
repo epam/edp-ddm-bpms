@@ -1,10 +1,10 @@
 package com.epam.digital.data.platform.bpms.security.listener;
 
+import com.epam.digital.data.platform.dataaccessor.initiator.InitiatorVariablesAccessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -17,12 +17,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class InitiatorTokenStartEventListener implements ExecutionListener {
 
-  public static final String INITIATOR_TOKEN_VAR_NAME = "initiator_access_token";
+  private final InitiatorVariablesAccessor initiatorVariablesAccessor;
 
   @Override
-  @SuppressWarnings("findbugs:BC_UNCONFIRMED_CAST")
   public void notify(DelegateExecution execution) {
-    var variableScope = (AbstractVariableScope) execution;
     String token = null;
 
     var auth = SecurityContextHolder.getContext().getAuthentication();
@@ -33,9 +31,8 @@ public class InitiatorTokenStartEventListener implements ExecutionListener {
       token = (String) auth.getCredentials();
     }
 
-    variableScope.setVariableLocalTransient(INITIATOR_TOKEN_VAR_NAME, token);
-    log.debug("Setting initiator access token {}={}. ProcessDefinitionId={}, processInstanceId={}",
-        INITIATOR_TOKEN_VAR_NAME, token, execution.getProcessDefinitionId(),
-        execution.getProcessInstanceId());
+    initiatorVariablesAccessor.on(execution).setInitiatorAccessToken(token);
+    log.debug("Setting initiator access token. ProcessDefinitionId={}, processInstanceId={}",
+        execution.getProcessDefinitionId(), execution.getProcessInstanceId());
   }
 }

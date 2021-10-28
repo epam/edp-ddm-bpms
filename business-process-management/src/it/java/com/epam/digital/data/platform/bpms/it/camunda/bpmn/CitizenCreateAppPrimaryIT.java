@@ -8,6 +8,7 @@ import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
 import com.epam.digital.data.platform.bpms.it.util.TestUtils;
+import com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -150,9 +151,10 @@ public class CitizenCreateAppPrimaryIT extends BaseBpmnIT {
         .assignee(testUserName)
         .expectedFormDataPrePopulation(deserializeFormData(
             "/json/citizen-create-app/form-data/Activity_citizen-shared-add-factors-pre-population.json"))
-        .expectedVariables(Map.of("initiator", testUserName, "const_dataFactoryBaseUrl",
-            dataFactoryBaseUrl, "start_form_ceph_key", START_FORM_CEPH_KEY, "fullName",
-            "testuser testuser testuser"))
+        .expectedVariables(Map.of("initiator", testUserName,
+            "const_dataFactoryBaseUrl", dataFactoryBaseUrl,
+            StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY,
+            "fullName", "testuser testuser testuser"))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
@@ -462,9 +464,10 @@ public class CitizenCreateAppPrimaryIT extends BaseBpmnIT {
         .assignee(testUserName)
         .expectedFormDataPrePopulation(deserializeFormData(
             "/json/citizen-create-app/form-data/Activity_citizen-shared-add-factors-pre-population.json"))
-        .expectedVariables(Map.of("initiator", testUserName, "const_dataFactoryBaseUrl",
-            dataFactoryBaseUrl, "start_form_ceph_key", START_FORM_CEPH_KEY, "fullName",
-            "testuser testuser testuser"))
+        .expectedVariables(Map.of("initiator", testUserName,
+            "const_dataFactoryBaseUrl", dataFactoryBaseUrl,
+            StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY,
+            "fullName", "testuser testuser testuser"))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)

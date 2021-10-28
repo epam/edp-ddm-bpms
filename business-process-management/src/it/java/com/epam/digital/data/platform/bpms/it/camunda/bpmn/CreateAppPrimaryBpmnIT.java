@@ -4,11 +4,12 @@ import static com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionU
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.historyService;
 
-import com.epam.digital.data.platform.bpms.api.constant.Constants;
 import com.epam.digital.data.platform.bpms.camunda.dto.AssertWaitingActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
+import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
+import com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable;
 import java.io.IOException;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
@@ -91,9 +92,10 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
         .assignee(testUserName)
         .expectedFormDataPrePopulation(deserializeFormData(
             "/json/create-app/form-data/name-edrpou-prepopulation.json"))
-        .expectedVariables(Map.of("initiator", testUserName, "const_dataFactoryBaseUrl",
-            dataFactoryBaseUrl, "start_form_ceph_key", START_FORM_CEPH_KEY, "fullName",
-            "testuser testuser testuser"))
+        .expectedVariables(Map.of("initiator", testUserName,
+            "const_dataFactoryBaseUrl", dataFactoryBaseUrl,
+            StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY,
+            "fullName", "testuser testuser testuser"))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
@@ -202,7 +204,7 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
         .build());
 
     addExpectedVariable("Activity_shared-sign-app-include_completer", testUserName);
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT,
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
         "Прийнято рішення про внесення лабораторії до переліку");
 
     var processInstances = historyService().createHistoricProcessInstanceQuery()
@@ -278,8 +280,9 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
         .activityDefinitionId("Activity_shared-subject-status-error")
         .formKey("shared-subject-status-error")
         .assignee(testUserName)
-        .expectedVariables(Map.of("initiator", testUserName, "const_dataFactoryBaseUrl",
-            dataFactoryBaseUrl, "start_form_ceph_key", START_FORM_CEPH_KEY))
+        .expectedVariables(Map.of("initiator", testUserName,
+            "const_dataFactoryBaseUrl", dataFactoryBaseUrl,
+            StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
@@ -405,7 +408,7 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
 
     addExpectedVariable("fullName", null);
     addExpectedVariable("Activity_shared-sign-app-deny_completer", testUserName);
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT,
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
         "Прийнято рішення про залишення без розгляду");
 
     var processInstances = historyService().createHistoricProcessInstanceQuery()
@@ -546,9 +549,10 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
         .assignee(testUserName)
         .expectedFormDataPrePopulation(deserializeFormData(
             "/json/create-app/form-data/name-edrpou-prepopulation.json"))
-        .expectedVariables(Map.of("initiator", testUserName, "const_dataFactoryBaseUrl",
-            dataFactoryBaseUrl, "start_form_ceph_key", START_FORM_CEPH_KEY, "fullName",
-            "testuser testuser testuser"))
+        .expectedVariables(Map.of("initiator", testUserName,
+            "const_dataFactoryBaseUrl", dataFactoryBaseUrl,
+            StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY,
+            "fullName", "testuser testuser testuser"))
         .build());
   }
 
@@ -627,8 +631,9 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
         .activityDefinitionId("Activity_shared-subject-status-error")
         .formKey("shared-subject-status-error")
         .assignee(testUserName)
-        .expectedVariables(Map.of("initiator", testUserName, "const_dataFactoryBaseUrl",
-            dataFactoryBaseUrl, "start_form_ceph_key", START_FORM_CEPH_KEY))
+        .expectedVariables(Map.of("initiator", testUserName,
+            "const_dataFactoryBaseUrl", dataFactoryBaseUrl,
+            StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)

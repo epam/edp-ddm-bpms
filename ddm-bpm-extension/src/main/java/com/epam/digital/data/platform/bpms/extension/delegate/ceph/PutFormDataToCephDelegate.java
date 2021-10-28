@@ -1,14 +1,13 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.ceph;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.epam.digital.data.platform.integration.ceph.service.FormDataCephService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.LinkedHashMap;
-import java.util.Set;
-import lombok.RequiredArgsConstructor;
+import java.util.Map;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.spin.Spin;
 import org.camunda.spin.json.SpinJsonNode;
 import org.springframework.stereotype.Component;
 
@@ -17,32 +16,31 @@ import org.springframework.stereotype.Component;
  * {@link FormDataCephService} service.
  */
 @Component(PutFormDataToCephDelegate.DELEGATE_NAME)
-@RequiredArgsConstructor
-public class PutFormDataToCephDelegate extends BaseJavaDelegate {
+public class PutFormDataToCephDelegate extends BaseFormDataDelegate {
 
   public static final String DELEGATE_NAME = "putFormDataToCephDelegate";
-  private static final String TASK_DEFINITION_KEY_PARAMETER = "taskDefinitionKey";
-  private static final String FORM_DATA_PARAMETER = "formData";
 
   private static final LinkedHashMapTypeReference FORM_DATA_TYPE = new LinkedHashMapTypeReference();
 
-  private final FormDataCephService cephService;
   private final ObjectMapper objectMapper;
-  private final CephKeyProvider cephKeyProvider;
+
+  public PutFormDataToCephDelegate(FormDataCephService cephService, CephKeyProvider cephKeyProvider,
+      ObjectMapper objectMapper) {
+    super(cephService, cephKeyProvider);
+    this.objectMapper = objectMapper;
+  }
 
   @Override
-  public void execute(DelegateExecution execution) {
+  public void executeInternal(DelegateExecution execution) {
     logStartDelegateExecution();
-    var taskDefinitionKey = (String) execution.getVariable(TASK_DEFINITION_KEY_PARAMETER);
+    var taskDefinitionKey = taskDefinitionKeyVariable.from(execution).get();
     var processInstanceId = execution.getProcessInstanceId();
 
     var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, processInstanceId);
-    var formData = (SpinJsonNode) execution.getVariable(FORM_DATA_PARAMETER);
+    var formData = formDataVariable.from(execution).getOrDefault(Spin.JSON(Map.of()));
 
     logProcessExecution("put form data with key", cephKey);
     cephService.putFormData(cephKey, toFormDataDto(formData));
-    logDelegateExecution(execution, Set.of(TASK_DEFINITION_KEY_PARAMETER, FORM_DATA_PARAMETER),
-        Set.of());
   }
 
   @Override

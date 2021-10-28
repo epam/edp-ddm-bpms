@@ -4,6 +4,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.epam.digital.data.platform.bpms.extension.delegate.ceph.PutContentToCephDelegate;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableReadAccessor;
 import com.epam.digital.data.platform.integration.ceph.service.CephService;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.junit.Before;
@@ -26,15 +28,31 @@ public class PutContentToCephDelegateTest {
   @Mock
   private ExecutionEntity delegateExecution;
 
+  @Mock
+  private NamedVariableAccessor<String> keyVariableAccessor;
+  @Mock
+  private NamedVariableReadAccessor<String> keyVariableReadAccessor;
+
+  @Mock
+  private NamedVariableAccessor<String> contentVariableAccessor;
+  @Mock
+  private NamedVariableReadAccessor<String> contentVariableReadAccessor;
+
   @Before
   public void setUp() {
     ReflectionTestUtils.setField(putContentToCephDelegate, "cephBucketName", CEPH_BUCKET_NAME);
+    ReflectionTestUtils.setField(putContentToCephDelegate, "keyVariable", keyVariableAccessor);
+    ReflectionTestUtils.setField(putContentToCephDelegate, "contentVariable",
+        contentVariableAccessor);
+
+    when(keyVariableAccessor.from(delegateExecution)).thenReturn(keyVariableReadAccessor);
+    when(contentVariableAccessor.from(delegateExecution)).thenReturn(contentVariableReadAccessor);
   }
 
   @Test
-  public void execute() {
-    when(delegateExecution.getVariable("key")).thenReturn("someKey");
-    when(delegateExecution.getVariable("content")).thenReturn("someContent");
+  public void execute() throws Exception {
+    when(keyVariableReadAccessor.get()).thenReturn("someKey");
+    when(contentVariableReadAccessor.get()).thenReturn("someContent");
 
     putContentToCephDelegate.execute(delegateExecution);
 

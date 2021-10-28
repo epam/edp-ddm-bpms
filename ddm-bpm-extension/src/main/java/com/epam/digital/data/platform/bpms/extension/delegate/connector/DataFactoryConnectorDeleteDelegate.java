@@ -1,7 +1,6 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.DataFactoryConnectorResponse;
-import java.util.Set;
+import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,21 +29,19 @@ public class DataFactoryConnectorDeleteDelegate extends BaseConnectorDelegate {
   }
 
   @Override
-  public void execute(DelegateExecution execution) {
+  public void executeInternal(DelegateExecution execution) {
     logStartDelegateExecution();
-    var resource = (String) execution.getVariable(RESOURCE_VARIABLE);
-    var id = (String) execution.getVariable(RESOURCE_ID_VARIABLE);
+    var resource = resourceVariable.from(execution).get();
+    var id = resourceIdVariable.from(execution).get();
 
     logProcessExecution("delete entity on resource", resource);
     var response = performDelete(execution, resource, id);
 
-    setTransientResult(execution, RESPONSE_VARIABLE, response);
-    logDelegateExecution(execution, Set.of(RESOURCE_VARIABLE, RESOURCE_ID_VARIABLE),
-        Set.of(RESPONSE_VARIABLE));
+    responseVariable.on(execution).set(response);
   }
 
-  private DataFactoryConnectorResponse performDelete(DelegateExecution delegateExecution,
-      String resourceName, String resourceId) {
+  private ConnectorResponse performDelete(DelegateExecution delegateExecution, String resourceName,
+      String resourceId) {
     var uri = UriComponentsBuilder.fromHttpUrl(dataFactoryBaseUrl).pathSegment(resourceName)
         .pathSegment(resourceId).build().toUri();
 

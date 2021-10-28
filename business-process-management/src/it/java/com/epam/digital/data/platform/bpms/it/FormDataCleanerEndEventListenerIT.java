@@ -2,6 +2,7 @@ package com.epam.digital.data.platform.bpms.it;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable;
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -20,7 +21,8 @@ public class FormDataCleanerEndEventListenerIT extends BaseIT {
     var formData = FormDataDto.builder()
         .data(data)
         .build();
-    Map<String, Object> vars = Map.of("start_form_ceph_key", cephKey);
+    Map<String, Object> vars = Map.of(StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME,
+        cephKey);
 
     var processInstance = runtimeService
         .startProcessInstanceByKey("startFormDataCleanerListenerKey", vars);

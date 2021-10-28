@@ -1,9 +1,8 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.DataFactoryConnectorResponse;
-import java.util.Set;
+import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
+import java.util.Objects;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.spin.json.SpinJsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
@@ -31,20 +30,18 @@ public class DataFactoryConnectorCreateDelegate extends BaseConnectorDelegate {
   }
 
   @Override
-  public void execute(DelegateExecution execution) {
+  public void executeInternal(DelegateExecution execution) {
     logStartDelegateExecution();
-    var resource = (String) execution.getVariable(RESOURCE_VARIABLE);
-    var payload = (SpinJsonNode) execution.getVariable(PAYLOAD_VARIABLE);
+    var resource = resourceVariable.from(execution).get();
+    var payload = payloadVariable.from(execution).getOptional();
 
     logProcessExecution("create entity on resource", resource);
-    var response = performPost(execution, resource, payload.toString());
+    var response = performPost(execution, resource, payload.map(Objects::toString).orElse(null));
 
-    setTransientResult(execution, RESPONSE_VARIABLE, response);
-    logDelegateExecution(execution, Set.of(RESOURCE_VARIABLE, PAYLOAD_VARIABLE),
-        Set.of(RESPONSE_VARIABLE));
+    responseVariable.on(execution).set(response);
   }
 
-  private DataFactoryConnectorResponse performPost(DelegateExecution delegateExecution,
+  private ConnectorResponse performPost(DelegateExecution delegateExecution,
       String resourceName, String body) {
     var uri = UriComponentsBuilder.fromHttpUrl(dataFactoryBaseUrl).pathSegment(resourceName).build()
         .toUri();

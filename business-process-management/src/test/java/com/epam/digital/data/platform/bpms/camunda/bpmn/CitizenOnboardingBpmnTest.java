@@ -5,11 +5,11 @@ import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.history
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
-import com.epam.digital.data.platform.bpms.api.constant.Constants;
 import com.epam.digital.data.platform.bpms.camunda.dto.AssertWaitingActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
+import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
 import com.google.common.io.ByteStreams;
 import java.util.Map;
 import java.util.Objects;
@@ -158,7 +158,8 @@ public class CitizenOnboardingBpmnTest extends BaseBpmnTest {
         processInstances.get(1).getId() + "_system_signature_ceph_key";
 
     addExpectedVariable("sign_subject_settings_task_completer", "testuser");
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT, "Суб'єкт створено");
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
+        "Суб'єкт створено");
     addExpectedVariable("subject_system_signature_ceph_key", subjectSystemSignatureCephKey);
     addExpectedVariable("subject_settings_system_signature_ceph_key",
         subjectSettingsSystemSignatureCephKey);
@@ -313,7 +314,8 @@ public class CitizenOnboardingBpmnTest extends BaseBpmnTest {
     addExpectedVariable("subject_settings_system_signature_ceph_key",
         subjectSettingsSystemSignatureCephKey);
     addExpectedVariable("sign_subject_settings_task_completer", testUserName);
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT, "Суб'єкт створено");
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
+        "Суб'єкт створено");
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
@@ -455,7 +457,8 @@ public class CitizenOnboardingBpmnTest extends BaseBpmnTest {
         processInstances.get(0).getId() + "_system_signature_ceph_key";
     addExpectedVariable("subject_settings_system_signature_ceph_key",
         subjectSettingsSystemSignatureCephKey);
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT, "Суб'єкт створено");
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
+        "Суб'єкт створено");
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);

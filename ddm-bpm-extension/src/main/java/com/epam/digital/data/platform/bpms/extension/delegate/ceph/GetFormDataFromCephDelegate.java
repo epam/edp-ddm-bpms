@@ -1,11 +1,8 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.ceph;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.epam.digital.data.platform.integration.ceph.service.FormDataCephService;
 import java.util.LinkedHashMap;
-import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.spin.Spin;
 import org.springframework.stereotype.Component;
@@ -15,20 +12,19 @@ import org.springframework.stereotype.Component;
  * service, map the formData to {@link org.camunda.spin.json.SpinJsonNode} and return it.
  */
 @Component(GetFormDataFromCephDelegate.DELEGATE_NAME)
-@RequiredArgsConstructor
-public class GetFormDataFromCephDelegate extends BaseJavaDelegate {
+public class GetFormDataFromCephDelegate extends BaseFormDataDelegate {
 
   public static final String DELEGATE_NAME = "getFormDataFromCephDelegate";
-  private static final String TASK_DEFINITION_KEY_PARAMETER = "taskDefinitionKey";
-  private static final String FORM_DATA_PARAMETER = "formData";
 
-  private final FormDataCephService cephService;
-  private final CephKeyProvider cephKeyProvider;
+  public GetFormDataFromCephDelegate(FormDataCephService cephService,
+      CephKeyProvider cephKeyProvider) {
+    super(cephService, cephKeyProvider);
+  }
 
   @Override
-  public void execute(DelegateExecution execution) {
+  public void executeInternal(DelegateExecution execution) {
     logStartDelegateExecution();
-    var taskDefinitionKey = (String) execution.getVariable(TASK_DEFINITION_KEY_PARAMETER);
+    var taskDefinitionKey = taskDefinitionKeyVariable.from(execution).get();
 
     var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, execution.getProcessInstanceId());
 
@@ -37,9 +33,7 @@ public class GetFormDataFromCephDelegate extends BaseJavaDelegate {
         .map(FormDataDto::getData)
         .orElse(new LinkedHashMap<>());
 
-    setTransientResult(execution, FORM_DATA_PARAMETER, Spin.JSON(formData));
-    logDelegateExecution(execution, Set.of(TASK_DEFINITION_KEY_PARAMETER),
-        Set.of(FORM_DATA_PARAMETER));
+    formDataVariable.on(execution).set(Spin.JSON(formData));
   }
 
   @Override

@@ -1,8 +1,9 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.DataFactoryConnectorResponse;
+import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
+import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import java.util.List;
-import java.util.Set;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.spin.Spin;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,8 @@ public class DataFactoryConnectorBatchReadDelegate extends DataFactoryConnectorR
 
   public static final String DELEGATE_NAME = "dataFactoryConnectorBatchReadDelegate";
 
-  private static final String VAR_RESOURCE_IDS = "resourceIds";
+  @SystemVariable(name = "resourceIds")
+  private NamedVariableAccessor<List<String>> resourceIdsVariable;
 
   @Autowired
   public DataFactoryConnectorBatchReadDelegate(RestTemplate restTemplate,
@@ -26,29 +28,26 @@ public class DataFactoryConnectorBatchReadDelegate extends DataFactoryConnectorR
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public void execute(DelegateExecution execution) {
+  public void executeInternal(DelegateExecution execution) {
     logStartDelegateExecution();
-    var resource = (String) execution.getVariable(RESOURCE_VARIABLE);
-    var resourceIds = (List<String>) execution.getVariable(VAR_RESOURCE_IDS);
+    var resource = resourceVariable.from(execution).get();
+    var resourceIds = resourceIdsVariable.from(execution).getOrDefault(List.of());
 
     logProcessExecution("batch read entities on resource", resource);
     var response = executeBatchGetOperation(execution, resource, resourceIds);
 
-    setTransientResult(execution, RESPONSE_VARIABLE, response);
-    logDelegateExecution(execution, Set.of(RESOURCE_VARIABLE, VAR_RESOURCE_IDS),
-        Set.of(RESPONSE_VARIABLE));
+    responseVariable.on(execution).set(response);
   }
 
-  private DataFactoryConnectorResponse executeBatchGetOperation(DelegateExecution execution,
+  private ConnectorResponse executeBatchGetOperation(DelegateExecution execution,
       String resource, List<String> resourceIds) {
     var json = Spin.JSON("[]");
 
     resourceIds.stream()
         .map(id -> performGet(execution, resource, id))
-        .map(DataFactoryConnectorResponse::getResponseBody).forEach(json::append);
+        .map(ConnectorResponse::getResponseBody).forEach(json::append);
 
-    return DataFactoryConnectorResponse.builder()
+    return ConnectorResponse.builder()
         .statusCode(HttpStatus.OK.value())
         .responseBody(json)
         .build();

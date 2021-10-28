@@ -3,12 +3,13 @@ package com.epam.digital.data.platform.bpms.camunda.bpmn;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.historyService;
 
-import com.epam.digital.data.platform.bpms.api.constant.Constants;
 import com.epam.digital.data.platform.bpms.camunda.dto.AssertWaitingActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
 import com.epam.digital.data.platform.bpms.it.util.TestUtils;
+import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
+import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessExcerptIdVariable;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.test.Deployment;
@@ -143,9 +144,10 @@ public class CitizenAttestationExcerptTest extends BaseBpmnTest {
     executeWaitingJob("checkExcerptStatusActivity");
 
     addExpectedVariable("signAttestationExcerptActivity_completer", testUserName);
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_EXCERPT_ID,
+    addExpectedVariable(ProcessExcerptIdVariable.SYS_VAR_PROCESS_EXCERPT_ID,
         "d564f2ab-eec6-11eb-9efa-0a580a820439");
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT, "Витяг сформовано");
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
+        "Витяг сформовано");
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
@@ -277,9 +279,10 @@ public class CitizenAttestationExcerptTest extends BaseBpmnTest {
     executeWaitingJob("checkExcerptStatusActivity");
 
     addExpectedVariable("signAttestationExcerptActivity_completer", testUserName);
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_EXCERPT_ID,
+    addExpectedVariable(ProcessExcerptIdVariable.SYS_VAR_PROCESS_EXCERPT_ID,
         "d564f2ab-eec6-11eb-9efa-0a580a820439");
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT, "Витяг сформовано");
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
+        "Витяг сформовано");
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
@@ -410,7 +413,8 @@ public class CitizenAttestationExcerptTest extends BaseBpmnTest {
     executeWaitingJob("checkExcerptStatusActivity");
 
     addExpectedVariable("signAttestationExcerptActivity_completer", testUserName);
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT, "Витяг не сформовано");
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
+        "Витяг не сформовано");
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
@@ -554,7 +558,8 @@ public class CitizenAttestationExcerptTest extends BaseBpmnTest {
     executeWaitingJob("timeOutEvent");
 
     addExpectedVariable("signAttestationExcerptActivity_completer", testUserName);
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT, "Витяг не сформовано");
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
+        "Витяг не сформовано");
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
@@ -649,7 +654,8 @@ public class CitizenAttestationExcerptTest extends BaseBpmnTest {
         .build());
 
     addExpectedVariable("noAttestationErrorActivity_completer", testUserName);
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT, "Витяг не сформовано");
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
+        "Витяг не сформовано");
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
@@ -696,7 +702,8 @@ public class CitizenAttestationExcerptTest extends BaseBpmnTest {
         .build());
 
     addExpectedVariable("subjectStatusErrorActivity_completer", testUserName);
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT, "Витяг не сформовано");
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
+        "Витяг не сформовано");
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);
@@ -735,7 +742,8 @@ public class CitizenAttestationExcerptTest extends BaseBpmnTest {
         .build());
 
     addExpectedVariable("subjectNotFoundActivity_completer", testUserName);
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT, "Витяг не сформовано");
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
+        "Витяг не сформовано");
 
     assertThat(currentProcessInstance).isEnded();
     assertThat(currentProcessInstance).variables().containsAllEntriesOf(expectedVariablesMap);

@@ -15,13 +15,13 @@ import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.history
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.managementService;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
 
-import com.epam.digital.data.platform.bpms.api.constant.Constants;
 import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.extension.delegate.ceph.CephKeyProvider;
 import com.epam.digital.data.platform.bpms.it.BaseIT;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
 import com.epam.digital.data.platform.bpms.it.util.TestUtils;
+import com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable;
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -289,7 +289,7 @@ public abstract class BaseBpmnIT extends BaseIT {
     var variableValueDto = new VariableValueDto();
     variableValueDto.setValue(START_FORM_CEPH_KEY);
     startProcessInstanceDto.setVariables(
-        Map.of(Constants.BPMS_START_FORM_CEPH_KEY_VARIABLE_NAME, variableValueDto));
+        Map.of(StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, variableValueDto));
 
     return postForObject(
         String.format("api/process-definition/key/%s/start", processDefinitionKey),

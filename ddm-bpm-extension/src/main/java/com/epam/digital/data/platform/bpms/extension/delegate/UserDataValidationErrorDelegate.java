@@ -1,14 +1,15 @@
 package com.epam.digital.data.platform.bpms.extension.delegate;
 
+import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.starter.errorhandling.dto.ErrorDetailDto;
 import com.epam.digital.data.platform.starter.errorhandling.dto.ErrorsListDto;
 import com.epam.digital.data.platform.starter.errorhandling.dto.ValidationErrorDto;
 import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -24,25 +25,20 @@ import org.springframework.stereotype.Component;
 public class UserDataValidationErrorDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "userDataValidationErrorDelegate";
-  private static final String VAR_VALIDATION_ERRORS = "validationErrors";
 
   private final ObjectMapper objectMapper;
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public void execute(DelegateExecution execution) {
-    logStartDelegateExecution();
-    List<ErrorDetailDto> validationErrorDtos =
-        execution.hasVariable(VAR_VALIDATION_ERRORS) ?
-            ((List<String>) execution.getVariable(VAR_VALIDATION_ERRORS))
-                .stream().map(this::readValidationErrorValue).collect(Collectors.toList())
-            : Collections.emptyList();
+  @SystemVariable(name = "validationErrors")
+  private NamedVariableAccessor<List<String>> validationErrorsVariable;
 
-    try {
-      throw new ValidationException(createUserDataValidationErrorDto(validationErrorDtos));
-    } finally {
-      logDelegateExecution(execution, Set.of(VAR_VALIDATION_ERRORS), Set.of());
-    }
+  @Override
+  public void executeInternal(DelegateExecution execution) {
+    var validationErrorDtos = validationErrorsVariable.from(execution)
+        .getOptional().stream().flatMap(Collection::stream)
+        .map(this::readValidationErrorValue)
+        .collect(Collectors.toList());
+
+    throw new ValidationException(createUserDataValidationErrorDto(validationErrorDtos));
   }
 
   private ErrorDetailDto readValidationErrorValue(String value) {
