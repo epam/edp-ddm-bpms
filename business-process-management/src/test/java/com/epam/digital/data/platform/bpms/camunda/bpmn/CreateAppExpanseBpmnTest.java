@@ -3,11 +3,12 @@ package com.epam.digital.data.platform.bpms.camunda.bpmn;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.historyService;
 
-import com.epam.digital.data.platform.bpms.api.constant.Constants;
 import com.epam.digital.data.platform.bpms.camunda.dto.AssertWaitingActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
+import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
+import com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable;
 import com.epam.digital.data.platform.starter.errorhandling.dto.ErrorDetailDto;
 import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import java.util.Map;
@@ -108,9 +109,9 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
         .assignee(testUserName)
         .expectedFormDataPrePopulation(deserializeFormData(
             "/json/create-app-expanse/form-data/addApplicationFormActivityPrePopulation.json"))
-        .expectedVariables(
-            Map.of("initiator", testUserName, "fullName", "testuser testuser testuser",
-                "start_form_ceph_key", START_FORM_CEPH_KEY))
+        .expectedVariables(Map.of("initiator", testUserName,
+            "fullName", "testuser testuser testuser",
+            StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(currentProcessInstanceId)
@@ -228,7 +229,7 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
     addExpectedVariable("Activity_shared-sign-app-include_completer", testUserName);
     addExpectedVariable("system_signature_ceph_key", systemSignatureCephKey);
     addExpectedVariable("x_digital_signature_derived_ceph_key", systemSignatureCephKey);
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT,
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
         "Прийнято рішення про розширення факторів");
 
     assertSystemSignature("system_signature_ceph_key",
@@ -304,8 +305,8 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
         .activityDefinitionId(subjectStatusErrorActivityDefinitionKey)
         .formKey("shared-subject-status-error")
         .assignee(testUserName)
-        .expectedVariables(
-            Map.of("initiator", testUserName, "start_form_ceph_key", START_FORM_CEPH_KEY))
+        .expectedVariables(Map.of("initiator", testUserName,
+            StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(currentProcessInstanceId)
@@ -442,7 +443,7 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
     addExpectedVariable("system_signature_ceph_key", systemSignatureCephKey);
     addExpectedVariable("Activity_shared-sign-app-deny_completer", testUserName);
     addExpectedVariable("x_digital_signature_derived_ceph_key", systemSignatureCephKey);
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT,
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
         "Прийнято рішення про залишення без розгляду");
 
     assertSystemSignature("system_signature_ceph_key",
@@ -575,9 +576,9 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
         .assignee(testUserName)
         .expectedFormDataPrePopulation(deserializeFormData(
             "/json/create-app-expanse/form-data/name-edrpou-prepopulation.json"))
-        .expectedVariables(
-            Map.of("initiator", testUserName, "fullName", "testuser testuser testuser",
-                "start_form_ceph_key", START_FORM_CEPH_KEY))
+        .expectedVariables(Map.of("initiator", testUserName,
+            "fullName", "testuser testuser testuser",
+            StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY))
         .build());
 
     mockServer.verify();
@@ -666,8 +667,8 @@ public class CreateAppExpanseBpmnTest extends BaseBpmnTest {
         .activityDefinitionId(subjectStatusErrorActivityDefinitionKey)
         .formKey("shared-subject-status-error")
         .assignee(testUserName)
-        .expectedVariables(
-            Map.of("initiator", testUserName, "start_form_ceph_key", START_FORM_CEPH_KEY))
+        .expectedVariables(Map.of("initiator", testUserName,
+            StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(currentProcessInstanceId)

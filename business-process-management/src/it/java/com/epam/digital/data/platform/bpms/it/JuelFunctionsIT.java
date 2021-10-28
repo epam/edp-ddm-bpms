@@ -7,6 +7,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable;
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.LinkedHashMap;
@@ -66,7 +67,8 @@ public class JuelFunctionsIT extends BaseIT {
     var processDefinitionKey = "testSubmissionKey";
     var formData = new LinkedHashMap<String, Object>();
     formData.put("userName", "testuser");
-    Map<String, Object> vars = Map.of("start_form_ceph_key", "testKey");
+    Map<String, Object> vars = Map.of(StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME,
+        "testKey");
 
     var processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey, vars);
 
@@ -74,7 +76,8 @@ public class JuelFunctionsIT extends BaseIT {
     cephService.putFormData(cephKey, FormDataDto.builder().data(formData).build());
     cephService.putFormData(startFormCephKey, FormDataDto.builder().data(formData).build());
 
-    String taskId = taskService.createTaskQuery().taskDefinitionKey(taskDefinitionKey).singleResult().getId();
+    String taskId = taskService.createTaskQuery().taskDefinitionKey(taskDefinitionKey)
+        .singleResult().getId();
     taskService.complete(taskId);
 
     BpmnAwareTests.assertThat(processInstance).isEnded();
@@ -89,7 +92,8 @@ public class JuelFunctionsIT extends BaseIT {
     var signature = "test signature";
     var data = new LinkedHashMap<String, Object>();
     data.put("userName", "testuser");
-    Map<String, Object> vars = Map.of("start_form_ceph_key", "testKey");
+    Map<String, Object> vars = Map.of(StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME,
+        "testKey");
 
     var processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey, vars);
 

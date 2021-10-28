@@ -3,12 +3,12 @@ package com.epam.digital.data.platform.bpms.camunda.bpmn;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.epam.digital.data.platform.bpms.api.constant.Constants;
 import com.epam.digital.data.platform.bpms.camunda.dto.AssertWaitingActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
 import com.epam.digital.data.platform.bpms.it.util.TestUtils;
+import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
 import com.epam.digital.data.platform.starter.errorhandling.dto.ErrorDetailDto;
 import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import java.util.Collections;
@@ -161,7 +161,8 @@ public class CitizenAddLabBpmnTest extends BaseBpmnTest {
         .build());
 
     addExpectedVariable("signLabOfficerActivity_completer", testuser2UserName);
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT, "Лабораторія створена");
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
+        "Лабораторія створена");
 
     assertSystemSignature("system_signature_ceph_key",
         "/json/citizen-add-lab/dso/digitalSignatureCephContent.json");
@@ -264,7 +265,7 @@ public class CitizenAddLabBpmnTest extends BaseBpmnTest {
         .build());
 
     addExpectedVariable("checkLabOfficerActivity_completer", testuser2UserName);
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT,
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
         "Лабораторія не створена - Така лабораторія вже існує");
 
     assertThat(currentProcessInstance).isEnded();

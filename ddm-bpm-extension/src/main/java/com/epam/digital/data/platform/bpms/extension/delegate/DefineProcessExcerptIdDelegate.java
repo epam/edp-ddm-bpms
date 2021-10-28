@@ -1,7 +1,9 @@
 package com.epam.digital.data.platform.bpms.extension.delegate;
 
-import com.epam.digital.data.platform.bpms.api.constant.Constants;
-import java.util.Set;
+import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
+import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessExcerptIdVariable;
+import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
@@ -11,17 +13,20 @@ import org.springframework.stereotype.Component;
  * a business process system variable
  */
 @Component(DefineProcessExcerptIdDelegate.DELEGATE_EXECUTION)
+@RequiredArgsConstructor
 public class DefineProcessExcerptIdDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_EXECUTION = "defineProcessExcerptIdDelegate";
   public static final String EXCERPT_ID_PARAMETER = "excerptId";
 
+  @SystemVariable(name = "excerptId")
+  private NamedVariableAccessor<String> excerptIdVariable;
+  private final ProcessExcerptIdVariable sysVarExcerptIdVariable;
+
   @Override
-  public void execute(DelegateExecution execution) {
-    logStartDelegateExecution();
-    var excerptId = execution.getVariable(EXCERPT_ID_PARAMETER);
-    setResult(execution, Constants.SYS_VAR_PROCESS_EXCERPT_ID, excerptId);
-    logDelegateExecution(execution, Set.of(Constants.SYS_VAR_PROCESS_EXCERPT_ID), Set.of());
+  public void executeInternal(DelegateExecution execution) {
+    var excerptId = excerptIdVariable.from(execution).get();
+    sysVarExcerptIdVariable.on(execution).set(excerptId);
   }
 
   @Override

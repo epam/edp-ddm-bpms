@@ -1,8 +1,9 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.DataFactoryConnectorResponse;
+import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
+import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import java.util.Map;
-import java.util.Set;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,9 +20,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class DataFactoryConnectorSearchDelegate extends BaseConnectorDelegate {
 
   public static final String DELEGATE_NAME = "dataFactoryConnectorSearchDelegate";
-  private static final String SEARCH_CONDITIONS_VARIABLE = "searchConditions";
 
   private final String dataFactoryBaseUrl;
+
+  @SystemVariable(name = "searchConditions")
+  private NamedVariableAccessor<Map<String, String>> searchConditionsVariable;
 
   @Autowired
   public DataFactoryConnectorSearchDelegate(RestTemplate restTemplate,
@@ -32,27 +35,22 @@ public class DataFactoryConnectorSearchDelegate extends BaseConnectorDelegate {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public void execute(DelegateExecution execution) {
+  public void executeInternal(DelegateExecution execution) {
     logStartDelegateExecution();
-    var resource = (String) execution.getVariable(RESOURCE_VARIABLE);
-    var searchConditions = (Map<String, String>) execution.getVariable(SEARCH_CONDITIONS_VARIABLE);
+    var resource = resourceVariable.from(execution).get();
+    var searchConditions = searchConditionsVariable.from(execution).getOrDefault(Map.of());
 
     logProcessExecution("search entities on resource", resource);
     var response = performSearch(execution, resource, searchConditions);
 
-    setTransientResult(execution, RESPONSE_VARIABLE, response);
-    logDelegateExecution(execution, Set.of(RESOURCE_VARIABLE, SEARCH_CONDITIONS_VARIABLE),
-        Set.of(RESPONSE_VARIABLE));
+    responseVariable.on(execution).set(response);
   }
 
-  private DataFactoryConnectorResponse performSearch(DelegateExecution delegateExecution,
-      String resourceName, Map<String, String> searchCriteria) {
+  private ConnectorResponse performSearch(DelegateExecution delegateExecution, String resourceName,
+      Map<String, String> searchCriteria) {
     var uriBuilder = UriComponentsBuilder.fromHttpUrl(dataFactoryBaseUrl).pathSegment(resourceName)
         .encode();
-    if (searchCriteria != null) {
-      searchCriteria.forEach(uriBuilder::queryParam);
-    }
+    searchCriteria.forEach(uriBuilder::queryParam);
 
     return perform(RequestEntity.get(uriBuilder.build().toUri())
         .headers(getHeaders(delegateExecution)).build());

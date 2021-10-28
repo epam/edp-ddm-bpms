@@ -3,11 +3,11 @@ package com.epam.digital.data.platform.bpms.it.camunda.bpmn;
 import static com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil.processInstance;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 
-import com.epam.digital.data.platform.bpms.api.constant.Constants;
 import com.epam.digital.data.platform.bpms.camunda.dto.AssertWaitingActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
+import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Map;
 import org.camunda.bpm.engine.test.Deployment;
@@ -76,7 +76,7 @@ public class CitizenReadStaffIT extends BaseBpmnIT {
         .build());
 
     addExpectedVariable("Activity_read-personnel-bp-read-personnel_completer", testUserName);
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT,
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
         "Дані про кадровий склад відображені");
 
     BpmnAwareTests.assertThat(processInstance)

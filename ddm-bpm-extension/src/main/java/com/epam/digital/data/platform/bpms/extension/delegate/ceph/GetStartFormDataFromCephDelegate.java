@@ -1,12 +1,9 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.ceph;
 
-import com.epam.digital.data.platform.bpms.api.constant.Constants;
-import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
+import com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable;
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.epam.digital.data.platform.integration.ceph.service.FormDataCephService;
 import java.util.LinkedHashMap;
-import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.spin.Spin;
 import org.springframework.stereotype.Component;
@@ -17,27 +14,29 @@ import org.springframework.stereotype.Component;
  * it.
  */
 @Component(GetStartFormDataFromCephDelegate.DELEGATE_NAME)
-@RequiredArgsConstructor
-public class GetStartFormDataFromCephDelegate extends BaseJavaDelegate {
+public class GetStartFormDataFromCephDelegate extends BaseFormDataDelegate {
 
   public static final String DELEGATE_NAME = "getStartFormDataFromCephDelegate";
-  private static final String FORM_DATA_PARAMETER = "formData";
 
-  private final FormDataCephService cephService;
+  private final StartFormCephKeyVariable startFormCephKeyVariable;
+
+  public GetStartFormDataFromCephDelegate(FormDataCephService cephService,
+      CephKeyProvider cephKeyProvider, StartFormCephKeyVariable startFormCephKeyVariable) {
+    super(cephService, cephKeyProvider);
+    this.startFormCephKeyVariable = startFormCephKeyVariable;
+  }
 
   @Override
-  public void execute(DelegateExecution execution) {
+  public void executeInternal(DelegateExecution execution) {
     logStartDelegateExecution();
-    var cephKey = (String) execution.getVariable(Constants.BPMS_START_FORM_CEPH_KEY_VARIABLE_NAME);
+    var cephKey = startFormCephKeyVariable.from(execution).get();
 
     logProcessExecution("get start form data by key", cephKey);
     var formData = cephService.getFormData(cephKey)
         .map(FormDataDto::getData)
         .orElse(new LinkedHashMap<>());
 
-    setTransientResult(execution, FORM_DATA_PARAMETER, Spin.JSON(formData));
-    logDelegateExecution(execution, Set.of(Constants.BPMS_START_FORM_CEPH_KEY_VARIABLE_NAME),
-        Set.of(FORM_DATA_PARAMETER));
+    formDataVariable.on(execution).set(Spin.JSON(formData));
   }
 
   @Override

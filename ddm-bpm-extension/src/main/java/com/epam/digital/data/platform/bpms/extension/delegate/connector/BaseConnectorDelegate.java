@@ -2,7 +2,10 @@ package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
 import com.epam.digital.data.platform.bpms.api.dto.enums.PlatformHttpHeader;
 import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.DataFactoryConnectorResponse;
+import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
+import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -12,6 +15,7 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.spin.Spin;
+import org.camunda.spin.json.SpinJsonNode;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.RequestEntity;
 import org.springframework.web.client.RestTemplate;
@@ -24,14 +28,28 @@ import org.springframework.web.client.RestTemplate;
 public abstract class BaseConnectorDelegate extends BaseJavaDelegate {
 
   protected static final String RESOURCE_SETTINGS = "settings";
-  protected static final String RESOURCE_VARIABLE = "resource";
   protected static final String RESOURCE_EXCERPTS = "excerpts";
-  protected static final String RESOURCE_ID_VARIABLE = "id";
-  protected static final String PAYLOAD_VARIABLE = "payload";
-  protected static final String RESPONSE_VARIABLE = "response";
 
   private final RestTemplate restTemplate;
   private final String springAppName;
+
+  @SystemVariable(name = "x_access_token")
+  private NamedVariableAccessor<String> xAccessTokenVariable;
+  @SystemVariable(name = "x_digital_signature_ceph_key")
+  private NamedVariableAccessor<String> xDigitalSignatureCephKeyVariable;
+  @SystemVariable(name = "x_digital_signature_derived_ceph_key")
+  protected NamedVariableAccessor<String> xDigitalSignatureDerivedCephKeyVariable;
+  @SystemVariable(name = "headers")
+  private NamedVariableAccessor<Map<String, String>> headersVariable;
+
+  @SystemVariable(name = "resource")
+  protected NamedVariableAccessor<String> resourceVariable;
+  @SystemVariable(name = "id")
+  protected NamedVariableAccessor<String> resourceIdVariable;
+  @SystemVariable(name = "payload", isTransient = true)
+  protected NamedVariableAccessor<SpinJsonNode> payloadVariable;
+  @SystemVariable(name = "response", isTransient = true)
+  protected NamedVariableAccessor<ConnectorResponse> responseVariable;
 
   /**
    * Method for performing requests to data factory
@@ -39,11 +57,11 @@ public abstract class BaseConnectorDelegate extends BaseJavaDelegate {
    * @param requestEntity {@link RequestEntity} entity
    * @return response from data factory
    */
-  protected DataFactoryConnectorResponse perform(RequestEntity<?> requestEntity) {
+  protected ConnectorResponse perform(RequestEntity<?> requestEntity) {
     var httpResponse = restTemplate.exchange(requestEntity, String.class);
 
     var spin = Objects.isNull(httpResponse.getBody()) ? null : Spin.JSON(httpResponse.getBody());
-    return DataFactoryConnectorResponse.builder()
+    return ConnectorResponse.builder()
         .statusCode(httpResponse.getStatusCode().value())
         .responseBody(spin)
         .headers(httpResponse.getHeaders())
@@ -57,7 +75,6 @@ public abstract class BaseConnectorDelegate extends BaseJavaDelegate {
    * @param delegateExecution {@link DelegateExecution} object
    * @return list of http headers
    */
-  @SuppressWarnings("unchecked")
   protected HttpHeaders getHeaders(DelegateExecution delegateExecution) {
     var headers = new HttpHeaders();
     headers.add("Content-Type", "application/json");
@@ -76,21 +93,19 @@ public abstract class BaseConnectorDelegate extends BaseJavaDelegate {
 
     getAccessToken(delegateExecution).ifPresent(xAccessToken ->
         headers.add(PlatformHttpHeader.X_ACCESS_TOKEN.getName(), xAccessToken));
-    var xDigitalSignatureCephKey = (String) delegateExecution
-        .getVariable("x_digital_signature_ceph_key");
+    var xDigitalSignatureCephKey = xDigitalSignatureCephKeyVariable.from(delegateExecution).get();
     headers.add(PlatformHttpHeader.X_DIGITAL_SIGNATURE.getName(), xDigitalSignatureCephKey);
-    var xDigitalSignatureDerivedCephKey = (String) delegateExecution
-        .getVariable("x_digital_signature_derived_ceph_key");
+    var xDigitalSignatureDerivedCephKey = xDigitalSignatureDerivedCephKeyVariable
+        .from(delegateExecution).get();
     if (!StringUtils.isBlank(xDigitalSignatureDerivedCephKey)) {
       headers.add(PlatformHttpHeader.X_DIGITAL_SIGNATURE_DERIVED.getName(),
           xDigitalSignatureDerivedCephKey);
     }
 
-    var customHeaders = (Map<String, String>) delegateExecution.getVariable("headers");
-    if (customHeaders != null) {
-      customHeaders.entrySet().stream().filter(entry -> !headers.containsKey(entry.getKey()))
-          .forEach(entry -> headers.add(entry.getKey(), entry.getValue()));
-    }
+    headersVariable.from(delegateExecution).getOptional()
+        .map(Map::entrySet).stream().flatMap(Collection::stream)
+        .filter(entry -> !headers.containsKey(entry.getKey()))
+        .forEach(entry -> headers.add(entry.getKey(), entry.getValue()));
 
     return headers;
   }
@@ -102,7 +117,6 @@ public abstract class BaseConnectorDelegate extends BaseJavaDelegate {
    * @return access token body
    */
   protected Optional<String> getAccessToken(DelegateExecution delegateExecution) {
-    var xAccessToken = (String) delegateExecution.getVariable("x_access_token");
-    return Optional.ofNullable(xAccessToken);
+    return xAccessTokenVariable.from(delegateExecution).getOptional();
   }
 }

@@ -1,9 +1,13 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloak.officer;
 
-import java.util.Objects;
-import java.util.Set;
+import com.epam.digital.data.platform.bpms.extension.delegate.dto.KeycloakUserDto;
+import com.epam.digital.data.platform.bpms.extension.service.KeycloakClientService;
+import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
+import java.util.List;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,22 +20,28 @@ public class KeycloakGetOfficerUsersConnectorDelegate extends BaseKeycloakOffice
   public static final String DELEGATE_NAME = "keycloakGetUsersConnectorDelegate";
 
   private static final String DEFAULT_ROLE = "officer";
-  private static final String ROLE_NAME_VAR = "role_name";
-  private static final String RESULT_NAME_VAR = "usersByRole";
+
+  @SystemVariable(name = "role_name")
+  private NamedVariableAccessor<String> roleNameVariable;
+  @SystemVariable(name = "usersByRole")
+  private NamedVariableAccessor<List<KeycloakUserDto>> usersByRoleVariable;
+
+  public KeycloakGetOfficerUsersConnectorDelegate(
+      @Qualifier("officer-keycloak-service") KeycloakClientService keycloakClientService) {
+    super(keycloakClientService);
+  }
 
   @Override
-  public void execute(DelegateExecution execution) throws Exception {
+  public void executeInternal(DelegateExecution execution) throws Exception {
     logStartDelegateExecution();
-    var role = Objects.requireNonNullElse((String) execution.getVariable(ROLE_NAME_VAR),
-        DEFAULT_ROLE);
+    var role = roleNameVariable.from(execution).getOrDefault(DEFAULT_ROLE);
 
     logProcessExecution("get realm resource");
     var realmResource = keycloakClientService.getRealmResource();
     logProcessExecution("get users by role", role);
     var roleUserMembers = keycloakClientService.getRoleUserMembers(realmResource, role);
 
-    setResult(execution, RESULT_NAME_VAR, roleUserMembers);
-    logDelegateExecution(execution, Set.of(ROLE_NAME_VAR), Set.of(RESULT_NAME_VAR));
+    usersByRoleVariable.on(execution).set(roleUserMembers);
   }
 
   @Override

@@ -3,12 +3,12 @@ package com.epam.digital.data.platform.bpms.it.camunda.bpmn;
 import static com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil.processInstance;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 
-import com.epam.digital.data.platform.bpms.api.constant.Constants;
 import com.epam.digital.data.platform.bpms.camunda.dto.AssertWaitingActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
 import com.epam.digital.data.platform.bpms.it.util.TestUtils;
+import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -293,7 +293,7 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
         .build());
 
     addExpectedVariable("signAppExcludeFormActivity_completer", headOfficerName);
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT,
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
         "Лабораторію видалено з реєстру");
 
     assertThat(processInstance).isEnded();
@@ -473,7 +473,7 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
         .build());
 
     addExpectedVariable("signAppDenyFormActivity_completer", headOfficerName);
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT,
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
         "Залишено без розгляду");
 
     assertThat(processInstance).isEnded();

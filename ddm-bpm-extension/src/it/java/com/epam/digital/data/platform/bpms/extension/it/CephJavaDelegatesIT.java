@@ -5,7 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-import com.epam.digital.data.platform.bpms.api.constant.Constants;
+import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
+import com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable;
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.epam.digital.data.platform.integration.ceph.exception.MisconfigurationException;
 import com.google.common.collect.ImmutableMap;
@@ -110,14 +111,15 @@ public class CephJavaDelegatesIT extends BaseIT {
         .processInstanceId(processInstance.getId()).list().stream()
         .collect(toMap(HistoricVariableInstance::getName, HistoricVariableInstance::getValue,
             (o1, o2) -> o1));
-    assertThat(resultVariables).containsEntry("sys-var-process-completion-result", status);
+    assertThat(resultVariables).containsEntry(
+        ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT, status);
   }
 
   @Test
   @Deployment(resources = {"bpmn/delegate/testStartFormKey.bpmn"})
   public void shouldReadStartFormData() {
-    Map<String, Object> vars = ImmutableMap.of(
-        Constants.BPMS_START_FORM_CEPH_KEY_VARIABLE_NAME, "cephKey");
+    Map<String, Object> vars = Map.of(
+        StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, "cephKey");
 
     var data = new LinkedHashMap<String, Object>();
     data.put("prop1", "value1");

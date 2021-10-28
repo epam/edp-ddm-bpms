@@ -3,12 +3,13 @@ package com.epam.digital.data.platform.bpms.it.camunda.bpmn;
 import static com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil.processInstance;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 
-import com.epam.digital.data.platform.bpms.api.constant.Constants;
 import com.epam.digital.data.platform.bpms.camunda.dto.AssertWaitingActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
 import com.epam.digital.data.platform.bpms.it.util.TestUtils;
+import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
+import com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -154,9 +155,10 @@ public class CitizenCreateAppExpanseIT extends BaseBpmnIT {
         .assignee(testUserName)
         .expectedFormDataPrePopulation(deserializeFormData(
             "/json/citizen-create-expanse/form-data/Activity_citizen-shared-add-factors-pre-population.json"))
-        .expectedVariables(Map.of("initiator", testUserName, "const_dataFactoryBaseUrl",
-            dataFactoryBaseUrl, "start_form_ceph_key", START_FORM_CEPH_KEY, "fullName",
-            "testuser testuser testuser"))
+        .expectedVariables(Map.of("initiator", testUserName,
+            "const_dataFactoryBaseUrl", dataFactoryBaseUrl,
+            StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY,
+            "fullName", "testuser testuser testuser"))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
@@ -317,7 +319,7 @@ public class CitizenCreateAppExpanseIT extends BaseBpmnIT {
         .build());
 
     addExpectedVariable(citizenSharedSignAppInclude + "_completer", headOfficerUserName);
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT,
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
         "Прийнято рішення про внесення лабораторії до переліку");
 
     assertThat(processInstance).isEnded();
@@ -436,9 +438,10 @@ public class CitizenCreateAppExpanseIT extends BaseBpmnIT {
         .assignee(testUserName)
         .expectedFormDataPrePopulation(deserializeFormData(
             "/json/citizen-create-expanse/form-data/Activity_citizen-shared-add-factors-pre-population.json"))
-        .expectedVariables(Map.of("initiator", testUserName, "const_dataFactoryBaseUrl",
-            dataFactoryBaseUrl, "start_form_ceph_key", START_FORM_CEPH_KEY, "fullName",
-            "testuser testuser testuser"))
+        .expectedVariables(Map.of("initiator", testUserName,
+            "const_dataFactoryBaseUrl", dataFactoryBaseUrl,
+            StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY,
+            "fullName", "testuser testuser testuser"))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
@@ -636,7 +639,7 @@ public class CitizenCreateAppExpanseIT extends BaseBpmnIT {
         .build());
 
     addExpectedVariable(citizenSharedSignAppDeny + "_completer", headOfficerUserName);
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT,
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
         "Прийнято рішення про залишення без розгляду");
 
     assertThat(processInstance).isEnded();

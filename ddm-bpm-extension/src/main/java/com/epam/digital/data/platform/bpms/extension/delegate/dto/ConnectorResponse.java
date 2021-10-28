@@ -14,7 +14,7 @@ import org.camunda.spin.json.SpinJsonNode;
 @Builder
 @Getter
 @ToString
-public class DataFactoryConnectorResponse implements Serializable {
+public class ConnectorResponse implements Serializable {
 
   private final int statusCode;
   private final transient SpinJsonNode responseBody;

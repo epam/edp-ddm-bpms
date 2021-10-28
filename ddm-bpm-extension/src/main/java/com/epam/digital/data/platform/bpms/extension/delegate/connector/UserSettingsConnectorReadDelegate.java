@@ -1,7 +1,6 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.DataFactoryConnectorResponse;
-import java.util.Set;
+import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,17 +30,16 @@ public class UserSettingsConnectorReadDelegate extends BaseConnectorDelegate {
   }
 
   @Override
-  public void execute(DelegateExecution execution) throws Exception {
+  public void executeInternal(DelegateExecution execution) throws Exception {
     logStartDelegateExecution();
     logProcessExecution("read user settings  on resource", RESOURCE_SETTINGS);
     var response = performGet(execution);
 
-    setTransientResult(execution, RESPONSE_VARIABLE, response);
-    logDelegateExecution(execution, Set.of(), Set.of(RESPONSE_VARIABLE));
+    responseVariable.on(execution).set(response);
   }
 
 
-  protected DataFactoryConnectorResponse performGet(DelegateExecution delegateExecution) {
+  protected ConnectorResponse performGet(DelegateExecution delegateExecution) {
     var uri = UriComponentsBuilder.fromHttpUrl(userSettingsBaseUrl).pathSegment(RESOURCE_SETTINGS)
         .build().toUri();
 

@@ -1,52 +1,65 @@
 package com.epam.digital.data.platform.bpms.security.listener;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import com.epam.digital.data.platform.dataaccessor.initiator.InitiatorVariablesAccessor;
+import com.epam.digital.data.platform.dataaccessor.initiator.InitiatorVariablesWriteAccessor;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-@RunWith(MockitoJUnitRunner.class)
-public class InitiatorTokenStartEventListenerTest {
+@ExtendWith(MockitoExtension.class)
+class InitiatorTokenStartEventListenerTest {
 
   @InjectMocks
   private InitiatorTokenStartEventListener initiatorTokenStartEventListener;
   @Mock
   private ExecutionEntity execution;
+  @Mock
+  private InitiatorVariablesAccessor initiatorVariablesAccessor;
+  @Mock
+  private InitiatorVariablesWriteAccessor initiatorVariablesWriteAccessor;
+
+  @BeforeEach
+  public void setUp() {
+    when(initiatorVariablesAccessor.on(execution)).thenReturn(initiatorVariablesWriteAccessor);
+  }
 
   @Test
-  public void testNotAuthenticated() {
+  void testNotAuthenticated() {
     SecurityContextHolder.getContext().setAuthentication(null);
 
     initiatorTokenStartEventListener.notify(execution);
 
-    verify(execution).setVariableLocalTransient("initiator_access_token", null);
+    verify(initiatorVariablesWriteAccessor).setInitiatorAccessToken(null);
   }
 
   @Test
-  public void testAuthenticatedNotByStringToken() {
+  void testAuthenticatedNotByStringToken() {
     var notStringCredentials = new Object();
     var auth = new UsernamePasswordAuthenticationToken("user", notStringCredentials);
     SecurityContextHolder.getContext().setAuthentication(auth);
 
     initiatorTokenStartEventListener.notify(execution);
 
-    verify(execution).setVariableLocalTransient("initiator_access_token", null);
+    verify(initiatorVariablesWriteAccessor).setInitiatorAccessToken(null);
   }
 
   @Test
-  public void testAuthenticated() {
+  void testAuthenticated() {
     var stringCredentials = "token";
     var auth = new UsernamePasswordAuthenticationToken("user", stringCredentials);
     SecurityContextHolder.getContext().setAuthentication(auth);
 
     initiatorTokenStartEventListener.notify(execution);
 
-    verify(execution).setVariableLocalTransient("initiator_access_token", stringCredentials);
+    verify(initiatorVariablesWriteAccessor).setInitiatorAccessToken(stringCredentials);
   }
 }

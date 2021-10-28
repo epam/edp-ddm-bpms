@@ -1,9 +1,13 @@
 package com.epam.digital.data.platform.bpms.listener;
 
+import com.epam.digital.data.platform.dataaccessor.completer.CompleterVariablesAccessor;
+import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -13,40 +17,40 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class CompleterTaskEventListener implements TaskListener {
 
-  private static final String COMPLETER_VAR_TOKEN_FORMAT = "%s_completer_access_token";
-  private static final String COMPLETER_VAR_NAME_FORMAT = "%s_completer";
+  private final CompleterVariablesAccessor completerVariablesAccessor;
 
   @Override
   public void notify(DelegateTask delegateTask) {
     var taskDefinitionKey = delegateTask.getTaskDefinitionKey();
-    AbstractVariableScope variableScope = getRootExecution(delegateTask);
-    String completerToken = null;
-    String completerName = null;
+    if (Objects.isNull(taskDefinitionKey)) {
+      return;
+    }
     var authentication = SecurityContextHolder.getContext().getAuthentication();
 
     if (authentication == null) {
       log.warn("User is not authenticated");
-    } else {
-      completerToken = (String) authentication.getCredentials();
-      completerName = authentication.getName();
+      return;
     }
-    var completerVarResultName = String.format(COMPLETER_VAR_NAME_FORMAT, taskDefinitionKey);
-    var completerVarResultToken = String.format(COMPLETER_VAR_TOKEN_FORMAT, taskDefinitionKey);
-    variableScope.setVariable(completerVarResultName, completerName);
-    variableScope.setVariableLocalTransient(completerVarResultToken, completerToken);
+    var completerToken = (String) authentication.getCredentials();
+    var completerName = authentication.getName();
+
+    var delegateExecution = getRootExecution(delegateTask);
+    var variableAccessor = completerVariablesAccessor.on(delegateExecution);
+    variableAccessor.setTaskCompleter(taskDefinitionKey, completerName);
+    variableAccessor.setTaskCompleterToken(taskDefinitionKey, completerToken);
+
     log.debug("Setting task completer variables:\n"
-            + "Task definition key - {}\n"
-            + "User name {} - {}\n"
-            + "Access token {} - {}", taskDefinitionKey, completerVarResultName, completerName,
-        completerVarResultToken, completerToken);
+        + "Task definition key - {}\n"
+        + "User name - {}", taskDefinitionKey, completerName);
   }
 
-  private AbstractVariableScope getRootExecution(DelegateTask delegateTask) {
-    var variableScope = (AbstractVariableScope) delegateTask.getExecution();
+  private DelegateExecution getRootExecution(DelegateTask delegateTask) {
+    var variableScope = (ExecutionEntity) delegateTask.getExecution();
     while (variableScope.getParentVariableScope() != null) {
-      variableScope = variableScope.getParentVariableScope();
+      variableScope = (ExecutionEntity) variableScope.getParentVariableScope();
     }
     return variableScope;
   }

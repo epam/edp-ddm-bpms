@@ -7,13 +7,19 @@
   <parent>
     <artifactId>business-process-management-parent</artifactId>
     <groupId>com.epam.digital.data.platform</groupId>
-    <version>1.5.0-SNAPSHOT</version>
+    <version>1.5.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>ddm-bpm-engine</artifactId>
   <name>ddm-bpm-engine</name>
 
   <dependencies>
+    <dependency>
+      <groupId>com.epam.digital.data.platform</groupId>
+      <artifactId>ddm-bpm-data-accessor</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>

@@ -1,9 +1,6 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.ceph;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.integration.ceph.service.CephService;
-import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,25 +11,22 @@ import org.springframework.stereotype.Component;
  * as string using {@link CephService} service.
  */
 @Component(PutContentToCephDelegate.DELEGATE_NAME)
-@RequiredArgsConstructor
-public class PutContentToCephDelegate extends BaseJavaDelegate {
+public class PutContentToCephDelegate extends BaseCephDelegate {
 
   public static final String DELEGATE_NAME = "putContentToCephDelegate";
-  private static final String KEY_PARAMETER = "key";
-  private static final String CONTENT_PARAMETER = "content";
 
-  @Value("${ceph.bucket}")
-  private final String cephBucketName;
-  private final CephService cephService;
+  public PutContentToCephDelegate(@Value("${ceph.bucket}") String cephBucketName,
+      CephService cephService) {
+    super(cephBucketName, cephService);
+  }
 
   @Override
-  public void execute(DelegateExecution execution) {
+  public void executeInternal(DelegateExecution execution) {
     logStartDelegateExecution();
-    var key = (String) execution.getVariable(KEY_PARAMETER);
-    var content = (String) execution.getVariable(CONTENT_PARAMETER);
+    var key = keyVariable.from(execution).get();
+    var content = contentVariable.from(execution).get();
     logProcessExecution("put content with key", key);
     cephService.putContent(cephBucketName, key, content);
-    logDelegateExecution(execution, Set.of(KEY_PARAMETER, CONTENT_PARAMETER), Set.of());
   }
 
   @Override
