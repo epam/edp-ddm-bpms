@@ -1,7 +1,9 @@
 package com.epam.digital.data.platform.bpms.extension.delegate;
 
-import com.epam.digital.data.platform.bpms.api.constant.Constants;
-import java.util.Set;
+import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
+import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
+import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
@@ -11,17 +13,20 @@ import org.springframework.stereotype.Component;
  * of a business process
  */
 @Component(DefineBusinessProcessStatusDelegate.DELEGATE_EXECUTION)
+@RequiredArgsConstructor
 public class DefineBusinessProcessStatusDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_EXECUTION = "defineBusinessProcessStatusDelegate";
-  public static final String STATUS_PARAMETER = "status";
+
+  @SystemVariable(name = "status")
+  private NamedVariableAccessor<String> statusVariable;
+  private final ProcessCompletionResultVariable sysVarCompletionResult;
 
   @Override
-  public void execute(DelegateExecution execution) {
+  public void executeInternal(DelegateExecution execution) {
     logStartDelegateExecution();
-    var status = execution.getVariable(STATUS_PARAMETER);
-    setResult(execution, Constants.SYS_VAR_PROCESS_COMPLETION_RESULT, status);
-    logDelegateExecution(execution, Set.of(STATUS_PARAMETER), Set.of());
+    var status = statusVariable.from(execution).get();
+    sysVarCompletionResult.on(execution).set(status);
   }
 
   @Override

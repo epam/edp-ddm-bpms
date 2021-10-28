@@ -8,6 +8,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.epam.digital.data.platform.bpms.extension.delegate.ceph.CephKeyProvider;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableReadAccessor;
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.epam.digital.data.platform.integration.ceph.service.FormDataCephService;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -17,17 +19,19 @@ import java.util.Map;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.spin.Spin;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.camunda.spin.json.SpinJsonNode;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
-@RunWith(MockitoJUnitRunner.class)
-public class PutFormDataToCephListenerTest {
+@ExtendWith(MockitoExtension.class)
+class PutFormDataToCephListenerTest {
 
   private static final String CEPH_KEY = "cephKey";
 
@@ -43,29 +47,37 @@ public class PutFormDataToCephListenerTest {
   private DelegateExecution delegateExecution;
   @Mock
   private DelegateTask delegateTask;
+  @Mock
+  private NamedVariableAccessor<SpinJsonNode> userTaskInputFormDataPrepopulateVariable;
+  @Mock
+  private NamedVariableReadAccessor<SpinJsonNode> userTaskInputFormDataPrepopulateReadAccessor;
 
   @Captor
   private ArgumentCaptor<FormDataDto> formDataDtoArgumentCaptor;
 
-  @Before
-  public void setUp() {
-    var taskDefinitionKey = "task";
-    var processInstanceId = "id";
-
+  @BeforeEach
+  void setUp() {
     when(delegateTask.getExecution()).thenReturn(delegateExecution);
-    when(delegateTask.getTaskDefinitionKey()).thenReturn(taskDefinitionKey);
-    when(delegateTask.getProcessInstanceId()).thenReturn(processInstanceId);
-    when(cephKeyProvider.generateKey(taskDefinitionKey, processInstanceId)).thenReturn(CEPH_KEY);
+
+    when(userTaskInputFormDataPrepopulateVariable.from(delegateExecution)).thenReturn(
+        userTaskInputFormDataPrepopulateReadAccessor);
+    ReflectionTestUtils.setField(putFormDataToCephTaskListener,
+        "userTaskInputFormDataPrepopulateVariable", userTaskInputFormDataPrepopulateVariable);
   }
 
   @Test
-  public void testPutFormDataToCephTaskListener() {
+  void testPutFormDataToCephTaskListener() {
+    var taskDefinitionKey = "task";
+    var processInstanceId = "id";
     var map = Map.of("field1", "value1");
     var spinObj = Spin.JSON(map);
-    when(delegateExecution.getVariableLocal("userTaskInputFormDataPrepopulate"))
-        .thenReturn(spinObj);
+    when(userTaskInputFormDataPrepopulateReadAccessor.get()).thenReturn(spinObj);
     when(objectMapper.convertValue(eq(spinObj.unwrap()), any(TypeReference.class)))
         .thenReturn(new LinkedHashMap<String, Object>(map));
+
+    when(delegateTask.getTaskDefinitionKey()).thenReturn(taskDefinitionKey);
+    when(delegateTask.getProcessInstanceId()).thenReturn(processInstanceId);
+    when(cephKeyProvider.generateKey(taskDefinitionKey, processInstanceId)).thenReturn(CEPH_KEY);
 
     putFormDataToCephTaskListener.notify(delegateTask);
 
@@ -76,17 +88,7 @@ public class PutFormDataToCephListenerTest {
   }
 
   @Test
-  public void testPutFormDataToCephTaskListener_noInputParams() {
-    putFormDataToCephTaskListener.notify(delegateTask);
-
-    verify(formDataCephService, never()).putFormData(any(), any());
-  }
-
-  @Test
-  public void testPutFormDataToCephTaskListener_inputParamWithWrongArgumentType() {
-    when(delegateExecution.getVariableLocal("userTaskInputFormDataPrepopulate"))
-        .thenReturn(new Object());
-
+  void testPutFormDataToCephTaskListener_noInputParams() {
     putFormDataToCephTaskListener.notify(delegateTask);
 
     verify(formDataCephService, never()).putFormData(any(), any());

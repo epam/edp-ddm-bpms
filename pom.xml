@@ -12,7 +12,7 @@
   </parent>
 
   <artifactId>business-process-management-parent</artifactId>
-  <version>1.5.0-SNAPSHOT</version>
+  <version>1.5.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -20,6 +20,7 @@
     <module>business-process-management</module>
     <module>business-process-management-api</module>
     <module>business-process-management-client</module>
+    <module>ddm-bpm-data-accessor</module>
     <module>ddm-bpm-extension</module>
     <module>ddm-bpm-engine</module>
   </modules>

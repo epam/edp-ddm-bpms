@@ -1,9 +1,7 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.DataFactoryConnectorResponse;
-import java.util.Set;
+import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.spin.json.SpinJsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
@@ -32,18 +30,17 @@ public class UserSettingsConnectorUpdateDelegate extends BaseConnectorDelegate {
   }
 
   @Override
-  public void execute(DelegateExecution execution) throws Exception {
+  public void executeInternal(DelegateExecution execution) throws Exception {
     logStartDelegateExecution();
-    var payload = (SpinJsonNode) execution.getVariable(PAYLOAD_VARIABLE);
+    var payload = payloadVariable.from(execution).getOptional();
 
     logProcessExecution("create or update user settings on resource", RESOURCE_SETTINGS);
-    var response = performPut(execution, payload.toString());
+    var response = performPut(execution, payload.map(Object::toString).orElse(null));
 
-    setTransientResult(execution, RESPONSE_VARIABLE, response);
-    logDelegateExecution(execution, Set.of(PAYLOAD_VARIABLE), Set.of(RESPONSE_VARIABLE));
+    responseVariable.on(execution).set(response);
   }
 
-  private DataFactoryConnectorResponse performPut(DelegateExecution execution, String body) {
+  private ConnectorResponse performPut(DelegateExecution execution, String body) {
     var uri = UriComponentsBuilder.fromHttpUrl(userSettingsBaseUrl).pathSegment(RESOURCE_SETTINGS)
         .build().toUri();
 

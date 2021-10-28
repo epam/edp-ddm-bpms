@@ -1,5 +1,6 @@
 package com.epam.digital.data.platform.bpms.listener;
 
+import com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable;
 import com.epam.digital.data.platform.integration.ceph.service.S3ObjectCephService;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +20,13 @@ import org.springframework.stereotype.Component;
 public class FormDataCleanerEndEventListener implements ExecutionListener {
 
   private static final String USER_TASK_FORM_DATA_PREFIX_FORMAT = "process/%s/";
-  private static final String START_FORM_CEPH_KEY = "start_form_ceph_key";
 
   private final S3ObjectCephService s3FormDataStorageCephService;
+  private final StartFormCephKeyVariable startFormCephKeyVariable;
 
   @Override
   public void notify(DelegateExecution execution) throws Exception {
-    var startFormDataCephKey = (String) execution.getVariable(START_FORM_CEPH_KEY);
+    var startFormDataCephKey = startFormCephKeyVariable.from(execution).get();
     var processInstanceId = execution.getProcessInstanceId();
     var userFormDataPrefixKey = String.format(USER_TASK_FORM_DATA_PREFIX_FORMAT, processInstanceId);
 

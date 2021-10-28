@@ -3,12 +3,12 @@ package com.epam.digital.data.platform.bpms.it.camunda.bpmn;
 import static com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil.processInstance;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 
-import com.epam.digital.data.platform.bpms.api.constant.Constants;
 import com.epam.digital.data.platform.bpms.camunda.dto.AssertWaitingActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
 import com.epam.digital.data.platform.bpms.it.util.TestUtils;
+import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Collections;
 import java.util.List;
@@ -227,7 +227,7 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         "/json/citizen-update-lab/dso/dsoCephContent_nameUnique.json");
 
     addExpectedVariable("signLabOfficerActivity_completer", testuser2UserName);
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT,
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
         "Дані про лабораторію оновлені");
 
     assertThat(processInstance).isEnded();
@@ -391,7 +391,7 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         .build());
 
     addExpectedVariable("checkLabOfficerActivity_completer", testuser2UserName);
-    addExpectedVariable(Constants.SYS_VAR_PROCESS_COMPLETION_RESULT,
+    addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
         "Дані про лабораторію не оновлені - Така лабораторія вже існує");
 
     assertThat(processInstance).isEnded();

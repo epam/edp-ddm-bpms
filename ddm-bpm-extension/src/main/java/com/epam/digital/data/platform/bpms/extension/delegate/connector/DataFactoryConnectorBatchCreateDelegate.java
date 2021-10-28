@@ -1,11 +1,9 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.DataFactoryConnectorResponse;
+import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
 import com.epam.digital.data.platform.integration.ceph.service.CephService;
 import java.util.Map;
-import java.util.Set;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.spin.Spin;
 import org.camunda.spin.json.SpinJsonNode;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,22 +41,19 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelega
   }
 
   @Override
-  public void execute(DelegateExecution execution) {
+  public void executeInternal(DelegateExecution execution) throws Exception {
     logStartDelegateExecution();
-    var resource = (String) execution.getVariable(RESOURCE_VARIABLE);
-    var payload = (SpinJsonNode) execution.getVariable(PAYLOAD_VARIABLE);
+    var resource = resourceVariable.from(execution).get();
+    var payload = payloadVariable.from(execution).getOrDefault(Spin.JSON(Map.of()));
 
     logProcessExecution("batch create entities on resource", resource);
     var response = executeBatchCreateOperation(execution, payload, resource);
 
-    setTransientResult(execution, RESPONSE_VARIABLE, response);
-    logDelegateExecution(execution, Set.of(RESOURCE_VARIABLE, PAYLOAD_VARIABLE),
-        Set.of(RESPONSE_VARIABLE));
+    responseVariable.on(execution).set(response);
   }
 
-  private DataFactoryConnectorResponse executeBatchCreateOperation(DelegateExecution execution,
-      SpinJsonNode payload, String resource) {
-
+  private ConnectorResponse executeBatchCreateOperation(DelegateExecution execution,
+      SpinJsonNode payload, String resource) throws Exception {
     var spinJsonNodes = payload.elements();
     for (int nodeIndex = 0; nodeIndex < spinJsonNodes.size(); nodeIndex++) {
       var spinJsonNode = spinJsonNodes.get(nodeIndex);
@@ -72,7 +67,7 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelega
       logProcessExecution("create entity", String.valueOf(nodeIndex));
       performPost(execution, resource, stringJsonNode);
     }
-    return DataFactoryConnectorResponse.builder()
+    return ConnectorResponse.builder()
         .statusCode(HttpStatus.CREATED.value())
         .build();
   }
@@ -86,19 +81,19 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelega
     var systemSignatureCephKey =
         "lowcode_" + processInstanceId + "_system_signature_ceph_key_" + nodeIndex;
     cephService.putContent(cephBucketName, systemSignatureCephKey, cephContent);
-    execution.setVariable("x_digital_signature_derived_ceph_key", systemSignatureCephKey);
+    xDigitalSignatureDerivedCephKeyVariable.on(execution).set(systemSignatureCephKey);
   }
 
-  private Object signNode(DelegateExecution execution, String stringJsonNode) {
+  private Object signNode(DelegateExecution execution, String stringJsonNode) throws Exception {
     var signRequestMap = Map.of("data", stringJsonNode);
     var signRequestPayload = Spin.JSON(signRequestMap);
 
-    execution.removeVariable(PAYLOAD_VARIABLE);
-    ((AbstractVariableScope) execution)
-        .setVariableLocalTransient(PAYLOAD_VARIABLE, signRequestPayload);
+    payloadVariable.on(execution).remove();
+    payloadVariable.on(execution).set(signRequestPayload);
     digitalSignatureConnectorDelegate.execute(execution);
-    var stringSystemSignature = execution.getVariable(RESPONSE_VARIABLE);
-    execution.removeVariable(RESPONSE_VARIABLE);
+    var responseVariable = digitalSignatureConnectorDelegate.getDsoResponseVariable();
+    var stringSystemSignature = responseVariable.from(execution).get();
+    responseVariable.on(execution).remove();
     return Spin.JSON(stringSystemSignature).prop("signature").value();
   }
 

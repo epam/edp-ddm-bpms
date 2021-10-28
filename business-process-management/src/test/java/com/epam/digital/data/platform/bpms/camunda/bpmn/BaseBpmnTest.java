@@ -17,7 +17,6 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
-import com.epam.digital.data.platform.bpms.api.constant.Constants;
 import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
 import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.extension.delegate.DefineBusinessProcessStatusDelegate;
@@ -28,6 +27,7 @@ import com.epam.digital.data.platform.bpms.extension.delegate.ceph.GetContentFro
 import com.epam.digital.data.platform.bpms.extension.delegate.ceph.GetFormDataFromCephDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.ceph.PutContentToCephDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.ceph.PutFormDataToCephDelegate;
+import com.epam.digital.data.platform.bpms.extension.delegate.connector.BaseConnectorDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.DataFactoryConnectorBatchCreateDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.DataFactoryConnectorBatchReadDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.DataFactoryConnectorCreateDelegate;
@@ -49,6 +49,13 @@ import com.epam.digital.data.platform.bpms.extension.exception.handler.Connector
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
 import com.epam.digital.data.platform.bpms.it.config.TestCephServiceImpl;
 import com.epam.digital.data.platform.bpms.it.util.TestUtils;
+import com.epam.digital.data.platform.bpms.listener.PutFormDataToCephTaskListener;
+import com.epam.digital.data.platform.dataaccessor.VariableAccessorFactory;
+import com.epam.digital.data.platform.dataaccessor.named.BaseNamedVariableAccessorFactory;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessorFactory;
+import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
+import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessExcerptIdVariable;
+import com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable;
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.epam.digital.data.platform.starter.localization.MessageResolver;
 import com.epam.digital.data.platform.starter.security.jwt.TokenParser;
@@ -61,6 +68,7 @@ import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -77,6 +85,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -110,6 +119,8 @@ public abstract class BaseBpmnTest {
   protected TestCephServiceImpl cephService;
   protected CephKeyProvider cephKeyProvider;
   protected RestTemplate restTemplate;
+  protected NamedVariableAccessorFactory namedVarAccessorFactory;
+  protected VariableAccessorFactory varAccessorFactory;
 
   protected MockRestServiceServer mockServer;
 
@@ -132,6 +143,9 @@ public abstract class BaseBpmnTest {
     objectMapper = (ObjectMapper) beans.get("objectMapper");
     cephService = (TestCephServiceImpl) beans.get("cephService");
     cephKeyProvider = (CephKeyProvider) beans.get("cephKeyProvider");
+    varAccessorFactory = (VariableAccessorFactory) beans.get("variableAccessorFactory");
+    namedVarAccessorFactory = new BaseNamedVariableAccessorFactory(varAccessorFactory);
+    initPutFormDataToCephTaskListener(beans);
 
     var connectorResponseErrorHandler = new ConnectorResponseErrorHandler(objectMapper,
         messageResolver);
@@ -142,12 +156,9 @@ public abstract class BaseBpmnTest {
     initCephDelegates();
     initConnectorDelegates();
 
-    var userDataValidationErrorDelegate = new UserDataValidationErrorDelegate(objectMapper);
-    var defineBusinessProcessStatusDelegate = new DefineBusinessProcessStatusDelegate();
-    var defineProcessExcerptIdDelegate = new DefineProcessExcerptIdDelegate();
-    Mocks.register("defineBusinessProcessStatusDelegate", defineBusinessProcessStatusDelegate);
-    Mocks.register("userDataValidationErrorDelegate", userDataValidationErrorDelegate);
-    Mocks.register("defineProcessExcerptIdDelegate", defineProcessExcerptIdDelegate);
+    initUserDataValidationDelegate();
+    initDefineBusinessProcessStatusDelegate();
+    initDefineProcessExcerptIdDelegate();
 
     // register keycloak delegates
     Mocks.register("keycloakRemoveRoleConnectorDelegate", keycloakRemoveRoleConnectorDelegate);
@@ -161,6 +172,40 @@ public abstract class BaseBpmnTest {
     SecurityContextHolder.getContext().setAuthentication(
         new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
     CamundaAssertionUtil.setCephService(cephService);
+  }
+
+  private void initPutFormDataToCephTaskListener(Map<Object, Object> beans) {
+    var listener = (PutFormDataToCephTaskListener) beans.get("putFormDataToCephListener");
+    var formDataVar = namedVarAccessorFactory.variableAccessor("userTaskInputFormDataPrepopulate",
+        true);
+    ReflectionTestUtils.setField(listener, "userTaskInputFormDataPrepopulateVariable", formDataVar);
+  }
+
+  private void initDefineBusinessProcessStatusDelegate() {
+    var delegate = new DefineBusinessProcessStatusDelegate(
+        new ProcessCompletionResultVariable(varAccessorFactory));
+    var statusVar = namedVarAccessorFactory.variableAccessor("status", false);
+
+    ReflectionTestUtils.setField(delegate, "statusVariable", statusVar);
+    Mocks.register("defineBusinessProcessStatusDelegate", delegate);
+  }
+
+  private void initUserDataValidationDelegate() {
+    var delegate = new UserDataValidationErrorDelegate(objectMapper);
+    var validationErrorsVar = namedVarAccessorFactory.variableAccessor("validationErrors",
+        false);
+
+    ReflectionTestUtils.setField(delegate, "validationErrorsVariable", validationErrorsVar);
+    Mocks.register("userDataValidationErrorDelegate", delegate);
+  }
+
+  private void initDefineProcessExcerptIdDelegate() {
+    var delegate = new DefineProcessExcerptIdDelegate(
+        new ProcessExcerptIdVariable(varAccessorFactory));
+    var excerptIdVariable = namedVarAccessorFactory.variableAccessor("excerptId", false);
+
+    ReflectionTestUtils.setField(delegate, "excerptIdVariable", excerptIdVariable);
+    Mocks.register("defineProcessExcerptIdDelegate", delegate);
   }
 
   protected void completeTask(String taskDefinitionKey, String formData) {
@@ -282,48 +327,87 @@ public abstract class BaseBpmnTest {
   }
 
   private void initCephDelegates() {
-    var getFormDataFromCephDelegate = new GetFormDataFromCephDelegate(cephService, cephKeyProvider);
-    var putFormDataToCephDelegate = new PutFormDataToCephDelegate(cephService, objectMapper,
-        cephKeyProvider);
-    var putContentToCephDelegate = new PutContentToCephDelegate(cephBucketName, cephService);
-    var getContentFromCephDelegate = new GetContentFromCephDelegate(cephBucketName, cephService);
+    initGetFormDataFromCephDelegate();
+    initPutFormDataToCephDelegate();
+    initPutContentToCephDelegate();
+    initGetContentFromCephDelegate();
+  }
 
-    Mocks.register("getFormDataFromCephDelegate", getFormDataFromCephDelegate);
-    Mocks.register("putFormDataToCephDelegate", putFormDataToCephDelegate);
-    Mocks.register("putContentToCephDelegate", putContentToCephDelegate);
-    Mocks.register("getContentFromCephDelegate", getContentFromCephDelegate);
+  private void initGetFormDataFromCephDelegate() {
+    var delegate = new GetFormDataFromCephDelegate(cephService, cephKeyProvider);
+    var taskDefinitionKeyVar = namedVarAccessorFactory.variableAccessor("taskDefinitionKey",
+        false);
+    var formDataVariable = namedVarAccessorFactory.variableAccessor("formData", true);
+
+    ReflectionTestUtils.setField(delegate, "taskDefinitionKeyVariable", taskDefinitionKeyVar);
+    ReflectionTestUtils.setField(delegate, "formDataVariable", formDataVariable);
+    Mocks.register("getFormDataFromCephDelegate", delegate);
+  }
+
+  private void initPutFormDataToCephDelegate() {
+    var delegate = new PutFormDataToCephDelegate(cephService, cephKeyProvider, objectMapper);
+    var taskDefinitionKeyVar = namedVarAccessorFactory.variableAccessor("taskDefinitionKey",
+        false);
+    var formDataVariable = namedVarAccessorFactory.variableAccessor("formData", true);
+
+    ReflectionTestUtils.setField(delegate, "taskDefinitionKeyVariable", taskDefinitionKeyVar);
+    ReflectionTestUtils.setField(delegate, "formDataVariable", formDataVariable);
+    Mocks.register("putFormDataToCephDelegate", delegate);
+  }
+
+  private void initPutContentToCephDelegate() {
+    var delegate = new PutContentToCephDelegate(cephBucketName, cephService);
+    var keyVariable = namedVarAccessorFactory.variableAccessor("key", false);
+    var contentVariable = namedVarAccessorFactory.variableAccessor("content", true);
+
+    ReflectionTestUtils.setField(delegate, "keyVariable", keyVariable);
+    ReflectionTestUtils.setField(delegate, "contentVariable", contentVariable);
+    Mocks.register("putContentToCephDelegate", delegate);
+  }
+
+  private void initGetContentFromCephDelegate() {
+    var delegate = new GetContentFromCephDelegate(cephBucketName, cephService);
+    var keyVariable = namedVarAccessorFactory.variableAccessor("key", false);
+    var contentVariable = namedVarAccessorFactory.variableAccessor("content", true);
+
+    ReflectionTestUtils.setField(delegate, "keyVariable", keyVariable);
+    ReflectionTestUtils.setField(delegate, "contentVariable", contentVariable);
+    Mocks.register("getContentFromCephDelegate", delegate);
   }
 
   private void initConnectorDelegates() {
-    var digitalSignatureConnectorDelegate = new DigitalSignatureConnectorDelegate(restTemplate,
-        springAppName, digitalSignatureUrl);
-    Mocks.register("digitalSignatureConnectorDelegate", digitalSignatureConnectorDelegate);
+    DigitalSignatureConnectorDelegate delegate = initDigitalSignatureConnectorDelegate();
 
-    var dataFactoryConnectorSearchDelegate = new DataFactoryConnectorSearchDelegate(restTemplate,
-        springAppName, dataFactoryUrl);
+    initDataFactoryConnectorSearchDelegate();
+
     var dataFactoryConnectorCreateDelegate = new DataFactoryConnectorCreateDelegate(restTemplate,
         springAppName, dataFactoryUrl);
+    initConnectorVariables(dataFactoryConnectorCreateDelegate);
     var dataFactoryConnectorReadDelegate = new DataFactoryConnectorReadDelegate(restTemplate,
         springAppName, dataFactoryUrl);
+    initConnectorVariables(dataFactoryConnectorReadDelegate);
     var dataFactoryConnectorBatchCreateDelegate = new DataFactoryConnectorBatchCreateDelegate(
-        restTemplate, cephService, digitalSignatureConnectorDelegate, springAppName, cephBucketName,
+        restTemplate, cephService, delegate, springAppName, cephBucketName,
         dataFactoryUrl);
-    var dataFactoryConnectorBatchReadDelegate = new DataFactoryConnectorBatchReadDelegate(
-        restTemplate, springAppName, dataFactoryUrl);
+    initConnectorVariables(dataFactoryConnectorBatchCreateDelegate);
+
+    initDataFactoryBatchReadDelegate();
+
     var dataFactoryConnectorUpdateDelegate = new DataFactoryConnectorUpdateDelegate(restTemplate,
         springAppName, dataFactoryUrl);
-    Mocks.register("dataFactoryConnectorSearchDelegate", dataFactoryConnectorSearchDelegate);
+    initConnectorVariables(dataFactoryConnectorUpdateDelegate);
     Mocks.register("dataFactoryConnectorCreateDelegate", dataFactoryConnectorCreateDelegate);
     Mocks.register("dataFactoryConnectorReadDelegate", dataFactoryConnectorReadDelegate);
     Mocks.register("dataFactoryConnectorBatchCreateDelegate",
         dataFactoryConnectorBatchCreateDelegate);
-    Mocks.register("dataFactoryConnectorBatchReadDelegate", dataFactoryConnectorBatchReadDelegate);
     Mocks.register("dataFactoryConnectorUpdateDelegate", dataFactoryConnectorUpdateDelegate);
 
     var userSettingsConnectorReadDelegate = new UserSettingsConnectorReadDelegate(restTemplate,
         springAppName, userSettingsBaseUrl);
+    initConnectorVariables(userSettingsConnectorReadDelegate);
     var userSettingsConnectorUpdateDelegate = new UserSettingsConnectorUpdateDelegate(restTemplate,
         springAppName, userSettingsBaseUrl);
+    initConnectorVariables(userSettingsConnectorUpdateDelegate);
     Mocks.register("userSettingsConnectorReadDelegate", userSettingsConnectorReadDelegate);
     Mocks.register("userSettingsConnectorUpdateDelegate", userSettingsConnectorUpdateDelegate);
 
@@ -331,12 +415,93 @@ public abstract class BaseBpmnTest {
         searchSubjectsEdrRegistryConnectorDelegate);
     Mocks.register("keycloakGetUsersConnectorDelegate", keycloakGetUsersConnectorDelegate);
 
-    var excerptConnectorGenerateDelegate = new ExcerptConnectorGenerateDelegate(restTemplate,
-        springAppName, excerptServiceBaseUrl, objectMapper);
-    Mocks.register("excerptConnectorGenerateDelegate", excerptConnectorGenerateDelegate);
-    var excerptConnectorStatusDelegate = new ExcerptConnectorStatusDelegate(restTemplate,
-        springAppName, excerptServiceBaseUrl, objectMapper);
-    Mocks.register("excerptConnectorStatusDelegate", excerptConnectorStatusDelegate);
+    initExcerptConnectorGenerateDelegate();
+    initExcerptConnectorStatusDelegate();
+  }
+
+  private DigitalSignatureConnectorDelegate initDigitalSignatureConnectorDelegate() {
+    var delegate = new DigitalSignatureConnectorDelegate(restTemplate, springAppName,
+        digitalSignatureUrl);
+    initConnectorVariables(delegate);
+    var responseVariable = namedVarAccessorFactory.variableAccessor("response", true);
+
+    ReflectionTestUtils.setField(delegate, "dsoResponseVariable", responseVariable);
+    Mocks.register("digitalSignatureConnectorDelegate", delegate);
+    return delegate;
+  }
+
+  private void initConnectorVariables(BaseConnectorDelegate delegate) {
+    var xAccessTokenVariable = namedVarAccessorFactory.variableAccessor("x_access_token",
+        false);
+    var xDigitalSignatureCephKeyVariable = namedVarAccessorFactory.variableAccessor(
+        "x_digital_signature_ceph_key", false);
+    var xDigitalSignatureDerivedCephKeyVariable = namedVarAccessorFactory.variableAccessor(
+        "x_digital_signature_derived_ceph_key", false);
+    var headersVariable = namedVarAccessorFactory.variableAccessor("headers", false);
+
+    ReflectionTestUtils.setField(delegate, "xAccessTokenVariable", xAccessTokenVariable);
+    ReflectionTestUtils.setField(delegate, "xDigitalSignatureCephKeyVariable",
+        xDigitalSignatureCephKeyVariable);
+    ReflectionTestUtils.setField(delegate, "xDigitalSignatureDerivedCephKeyVariable",
+        xDigitalSignatureDerivedCephKeyVariable);
+    ReflectionTestUtils.setField(delegate, "headersVariable", headersVariable);
+
+    var resourceVariable = namedVarAccessorFactory.variableAccessor("resource", false);
+    var resourceIdVariable = namedVarAccessorFactory.variableAccessor("id", false);
+    var payloadVariable = namedVarAccessorFactory.variableAccessor("payload", true);
+    var responseVariable = namedVarAccessorFactory.variableAccessor("response", true);
+
+    ReflectionTestUtils.setField(delegate, "resourceVariable", resourceVariable);
+    ReflectionTestUtils.setField(delegate, "resourceIdVariable", resourceIdVariable);
+    ReflectionTestUtils.setField(delegate, "payloadVariable", payloadVariable);
+    ReflectionTestUtils.setField(delegate, "responseVariable", responseVariable);
+  }
+
+  private void initDataFactoryConnectorSearchDelegate() {
+    var delegate = new DataFactoryConnectorSearchDelegate(restTemplate, springAppName,
+        dataFactoryUrl);
+    initConnectorVariables(delegate);
+    var searchConditionsVariable = namedVarAccessorFactory.variableAccessor("searchConditions",
+        false);
+    ReflectionTestUtils.setField(delegate, "searchConditionsVariable", searchConditionsVariable);
+    Mocks.register("dataFactoryConnectorSearchDelegate", delegate);
+  }
+
+  private void initDataFactoryBatchReadDelegate() {
+    var delegate = new DataFactoryConnectorBatchReadDelegate(restTemplate, springAppName,
+        dataFactoryUrl);
+    initConnectorVariables(delegate);
+    var resourceIdsVariable = namedVarAccessorFactory.variableAccessor("resourceIds", false);
+    ReflectionTestUtils.setField(delegate, "resourceIdsVariable", resourceIdsVariable);
+    Mocks.register("dataFactoryConnectorBatchReadDelegate", delegate);
+  }
+
+  private void initExcerptConnectorStatusDelegate() {
+    var delegate = new ExcerptConnectorStatusDelegate(restTemplate, springAppName,
+        excerptServiceBaseUrl);
+    initConnectorVariables(delegate);
+    var excerptIdentifierVariable = namedVarAccessorFactory.variableAccessor(
+        "excerptIdentifier", false);
+    ReflectionTestUtils.setField(delegate, "excerptIdentifierVariable", excerptIdentifierVariable);
+    Mocks.register("excerptConnectorStatusDelegate", delegate);
+  }
+
+  private void initExcerptConnectorGenerateDelegate() {
+    var delegate = new ExcerptConnectorGenerateDelegate(restTemplate, springAppName,
+        excerptServiceBaseUrl, objectMapper);
+
+    initConnectorVariables(delegate);
+    var excerptTypeVariable = namedVarAccessorFactory.variableAccessor("excerptType", false);
+    var excerptInputDataVariable = namedVarAccessorFactory.variableAccessor("excerptInputData",
+        false);
+    var requiresSystemSignatureVariable = namedVarAccessorFactory.variableAccessor(
+        "requiresSystemSignature", false);
+    ReflectionTestUtils.setField(delegate, "excerptTypeVariable", excerptTypeVariable);
+    ReflectionTestUtils.setField(delegate, "requiresSystemSignatureVariable",
+        requiresSystemSignatureVariable);
+    ReflectionTestUtils.setField(delegate, "excerptInputDataVariable", excerptInputDataVariable);
+
+    Mocks.register("excerptConnectorGenerateDelegate", delegate);
   }
 
   @SneakyThrows
@@ -348,7 +513,7 @@ public abstract class BaseBpmnTest {
           EdrRegistryConnectorResponse.builder().responseBody(
               Spin.JSON(TestUtils.getContent(responseBody))).build());
       return null;
-    }).when(searchSubjectsEdrRegistryConnectorDelegate).execute(any());
+    }).when(searchSubjectsEdrRegistryConnectorDelegate).execute(any(DelegateExecution.class));
   }
 
   @SneakyThrows
@@ -359,7 +524,7 @@ public abstract class BaseBpmnTest {
           objectMapper.readerForListOf(KeycloakUserDto.class)
               .readValue(TestUtils.getContent(officerUsers)));
       return null;
-    }).when(keycloakGetUsersConnectorDelegate).execute(any());
+    }).when(keycloakGetUsersConnectorDelegate).execute(any(DelegateExecution.class));
   }
 
   @SneakyThrows
@@ -399,9 +564,9 @@ public abstract class BaseBpmnTest {
   protected void startProcessInstanceWithStartForm(String processDefinitionId,
       FormDataDto formData) {
     cephService.putFormData(START_FORM_CEPH_KEY, formData);
-    startProcessInstance(processDefinitionId,
-        Map.of(Constants.BPMS_START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY,
-            "initiator", testUserName));
+    startProcessInstance(processDefinitionId, Map.of(
+        StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY,
+        "initiator", testUserName));
   }
 
   @RequiredArgsConstructor

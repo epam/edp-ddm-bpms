@@ -1,9 +1,7 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.DataFactoryConnectorResponse;
-import java.util.Set;
+import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.spin.json.SpinJsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
@@ -31,23 +29,20 @@ public class DataFactoryConnectorUpdateDelegate extends BaseConnectorDelegate {
   }
 
   @Override
-  public void execute(DelegateExecution execution) {
+  public void executeInternal(DelegateExecution execution) {
     logStartDelegateExecution();
-    var resource = (String) execution.getVariable(RESOURCE_VARIABLE);
-    var id = (String) execution.getVariable(RESOURCE_ID_VARIABLE);
-    var payload = (SpinJsonNode) execution.getVariable(PAYLOAD_VARIABLE);
+    var resource = resourceVariable.from(execution).get();
+    var id = resourceIdVariable.from(execution).get();
+    var payload = payloadVariable.from(execution).getOptional();
 
     logProcessExecution("update entity on resource", resource);
-    var response = performPut(execution, resource, id, payload.toString());
+    var response = performPut(execution, resource, id, payload.map(Object::toString).orElse(null));
 
-    setTransientResult(execution, RESPONSE_VARIABLE, response);
-    logDelegateExecution(execution,
-        Set.of(RESOURCE_VARIABLE, RESOURCE_ID_VARIABLE, PAYLOAD_VARIABLE),
-        Set.of(RESPONSE_VARIABLE));
+    responseVariable.on(execution).set(response);
   }
 
-  private DataFactoryConnectorResponse performPut(DelegateExecution delegateExecution,
-      String resourceName, String resourceId, String body) {
+  private ConnectorResponse performPut(DelegateExecution delegateExecution, String resourceName,
+      String resourceId, String body) {
     var uri = UriComponentsBuilder.fromHttpUrl(dataFactoryBaseUrl).pathSegment(resourceName)
         .pathSegment(resourceId).build().toUri();
 
