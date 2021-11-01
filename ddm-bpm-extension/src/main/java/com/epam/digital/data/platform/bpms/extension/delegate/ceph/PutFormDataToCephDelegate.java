@@ -32,7 +32,6 @@ public class PutFormDataToCephDelegate extends BaseFormDataDelegate {
 
   @Override
   public void executeInternal(DelegateExecution execution) {
-    logStartDelegateExecution();
     var taskDefinitionKey = taskDefinitionKeyVariable.from(execution).get();
     var processInstanceId = execution.getProcessInstanceId();
 

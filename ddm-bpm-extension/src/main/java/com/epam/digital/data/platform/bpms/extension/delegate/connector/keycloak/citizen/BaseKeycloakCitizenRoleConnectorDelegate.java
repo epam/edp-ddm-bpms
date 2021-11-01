@@ -26,7 +26,6 @@ public abstract class BaseKeycloakCitizenRoleConnectorDelegate extends
 
   @Override
   public void executeInternal(DelegateExecution execution) {
-    logStartDelegateExecution();
     var userName = userNameVariable.from(execution).get();
     var role = roleVariable.from(execution).get();
 

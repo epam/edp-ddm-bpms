@@ -22,7 +22,6 @@ public class GetContentFromCephDelegate extends BaseCephDelegate {
 
   @Override
   public void executeInternal(DelegateExecution execution) {
-    logStartDelegateExecution();
     var key = keyVariable.from(execution).get();
 
     logProcessExecution("get content by key", key);

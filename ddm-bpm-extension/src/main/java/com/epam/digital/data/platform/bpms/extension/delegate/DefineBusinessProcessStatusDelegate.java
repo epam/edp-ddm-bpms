@@ -24,7 +24,6 @@ public class DefineBusinessProcessStatusDelegate extends BaseJavaDelegate {
 
   @Override
   public void executeInternal(DelegateExecution execution) {
-    logStartDelegateExecution();
     var status = statusVariable.from(execution).get();
     sysVarCompletionResult.on(execution).set(status);
   }

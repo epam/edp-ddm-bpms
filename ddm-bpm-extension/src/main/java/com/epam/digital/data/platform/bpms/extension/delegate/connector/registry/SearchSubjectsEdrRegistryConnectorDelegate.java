@@ -28,7 +28,6 @@ public class SearchSubjectsEdrRegistryConnectorDelegate extends BaseEdrRegistryC
 
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
-    logStartDelegateExecution();
     var code = codeVariable.from(execution).get();
     var authorizationToken = authorizationTokenVariable.from(execution).get();
 

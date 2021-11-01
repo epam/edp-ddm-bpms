@@ -42,7 +42,6 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelega
 
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
-    logStartDelegateExecution();
     var resource = resourceVariable.from(execution).get();
     var payload = payloadVariable.from(execution).getOrDefault(Spin.JSON(Map.of()));
 

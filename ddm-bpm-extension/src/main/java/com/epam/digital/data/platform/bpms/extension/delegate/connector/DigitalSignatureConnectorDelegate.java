@@ -41,7 +41,6 @@ public class DigitalSignatureConnectorDelegate extends BaseConnectorDelegate {
 
   @Override
   public void executeInternal(DelegateExecution execution) {
-    logStartDelegateExecution();
     var payload = payloadVariable.from(execution).getOptional();
 
     logProcessExecution("sign data");

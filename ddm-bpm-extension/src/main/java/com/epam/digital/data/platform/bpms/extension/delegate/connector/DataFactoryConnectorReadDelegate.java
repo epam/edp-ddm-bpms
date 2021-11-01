@@ -30,7 +30,6 @@ public class DataFactoryConnectorReadDelegate extends BaseConnectorDelegate {
 
   @Override
   public void executeInternal(DelegateExecution execution) {
-    logStartDelegateExecution();
     var resource = resourceVariable.from(execution).get();
     var id = resourceIdVariable.from(execution).get();
 

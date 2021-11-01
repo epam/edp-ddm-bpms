@@ -28,7 +28,6 @@ public class SubjectDetailEdrRegistryConnectorDelegate extends BaseEdrRegistryCo
 
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
-    logStartDelegateExecution();
     var authorizationToken = authorizationTokenVariable.from(execution).get();
     var id = idVariable.from(execution).get();
     Objects.requireNonNull(id,

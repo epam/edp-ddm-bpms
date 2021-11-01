@@ -28,7 +28,6 @@ public class GetStartFormDataFromCephDelegate extends BaseFormDataDelegate {
 
   @Override
   public void executeInternal(DelegateExecution execution) {
-    logStartDelegateExecution();
     var cephKey = startFormCephKeyVariable.from(execution).get();
 
     logProcessExecution("get start form data by key", cephKey);

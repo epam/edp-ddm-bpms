@@ -29,7 +29,6 @@ public class DataFactoryConnectorBatchReadDelegate extends DataFactoryConnectorR
 
   @Override
   public void executeInternal(DelegateExecution execution) {
-    logStartDelegateExecution();
     var resource = resourceVariable.from(execution).get();
     var resourceIds = resourceIdsVariable.from(execution).getOrDefault(List.of());
 

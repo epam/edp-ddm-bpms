@@ -33,7 +33,6 @@ public class KeycloakGetOfficerUsersConnectorDelegate extends BaseKeycloakOffice
 
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
-    logStartDelegateExecution();
     var role = roleNameVariable.from(execution).getOrDefault(DEFAULT_ROLE);
 
     logProcessExecution("get realm resource");

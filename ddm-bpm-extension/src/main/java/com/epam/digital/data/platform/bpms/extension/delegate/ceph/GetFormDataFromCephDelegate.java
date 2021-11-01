@@ -23,7 +23,6 @@ public class GetFormDataFromCephDelegate extends BaseFormDataDelegate {
 
   @Override
   public void executeInternal(DelegateExecution execution) {
-    logStartDelegateExecution();
     var taskDefinitionKey = taskDefinitionKeyVariable.from(execution).get();
 
     var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, execution.getProcessInstanceId());

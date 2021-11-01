@@ -24,23 +24,21 @@
     class="com.epam.digital.data.platform.bpms.security.listener.AuthorizationStartEventListener">
     <constructor-arg ref="camundaAdminImpersonationFactory"/>
   </bean>
+  <bean id="initiatorVariablesAccessor"
+    class="com.epam.digital.data.platform.dataaccessor.initiator.BaseInitiatorVariablesAccessor">
+    <constructor-arg ref="variableAccessorFactory"/>
+  </bean>
   <bean id="initiatorListener"
     class="com.epam.digital.data.platform.bpms.security.listener.InitiatorTokenStartEventListener">
-    <constructor-arg>
-      <bean
-        class="com.epam.digital.data.platform.dataaccessor.initiator.BaseInitiatorVariablesAccessor">
-        <constructor-arg ref="variableAccessorFactory"/>
-      </bean>
-    </constructor-arg>
+    <constructor-arg ref="initiatorVariablesAccessor"/>
+  </bean>
+  <bean id="completerVariablesAccessor"
+    class="com.epam.digital.data.platform.dataaccessor.completer.BaseCompleterVariablesAccessor">
+    <constructor-arg ref="variableAccessorFactory"/>
   </bean>
   <bean id="completerListener"
     class="com.epam.digital.data.platform.bpms.listener.CompleterTaskEventListener">
-    <constructor-arg>
-      <bean
-        class="com.epam.digital.data.platform.dataaccessor.completer.BaseCompleterVariablesAccessor">
-        <constructor-arg ref="variableAccessorFactory"/>
-      </bean>
-    </constructor-arg>
+    <constructor-arg ref="completerVariablesAccessor"/>
   </bean>
   <bean id="putFormDataToCephListener"
     class="com.epam.digital.data.platform.bpms.listener.PutFormDataToCephTaskListener">
@@ -54,14 +52,14 @@
   </bean>
   <bean id="variableAccessorFactory"
     class="com.epam.digital.data.platform.dataaccessor.BaseVariableAccessorFactory"/>
+  <bean id="startFormCephKeyVariable"
+    class="com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable">
+    <constructor-arg ref="variableAccessorFactory"/>
+  </bean>
   <bean id="formDataCleanerEndEventListener"
     class="com.epam.digital.data.platform.bpms.listener.FormDataCleanerEndEventListener">
     <constructor-arg ref="cephService"/>
-    <constructor-arg>
-      <bean class="com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable">
-        <constructor-arg ref="variableAccessorFactory"/>
-      </bean>
-    </constructor-arg>
+    <constructor-arg ref="startFormCephKeyVariable"/>
   </bean>
 
   <bean id="processEngineConfiguration"
@@ -95,6 +93,10 @@
       <bean class="com.epam.digital.data.platform.bpms.camunda.bpmn.config.TestExpressionManager">
         <constructor-arg ref="cephService"/>
         <constructor-arg ref="objectMapper"/>
+        <constructor-arg ref="variableAccessorFactory"/>
+        <constructor-arg ref="initiatorVariablesAccessor"/>
+        <constructor-arg ref="completerVariablesAccessor"/>
+        <constructor-arg ref="startFormCephKeyVariable"/>
       </bean>
     </property>
     <property name="preParseListeners">

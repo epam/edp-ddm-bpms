@@ -35,7 +35,6 @@ public class ExcerptConnectorStatusDelegate extends BaseConnectorDelegate {
 
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
-    logStartDelegateExecution();
     var excerptIdentifier = excerptIdentifierVariable.from(execution).get();
 
     logProcessExecution("get excerpt status on resource", RESOURCE_EXCERPTS);

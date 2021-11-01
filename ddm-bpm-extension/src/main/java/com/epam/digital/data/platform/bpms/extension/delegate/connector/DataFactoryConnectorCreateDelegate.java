@@ -31,7 +31,6 @@ public class DataFactoryConnectorCreateDelegate extends BaseConnectorDelegate {
 
   @Override
   public void executeInternal(DelegateExecution execution) {
-    logStartDelegateExecution();
     var resource = resourceVariable.from(execution).get();
     var payload = payloadVariable.from(execution).getOptional();
 
