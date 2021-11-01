@@ -31,7 +31,6 @@ public class UserSettingsConnectorUpdateDelegate extends BaseConnectorDelegate {
 
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
-    logStartDelegateExecution();
     var payload = payloadVariable.from(execution).getOptional();
 
     logProcessExecution("create or update user settings on resource", RESOURCE_SETTINGS);

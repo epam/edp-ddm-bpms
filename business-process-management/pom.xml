@@ -13,7 +13,6 @@
 
   <properties>
     <camunda.bpm.assert.version>7.0.0</camunda.bpm.assert.version>
-    <sonar.coverage.exclusions>**/digital/data/platform/bpms/dto/**/*</sonar.coverage.exclusions>
   </properties>
 
   <dependencies>

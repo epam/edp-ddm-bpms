@@ -5,6 +5,10 @@ import static org.mockito.Mockito.mock;
 
 import com.epam.digital.data.platform.bpms.engine.el.TransientVariableScopeElResolver;
 import com.epam.digital.data.platform.bpms.it.util.TestUtils;
+import com.epam.digital.data.platform.dataaccessor.VariableAccessorFactory;
+import com.epam.digital.data.platform.dataaccessor.completer.CompleterVariablesAccessor;
+import com.epam.digital.data.platform.dataaccessor.initiator.InitiatorVariablesAccessor;
+import com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable;
 import com.epam.digital.data.platform.el.juel.AbstractApplicationContextAwareJuelFunction;
 import com.epam.digital.data.platform.el.juel.CompleterJuelFunction;
 import com.epam.digital.data.platform.el.juel.InitiatorJuelFunction;
@@ -25,11 +29,24 @@ import org.springframework.context.ApplicationContext;
 
 public class TestExpressionManager extends ExpressionManager {
 
-  public TestExpressionManager(ObjectMapper objectMapper, FormDataCephService cephService) {
+  public TestExpressionManager(ObjectMapper objectMapper,
+      FormDataCephService cephService,
+      VariableAccessorFactory variableAccessorFactory,
+      InitiatorVariablesAccessor initiatorVariablesAccessor,
+      CompleterVariablesAccessor completerVariablesAccessor,
+      StartFormCephKeyVariable startFormCephKeyVariable) {
     var appContext = mock(ApplicationContext.class);
     lenient().when(appContext.getBean(TokenParser.class)).thenReturn(new TokenParser(objectMapper));
     lenient().when(appContext.getBean(FormDataCephService.class)).thenReturn(cephService);
     lenient().when(appContext.getBean(CephKeyProvider.class)).thenReturn(new CephKeyProvider());
+    lenient().when(appContext.getBean(VariableAccessorFactory.class))
+        .thenReturn(variableAccessorFactory);
+    lenient().when(appContext.getBean(InitiatorVariablesAccessor.class))
+        .thenReturn(initiatorVariablesAccessor);
+    lenient().when(appContext.getBean(CompleterVariablesAccessor.class))
+        .thenReturn(completerVariablesAccessor);
+    lenient().when(appContext.getBean(StartFormCephKeyVariable.class))
+        .thenReturn(startFormCephKeyVariable);
     var keycloakProvider = mock(KeycloakProvider.class);
     lenient().when(appContext.getBean(KeycloakProvider.class)).thenReturn(keycloakProvider);
     lenient().when(keycloakProvider.getSystemUserAccessToken()).thenReturn(
