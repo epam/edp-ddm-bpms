@@ -24,7 +24,6 @@ public class CamundaSystemErrorDelegate extends BaseJavaDelegate {
 
   @Override
   public void executeInternal(DelegateExecution execution) {
-    logStartDelegateExecution();
     var systemError = systemErrorVariable.from(execution).getOrDefault(StringUtils.EMPTY);
     throw new SystemException(MDC.get(BaseRestExceptionHandler.TRACE_ID_KEY), "SYSTEM_EXCEPTION",
         "System error", systemError);

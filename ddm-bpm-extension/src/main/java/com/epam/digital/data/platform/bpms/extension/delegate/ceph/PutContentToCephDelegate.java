@@ -22,7 +22,6 @@ public class PutContentToCephDelegate extends BaseCephDelegate {
 
   @Override
   public void executeInternal(DelegateExecution execution) {
-    logStartDelegateExecution();
     var key = keyVariable.from(execution).get();
     var content = contentVariable.from(execution).get();
     logProcessExecution("put content with key", key);

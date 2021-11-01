@@ -21,7 +21,7 @@ public abstract class BaseJavaDelegate implements JavaDelegate {
   @SuppressWarnings("java:S112")
   protected abstract void executeInternal(DelegateExecution execution) throws Exception;
 
-  public void logStartDelegateExecution() {
+  private void logStartDelegateExecution() {
     var log = getLogger();
     if (log.isDebugEnabled()) {
       log.debug("Delegate {} started execution.", getDelegateName());
@@ -40,7 +40,7 @@ public abstract class BaseJavaDelegate implements JavaDelegate {
     logProcessExecution(operationMessage, "");
   }
 
-  public void logDelegateExecution(DelegateExecution delegateExecution) {
+  private void logDelegateExecution(DelegateExecution delegateExecution) {
     var log = LoggerFactory.getLogger(this.getClass());
     if (!log.isDebugEnabled()) {
       return;

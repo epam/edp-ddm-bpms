@@ -32,7 +32,6 @@ public class KeycloakGetCitizenRolesConnectorDelegate extends BaseKeycloakCitize
 
   @Override
   public void executeInternal(DelegateExecution execution) {
-    logStartDelegateExecution();
     logProcessExecution("get realm resource");
     var realmResource = keycloakClientService.getRealmResource();
     logProcessExecution("get keycloak roles");
