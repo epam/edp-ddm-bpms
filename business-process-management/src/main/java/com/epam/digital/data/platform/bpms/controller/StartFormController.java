@@ -1,7 +1,7 @@
 package com.epam.digital.data.platform.bpms.controller;
 
 import com.epam.digital.data.platform.bpms.api.dto.StartFormQueryDto;
-import com.epam.digital.data.platform.bpms.service.StartFormService;
+import com.epam.digital.data.platform.bpms.service.BatchFormService;
 import java.util.Map;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -20,11 +20,11 @@ import org.springframework.stereotype.Component;
 @Path("/extended/start-form")
 public class StartFormController {
 
-  private final StartFormService startFormService;
+  private final BatchFormService batchFormService;
 
   /**
-   * POST method for getting start form keys. Returns a map, where key - processDefinitionId, value -
-   * startFormKey.
+   * POST method for getting start form keys. Returns a map, where key - processDefinitionId, value
+   * - startFormKey.
    *
    * @param startFormQueryDto dto that contains query params for selecting form keys
    * @return a map containing the start form keys
@@ -33,6 +33,6 @@ public class StartFormController {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   public Map<String, String> getStartFormMap(StartFormQueryDto startFormQueryDto) {
-    return startFormService.getStartFormMap(startFormQueryDto);
+    return batchFormService.getStartFormKeys(startFormQueryDto.getProcessDefinitionIdIn());
   }
 }
