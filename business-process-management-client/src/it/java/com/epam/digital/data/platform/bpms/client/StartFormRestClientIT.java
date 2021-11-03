@@ -9,8 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.epam.digital.data.platform.bpms.api.dto.StartFormQueryDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,7 +23,7 @@ public class StartFormRestClientIT extends BaseIT {
   public void shouldReturnTaskProperties() throws JsonProcessingException {
     var startForms = Map.of("process-definition", "start-form");
     var startFormQueryDto = StartFormQueryDto.builder()
-        .processDefinitionIdIn(List.of("process-definition")).build();
+        .processDefinitionIdIn(Set.of("process-definition")).build();
 
     restClientWireMock.addStubMapping(
         stubFor(post(urlPathEqualTo("/api/extended/start-form"))

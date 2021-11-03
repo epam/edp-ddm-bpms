@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 import com.epam.digital.data.platform.bpms.api.dto.StartFormQueryDto;
 import com.epam.digital.data.platform.bpms.service.BatchFormService;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Set;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -25,7 +25,7 @@ public class StartFormControllerTest {
   @Test
   public void getTaskProperty() {
     var startFormQueryDto = StartFormQueryDto.builder()
-        .processDefinitionIdIn(List.of("process-definition")).build();
+        .processDefinitionIdIn(Set.of("process-definition")).build();
     var expected = new HashMap<String, String>();
     when(
         batchFormService.getStartFormKeys(startFormQueryDto.getProcessDefinitionIdIn())).thenReturn(
