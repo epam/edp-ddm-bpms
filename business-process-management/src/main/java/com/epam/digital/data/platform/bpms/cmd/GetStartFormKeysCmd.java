@@ -1,9 +1,9 @@
 package com.epam.digital.data.platform.bpms.cmd;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import org.camunda.bpm.engine.delegate.Expression;
@@ -23,9 +23,9 @@ import org.springframework.util.CollectionUtils;
 @EqualsAndHashCode
 public class GetStartFormKeysCmd implements Command<Map<String, String>> {
 
-  private final List<String> processDefinitionIds;
+  private final Set<String> processDefinitionIds;
 
-  public GetStartFormKeysCmd(List<String> processDefinitionIds) {
+  public GetStartFormKeysCmd(Set<String> processDefinitionIds) {
     this.processDefinitionIds = processDefinitionIds;
   }
 

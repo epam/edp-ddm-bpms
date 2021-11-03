@@ -1,6 +1,6 @@
 package com.epam.digital.data.platform.bpms.api.dto;
 
-import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +18,6 @@ import lombok.ToString;
 @ToString
 public class StartFormQueryDto {
 
-  private List<String> processDefinitionIdIn;
+  private Set<String> processDefinitionIdIn;
 
 }
