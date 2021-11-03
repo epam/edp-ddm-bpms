@@ -21,10 +21,13 @@ public class KeycloakGetOfficerUsersConnectorDelegate extends BaseKeycloakOffice
 
   @Override
   public void execute(DelegateExecution execution) throws Exception {
+    logStartDelegateExecution();
     var role = Objects.requireNonNullElse((String) execution.getVariable(ROLE_NAME_VAR),
         DEFAULT_ROLE);
 
+    logProcessExecution("get realm resource");
     var realmResource = keycloakClientService.getRealmResource();
+    logProcessExecution("get users by role", role);
     var roleUserMembers = keycloakClientService.getRoleUserMembers(realmResource, role);
 
     setResult(execution, RESULT_NAME_VAR, roleUserMembers);

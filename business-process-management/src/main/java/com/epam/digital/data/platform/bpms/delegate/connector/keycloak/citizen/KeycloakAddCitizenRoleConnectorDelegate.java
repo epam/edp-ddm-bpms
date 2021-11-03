@@ -17,6 +17,7 @@ public class KeycloakAddCitizenRoleConnectorDelegate extends
   @Override
   protected void performOperationWithRole(RoleScopeResource roleScopeResource,
       RoleRepresentation roleRepresentation) {
+    logProcessExecution("add role", roleRepresentation.getName());
     keycloakClientService.addRole(roleScopeResource, roleRepresentation);
   }
 

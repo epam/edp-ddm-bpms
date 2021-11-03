@@ -34,9 +34,11 @@ public class DataFactoryConnectorSearchDelegate extends BaseConnectorDelegate {
   @Override
   @SuppressWarnings("unchecked")
   public void execute(DelegateExecution execution) {
+    logStartDelegateExecution();
     var resource = (String) execution.getVariable(RESOURCE_VARIABLE);
     var searchConditions = (Map<String, String>) execution.getVariable(SEARCH_CONDITIONS_VARIABLE);
 
+    logProcessExecution("search entities on resource", resource);
     var response = performSearch(execution, resource, searchConditions);
 
     setTransientResult(execution, RESPONSE_VARIABLE, response);

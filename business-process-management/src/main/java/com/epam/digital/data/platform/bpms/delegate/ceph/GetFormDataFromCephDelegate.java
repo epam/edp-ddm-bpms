@@ -27,9 +27,12 @@ public class GetFormDataFromCephDelegate extends BaseJavaDelegate {
 
   @Override
   public void execute(DelegateExecution execution) {
+    logStartDelegateExecution();
     var taskDefinitionKey = (String) execution.getVariable(TASK_DEFINITION_KEY_PARAMETER);
 
     var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, execution.getProcessInstanceId());
+
+    logProcessExecution("get form data by key", cephKey);
     var formData = cephService.getFormData(cephKey)
         .map(FormDataDto::getData)
         .orElse(new LinkedHashMap<>());

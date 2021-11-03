@@ -21,6 +21,7 @@ public class CamundaSystemErrorDelegate extends BaseJavaDelegate {
 
   @Override
   public void execute(DelegateExecution execution) {
+    logStartDelegateExecution();
     var systemError = execution.hasVariable(VAR_SYSTEM_ERROR) ?
         (String) execution.getVariable(VAR_SYSTEM_ERROR) : StringUtils.EMPTY;
     try {

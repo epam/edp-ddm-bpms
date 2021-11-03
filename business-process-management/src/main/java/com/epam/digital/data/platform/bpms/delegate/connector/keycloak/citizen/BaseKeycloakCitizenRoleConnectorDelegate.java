@@ -18,12 +18,18 @@ public abstract class BaseKeycloakCitizenRoleConnectorDelegate extends
 
   @Override
   public void execute(DelegateExecution execution) {
+    logStartDelegateExecution();
     var userName = (String) execution.getVariable(USER_NAME_PARAMETER);
     var role = (String) execution.getVariable(ROLE_PARAMETER);
 
+    logProcessExecution("get realm resource");
     var realmResource = keycloakClientService.getRealmResource();
+    logProcessExecution("get role representation by name", role);
     var roleRepresentation = keycloakClientService.getRoleRepresentation(realmResource, role);
+    logProcessExecution("get user representation by name", userName);
     var userRepresentation = keycloakClientService.getUserRepresentation(realmResource, userName);
+    logProcessExecution("get role scope resource by user representation id",
+        userRepresentation.getId());
     var roleScopeResource = keycloakClientService
         .getRoleScopeResource(realmResource, userRepresentation.getId());
 

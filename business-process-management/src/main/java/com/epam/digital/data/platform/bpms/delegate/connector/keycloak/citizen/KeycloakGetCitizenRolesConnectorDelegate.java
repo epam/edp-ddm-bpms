@@ -21,8 +21,12 @@ public class KeycloakGetCitizenRolesConnectorDelegate extends BaseKeycloakCitize
 
   @Override
   public void execute(DelegateExecution execution) {
+    logStartDelegateExecution();
+    logProcessExecution("get realm resource");
     var realmResource = keycloakClientService.getRealmResource();
+    logProcessExecution("get keycloak roles");
     var keycloakRoles = keycloakClientService.getKeycloakRoles(realmResource);
+    logProcessExecution("keycloak role filtering");
     var regulationsRoles = keycloakRoles.stream()
         .map(RoleRepresentation::getName)
         .filter(Predicate.not(KeycloakPlatformRole::containsRole))

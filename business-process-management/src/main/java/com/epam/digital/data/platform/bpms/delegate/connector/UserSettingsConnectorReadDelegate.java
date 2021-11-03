@@ -32,6 +32,8 @@ public class UserSettingsConnectorReadDelegate extends BaseConnectorDelegate {
 
   @Override
   public void execute(DelegateExecution execution) throws Exception {
+    logStartDelegateExecution();
+    logProcessExecution("read user settings  on resource", RESOURCE_SETTINGS);
     var response = performGet(execution);
 
     setTransientResult(execution, RESPONSE_VARIABLE, response);

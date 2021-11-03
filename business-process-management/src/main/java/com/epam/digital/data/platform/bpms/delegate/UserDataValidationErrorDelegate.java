@@ -31,6 +31,7 @@ public class UserDataValidationErrorDelegate extends BaseJavaDelegate {
   @Override
   @SuppressWarnings("unchecked")
   public void execute(DelegateExecution execution) {
+    logStartDelegateExecution();
     List<ErrorDetailDto> validationErrorDtos =
         execution.hasVariable(VAR_VALIDATION_ERRORS) ?
             ((List<String>) execution.getVariable(VAR_VALIDATION_ERRORS))

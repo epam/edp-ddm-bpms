@@ -7,15 +7,35 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class BaseJavaDelegate implements JavaDelegate {
 
   public abstract String getDelegateName();
 
+  public void logStartDelegateExecution() {
+    var log = getLogger();
+    if (log.isDebugEnabled()) {
+      log.debug("Delegate {} started execution.", getDelegateName());
+    }
+  }
+
+  public void logProcessExecution(String operationMessage, String parameter) {
+    var log = getLogger();
+    if (log.isDebugEnabled()) {
+      log.debug("Delegate {} performs the operation: {} {}", getDelegateName(), operationMessage,
+          parameter);
+    }
+  }
+
+  public void logProcessExecution(String operationMessage) {
+    logProcessExecution(operationMessage, "");
+  }
+
   public void logDelegateExecution(DelegateExecution delegateExecution, Set<String> inputParameters,
       Set<String> outputParameters) {
-    var log = LoggerFactory.getLogger(this.getClass());
+    var log = getLogger();
     if (!log.isDebugEnabled()) {
       return;
     }
@@ -47,5 +67,9 @@ public abstract class BaseJavaDelegate implements JavaDelegate {
 
   protected void setResult(DelegateExecution execution, String name, Object value) {
     execution.setVariable(name, value);
+  }
+
+  private Logger getLogger() {
+    return LoggerFactory.getLogger(this.getClass());
   }
 }

@@ -31,9 +31,11 @@ public class DataFactoryConnectorDeleteDelegate extends BaseConnectorDelegate {
 
   @Override
   public void execute(DelegateExecution execution) {
+    logStartDelegateExecution();
     var resource = (String) execution.getVariable(RESOURCE_VARIABLE);
     var id = (String) execution.getVariable(RESOURCE_ID_VARIABLE);
 
+    logProcessExecution("delete entity on resource", resource);
     var response = performDelete(execution, resource, id);
 
     setTransientResult(execution, RESPONSE_VARIABLE, response);

@@ -34,7 +34,10 @@ public class DigitalSignatureConnectorDelegate extends BaseConnectorDelegate {
 
   @Override
   public void execute(DelegateExecution execution) {
+    logStartDelegateExecution();
     var payload = (SpinJsonNode) execution.getVariable(PAYLOAD_VARIABLE);
+
+    logProcessExecution("sign data");
     var response = performPost(execution, payload.toString());
 
     setTransientResult(execution, RESPONSE_VARIABLE, response.getResponseBody());

@@ -27,8 +27,10 @@ public class PutContentToCephDelegate extends BaseJavaDelegate {
 
   @Override
   public void execute(DelegateExecution execution) {
+    logStartDelegateExecution();
     var key = (String) execution.getVariable(KEY_PARAMETER);
     var content = (String) execution.getVariable(CONTENT_PARAMETER);
+    logProcessExecution("put content with key", key);
     cephService.putContent(cephBucketName, key, content);
     logDelegateExecution(execution, Set.of(KEY_PARAMETER, CONTENT_PARAMETER), Set.of());
   }

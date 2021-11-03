@@ -33,8 +33,10 @@ public class UserSettingsConnectorUpdateDelegate extends BaseConnectorDelegate {
 
   @Override
   public void execute(DelegateExecution execution) throws Exception {
+    logStartDelegateExecution();
     var payload = (SpinJsonNode) execution.getVariable(PAYLOAD_VARIABLE);
 
+    logProcessExecution("create or update user settings on resource", RESOURCE_SETTINGS);
     var response = performPut(execution, payload.toString());
 
     setTransientResult(execution, RESPONSE_VARIABLE, response);

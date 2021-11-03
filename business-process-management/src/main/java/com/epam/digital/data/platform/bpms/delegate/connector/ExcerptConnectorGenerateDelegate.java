@@ -42,6 +42,7 @@ public class ExcerptConnectorGenerateDelegate extends BaseConnectorDelegate {
   @Override
   @SuppressWarnings("unchecked")
   public void execute(DelegateExecution execution) throws Exception {
+    logStartDelegateExecution();
     var excerptType = (String) execution.getVariable(EXCERPT_TYPE_VAR);
     var excerptInputData = (Map<String, Object>) execution.getVariable(EXCERPT_INPUT_DATA_VAR);
     var requiresSystemSignature = Boolean.parseBoolean(
@@ -50,6 +51,7 @@ public class ExcerptConnectorGenerateDelegate extends BaseConnectorDelegate {
     var requestBody = new ExcerptEventDto(null, excerptType, excerptInputData,
         requiresSystemSignature);
 
+    logProcessExecution("generate excerpt on resource", RESOURCE_EXCERPTS);
     var response = performPost(execution, objectMapper.writeValueAsString(requestBody));
     setTransientResult(execution, RESPONSE_VARIABLE, response);
     logDelegateExecution(execution,
