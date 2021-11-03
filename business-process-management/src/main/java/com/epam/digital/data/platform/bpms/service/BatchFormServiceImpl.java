@@ -1,8 +1,8 @@
 package com.epam.digital.data.platform.bpms.service;
 
 import com.epam.digital.data.platform.bpms.cmd.GetStartFormKeysCmd;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.impl.ServiceImpl;
 import org.springframework.stereotype.Component;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class BatchFormServiceImpl extends ServiceImpl implements BatchFormService {
 
   @Override
-  public Map<String, String> getStartFormKeys(List<String> processDefinitionIds) {
+  public Map<String, String> getStartFormKeys(Set<String> processDefinitionIds) {
     log.info("Getting start form map for process definitions - {}", processDefinitionIds);
     var result = commandExecutor.execute(new GetStartFormKeysCmd(processDefinitionIds));
     log.info("Found {} start forms", result.size());

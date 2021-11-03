@@ -5,8 +5,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.epam.digital.data.platform.bpms.cmd.GetStartFormKeysCmd;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,11 +33,11 @@ public class StartBatchFormServiceTest {
     var nonExistedProcessDefinition = "notExisted";
 
     when(commandExecutor.execute(eq(new GetStartFormKeysCmd(
-        List.of(existedProcessDefinition, nonExistedProcessDefinition))))).thenReturn(
+        Set.of(existedProcessDefinition, nonExistedProcessDefinition))))).thenReturn(
         Map.of(existedProcessDefinition, "form-key"));
 
     var formKeys = batchFormService.getStartFormKeys(
-        List.of(existedProcessDefinition, nonExistedProcessDefinition));
+        Set.of(existedProcessDefinition, nonExistedProcessDefinition));
 
     assertThat(formKeys).containsEntry(existedProcessDefinition, "form-key");
   }

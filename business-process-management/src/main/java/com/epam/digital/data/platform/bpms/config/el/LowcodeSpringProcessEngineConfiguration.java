@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LowcodeSpringProcessEngineConfiguration extends SpringProcessEngineConfiguration {
 
-  public final BatchFormService formServiceImpl;
+  private final BatchFormService formServiceImpl;
 
   @Autowired
   public LowcodeSpringProcessEngineConfiguration(
