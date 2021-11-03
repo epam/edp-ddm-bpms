@@ -29,9 +29,11 @@ public class SearchSubjectsEdrRegistryConnectorDelegate extends BaseJavaDelegate
 
   @Override
   public void execute(DelegateExecution execution) throws Exception {
+    logStartDelegateExecution();
     var code = (String) execution.getVariable(EDR_CODE_VARIABLE);
     var authorizationToken = (String) execution.getVariable(AUTHORIZATION_TOKEN_VARIABLE);
 
+    logProcessExecution("search subjects by code", code);
     var response = edrRemoteService.searchSubjects(code, authorizationToken);
     var connectorResponse = prepareConnectorResponse(response);
 

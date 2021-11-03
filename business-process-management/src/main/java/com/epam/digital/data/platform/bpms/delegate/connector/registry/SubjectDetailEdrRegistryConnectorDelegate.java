@@ -29,9 +29,11 @@ public class SubjectDetailEdrRegistryConnectorDelegate extends BaseJavaDelegate 
 
   @Override
   public void execute(DelegateExecution execution) throws Exception {
+    logStartDelegateExecution();
     var authorizationToken = (String) execution.getVariable(AUTHORIZATION_TOKEN_VARIABLE);
     var id = (String) execution.getVariable(ID_VARIABLE);
 
+    logProcessExecution("get subject detail by id", id);
     var response = edrRemoteService.getSubjectDetail(new BigInteger(id), authorizationToken);
     var connectorResponse = prepareConnectorResponse(response);
 

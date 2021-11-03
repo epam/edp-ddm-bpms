@@ -27,7 +27,10 @@ public class GetStartFormDataFromCephDelegate extends BaseJavaDelegate {
 
   @Override
   public void execute(DelegateExecution execution) {
+    logStartDelegateExecution();
     var cephKey = (String) execution.getVariable(Constants.BPMS_START_FORM_CEPH_KEY_VARIABLE_NAME);
+
+    logProcessExecution("get start form data by key", cephKey);
     var formData = cephService.getFormData(cephKey)
         .map(FormDataDto::getData)
         .orElse(new LinkedHashMap<>());
