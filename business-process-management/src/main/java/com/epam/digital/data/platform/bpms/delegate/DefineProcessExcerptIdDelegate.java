@@ -14,10 +14,12 @@ import org.springframework.stereotype.Component;
 public class DefineProcessExcerptIdDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_EXECUTION = "defineProcessExcerptIdDelegate";
+  public static final String EXCERPT_ID_PARAMETER = "excerptId";
 
   @Override
   public void execute(DelegateExecution execution) {
-    var excerptId = execution.getVariable("excerptId");
+    logStartDelegateExecution();
+    var excerptId = execution.getVariable(EXCERPT_ID_PARAMETER);
     setResult(execution, Constants.SYS_VAR_PROCESS_EXCERPT_ID, excerptId);
     logDelegateExecution(execution, Set.of(Constants.SYS_VAR_PROCESS_EXCERPT_ID), Set.of());
   }

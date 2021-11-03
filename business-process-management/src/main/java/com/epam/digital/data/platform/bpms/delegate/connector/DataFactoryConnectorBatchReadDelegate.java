@@ -28,9 +28,11 @@ public class DataFactoryConnectorBatchReadDelegate extends DataFactoryConnectorR
   @Override
   @SuppressWarnings("unchecked")
   public void execute(DelegateExecution execution) {
+    logStartDelegateExecution();
     var resource = (String) execution.getVariable(RESOURCE_VARIABLE);
     var resourceIds = (List<String>) execution.getVariable(VAR_RESOURCE_IDS);
 
+    logProcessExecution("batch read entities on resource", resource);
     var response = executeBatchGetOperation(execution, resource, resourceIds);
 
     setTransientResult(execution, RESPONSE_VARIABLE, response);

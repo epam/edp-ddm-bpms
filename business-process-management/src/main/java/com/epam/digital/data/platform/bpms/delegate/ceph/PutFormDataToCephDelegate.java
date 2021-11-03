@@ -32,12 +32,14 @@ public class PutFormDataToCephDelegate extends BaseJavaDelegate {
 
   @Override
   public void execute(DelegateExecution execution) {
+    logStartDelegateExecution();
     var taskDefinitionKey = (String) execution.getVariable(TASK_DEFINITION_KEY_PARAMETER);
     var processInstanceId = execution.getProcessInstanceId();
 
     var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, processInstanceId);
     var formData = (SpinJsonNode) execution.getVariable(FORM_DATA_PARAMETER);
 
+    logProcessExecution("put form data with key", cephKey);
     cephService.putFormData(cephKey, toFormDataDto(formData));
     logDelegateExecution(execution, Set.of(TASK_DEFINITION_KEY_PARAMETER, FORM_DATA_PARAMETER),
         Set.of());

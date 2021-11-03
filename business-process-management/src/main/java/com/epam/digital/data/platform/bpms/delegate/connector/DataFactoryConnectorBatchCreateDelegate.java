@@ -44,9 +44,11 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelega
 
   @Override
   public void execute(DelegateExecution execution) {
+    logStartDelegateExecution();
     var resource = (String) execution.getVariable(RESOURCE_VARIABLE);
     var payload = (SpinJsonNode) execution.getVariable(PAYLOAD_VARIABLE);
 
+    logProcessExecution("batch create entities on resource", resource);
     var response = executeBatchCreateOperation(execution, payload, resource);
 
     setTransientResult(execution, RESPONSE_VARIABLE, response);
@@ -64,8 +66,10 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelega
 
       var systemSignature = signNode(execution, stringJsonNode);
 
+      logProcessExecution("put signature to ceph", String.valueOf(nodeIndex));
       putSignatureToCeph(execution, stringJsonNode, systemSignature, nodeIndex);
 
+      logProcessExecution("create entity", String.valueOf(nodeIndex));
       performPost(execution, resource, stringJsonNode);
     }
     return DataFactoryConnectorResponse.builder()

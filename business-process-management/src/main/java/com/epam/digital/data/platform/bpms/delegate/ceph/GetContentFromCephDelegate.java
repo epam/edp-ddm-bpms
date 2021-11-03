@@ -27,7 +27,10 @@ public class GetContentFromCephDelegate extends BaseJavaDelegate {
 
   @Override
   public void execute(DelegateExecution execution) {
+    logStartDelegateExecution();
     var key = (String) execution.getVariable(KEY_PARAMETER);
+
+    logProcessExecution("get content by key", key);
     var content = cephService.getContent(cephBucketName, key).orElse(null);
 
     setTransientResult(execution, CONTENT_PARAMETER, content);
