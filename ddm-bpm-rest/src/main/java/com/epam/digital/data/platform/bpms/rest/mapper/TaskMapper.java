@@ -1,6 +1,7 @@
 package com.epam.digital.data.platform.bpms.rest.mapper;
 
 import com.epam.digital.data.platform.bpms.api.dto.HistoryUserTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.SignableUserTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.UserTaskDto;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -18,6 +19,9 @@ public interface TaskMapper {
 
   @Mapping(target = "created", qualifiedByName = "toLocalDateTime")
   UserTaskDto toUserTaskDto(TaskDto taskDto);
+
+  @Mapping(target = "created", qualifiedByName = "toLocalDateTime")
+  SignableUserTaskDto toSignableUserTaskDto(TaskDto taskDto);
 
   @Mapping(target = "startTime", qualifiedByName = "toLocalDateTime")
   @Mapping(target = "endTime", qualifiedByName = "toLocalDateTime")
