@@ -24,7 +24,6 @@ public class KeycloakRemoveCitizenRoleConnectorDelegate extends
   @Override
   protected void performOperationWithRole(RoleScopeResource roleScopeResource,
       RoleRepresentation roleRepresentation) {
-    logProcessExecution("remove role", roleRepresentation.getName());
     keycloakClientService.removeRole(roleScopeResource, roleRepresentation);
   }
 

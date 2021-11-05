@@ -7,6 +7,7 @@ import com.epam.digital.data.platform.starter.trembita.integration.dto.SubjectDe
 import com.epam.digital.data.platform.starter.trembita.integration.service.EdrRemoteService;
 import java.math.BigInteger;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.spin.Spin;
@@ -15,6 +16,7 @@ import org.camunda.spin.Spin;
  * The class represents an implementation of {@link JavaDelegate} that is used to search subject
  * details in EDR registry.
  */
+@Slf4j
 public class SubjectDetailEdrRegistryConnectorDelegate extends BaseEdrRegistryConnectorDelegate {
 
   public static final String DELEGATE_NAME = "subjectDetailEdrRegistryConnectorDelegate";
@@ -33,9 +35,10 @@ public class SubjectDetailEdrRegistryConnectorDelegate extends BaseEdrRegistryCo
     Objects.requireNonNull(id,
         "'id' parameter is null in subjectDetailEdrRegistryConnectorDelegate");
 
-    logProcessExecution("get subject detail by id", id);
+    log.debug("Start getting subject detail by id {}", id);
     var response = edrRemoteService.getSubjectDetail(new BigInteger(id), authorizationToken);
     var connectorResponse = prepareConnectorResponse(response);
+    log.debug("Got subject detail response with status: {}", connectorResponse.getStatusCode());
 
     responseVariable.on(execution).set(connectorResponse);
   }

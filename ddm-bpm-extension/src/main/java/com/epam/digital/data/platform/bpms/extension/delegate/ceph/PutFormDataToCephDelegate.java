@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.spin.Spin;
 import org.camunda.spin.json.SpinJsonNode;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
  * The class used to map {@link SpinJsonNode} to {@link FormDataDto} entity and put in ceph using
  * {@link FormDataCephService} service.
  */
+@Slf4j
 @Component(PutFormDataToCephDelegate.DELEGATE_NAME)
 public class PutFormDataToCephDelegate extends BaseFormDataDelegate {
 
@@ -38,8 +40,9 @@ public class PutFormDataToCephDelegate extends BaseFormDataDelegate {
     var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, processInstanceId);
     var formData = formDataVariable.from(execution).getOrDefault(Spin.JSON(Map.of()));
 
-    logProcessExecution("put form data with key", cephKey);
+    log.debug("Start putting form data with key {}", cephKey);
     cephService.putFormData(cephKey, toFormDataDto(formData));
+    log.debug("Form data put successfully with key {}", cephKey);
   }
 
   @Override

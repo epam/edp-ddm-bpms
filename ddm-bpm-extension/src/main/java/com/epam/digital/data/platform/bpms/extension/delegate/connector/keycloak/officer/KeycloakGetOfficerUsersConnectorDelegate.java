@@ -35,9 +35,7 @@ public class KeycloakGetOfficerUsersConnectorDelegate extends BaseKeycloakOffice
   public void executeInternal(DelegateExecution execution) throws Exception {
     var role = roleNameVariable.from(execution).getOrDefault(DEFAULT_ROLE);
 
-    logProcessExecution("get realm resource");
     var realmResource = keycloakClientService.getRealmResource();
-    logProcessExecution("get users by role", role);
     var roleUserMembers = keycloakClientService.getRoleUserMembers(realmResource, role);
 
     usersByRoleVariable.on(execution).set(roleUserMembers);

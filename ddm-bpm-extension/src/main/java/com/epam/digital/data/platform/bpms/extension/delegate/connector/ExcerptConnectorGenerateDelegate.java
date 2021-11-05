@@ -6,6 +6,7 @@ import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.excerpt.model.ExcerptEventDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
  * The class represents an implementation of {@link BaseConnectorDelegate} that is used for excerpt
  * generation
  */
+@Slf4j
 @Component(ExcerptConnectorGenerateDelegate.DELEGATE_NAME)
 public class ExcerptConnectorGenerateDelegate extends BaseConnectorDelegate {
 
@@ -53,8 +55,10 @@ public class ExcerptConnectorGenerateDelegate extends BaseConnectorDelegate {
     var requestBody = new ExcerptEventDto(null, excerptType, excerptInputData,
         requiresSystemSignature);
 
-    logProcessExecution("generate excerpt on resource", RESOURCE_EXCERPTS);
+    log.debug("Start generating excerpt on resource {}", RESOURCE_EXCERPTS);
     var response = performPost(execution, objectMapper.writeValueAsString(requestBody));
+    log.debug("Excerpt successfully generated");
+
     responseVariable.on(execution).set(response);
   }
 

@@ -7,6 +7,7 @@ import com.epam.digital.data.platform.starter.security.dto.enums.KeycloakPlatfor
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.keycloak.representations.idm.RoleRepresentation;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
  * The class represents an implementation of {@link JavaDelegate} that is used to get the list of
  * regulations roles from keycloak.
  */
+@Slf4j
 @Component(KeycloakGetCitizenRolesConnectorDelegate.DELEGATE_NAME)
 public class KeycloakGetCitizenRolesConnectorDelegate extends BaseKeycloakCitizenConnectorDelegate {
 
@@ -32,15 +34,14 @@ public class KeycloakGetCitizenRolesConnectorDelegate extends BaseKeycloakCitize
 
   @Override
   public void executeInternal(DelegateExecution execution) {
-    logProcessExecution("get realm resource");
     var realmResource = keycloakClientService.getRealmResource();
-    logProcessExecution("get keycloak roles");
     var keycloakRoles = keycloakClientService.getKeycloakRoles(realmResource);
-    logProcessExecution("keycloak role filtering");
+    log.debug("Start filtering keycloak roles {}", keycloakRoles);
     var regulationsRoles = keycloakRoles.stream()
         .map(RoleRepresentation::getName)
         .filter(Predicate.not(KeycloakPlatformRole::containsRole))
         .collect(Collectors.toList());
+    log.debug("Keycloak roles {} was filtered", regulationsRoles);
     rolesVariable.on(execution).set(regulationsRoles);
   }
 

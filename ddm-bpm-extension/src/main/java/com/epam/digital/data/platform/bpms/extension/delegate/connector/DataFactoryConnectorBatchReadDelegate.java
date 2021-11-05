@@ -4,6 +4,7 @@ import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorRespo
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.spin.Spin;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+@Slf4j
 @Component(DataFactoryConnectorBatchReadDelegate.DELEGATE_NAME)
 public class DataFactoryConnectorBatchReadDelegate extends DataFactoryConnectorReadDelegate {
 
@@ -32,8 +34,9 @@ public class DataFactoryConnectorBatchReadDelegate extends DataFactoryConnectorR
     var resource = resourceVariable.from(execution).get();
     var resourceIds = resourceIdsVariable.from(execution).getOrDefault(List.of());
 
-    logProcessExecution("batch read entities on resource", resource);
+    log.debug("Start executing batch read entities on resource {}", resource);
     var response = executeBatchGetOperation(execution, resource, resourceIds);
+    log.debug("Finished batch read operation");
 
     responseVariable.on(execution).set(response);
   }

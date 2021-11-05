@@ -1,6 +1,7 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
 import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
  * The class represents an implementation of {@link BaseConnectorDelegate} that is used to read data
  * from Data Factory
  */
+@Slf4j
 @Component(DataFactoryConnectorReadDelegate.DELEGATE_NAME)
 public class DataFactoryConnectorReadDelegate extends BaseConnectorDelegate {
 
@@ -33,8 +35,9 @@ public class DataFactoryConnectorReadDelegate extends BaseConnectorDelegate {
     var resource = resourceVariable.from(execution).get();
     var id = resourceIdVariable.from(execution).get();
 
-    logProcessExecution("get entity on resource", resource);
+    log.debug("Start getting entity by id {} on resource {}", id, resource);
     var response = performGet(execution, resource, id);
+    log.debug("Got entity by id {}", id);
 
     responseVariable.on(execution).set(response);
   }
