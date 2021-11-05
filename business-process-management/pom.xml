@@ -26,22 +26,24 @@
       <artifactId>business-process-management-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <dependency>
       <groupId>com.epam.digital.data.platform</groupId>
       <artifactId>ddm-bpm-engine</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <dependency>
       <groupId>com.epam.digital.data.platform</groupId>
       <artifactId>ddm-bpm-extension</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <dependency>
       <groupId>com.epam.digital.data.platform</groupId>
       <artifactId>ddm-bpm-data-accessor</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.epam.digital.data.platform</groupId>
+      <artifactId>ddm-bpm-rest</artifactId>
       <version>${project.version}</version>
     </dependency>
 

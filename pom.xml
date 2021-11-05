@@ -16,13 +16,14 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>ddm-bpm-security</module>
     <module>business-process-management</module>
     <module>business-process-management-api</module>
     <module>business-process-management-client</module>
     <module>ddm-bpm-data-accessor</module>
-    <module>ddm-bpm-extension</module>
     <module>ddm-bpm-engine</module>
+    <module>ddm-bpm-extension</module>
+    <module>ddm-bpm-rest</module>
+    <module>ddm-bpm-security</module>
   </modules>
 
   <properties>

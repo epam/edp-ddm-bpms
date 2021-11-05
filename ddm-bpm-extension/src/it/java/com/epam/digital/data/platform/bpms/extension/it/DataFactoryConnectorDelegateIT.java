@@ -293,4 +293,30 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
 
     BpmnAwareTests.assertThat(processInstance).isEnded();
   }
+
+  @Test
+  @Deployment(resources = {"bpmn/connector/testDataFactoryConnectorCreateDelegate.bpmn"})
+  public void testDataFactoryConnectorCreateDelegate() {
+    dataFactoryMockServer.addStubMapping(
+        stubFor(post(urlPathEqualTo("/mock-server/test"))
+            .withHeader("X-Access-Token", equalTo(validAccessToken))
+            .withRequestBody(
+                equalTo("{\"data\":\"test data\",\"description\":\"some description\"}"))
+            .willReturn(aResponse().withStatus(201))));
+
+    var processInstance = runtimeService
+        .startProcessInstanceByKey("testDataFactoryConnectorCreateDelegate_key");
+
+    var cephKeyToken = cephKeyProvider
+        .generateKey("test_token", processInstance.getProcessInstanceId());
+    cephService.putFormData(cephKeyToken, FormDataDto.builder().accessToken(validAccessToken)
+        .data(new LinkedHashMap<>()).build());
+
+    var taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionCreateDelegateTask")
+        .singleResult()
+        .getId();
+    taskService.complete(taskId);
+
+    BpmnAwareTests.assertThat(processInstance).isEnded();
+  }
 }
