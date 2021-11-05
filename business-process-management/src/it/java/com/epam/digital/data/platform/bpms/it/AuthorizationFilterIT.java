@@ -11,6 +11,7 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
+import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,6 +23,7 @@ public class AuthorizationFilterIT extends BaseIT {
   }
 
   @Test
+  @Deployment(resources = "bpmn/testInitSystemVariablesProcess.bpmn")
   public void shouldReadProcessInstanceHistory() throws Exception {
     //get process-definition
     ProcessDefinitionDto[] processDefinitionDtos = getForObject("api/process-definition",
@@ -45,6 +47,7 @@ public class AuthorizationFilterIT extends BaseIT {
   }
 
   @Test
+  @Deployment(resources = "bpmn/testInitSystemVariablesProcess.bpmn")
   public void shouldNotReadProcessInstanceHistory() throws IOException {
     ProcessDefinitionDto[] processDefinitionDtos = getForObject("api/process-definition",
         ProcessDefinitionDto[].class);
@@ -68,6 +71,7 @@ public class AuthorizationFilterIT extends BaseIT {
   }
 
   @Test
+  @Deployment(resources = "bpmn/testInitSystemVariablesProcess.bpmn")
   public void shouldReadUserTasksHistory() throws IOException {
     ProcessDefinitionDto[] processDefinitionDtos = getForObject("api/process-definition",
         ProcessDefinitionDto[].class);
@@ -89,6 +93,7 @@ public class AuthorizationFilterIT extends BaseIT {
   }
 
   @Test
+  @Deployment(resources = "bpmn/testInitSystemVariablesProcess.bpmn")
   public void shouldNotReadUserTasksHistory() throws IOException {
     ProcessDefinitionDto[] processDefinitionDtos = getForObject("api/process-definition",
         ProcessDefinitionDto[].class);
@@ -110,6 +115,7 @@ public class AuthorizationFilterIT extends BaseIT {
   }
 
   @Test
+  @Deployment(resources = "bpmn/testInitSystemVariablesProcess.bpmn")
   public void shouldReadUserTasks() throws IOException {
     ProcessDefinitionDto[] processDefinitionDtos = getForObject("api/process-definition",
         ProcessDefinitionDto[].class);
@@ -128,6 +134,7 @@ public class AuthorizationFilterIT extends BaseIT {
   }
 
   @Test
+  @Deployment(resources = "bpmn/testInitSystemVariablesProcess.bpmn")
   public void shouldNotReadUserTasks() throws IOException {
     ProcessDefinitionDto[] processDefinitionDtos = getForObject("api/process-definition",
         ProcessDefinitionDto[].class);
@@ -149,6 +156,7 @@ public class AuthorizationFilterIT extends BaseIT {
   }
 
   @Test
+  @Deployment(resources = "bpmn/testInitSystemVariablesProcess.bpmn")
   public void shouldReadOnlyPermittedTasks() throws IOException {
     ProcessDefinitionDto[] processDefinitionDtos = getForObject("api/process-definition",
         ProcessDefinitionDto[].class);
