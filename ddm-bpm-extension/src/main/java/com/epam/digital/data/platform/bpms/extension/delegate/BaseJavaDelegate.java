@@ -22,22 +22,10 @@ public abstract class BaseJavaDelegate implements JavaDelegate {
   protected abstract void executeInternal(DelegateExecution execution) throws Exception;
 
   private void logStartDelegateExecution() {
-    var log = getLogger();
+    var log = LoggerFactory.getLogger(this.getClass());
     if (log.isDebugEnabled()) {
-      log.debug("Delegate {} started execution.", getDelegateName());
+      log.debug("Starting execution");
     }
-  }
-
-  public void logProcessExecution(String operationMessage, String parameter) {
-    var log = getLogger();
-    if (log.isDebugEnabled()) {
-      log.debug("Delegate {} performs the operation: {} {}", getDelegateName(), operationMessage,
-          parameter);
-    }
-  }
-
-  public void logProcessExecution(String operationMessage) {
-    logProcessExecution(operationMessage, "");
   }
 
   private void logDelegateExecution(DelegateExecution delegateExecution) {
@@ -58,9 +46,5 @@ public abstract class BaseJavaDelegate implements JavaDelegate {
             + "Process-instance-id - {},\n"
             + "Task-definition - {}",
         getDelegateName(), processDefinitionKey, processInstanceId, taskDefinitionKey);
-  }
-
-  private Logger getLogger() {
-    return LoggerFactory.getLogger(this.getClass());
   }
 }

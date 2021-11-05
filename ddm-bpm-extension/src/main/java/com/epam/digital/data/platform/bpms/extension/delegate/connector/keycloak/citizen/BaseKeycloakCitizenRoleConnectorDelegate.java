@@ -29,14 +29,9 @@ public abstract class BaseKeycloakCitizenRoleConnectorDelegate extends
     var userName = userNameVariable.from(execution).get();
     var role = roleVariable.from(execution).get();
 
-    logProcessExecution("get realm resource");
     var realmResource = keycloakClientService.getRealmResource();
-    logProcessExecution("get role representation by name", role);
     var roleRepresentation = keycloakClientService.getRoleRepresentation(realmResource, role);
-    logProcessExecution("get user representation by name", userName);
     var userRepresentation = keycloakClientService.getUserRepresentation(realmResource, userName);
-    logProcessExecution("get role scope resource by user representation id",
-        userRepresentation.getId());
     var roleScopeResource = keycloakClientService
         .getRoleScopeResource(realmResource, userRepresentation.getId());
 

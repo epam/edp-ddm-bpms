@@ -5,6 +5,7 @@ import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import java.util.Objects;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.spin.json.SpinJsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import org.springframework.web.util.UriComponentsBuilder;
  * The class represents an implementation of {@link BaseConnectorDelegate} that is used for digital
  * signature of data
  */
+@Slf4j
 @Component(DigitalSignatureConnectorDelegate.DELEGATE_NAME)
 public class DigitalSignatureConnectorDelegate extends BaseConnectorDelegate {
 
@@ -43,8 +45,9 @@ public class DigitalSignatureConnectorDelegate extends BaseConnectorDelegate {
   public void executeInternal(DelegateExecution execution) {
     var payload = payloadVariable.from(execution).getOptional();
 
-    logProcessExecution("sign data");
+    log.debug("Start sending data to sign");
     var response = performPost(execution, payload.map(Objects::toString).orElse(null));
+    log.debug("Got digital signature");
 
     dsoResponseVariable.on(execution).set(response.getResponseBody());
   }

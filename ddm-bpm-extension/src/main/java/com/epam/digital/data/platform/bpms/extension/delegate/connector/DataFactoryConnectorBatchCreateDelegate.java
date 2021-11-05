@@ -3,6 +3,7 @@ package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
 import com.epam.digital.data.platform.integration.ceph.service.CephService;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.spin.Spin;
 import org.camunda.spin.json.SpinJsonNode;
@@ -17,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
  * The class represents an implementation of {@link BaseConnectorDelegate} that is used to execute
  * data batch creation in Data Factory
  */
+@Slf4j
 @Component(DataFactoryConnectorBatchCreateDelegate.DELEGATE_NAME)
 public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelegate {
 
@@ -45,8 +47,9 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelega
     var resource = resourceVariable.from(execution).get();
     var payload = payloadVariable.from(execution).getOrDefault(Spin.JSON(Map.of()));
 
-    logProcessExecution("batch create entities on resource", resource);
+    log.debug("Start executing batch create entities on resource {}", resource);
     var response = executeBatchCreateOperation(execution, payload, resource);
+    log.debug("Finished batch create operation");
 
     responseVariable.on(execution).set(response);
   }
@@ -60,11 +63,13 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelega
 
       var systemSignature = signNode(execution, stringJsonNode);
 
-      logProcessExecution("put signature to ceph", String.valueOf(nodeIndex));
+      log.debug("Start putting signature to ceph for {} entity", nodeIndex);
       putSignatureToCeph(execution, stringJsonNode, systemSignature, nodeIndex);
+      log.debug("Signature put successfully for {} entity", nodeIndex);
 
-      logProcessExecution("create entity", String.valueOf(nodeIndex));
+      log.debug("Start creating {} entity", nodeIndex);
       performPost(execution, resource, stringJsonNode);
+      log.debug("Entity {} was created successfully", nodeIndex);
     }
     return ConnectorResponse.builder()
         .statusCode(HttpStatus.CREATED.value())
