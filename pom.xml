@@ -38,6 +38,7 @@
     <ddm-starter-trembita-integration.version>1.5.0-SNAPSHOT</ddm-starter-trembita-integration.version>
     <excerpt-model.version>1.4.0</excerpt-model.version>
     <p6spy-spring-boot-starter.version>1.7.1</p6spy-spring-boot-starter.version>
+    <dso.version>1.4.5</dso.version>
 
     <deployable.module>business-process-management</deployable.module>
 

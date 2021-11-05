@@ -25,6 +25,11 @@
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.epam.digital.data.platform</groupId>
+      <artifactId>digital-signature-ops-api</artifactId>
+      <version>${dso.version}</version>
+    </dependency>
   </dependencies>
 
 </project>
