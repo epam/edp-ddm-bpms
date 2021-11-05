@@ -3,6 +3,7 @@ package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
  * The class represents an implementation of {@link BaseConnectorDelegate} that is used for getting
  * excerpt status
  */
+@Slf4j
 @Component(ExcerptConnectorStatusDelegate.DELEGATE_NAME)
 public class ExcerptConnectorStatusDelegate extends BaseConnectorDelegate {
 
@@ -37,8 +39,11 @@ public class ExcerptConnectorStatusDelegate extends BaseConnectorDelegate {
   public void executeInternal(DelegateExecution execution) throws Exception {
     var excerptIdentifier = excerptIdentifierVariable.from(execution).get();
 
-    logProcessExecution("get excerpt status on resource", RESOURCE_EXCERPTS);
+    log.debug("Start getting excerpt status by id {} on resource {}", excerptIdentifier,
+        RESOURCE_EXCERPTS);
     var response = performGet(execution, excerptIdentifier);
+    log.debug("Got excerpt status by id {}", excerptIdentifier);
+
     responseVariable.on(execution).set(response);
   }
 

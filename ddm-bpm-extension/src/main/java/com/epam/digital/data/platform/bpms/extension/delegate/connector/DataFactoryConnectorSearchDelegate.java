@@ -4,6 +4,7 @@ import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorRespo
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
  * The class represents an implementation of {@link BaseConnectorDelegate} that is used to search
  * data in Data Factory
  */
+@Slf4j
 @Component(DataFactoryConnectorSearchDelegate.DELEGATE_NAME)
 public class DataFactoryConnectorSearchDelegate extends BaseConnectorDelegate {
 
@@ -39,8 +41,9 @@ public class DataFactoryConnectorSearchDelegate extends BaseConnectorDelegate {
     var resource = resourceVariable.from(execution).get();
     var searchConditions = searchConditionsVariable.from(execution).getOrDefault(Map.of());
 
-    logProcessExecution("search entities on resource", resource);
+    log.debug("Start searching entities on resource {}", resource);
     var response = performSearch(execution, resource, searchConditions);
+    log.debug("Found entities on resource {}", resource);
 
     responseVariable.on(execution).set(response);
   }

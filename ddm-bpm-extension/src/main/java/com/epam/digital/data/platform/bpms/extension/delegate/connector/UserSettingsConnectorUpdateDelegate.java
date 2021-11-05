@@ -1,6 +1,7 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
 import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
  * The class represents an implementation of {@link BaseConnectorDelegate} that is used to create or
  * update user settings.
  */
+@Slf4j
 @Component(UserSettingsConnectorUpdateDelegate.DELEGATE_NAME)
 public class UserSettingsConnectorUpdateDelegate extends BaseConnectorDelegate {
 
@@ -33,8 +35,9 @@ public class UserSettingsConnectorUpdateDelegate extends BaseConnectorDelegate {
   public void executeInternal(DelegateExecution execution) throws Exception {
     var payload = payloadVariable.from(execution).getOptional();
 
-    logProcessExecution("create or update user settings on resource", RESOURCE_SETTINGS);
+    log.debug("Start creating or updating user settings on resource {}", RESOURCE_SETTINGS);
     var response = performPut(execution, payload.map(Object::toString).orElse(null));
+    log.debug("User settings successfully created or updated");
 
     responseVariable.on(execution).set(response);
   }

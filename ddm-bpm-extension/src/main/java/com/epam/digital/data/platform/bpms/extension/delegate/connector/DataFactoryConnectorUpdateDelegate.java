@@ -1,6 +1,7 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
 import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
  * The class represents an implementation of {@link BaseConnectorDelegate} that is used to update
  * data in Data Factory
  */
+@Slf4j
 @Component("dataFactoryConnectorUpdateDelegate")
 public class DataFactoryConnectorUpdateDelegate extends BaseConnectorDelegate {
 
@@ -34,8 +36,9 @@ public class DataFactoryConnectorUpdateDelegate extends BaseConnectorDelegate {
     var id = resourceIdVariable.from(execution).get();
     var payload = payloadVariable.from(execution).getOptional();
 
-    logProcessExecution("update entity on resource", resource);
+    log.debug("Start updating entity with id {} on resource {}", id, resource);
     var response = performPut(execution, resource, id, payload.map(Object::toString).orElse(null));
+    log.debug("Entity with id {} successfully updated", id);
 
     responseVariable.on(execution).set(response);
   }

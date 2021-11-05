@@ -2,6 +2,7 @@ package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
 import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
  * The class represents an implementation of {@link BaseConnectorDelegate} that is used to create
  * data in Data Factory
  */
+@Slf4j
 @Component(DataFactoryConnectorCreateDelegate.DELEGATE_NAME)
 public class DataFactoryConnectorCreateDelegate extends BaseConnectorDelegate {
 
@@ -34,8 +36,9 @@ public class DataFactoryConnectorCreateDelegate extends BaseConnectorDelegate {
     var resource = resourceVariable.from(execution).get();
     var payload = payloadVariable.from(execution).getOptional();
 
-    logProcessExecution("create entity on resource", resource);
+    log.debug("Start creating entity on resource {}", resource);
     var response = performPost(execution, resource, payload.map(Objects::toString).orElse(null));
+    log.debug("Entity successfully created");
 
     responseVariable.on(execution).set(response);
   }

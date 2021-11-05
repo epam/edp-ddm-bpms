@@ -4,6 +4,7 @@ import com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariab
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.epam.digital.data.platform.integration.ceph.service.FormDataCephService;
 import java.util.LinkedHashMap;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.spin.Spin;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
  * service for start form, map the formData to {@link org.camunda.spin.json.SpinJsonNode} and return
  * it.
  */
+@Slf4j
 @Component(GetStartFormDataFromCephDelegate.DELEGATE_NAME)
 public class GetStartFormDataFromCephDelegate extends BaseFormDataDelegate {
 
@@ -30,10 +32,11 @@ public class GetStartFormDataFromCephDelegate extends BaseFormDataDelegate {
   public void executeInternal(DelegateExecution execution) {
     var cephKey = startFormCephKeyVariable.from(execution).get();
 
-    logProcessExecution("get start form data by key", cephKey);
+    log.debug("Start getting start form data by key {}", cephKey);
     var formData = cephService.getFormData(cephKey)
         .map(FormDataDto::getData)
         .orElse(new LinkedHashMap<>());
+    log.debug("Got start form data by key {}", cephKey);
 
     formDataVariable.on(execution).set(Spin.JSON(formData));
   }
