@@ -139,7 +139,7 @@ class AbstractProcessEnginePlugin {
   preInit()
 }
 
-class CamundaSystemVariablesSupportListenerPlugin #back:lightblue;line:green;text:black extends AbstractProcessEnginePlugin {
+class CamundaEngineSystemVariablesSupportListenerPlugin #back:lightblue;line:green;text:black extends AbstractProcessEnginePlugin {
   preInit()
 }
 
@@ -147,7 +147,7 @@ class AbstractBpmnParseListener {
   parseStartEvent()
 }
 
-class CamundaSystemVariablesSupportListener #back:lightblue;line:green;text:black extends AbstractBpmnParseListener {
+class CamundaEngineSystemVariablesSupportListener #back:lightblue;line:green;text:black extends AbstractBpmnParseListener {
   parseStartEvent()
 }
 
@@ -155,14 +155,14 @@ class CamundaProperties #back:lightblue;line:green;text:black {
   Map<String, String> systemVariables
 }
 
-CamundaSystemVariablesSupportListenerPlugin -> CamundaSystemVariablesSupportListener
-CamundaSystemVariablesSupportListener -> CamundaProperties
+CamundaEngineSystemVariablesSupportListenerPlugin -> CamundaEngineSystemVariablesSupportListener
+CamundaEngineSystemVariablesSupportListener -> CamundaProperties
 @enduml
 ----
 
 - `CamundaProperties` містить список системних змінних
-- `CamundaSystemVariablesSupportListener` містить екземпляр класу `CamundaProperties` та у методі parseStartEvent додає системні змінні до контексту виконання бізнес-процесу
-- `CamundaSystemVariablesSupportListenerPlugin` додає екземпляр `CamundaSystemVariablesSupportListener` до загального списку `preParseListeners` у Camunda
+- `CamundaEngineSystemVariablesSupportListener` містить екземпляр класу `CamundaProperties` та у методі parseStartEvent додає системні змінні до контексту виконання бізнес-процесу
+- `CamundaEngineSystemVariablesSupportListenerPlugin` додає екземпляр `CamundaEngineSystemVariablesSupportListener` до загального списку `preParseListeners` у Camunda
 
 == Збереження токену ініціатора бізнес-процесу у transient змінній бізнес-процесу
 
@@ -175,7 +175,7 @@ class AbstractBpmnParseListener {
   parseStartEvent()
 }
 
-class CamundaSystemVariablesSupportListener #back:lightblue;line:green;text:black extends AbstractBpmnParseListener {
+class BpmSecuritySupportListener #back:lightblue;line:green;text:black extends AbstractBpmnParseListener {
   parseStartEvent()
 }
 
@@ -187,12 +187,12 @@ class InitiatorTokenStartEventListener #back:lightblue;line:green;text:black imp
   void notify(DelegateExecution)
 }
 
-CamundaSystemVariablesSupportListener o- InitiatorTokenStartEventListener
+BpmSecuritySupportListener o- InitiatorTokenStartEventListener
 @enduml
 ----
 
 - `InitiatorTokenStartEventListener` бере об'єкт автентифікації з `SecurityContextHolder` та зберігає токен у контексті Camunda в якості transient змінної з ім'ям `initiator_access_token`
-- `CamundaSystemVariablesSupportListener` містить екземпляр класу `InitiatorTokenStartEventListener` та у методі parseStartEvent додає цей об'єкт до загального списку `executionListeners` стартового івенту
+- `BpmSecuritySupportListener` містить екземпляр класу `InitiatorTokenStartEventListener` та у методі parseStartEvent додає цей об'єкт до загального списку `executionListeners` стартового івенту
 
 [IMPORTANT]
 --
@@ -210,7 +210,7 @@ class AbstractBpmnParseListener {
   parseUserTask()
 }
 
-class CamundaSystemVariablesSupportListener #back:lightblue;line:green;text:black extends AbstractBpmnParseListener {
+class BpmSecuritySupportListener #back:lightblue;line:green;text:black extends AbstractBpmnParseListener {
   parseUserTask()
 }
 
@@ -222,12 +222,12 @@ class CompleterTaskEventListener #back:lightblue;line:green;text:black implement
   void notify(DelegateTask)
 }
 
-CamundaSystemVariablesSupportListener o- CompleterTaskEventListener
+BpmSecuritySupportListener o- CompleterTaskEventListener
 @enduml
 ----
 
 - `CompleterTaskEventListener` бере об'єкт автентифікації з `SecurityContextHolder` та зберігає данні у контексті Camunda, а саме: ім'я користувача - в якості змінної з ім'ям `<task_id>_completer`, токен користувача - в якості transient змінної з ім'ям `<task_id>_completer_access_token`.
-- `CamundaSystemVariablesSupportListener` містить екземпляр класу `CompleterTaskEventListener` та у методі parseUserTask додає цей об'єкт до загального списку `taskListeners` користувацьких задач.
+- `BpmSecuritySupportListener` містить екземпляр класу `CompleterTaskEventListener` та у методі parseUserTask додає цей об'єкт до загального списку `taskListeners` користувацьких задач.
 
 [IMPORTANT]
 --
@@ -262,7 +262,7 @@ CamundaSystemVariablesSupportListener o- PutFormDataToCephTaskListener
 ----
 
 - `PutFormDataToCephTaskListener` бере інпут параметр задачі з ім'ям `userTaskInputFormDataPrepopulate` та зберігає його у Ceph під ключем що має відношення до користувацької задачі
-- `CamundaSystemVariablesSupportListener` містить екземпляр класу `PutFormDataToCephTaskListener` та у методі `parseUserTask` додає цей об'єкт до загального списку `taskListeners` кожної користувацької задачі
+- `LowcodeBpmnParseListener` містить екземпляр класу `PutFormDataToCephTaskListener` та у методі `parseUserTask` додає цей об'єкт до загального списку `taskListeners` кожної користувацької задачі
 
 [NOTE]
 --
@@ -297,7 +297,7 @@ CamundaSystemVariablesSupportListener o- FileCleanerEndEventListener
 ----
 
 - `FileCleanerEndEventListener` отримує ідентифікатор екземпляра бізнес-процесу та формує префікс формату `process/{processInstanceId}/` за яким отримує перелік ключів файлів збережених у Ceph, після чого видаляє файли за цим переліком.
-- `CamundaSystemVariablesSupportListener` містить екземпляр класу `FileCleanerEndEventListener` та у методі `parseEndEvent` додає цей об'єкт до загального списку `executionListeners` кінцевого івенту.
+- `LowcodeBpmnParseListener` містить екземпляр класу `FileCleanerEndEventListener` та у методі `parseEndEvent` додає цей об'єкт до загального списку `executionListeners` кінцевого івенту.
 
 == Видалення користувацьких даних з Ceph перед завершенням бізнес-процесу
 
@@ -327,7 +327,7 @@ CamundaSystemVariablesSupportListener o- FormDataCleanerEndEventListener
 ----
 
 - `FormDataCleanerEndEventListener` отримує ідентифікатор екземпляра бізнес-процесу та формує префікс формату `process/{processInstanceId}/` за яким отримує перелік ключів користувацьких даних збережених у Ceph, та додає до цього переліку ключ користувацьких даних стартової форми якщо він присутній, після чого видаляє дані за цим переліком.
-- `CamundaSystemVariablesSupportListener` містить екземпляр класу `FormDataCleanerEndEventListener` та у методі `parseEndEvent` додає цей об'єкт до загального списку `executionListeners` кінцевого івенту.
+- `LowcodeBpmnParseListener` містить екземпляр класу `FormDataCleanerEndEventListener` та у методі `parseEndEvent` додає цей об'єкт до загального списку `executionListeners` кінцевого івенту.
 
 == Маппинг виключень на HTTP відповідь
 
