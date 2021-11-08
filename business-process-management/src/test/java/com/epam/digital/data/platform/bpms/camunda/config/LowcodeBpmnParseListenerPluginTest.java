@@ -3,8 +3,8 @@ package com.epam.digital.data.platform.bpms.camunda.config;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.epam.digital.data.platform.bpms.config.CamundaSystemVariablesSupportListener;
-import com.epam.digital.data.platform.bpms.config.CamundaSystemVariablesSupportListenerPlugin;
+import com.epam.digital.data.platform.bpms.config.LowcodeBpmnParseListener;
+import com.epam.digital.data.platform.bpms.config.LowcodeProcessEnginePlugin;
 import java.util.List;
 import org.apache.commons.compress.utils.Lists;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
@@ -16,29 +16,29 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CamundaSystemVariablesSupportListenerPluginTest {
+public class LowcodeBpmnParseListenerPluginTest {
 
   @Mock
-  private CamundaSystemVariablesSupportListener camundaSystemVariablesSupportListener;
+  private LowcodeBpmnParseListener lowcodeBpmnParseListener;
   @Mock
   private ProcessEngineConfigurationImpl processEngineConfiguration;
 
-  private CamundaSystemVariablesSupportListenerPlugin camundaSystemVariablesSupportListenerPlugin;
+  private LowcodeProcessEnginePlugin lowcodeProcessEnginePlugin;
 
   @Before
   public void init() {
-    camundaSystemVariablesSupportListenerPlugin = new CamundaSystemVariablesSupportListenerPlugin(
-        camundaSystemVariablesSupportListener);
+    lowcodeProcessEnginePlugin = new LowcodeProcessEnginePlugin(
+        lowcodeBpmnParseListener);
   }
 
   @Test
   public void testPreInit() {
     when(processEngineConfiguration.getCustomPreBPMNParseListeners()).thenReturn(null);
 
-    camundaSystemVariablesSupportListenerPlugin.preInit(processEngineConfiguration);
+    lowcodeProcessEnginePlugin.preInit(processEngineConfiguration);
 
     List<BpmnParseListener> listeners = Lists.newArrayList();
-    listeners.add(camundaSystemVariablesSupportListener);
+    listeners.add(lowcodeBpmnParseListener);
     verify(processEngineConfiguration).setCustomPreBPMNParseListeners(listeners);
   }
 

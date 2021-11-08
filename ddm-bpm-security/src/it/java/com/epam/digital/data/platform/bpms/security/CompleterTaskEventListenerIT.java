@@ -1,4 +1,4 @@
-package com.epam.digital.data.platform.bpms.it;
+package com.epam.digital.data.platform.bpms.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

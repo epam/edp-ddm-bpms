@@ -5,8 +5,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.epam.digital.data.platform.bpms.config.CamundaSystemVariablesSupportListener;
-import com.epam.digital.data.platform.bpms.listener.CompleterTaskEventListener;
+import com.epam.digital.data.platform.bpms.config.LowcodeBpmnParseListener;
 import com.epam.digital.data.platform.bpms.listener.FileCleanerEndEventListener;
 import com.epam.digital.data.platform.bpms.listener.FormDataCleanerEndEventListener;
 import com.epam.digital.data.platform.bpms.listener.PutFormDataToCephTaskListener;
@@ -23,14 +22,12 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CamundaSystemVariablesSupportListenerTest {
+public class LowcodeBpmnParseListenerTest {
 
   @Mock
   private ActivityImpl activity;
   @Mock
   private PutFormDataToCephTaskListener putFormDataToCephTaskListener;
-  @Mock
-  private CompleterTaskEventListener completerTaskEventListener;
   @Mock
   private UserTaskActivityBehavior userTaskActivityBehavior;
   @Mock
@@ -40,12 +37,12 @@ public class CamundaSystemVariablesSupportListenerTest {
   @Mock
   private TaskDefinition taskDefinition;
 
-  private CamundaSystemVariablesSupportListener camundaSystemVariablesSupportListener;
+  private LowcodeBpmnParseListener lowcodeBpmnParseListener;
 
   @Before
   public void init() {
-    camundaSystemVariablesSupportListener = new CamundaSystemVariablesSupportListener(
-        completerTaskEventListener, putFormDataToCephTaskListener, fileCleanerEndEventListener,
+    lowcodeBpmnParseListener = new LowcodeBpmnParseListener(putFormDataToCephTaskListener,
+        fileCleanerEndEventListener,
         formDataCleanerEndEventListener);
   }
 
@@ -54,18 +51,16 @@ public class CamundaSystemVariablesSupportListenerTest {
     when(activity.getActivityBehavior()).thenReturn(userTaskActivityBehavior);
     when(userTaskActivityBehavior.getTaskDefinition()).thenReturn(taskDefinition);
 
-    camundaSystemVariablesSupportListener.parseUserTask(null, null, activity);
+    lowcodeBpmnParseListener.parseUserTask(null, null, activity);
 
     ArgumentCaptor<TaskListener> captor = ArgumentCaptor.forClass(TaskListener.class);
-    verify(taskDefinition, times(1))
-        .addTaskListener(eq(TaskListener.EVENTNAME_COMPLETE), captor.capture());
     verify(taskDefinition, times(1))
         .addTaskListener(eq(TaskListener.EVENTNAME_CREATE), captor.capture());
   }
 
   @Test
   public void shouldAddEndEventListener() {
-    camundaSystemVariablesSupportListener.parseEndEvent(null, null, activity);
+    lowcodeBpmnParseListener.parseEndEvent(null, null, activity);
 
     ArgumentCaptor<ExecutionListener> captor = ArgumentCaptor.forClass(ExecutionListener.class);
     verify(activity, times(2))

@@ -37,7 +37,7 @@
     <constructor-arg ref="variableAccessorFactory"/>
   </bean>
   <bean id="completerListener"
-    class="com.epam.digital.data.platform.bpms.listener.CompleterTaskEventListener">
+    class="com.epam.digital.data.platform.bpms.security.listener.CompleterTaskEventListener">
     <constructor-arg ref="completerVariablesAccessor"/>
   </bean>
   <bean id="putFormDataToCephListener"
@@ -102,8 +102,7 @@
     <property name="preParseListeners">
       <list>
         <bean
-          class="com.epam.digital.data.platform.bpms.config.CamundaSystemVariablesSupportListener">
-          <constructor-arg ref="completerListener"/>
+          class="com.epam.digital.data.platform.bpms.config.LowcodeBpmnParseListener">
           <constructor-arg ref="putFormDataToCephListener"/>
           <constructor-arg ref="fileCleanerEndEventListener"/>
           <constructor-arg ref="formDataCleanerEndEventListener"/>
@@ -111,6 +110,7 @@
         <bean class="com.epam.digital.data.platform.bpms.security.config.BpmSecuritySupportListener">
           <constructor-arg ref="authListener"/>
           <constructor-arg ref="initiatorListener"/>
+          <constructor-arg ref="completerListener"/>
         </bean>
         <bean
           class="com.epam.digital.data.platform.bpms.engine.config.CamundaEngineSystemVariablesSupportListener">
