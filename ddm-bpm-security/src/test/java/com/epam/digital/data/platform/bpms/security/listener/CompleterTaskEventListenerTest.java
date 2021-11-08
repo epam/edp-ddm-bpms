@@ -1,10 +1,11 @@
-package com.epam.digital.data.platform.bpms.listener;
+package com.epam.digital.data.platform.bpms.security.listener;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.epam.digital.data.platform.bpms.security.listener.CompleterTaskEventListener;
 import com.epam.digital.data.platform.dataaccessor.completer.CompleterVariablesAccessor;
 import com.epam.digital.data.platform.dataaccessor.completer.CompleterVariablesWriteAccessor;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -18,7 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 
 @ExtendWith(MockitoExtension.class)
-class CompleterTaskEventListenerTest {
+public class CompleterTaskEventListenerTest {
 
   @InjectMocks
   private CompleterTaskEventListener completerTaskEventListener;

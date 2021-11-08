@@ -1,6 +1,5 @@
 package com.epam.digital.data.platform.bpms.config;
 
-import com.epam.digital.data.platform.bpms.listener.CompleterTaskEventListener;
 import com.epam.digital.data.platform.bpms.listener.FileCleanerEndEventListener;
 import com.epam.digital.data.platform.bpms.listener.FormDataCleanerEndEventListener;
 import com.epam.digital.data.platform.bpms.listener.PutFormDataToCephTaskListener;
@@ -20,9 +19,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RequiredArgsConstructor
-public class CamundaSystemVariablesSupportListener extends AbstractBpmnParseListener {
+public class LowcodeBpmnParseListener extends AbstractBpmnParseListener {
 
-  private final CompleterTaskEventListener completerTaskEventListener;
   private final PutFormDataToCephTaskListener putFormDataToCephTaskListener;
   private final FileCleanerEndEventListener fileCleanerEndEventListener;
   private final FormDataCleanerEndEventListener formDataCleanerEndEventListener;
@@ -31,7 +29,6 @@ public class CamundaSystemVariablesSupportListener extends AbstractBpmnParseList
   public void parseUserTask(Element userTaskElement, ScopeImpl scope, ActivityImpl activity) {
     var userTaskActivityBehavior = ((UserTaskActivityBehavior) activity.getActivityBehavior());
     var taskDefinition = userTaskActivityBehavior.getTaskDefinition();
-    taskDefinition.addTaskListener(TaskListener.EVENTNAME_COMPLETE, completerTaskEventListener);
     taskDefinition.addTaskListener(TaskListener.EVENTNAME_CREATE, putFormDataToCephTaskListener);
   }
 

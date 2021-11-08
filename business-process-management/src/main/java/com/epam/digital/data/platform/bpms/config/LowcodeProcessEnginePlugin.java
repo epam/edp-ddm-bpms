@@ -14,9 +14,9 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @RequiredArgsConstructor
-public class CamundaSystemVariablesSupportListenerPlugin extends AbstractProcessEnginePlugin {
+public class LowcodeProcessEnginePlugin extends AbstractProcessEnginePlugin {
 
-  private final CamundaSystemVariablesSupportListener camundaSystemVariablesSupportListener;
+  private final LowcodeBpmnParseListener lowcodeBpmnParseListener;
 
   @Override
   public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
@@ -27,6 +27,6 @@ public class CamundaSystemVariablesSupportListenerPlugin extends AbstractProcess
       preParseListeners = new ArrayList<>();
       processEngineConfiguration.setCustomPreBPMNParseListeners(preParseListeners);
     }
-    preParseListeners.add(camundaSystemVariablesSupportListener);
+    preParseListeners.add(lowcodeBpmnParseListener);
   }
 }
