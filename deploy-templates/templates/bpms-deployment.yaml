@@ -29,11 +29,11 @@ spec:
           - >-
             while ! nc -w 1 {{ .Values.db.url }} {{ .Values.db.port }} </dev/null; do echo waiting for
             database; sleep 10; done;
-        image: {{ template "dockerProxyRegistry" . -}} busybox
+        image: {{ template "imageRegistry" . -}} busybox
         imagePullPolicy: IfNotPresent
         name: {{ .Chart.Name }}-init
       - name: create-db
-        image: {{ template "dockerProxyRegistry" . -}} bitnami/postgresql:latest
+        image: {{ template "imageRegistry" . -}} bitnami/postgresql:latest
         env:
           - name: PSQL_USER
             valueFrom:
