@@ -30,9 +30,9 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
-{{- define "dockerProxyRegistry" -}}
-{{- if .Values.dockerProxyRegistry -}}
-{{- printf "%s/" .Values.dockerProxyRegistry -}}
+{{- define "imageRegistry" -}}
+{{- if .Values.global.imageRegistry -}}
+{{- printf "%s/" .Values.global.imageRegistry -}}
 {{- else -}}
 {{- end -}}
 {{- end }}
