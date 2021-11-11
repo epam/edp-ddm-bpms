@@ -9,16 +9,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class TaskPropertyRestClientIT extends BaseIT {
+class TaskPropertyRestClientIT extends BaseIT {
 
   @Autowired
   private TaskPropertyRestClient taskPropertyRestClient;
 
   @Test
-  public void shouldReturnTaskProperties() throws JsonProcessingException {
+  void shouldReturnTaskProperties() throws JsonProcessingException {
     Map<String, String> testTaskProperties = new HashMap<>();
     testTaskProperties.put("first", "firstValue");
     testTaskProperties.put("second", "secondValue");

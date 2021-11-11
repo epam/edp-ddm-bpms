@@ -1,5 +1,6 @@
 package com.epam.digital.data.platform.bpms.rest.config;
 
+import com.epam.digital.data.platform.bpms.rest.controller.HistoricProcessInstanceController;
 import com.epam.digital.data.platform.bpms.rest.controller.HistoricTaskController;
 import com.epam.digital.data.platform.bpms.rest.controller.StartFormController;
 import com.epam.digital.data.platform.bpms.rest.controller.TaskController;
@@ -33,6 +34,7 @@ public class LowcodeJerseyConfig extends CamundaJerseyResourceConfig {
     register(StartFormController.class);
     register(TaskController.class);
     register(HistoricTaskController.class);
+    register(HistoricProcessInstanceController.class);
 
     register(UserDataValidationExceptionMapper.class);
     register(CamundaSystemExceptionMapper.class);

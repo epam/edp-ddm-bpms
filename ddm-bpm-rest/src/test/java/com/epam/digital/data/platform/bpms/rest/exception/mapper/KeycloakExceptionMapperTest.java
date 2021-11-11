@@ -5,14 +5,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.epam.digital.data.platform.bpms.extension.exception.KeycloakException;
 import com.epam.digital.data.platform.starter.errorhandling.BaseRestExceptionHandler;
 import com.epam.digital.data.platform.starter.errorhandling.dto.SystemErrorDto;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 
-public class KeycloakExceptionMapperTest {
+class KeycloakExceptionMapperTest {
 
   @Test
-  public void testKeycloakNotFoundExceptionMapper() {
+  void testKeycloakNotFoundExceptionMapper() {
     var traceId = "traceId";
     var code = String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR);
     var message = "message";

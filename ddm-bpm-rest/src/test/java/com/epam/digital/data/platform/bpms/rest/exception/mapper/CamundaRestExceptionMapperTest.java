@@ -6,16 +6,16 @@ import com.epam.digital.data.platform.starter.errorhandling.BaseRestExceptionHan
 import com.epam.digital.data.platform.starter.errorhandling.dto.SystemErrorDto;
 import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.rest.exception.RestException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 
-public class CamundaRestExceptionMapperTest {
+class CamundaRestExceptionMapperTest {
 
   private final CamundaRestExceptionMapper mapper = new CamundaRestExceptionMapper();
 
   @Test
-  public void toResponseTest() {
+  void toResponseTest() {
     var traceId = "traceId";
     var code = RestException.class.getSimpleName();
     var message = "message";

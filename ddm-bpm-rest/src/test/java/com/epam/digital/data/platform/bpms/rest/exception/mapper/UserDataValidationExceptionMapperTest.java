@@ -6,12 +6,12 @@ import com.epam.digital.data.platform.starter.errorhandling.dto.ValidationErrorD
 import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class UserDataValidationExceptionMapperTest {
+class UserDataValidationExceptionMapperTest {
 
   @Test
-  public void testUserDataValidationExceptionMapper() {
+  void testUserDataValidationExceptionMapper() {
     var errorDto = new ValidationErrorDto();
     errorDto.setMessage("test msg");
     var ex = new ValidationException(errorDto);

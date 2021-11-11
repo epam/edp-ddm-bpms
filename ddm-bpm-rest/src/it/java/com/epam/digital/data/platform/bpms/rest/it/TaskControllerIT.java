@@ -8,13 +8,13 @@ import com.epam.digital.data.platform.bpms.api.dto.UserTaskDto;
 import com.epam.digital.data.platform.dso.api.dto.Subject;
 import java.util.Map;
 import org.camunda.bpm.engine.test.Deployment;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class TaskControllerIT extends BaseIT {
+class TaskControllerIT extends BaseIT {
 
   @Test
   @Deployment(resources = "bpmn/testGetExtendedTasks.bpmn")
-  public void shouldGetTaskWithProcessDefinitionName() throws Exception {
+  void shouldGetTaskWithProcessDefinitionName() throws Exception {
     var startResult = postForObject("api/process-definition/key/testGetExtendedTasks_key/start", "",
         Map.class);
     var processId = (String) startResult.get("id");
@@ -30,7 +30,7 @@ public class TaskControllerIT extends BaseIT {
   }
 
   @Test
-  public void shouldGetTaskWithTaskProperties() throws Exception {
+  void shouldGetTaskWithTaskProperties() throws Exception {
     var startResult = postForObject("api/process-definition/key/testGetExtendedTasks_key/start", "",
         Map.class);
     var processId = (String) startResult.get("id");

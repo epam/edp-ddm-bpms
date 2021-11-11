@@ -10,16 +10,16 @@ import com.epam.digital.data.platform.bpms.api.dto.SignableUserTaskDto;
 import com.epam.digital.data.platform.dso.api.dto.Subject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Set;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class ExtendedUserTaskRestClientIT extends BaseIT {
+class ExtendedUserTaskRestClientIT extends BaseIT {
 
   @Autowired
   private ExtendedUserTaskRestClient extendedUserTaskRestClient;
 
   @Test
-  public void getUserTaskById() throws JsonProcessingException {
+  void getUserTaskById() throws JsonProcessingException {
     var id = "taskId";
     var processDefinitionName = "processDefinitionName";
     var signatureValidationPack = Set.of(Subject.ENTREPRENEUR);
