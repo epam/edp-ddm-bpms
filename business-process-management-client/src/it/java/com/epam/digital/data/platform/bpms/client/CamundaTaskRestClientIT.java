@@ -13,9 +13,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 
 import com.epam.digital.data.platform.bpms.api.dto.ClaimTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.PaginationQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.TaskCountQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.TaskQueryDto;
-import com.epam.digital.data.platform.bpms.api.dto.PaginationQueryDto;
 import com.epam.digital.data.platform.bpms.client.exception.AuthorizationException;
 import com.epam.digital.data.platform.bpms.client.exception.TaskNotFoundException;
 import com.epam.digital.data.platform.starter.errorhandling.dto.ErrorDetailDto;
@@ -35,16 +35,16 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class CamundaTaskRestClientIT extends BaseIT {
+class CamundaTaskRestClientIT extends BaseIT {
 
   @Autowired
   private CamundaTaskRestClient camundaTaskRestClient;
 
   @Test
-  public void shouldReturnTaskCount() throws JsonProcessingException {
+  void shouldReturnTaskCount() throws JsonProcessingException {
     restClientWireMock.addStubMapping(
         stubFor(post(urlPathEqualTo("/api/task/count"))
             .willReturn(aResponse()
@@ -60,7 +60,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturnListOfTasks() throws JsonProcessingException {
+  void shouldReturnListOfTasks() throws JsonProcessingException {
     var paginationQueryDto = PaginationQueryDto.builder().build();
     var taskDto = new TaskDto();
     taskDto.setAssignee("testAssignee");
@@ -82,7 +82,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturnTaskById() throws JsonProcessingException {
+  void shouldReturnTaskById() throws JsonProcessingException {
     var taskDtoById = new TaskDto();
     taskDtoById.setId("tid");
     restClientWireMock.addStubMapping(
@@ -100,7 +100,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturn403TaskById() throws JsonProcessingException {
+  void shouldReturn403TaskById() throws JsonProcessingException {
     var errorDto403 = new SystemErrorDto("testTraceId", "type", "message403", "testLocalizedMsg");
     restClientWireMock.addStubMapping(
         stubFor(get(urlPathEqualTo("/api/task/tid403"))
@@ -121,7 +121,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturn404TaskById() throws JsonProcessingException {
+  void shouldReturn404TaskById() throws JsonProcessingException {
     var errorDto404 = new SystemErrorDto("testTraceId", "type", "message404", "testLocalizedMsg");
     restClientWireMock.addStubMapping(
         stubFor(get(urlPathEqualTo("/api/task/tid404"))
@@ -142,7 +142,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldCompleteTaskById() throws JsonProcessingException {
+  void shouldCompleteTaskById() throws JsonProcessingException {
     Map<String, VariableValueDto> completeVariables = new HashMap<>();
     completeVariables.put("var1", new VariableValueDto());
     restClientWireMock.addStubMapping(
@@ -159,7 +159,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldCompleteTaskByIdSuccessfulWhenHttpStatus204() {
+  void shouldCompleteTaskByIdSuccessfulWhenHttpStatus204() {
     restClientWireMock.addStubMapping(
         stubFor(post(urlEqualTo("/api/task/testId204/complete"))
             .willReturn(aResponse()
@@ -172,7 +172,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturnTasksByProcessInstanceIdIn() throws JsonProcessingException {
+  void shouldReturnTasksByProcessInstanceIdIn() throws JsonProcessingException {
     var paginationQueryDto = PaginationQueryDto.builder().build();
     var requestDto = TaskQueryDto.builder()
         .processInstanceIdIn(
@@ -206,7 +206,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturnTasksByProcessInstanceId() throws JsonProcessingException {
+  void shouldReturnTasksByProcessInstanceId() throws JsonProcessingException {
     var paginationQueryDto = PaginationQueryDto.builder().build();
     var requestDto = TaskQueryDto.builder().processInstanceId("testProcessInstanceId").build();
 
@@ -232,7 +232,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturn422DuringTaskCompletion() throws JsonProcessingException {
+  void shouldReturn422DuringTaskCompletion() throws JsonProcessingException {
     var details = new ErrorsListDto();
     details.setErrors(Lists.newArrayList(new ErrorDetailDto("test msg",
         "key1", "val1")));
@@ -259,7 +259,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturnTasksByOrQueries() throws JsonProcessingException {
+  void shouldReturnTasksByOrQueries() throws JsonProcessingException {
     var paginationQueryDto = PaginationQueryDto.builder().build();
     String expectedBody = "{\"orQueries\":[{\"assignee\": \"testuser\",\"unassigned\": true}]}";
 
@@ -287,7 +287,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldClaimTaskByIdSuccessfulWhenHttpStatus204() throws JsonProcessingException {
+  void shouldClaimTaskByIdSuccessfulWhenHttpStatus204() throws JsonProcessingException {
     var claimTaskDto = ClaimTaskDto.builder().userId("userId").build();
     var stubMapping = stubFor(post(urlEqualTo("/api/task/testId204/claim"))
         .withRequestBody(equalTo(objectMapper.writeValueAsString(claimTaskDto)))
@@ -299,7 +299,7 @@ public class CamundaTaskRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturnTaskVariables() throws JsonProcessingException {
+  void shouldReturnTaskVariables() throws JsonProcessingException {
     var taskId = "taskId";
     var variableValue = "variableValue";
     var type = "String";

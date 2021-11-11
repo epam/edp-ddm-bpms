@@ -5,6 +5,7 @@ import static org.camunda.bpm.engine.variable.Variables.stringValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.epam.digital.data.platform.bpms.rest.mapper.LocalDateTimeMapper;
 import com.epam.digital.data.platform.bpms.rest.mapper.TaskMapper;
 import com.epam.digital.data.platform.bpms.rest.service.ProcessDefinitionService;
 import com.epam.digital.data.platform.bpms.rest.service.TaskPropertyService;
@@ -39,6 +40,9 @@ class TaskServiceImplTest {
   @Mock
   private TaskRestService taskRestService;
   @Spy
+  private LocalDateTimeMapper localDateTimeMapper = Mappers.getMapper(LocalDateTimeMapper.class);
+  @Spy
+  @InjectMocks
   private TaskMapper taskMapper = Mappers.getMapper(TaskMapper.class);
 
   @Mock

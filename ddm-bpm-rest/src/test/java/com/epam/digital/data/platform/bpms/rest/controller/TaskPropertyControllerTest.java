@@ -8,14 +8,14 @@ import static org.mockito.Mockito.when;
 import com.epam.digital.data.platform.bpms.rest.service.TaskPropertyService;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
-public class TaskPropertyControllerTest {
+@ExtendWith(MockitoExtension.class)
+class TaskPropertyControllerTest {
 
   private static final String TEST_ID = "testId";
 
@@ -25,7 +25,7 @@ public class TaskPropertyControllerTest {
   private TaskPropertyService taskPropertyService;
 
   @Test
-  public void getTaskProperty() {
+  void getTaskProperty() {
     when(taskPropertyService.getTaskProperty(TEST_ID)).thenReturn(new HashMap<>());
 
     Map<String, String> taskProperties = taskPropertyController.getTaskProperty(TEST_ID);

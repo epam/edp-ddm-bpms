@@ -19,14 +19,14 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
-public class TaskPropertyServiceTest {
+@ExtendWith(MockitoExtension.class)
+class TaskPropertyServiceTest {
 
   private static final String ID = "id";
 
@@ -52,14 +52,14 @@ public class TaskPropertyServiceTest {
   private CamundaImpersonation camundaImpersonation;
 
   @Test
-  public void shouldThrowExceptionIfImpersonationIsEmpty() {
+  void shouldThrowExceptionIfImpersonationIsEmpty() {
     when(camundaImpersonationFactory.getCamundaImpersonation()).thenReturn(Optional.empty());
 
     assertThrows(IllegalStateException.class, () -> taskPropertyService.getTaskProperty(ID));
   }
 
   @Test
-  public void shouldReturnEmptyMapAsTaskHasEmptyProperty() {
+  void shouldReturnEmptyMapAsTaskHasEmptyProperty() {
     Collection<UserTask> userTasks = new ArrayList<>();
     userTasks.add(userTask);
     when(processEngine.getTaskService()).thenReturn(taskService);

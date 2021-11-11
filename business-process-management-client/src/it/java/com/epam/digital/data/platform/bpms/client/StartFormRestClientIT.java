@@ -11,16 +11,16 @@ import com.epam.digital.data.platform.bpms.api.dto.StartFormQueryDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class StartFormRestClientIT extends BaseIT {
+class StartFormRestClientIT extends BaseIT {
 
   @Autowired
   private StartFormRestClient startFormRestClient;
 
   @Test
-  public void shouldReturnTaskProperties() throws JsonProcessingException {
+  void shouldReturnTaskProperties() throws JsonProcessingException {
     var startForms = Map.of("process-definition", "start-form");
     var startFormQueryDto = StartFormQueryDto.builder()
         .processDefinitionIdIn(Set.of("process-definition")).build();
