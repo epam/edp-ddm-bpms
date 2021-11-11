@@ -11,16 +11,16 @@ import com.epam.digital.data.platform.bpms.api.dto.HistoryVariableInstanceQueryD
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.assertj.core.util.Lists;
 import org.camunda.bpm.engine.rest.dto.history.HistoricVariableInstanceDto;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class HistoryVariableInstanceClientIT extends BaseIT {
+class HistoryVariableInstanceClientIT extends BaseIT {
 
   @Autowired
   private HistoryVariableInstanceClient historyVariableInstanceClient;
 
   @Test
-  public void shouldReturnVariablesInstanceListPost() throws JsonProcessingException {
+  void shouldReturnVariablesInstanceListPost() throws JsonProcessingException {
     var dto = new HistoricVariableInstanceDto();
     dto.setValue("value");
 

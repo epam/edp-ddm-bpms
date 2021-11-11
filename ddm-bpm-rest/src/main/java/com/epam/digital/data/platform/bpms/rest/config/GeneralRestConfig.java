@@ -3,8 +3,10 @@ package com.epam.digital.data.platform.bpms.rest.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.TaskRestService;
+import org.camunda.bpm.engine.rest.history.HistoricProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricTaskInstanceRestService;
 import org.camunda.bpm.engine.rest.impl.TaskRestServiceImpl;
+import org.camunda.bpm.engine.rest.impl.history.HistoricProcessInstanceRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.history.HistoricTaskInstanceRestServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,5 +28,11 @@ public class GeneralRestConfig {
   public HistoricTaskInstanceRestService historicTaskInstanceRestService(ObjectMapper objectMapper,
       ProcessEngine processEngine) {
     return new HistoricTaskInstanceRestServiceImpl(objectMapper, processEngine);
+  }
+
+  @Bean
+  public HistoricProcessInstanceRestService historicProcessInstanceRestService(
+      ObjectMapper objectMapper, ProcessEngine processEngine) {
+    return new HistoricProcessInstanceRestServiceImpl(objectMapper, processEngine);
   }
 }

@@ -7,13 +7,13 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.camunda.bpm.engine.test.Deployment;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class HistoricTaskControllerIT extends BaseIT {
+class HistoricTaskControllerIT extends BaseIT {
 
   @Test
   @Deployment(resources = "bpmn/testGetExtendedTasks.bpmn")
-  public void shouldGetHistoryTaskWithProcessDefinitionName() throws Exception {
+  void shouldGetHistoryTaskWithProcessDefinitionName() throws Exception {
     var taskDefinitionKey = "Activity_046yw3m";
 
     var startResult = postForObject(

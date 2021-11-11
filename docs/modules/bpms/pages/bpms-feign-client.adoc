@@ -30,7 +30,7 @@ HistoryTaskRestClient  --[hidden]> HistoryVariableInstanceClient
 - `HistoryTaskRestClient` - клієнт який надає доступ до ресурсу `/api/history/task` (історія о виконаних/відмінених задачах користувача)
 - `CamundaVariableInstanceClient` - клієнт який надає доступ до ресурсу `/api/history/variable-instance` (історія про змінні бізнес-процесу)
 - `ProcessDefinitionRestClient` - клієнт який надає доступ до ресурсу `/api/process-definition` (бізнес-процеси)
-- `ProcessInstanceHistoryRestClient` - клієнт який надає доступ до ресурсу `/api/history/process-instance` (історія про виконані екземпляри бізнес-процесу)
+- `HistoryProcessInstanceRestClient` - клієнт який надає доступ до ресурсу `/api/history/process-instance` (історія про виконані екземпляри бізнес-процесу)
 - `ProcessInstanceRestClient` - клієнт який надає доступ до ресурсу `/api/process-instance` (екземпляри бізнес-процесу)
 - `TaskPropertyRestClient` - клієнт який надає доступ до ресурсу `/api/extended/task` (розширені властивості задач користувача)
 - `StartFormRestClient` - клієнт який надає доступ до ресурсу `/api/extended/start-form` (стартові форми бізнес-процесів)

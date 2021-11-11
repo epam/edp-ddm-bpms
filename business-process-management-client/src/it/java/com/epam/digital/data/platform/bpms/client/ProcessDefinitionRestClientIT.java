@@ -26,16 +26,16 @@ import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceWithVariablesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class ProcessDefinitionRestClientIT extends BaseIT {
+class ProcessDefinitionRestClientIT extends BaseIT {
 
   @Autowired
   private ProcessDefinitionRestClient processDefinitionRestClient;
 
   @Test
-  public void shouldReturnProcessDefinitionCount() throws JsonProcessingException {
+   void shouldReturnProcessDefinitionCount() throws JsonProcessingException {
     restClientWireMock.addStubMapping(
         stubFor(get(urlPathEqualTo("/api/process-definition/count"))
             .willReturn(aResponse()
@@ -53,7 +53,7 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturnListOfProcessDefinitions() throws JsonProcessingException {
+   void shouldReturnListOfProcessDefinitions() throws JsonProcessingException {
     var requestDto = ProcessDefinitionQueryDto.builder().latestVersion(true)
         .sortBy(ProcessDefinitionQueryDto.SortByConstants.SORT_BY_NAME)
         .sortOrder(SortOrder.ASC.stringValue()).build();
@@ -80,7 +80,7 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturnOneProcessDefinition() throws JsonProcessingException {
+   void shouldReturnOneProcessDefinition() throws JsonProcessingException {
     var processDefinitionEntity = new ProcessDefinitionEntity();
     processDefinitionEntity.setId("testId");
     var processDefinitionDto = ProcessDefinitionDto.fromProcessDefinition(processDefinitionEntity);
@@ -99,7 +99,7 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturnOneProcessDefinitionByKey() throws JsonProcessingException {
+   void shouldReturnOneProcessDefinitionByKey() throws JsonProcessingException {
     var processDefinitionEntity = new ProcessDefinitionEntity();
     processDefinitionEntity.setId("testId");
     processDefinitionEntity.setKey("testKey");
@@ -120,7 +120,7 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturn404OnMissingProcessDefinition() throws JsonProcessingException {
+   void shouldReturn404OnMissingProcessDefinition() throws JsonProcessingException {
     var errorDto = new SystemErrorDto("testTraceId", "type", "error", "testLocalizedMsg");
     restClientWireMock.addStubMapping(
         stubFor(get(urlEqualTo("/api/process-definition/testId404"))
@@ -141,7 +141,7 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturnProcessInstanceWithVariablesOnStartProcessDefinitionByKey()
+   void shouldReturnProcessInstanceWithVariablesOnStartProcessDefinitionByKey()
       throws JsonProcessingException {
     var executionEntity = new ExecutionEntity();
     executionEntity.setId("testInstanceId");
@@ -171,7 +171,7 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturnProcessInstanceOnStartProcessDefinition() throws JsonProcessingException {
+  void shouldReturnProcessInstanceOnStartProcessDefinition() throws JsonProcessingException {
     var executionEntity = new ExecutionEntity();
     executionEntity.setId("testInstanceId");
     executionEntity.setProcessDefinitionId("testId");
@@ -192,7 +192,7 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturnActiveProcessDefinitions() throws JsonProcessingException {
+  void shouldReturnActiveProcessDefinitions() throws JsonProcessingException {
     var requestDto = ProcessDefinitionQueryDto.builder().active(true).build();
 
     var processDefinitionEntity = new ProcessDefinitionEntity();
@@ -218,7 +218,7 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturnStartForm() throws JsonProcessingException {
+  void shouldReturnStartForm() throws JsonProcessingException {
     var formDto = new FormDto();
     formDto.setKey("testStartFormKey");
     restClientWireMock.addStubMapping(
@@ -236,7 +236,7 @@ public class ProcessDefinitionRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturnStartFormByProcessDefinitionKey() throws JsonProcessingException {
+  void shouldReturnStartFormByProcessDefinitionKey() throws JsonProcessingException {
     var formDto = new FormDto();
     formDto.setKey("testStartFormKey");
     restClientWireMock.addStubMapping(

@@ -18,16 +18,16 @@ import com.github.tomakehurst.wiremock.matching.EqualToPattern;
 import com.github.tomakehurst.wiremock.matching.UrlPattern;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class ProcessInstanceRestClientIT extends BaseIT {
+class ProcessInstanceRestClientIT extends BaseIT {
 
   @Autowired
   private ProcessInstanceRestClient processInstanceRestClient;
 
   @Test
-  public void shouldReturnProcessInstancesCount() throws JsonProcessingException {
+  void shouldReturnProcessInstancesCount() throws JsonProcessingException {
     restClientWireMock.addStubMapping(
         stubFor(get(urlEqualTo("/api/process-instance/count?rootProcessInstances=true"))
             .willReturn(aResponse()
@@ -47,7 +47,7 @@ public class ProcessInstanceRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturnProcessInstanceVariable() throws JsonProcessingException {
+  void shouldReturnProcessInstanceVariable() throws JsonProcessingException {
     var processInstanceId = "processInstanceId";
     var variableName = "variableName";
     var variableValue = "variableValue";
@@ -72,7 +72,7 @@ public class ProcessInstanceRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldThrowProcessInstanceVariableNotFound() {
+  void shouldThrowProcessInstanceVariableNotFound() {
     var processInstanceId = "processInstanceId";
     var variableName = "variableName404";
 
@@ -87,7 +87,7 @@ public class ProcessInstanceRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldSaveProcessInstanceVariable() throws JsonProcessingException {
+  void shouldSaveProcessInstanceVariable() throws JsonProcessingException {
     var processInstanceId = "processInstanceId";
     var variableName = "variableName";
     var variableValue = "variableValue";

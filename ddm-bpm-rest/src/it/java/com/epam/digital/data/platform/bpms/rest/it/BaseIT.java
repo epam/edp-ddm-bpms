@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.ByteStreams;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.ws.rs.client.Client;
@@ -16,26 +17,30 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status.Family;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.glassfish.jersey.client.JerseyClientBuilder;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.CollectionUtils;
 
 @ActiveProfiles("test")
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public abstract class BaseIT {
 
@@ -43,6 +48,10 @@ public abstract class BaseIT {
 
   @Inject
   protected TaskService taskService;
+  @Inject
+  protected HistoryService historyService;
+  @Inject
+  protected RuntimeService runtimeService;
   @Inject
   protected ProcessEngine engine;
   @Inject
@@ -56,18 +65,31 @@ public abstract class BaseIT {
 
   protected static String validAccessToken;
 
-  @BeforeClass
-  public static void setup() throws IOException {
+  @BeforeAll
+  static void setup() throws IOException {
     validAccessToken = new String(ByteStreams.toByteArray(Objects
         .requireNonNull(BaseIT.class.getResourceAsStream("/json/testUserAccessToken.json"))));
   }
 
-  @Before
-  public void setAuthorization() {
+  @BeforeEach
+  void setAuthorization() {
     SecurityContextHolder.getContext().setAuthentication(null);
     Stream.of(SystemRole.getRoleNames()).forEach(this::createAuthorizationsIfNotExists);
   }
 
+  @AfterEach
+  void deleteHistoricProcessInstances() {
+    var processInstanceIds = historyService.createHistoricProcessInstanceQuery()
+        .list().stream()
+        .map(HistoricProcessInstance::getId)
+        .collect(Collectors.toList());
+    if (processInstanceIds.isEmpty()) {
+      return;
+    }
+    runtimeService.deleteProcessInstancesIfExists(processInstanceIds, "Test clean up", true, true,
+        true);
+    historyService.deleteHistoricProcessInstancesIfExists(processInstanceIds);
+  }
 
   protected <T> T getForObject(String url, Class<T> targetClass) throws IOException {
     return this.getForObject(url, targetClass, validAccessToken);

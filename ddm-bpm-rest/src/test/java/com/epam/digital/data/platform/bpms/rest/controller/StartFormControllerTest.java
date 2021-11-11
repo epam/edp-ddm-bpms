@@ -8,14 +8,14 @@ import com.epam.digital.data.platform.bpms.api.dto.StartFormQueryDto;
 import com.epam.digital.data.platform.bpms.engine.service.BatchFormService;
 import java.util.HashMap;
 import java.util.Set;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
-public class StartFormControllerTest {
+@ExtendWith(MockitoExtension.class)
+class StartFormControllerTest {
 
   @InjectMocks
   private StartFormController startFormController;
@@ -23,7 +23,7 @@ public class StartFormControllerTest {
   private BatchFormService batchFormService;
 
   @Test
-  public void getTaskProperty() {
+  void getTaskProperty() {
     var startFormQueryDto = StartFormQueryDto.builder()
         .processDefinitionIdIn(Set.of("process-definition")).build();
     var expected = new HashMap<String, String>();

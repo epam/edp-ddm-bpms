@@ -12,7 +12,7 @@
   </parent>
 
   <artifactId>business-process-management-parent</artifactId>
-  <version>1.5.1-SNAPSHOT</version>
+  <version>1.5.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>

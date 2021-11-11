@@ -7,16 +7,16 @@ import com.epam.digital.data.platform.bpms.engine.exception.TaskAlreadyInComplet
 import com.epam.digital.data.platform.starter.errorhandling.BaseRestExceptionHandler;
 import com.epam.digital.data.platform.starter.errorhandling.dto.SystemErrorDto;
 import com.epam.digital.data.platform.starter.localization.MessageResolver;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 
-@RunWith(MockitoJUnitRunner.class)
-public class TaskAlreadyInCompletionExceptionMapperTest {
+@ExtendWith(MockitoExtension.class)
+class TaskAlreadyInCompletionExceptionMapperTest {
 
   @Mock
   private MessageResolver messageResolver;
@@ -24,7 +24,7 @@ public class TaskAlreadyInCompletionExceptionMapperTest {
   private TaskAlreadyInCompletionExceptionMapper mapper;
 
   @Test
-  public void toResponseTest() {
+  void toResponseTest() {
     var traceId = "traceId";
     var code = String.valueOf(HttpStatus.CONFLICT);
     var message = "message";

@@ -15,16 +15,16 @@ import org.assertj.core.util.Lists;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class HistoryTaskRestClientIT extends BaseIT {
+class HistoryTaskRestClientIT extends BaseIT {
 
   @Autowired
   private HistoryTaskRestClient historyTaskRestClient;
 
   @Test
-  public void shouldReturnHistoryTasks() throws JsonProcessingException {
+  void shouldReturnHistoryTasks() throws JsonProcessingException {
     var task = new TaskEntity();
     task.setId("testId");
     restClientWireMock.addStubMapping(
@@ -47,7 +47,7 @@ public class HistoryTaskRestClientIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturnTaskCount() throws JsonProcessingException {
+  void shouldReturnTaskCount() throws JsonProcessingException {
     restClientWireMock.addStubMapping(
         stubFor(post(urlPathEqualTo("/api/history/task/count"))
             .willReturn(aResponse()

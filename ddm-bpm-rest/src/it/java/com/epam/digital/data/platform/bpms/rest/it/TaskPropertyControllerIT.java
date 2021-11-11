@@ -1,16 +1,17 @@
 package com.epam.digital.data.platform.bpms.rest.it;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 import org.camunda.bpm.engine.test.Deployment;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class TaskPropertyControllerIT extends BaseIT {
+class TaskPropertyControllerIT extends BaseIT {
 
   @Test
   @Deployment(resources = {"bpmn/testTaskProperty.bpmn"})
-  public void shouldGetESignTaskProperties() throws Exception {
+  @SuppressWarnings("unchecked")
+  void shouldGetESignTaskProperties() throws Exception {
     var processes = postForObject("api/process-definition/key/testTaskProperty_key/start", "",
         Map.class);
 
@@ -18,10 +19,10 @@ public class TaskPropertyControllerIT extends BaseIT {
     var tasks = engine.getTaskService().createTaskQuery().processInstanceId(processId)
         .list();
 
-    var result = getForObject(
+    var result = (Map<String, String>) getForObject(
         "api/extended/task/" + tasks.get(0).getId() + "/extension-element/property", Map.class);
 
-    assertThat(result).isNotNull();
-    assertThat(result.get("eSign")).isEqualTo("true");
+    assertThat(result).isNotNull()
+        .containsEntry("eSign", "true");
   }
 }
