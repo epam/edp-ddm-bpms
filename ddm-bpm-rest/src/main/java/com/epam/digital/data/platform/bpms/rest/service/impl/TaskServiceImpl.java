@@ -100,7 +100,8 @@ public class TaskServiceImpl implements TaskService {
 
     var formVariableNames = List.of(formVariables.split(FORM_VARIABLES_REGEX));
     return taskRestService.getTask(taskId).getVariables().getVariables(true).entrySet().stream()
-        .filter(entry -> formVariableNames.contains(entry.getKey()))
+        .filter(entry -> formVariableNames.contains(entry.getKey()) && Objects
+            .nonNull(entry.getValue().getValue()))
         .collect(Collectors.toMap(Entry::getKey, entry -> entry.getValue().getValue()));
   }
 }
