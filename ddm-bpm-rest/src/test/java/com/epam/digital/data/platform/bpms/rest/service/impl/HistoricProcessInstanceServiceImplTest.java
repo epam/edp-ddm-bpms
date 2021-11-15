@@ -1,11 +1,14 @@
 package com.epam.digital.data.platform.bpms.rest.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.epam.digital.data.platform.bpms.api.dto.HistoryProcessInstanceDto;
+import com.epam.digital.data.platform.bpms.api.dto.enums.HistoryProcessInstanceStatus;
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
 import com.epam.digital.data.platform.bpms.rest.mapper.LocalDateTimeMapper;
 import com.epam.digital.data.platform.bpms.rest.mapper.ProcessInstanceMapper;
@@ -19,8 +22,10 @@ import java.util.List;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
+import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.history.HistoricProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.sub.history.HistoricProcessInstanceResource;
 import org.junit.jupiter.api.Test;
@@ -40,6 +45,8 @@ class HistoricProcessInstanceServiceImplTest {
   private HistoricProcessInstanceRestService historicProcessInstanceRestService;
   @Mock
   private HistoryService historyService;
+  @Mock
+  private TaskRestService taskRestService;
 
   @Spy
   private LocalDateTimeMapper localDateTimeMapper = Mappers.getMapper(LocalDateTimeMapper.class);
@@ -50,7 +57,7 @@ class HistoricProcessInstanceServiceImplTest {
 
   @Test
   void getHistoryProcessInstancesByParams() {
-    var expectedDto = createExpectedDto();
+    var expectedDto = createExpectedDto(HistoryProcessInstanceStatus.PENDING);
 
     var historicProcessInstanceQueryDto = mock(HistoricProcessInstanceQueryDto.class);
     var paginationQueryDto = PaginationQueryDto.builder()
@@ -63,6 +70,32 @@ class HistoricProcessInstanceServiceImplTest {
 
     mockVariables(expectedDto);
 
+    mockTasks(expectedDto);
+
+    var result = processInstanceService.getHistoryProcessInstancesByParams(
+        historicProcessInstanceQueryDto, paginationQueryDto);
+
+    assertThat(result).hasSize(1)
+        .contains(expectedDto);
+  }
+
+  @Test
+  void getHistoryProcessInstancesByParams_completed() {
+    var expectedDto = createExpectedDto(HistoryProcessInstanceStatus.COMPLETED);
+
+    var historicProcessInstanceQueryDto = mock(HistoricProcessInstanceQueryDto.class);
+    var paginationQueryDto = PaginationQueryDto.builder()
+        .maxResults(1)
+        .firstResult(2)
+        .build();
+
+    mockHistoricProcessInstanceDto(historicProcessInstanceQueryDto, paginationQueryDto,
+        expectedDto);
+
+    mockVariables(expectedDto);
+
+    mockTasks(expectedDto);
+
     var result = processInstanceService.getHistoryProcessInstancesByParams(
         historicProcessInstanceQueryDto, paginationQueryDto);
 
@@ -72,7 +105,7 @@ class HistoricProcessInstanceServiceImplTest {
 
   @Test
   void getHistoryProcessInstanceDtoById() {
-    var expectedDto = createExpectedDto();
+    var expectedDto = createExpectedDto(HistoryProcessInstanceStatus.COMPLETED);
 
     mockProcessInstanceById(expectedDto);
 
@@ -83,13 +116,14 @@ class HistoricProcessInstanceServiceImplTest {
     assertThat(result).isEqualTo(expectedDto);
   }
 
-  private HistoryProcessInstanceDto createExpectedDto() {
+  private HistoryProcessInstanceDto createExpectedDto(HistoryProcessInstanceStatus state) {
     var expectedDto = new HistoryProcessInstanceDto();
     expectedDto.setId("processInstanceId");
     expectedDto.setProcessDefinitionId("processDefinitionId");
     expectedDto.setProcessDefinitionName("processDefinitionName");
     expectedDto.setStartTime(LocalDateTime.of(2021, 11, 11, 15, 58));
     expectedDto.setEndTime(LocalDateTime.of(2021, 11, 11, 15, 59));
+    expectedDto.setState(state);
     expectedDto.setProcessCompletionResult("completed status");
     expectedDto.setExcerptId("excerpt id");
     return expectedDto;
@@ -124,6 +158,9 @@ class HistoricProcessInstanceServiceImplTest {
     when(mock.getStartTime()).thenReturn(
         Date.from(expected.getStartTime().toInstant(ZoneOffset.UTC)));
     when(mock.getEndTime()).thenReturn(Date.from(expected.getEndTime().toInstant(ZoneOffset.UTC)));
+    var state = expected.getState();
+    when(mock.getState()).thenReturn(state.equals(HistoryProcessInstanceStatus.PENDING)
+        ? HistoryProcessInstanceStatus.ACTIVE.name() : state.name());
     return mock;
   }
 
@@ -149,5 +186,15 @@ class HistoricProcessInstanceServiceImplTest {
     lenient().when(variableInstance.getName()).thenReturn(name);
     when(variableInstance.getValue()).thenReturn(value);
     return variableInstance;
+  }
+
+  private void mockTasks(HistoryProcessInstanceDto expected) {
+    if (!HistoryProcessInstanceStatus.PENDING.equals(expected.getState())) {
+      return;
+    }
+
+    var taskDto = mock(TaskDto.class);
+    when(taskDto.getProcessInstanceId()).thenReturn(expected.getId());
+    when(taskRestService.queryTasks(any(), isNull(), isNull())).thenReturn(List.of(taskDto));
   }
 }

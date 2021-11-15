@@ -1,10 +1,13 @@
 package com.epam.digital.data.platform.bpms.rest.mapper;
 
 import com.epam.digital.data.platform.bpms.api.dto.HistoryProcessInstanceDto;
+import com.epam.digital.data.platform.bpms.api.dto.enums.HistoryProcessInstanceStatus;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessExcerptIdVariable;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.mapstruct.Mapper;
@@ -18,10 +21,11 @@ public interface ProcessInstanceMapper {
 
   @Mapping(target = "startTime", qualifiedByName = "toLocalDateTime")
   @Mapping(target = "endTime", qualifiedByName = "toLocalDateTime")
+  @Mapping(target = "state", expression = "java(toState(dto.getState(), isPending))")
   @Mapping(target = "processCompletionResult", source = "variables", qualifiedByName = "toProcessCompletionResult")
   @Mapping(target = "excerptId", source = "variables", qualifiedByName = "toExcerptId")
   HistoryProcessInstanceDto toHistoryProcessInstanceDto(
-      HistoricProcessInstanceDto historicProcessInstanceDto, Map<String, String> variables);
+      HistoricProcessInstanceDto dto, Map<String, String> variables, boolean isPending);
 
   @Named("toProcessCompletionResult")
   default String toProcessCompletionResult(Map<String, String> variables) {
@@ -33,11 +37,25 @@ public interface ProcessInstanceMapper {
     return variables.get(ProcessExcerptIdVariable.SYS_VAR_PROCESS_EXCERPT_ID);
   }
 
+  @Named("toState")
+  default HistoryProcessInstanceStatus toState(String state, boolean isPending) {
+    if (isPending) {
+      return HistoryProcessInstanceStatus.PENDING;
+    }
+    return Objects.nonNull(state) ? HistoryProcessInstanceStatus.valueOf(state) : null;
+  }
+
   default List<HistoryProcessInstanceDto> toHistoryProcessInstanceDtos(
-      List<HistoricProcessInstanceDto> historicProcessInstanceDtos,
-      Map<String, Map<String, String>> variables) {
-    return historicProcessInstanceDtos.stream()
-        .map(dto -> toHistoryProcessInstanceDto(dto, variables.getOrDefault(dto.getId(), Map.of())))
+      List<HistoricProcessInstanceDto> dtos,
+      Map<String, Map<String, String>> variables,
+      Set<String> pendingProcessInstanceIds) {
+    return dtos.stream()
+        .map(dto -> {
+          var processInstanceVariables = variables.get(dto.getId());
+          var isPending = pendingProcessInstanceIds.contains(dto.getId());
+
+          return toHistoryProcessInstanceDto(dto, processInstanceVariables, isPending);
+        })
         .collect(Collectors.toList());
   }
 }

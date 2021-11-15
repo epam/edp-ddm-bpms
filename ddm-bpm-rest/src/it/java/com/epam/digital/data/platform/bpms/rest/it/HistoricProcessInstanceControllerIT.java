@@ -32,6 +32,26 @@ class HistoricProcessInstanceControllerIT extends BaseIT {
   }
 
   @Test
+  @Deployment(resources = "/bpmn/testPendingProcessInstance.bpmn")
+  void testPendingProcessInstance() throws IOException {
+    postForObject("api/process-definition/key/testPendingProcessInstance/start", "", Map.class);
+
+    var result = postForObject("api/extended/history/process-instance",
+        "{\"rootProcessInstances\":true, \"unfinished\":true}", HistoryProcessInstanceDto[].class);
+
+    assertThat(result).hasSize(1);
+    assertThat(result[0])
+        .hasFieldOrProperty("id")
+        .hasFieldOrProperty("processDefinitionId")
+        .hasFieldOrPropertyWithValue("processDefinitionName", "Test Pending Process Instance")
+        .hasFieldOrProperty("startTime")
+        .hasFieldOrProperty("endTime")
+        .hasFieldOrPropertyWithValue("state", HistoryProcessInstanceStatus.PENDING)
+        .hasFieldOrPropertyWithValue("processCompletionResult", null)
+        .hasFieldOrPropertyWithValue("excerptId", null);
+  }
+
+  @Test
   @Deployment(resources = "/bpmn/testHistoryProcessInstances.bpmn")
   void getHistoryProcessInstanceById() throws IOException {
     var startResult = postForObject("api/process-definition/key/testHistoryProcessInstances/start",
@@ -50,5 +70,26 @@ class HistoricProcessInstanceControllerIT extends BaseIT {
         .hasFieldOrPropertyWithValue("state", HistoryProcessInstanceStatus.COMPLETED)
         .hasFieldOrPropertyWithValue("processCompletionResult", "completion status")
         .hasFieldOrPropertyWithValue("excerptId", "excerpt id");
+  }
+
+  @Test
+  @Deployment(resources = "/bpmn/testPendingProcessInstance.bpmn")
+  void getHistoryProcessInstanceById_pending() throws IOException {
+    var startResult = postForObject("api/process-definition/key/testPendingProcessInstance/start",
+        "", Map.class);
+    var id = (String) startResult.get("id");
+
+    var result = getForObject("api/extended/history/process-instance/" + id,
+        HistoryProcessInstanceDto.class);
+
+    assertThat(result)
+        .hasFieldOrPropertyWithValue("id", id)
+        .hasFieldOrProperty("processDefinitionId")
+        .hasFieldOrPropertyWithValue("processDefinitionName", "Test Pending Process Instance")
+        .hasFieldOrProperty("startTime")
+        .hasFieldOrProperty("endTime")
+        .hasFieldOrPropertyWithValue("state", HistoryProcessInstanceStatus.PENDING)
+        .hasFieldOrPropertyWithValue("processCompletionResult", null)
+        .hasFieldOrPropertyWithValue("excerptId", null);
   }
 }
