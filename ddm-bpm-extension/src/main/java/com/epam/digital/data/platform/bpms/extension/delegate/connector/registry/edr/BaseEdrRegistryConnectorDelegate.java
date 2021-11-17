@@ -1,10 +1,10 @@
-package com.epam.digital.data.platform.bpms.extension.delegate.connector.registry;
+package com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.edr;
 
 import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.EdrRegistryConnectorResponse;
+import com.epam.digital.data.platform.bpms.extension.delegate.dto.RegistryConnectorResponse;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
-import com.epam.digital.data.platform.starter.trembita.integration.service.EdrRemoteService;
+import com.epam.digital.data.platform.starter.trembita.integration.edr.service.EdrRemoteService;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
@@ -17,9 +17,7 @@ public abstract class BaseEdrRegistryConnectorDelegate extends BaseJavaDelegate 
 
   protected final EdrRemoteService edrRemoteService;
 
-  @SystemVariable(name = "authorizationToken")
-  protected NamedVariableAccessor<String> authorizationTokenVariable;
   @SystemVariable(name = "response", isTransient = true)
-  protected NamedVariableAccessor<EdrRegistryConnectorResponse> responseVariable;
+  protected NamedVariableAccessor<RegistryConnectorResponse> responseVariable;
 }
 

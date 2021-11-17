@@ -35,9 +35,33 @@ keycloak:
     client-secret: system-user-client-secret
 
 trembita-exchange-gateway:
-  url: http://localhost:7788/trembita-mock-server
-  client:
-    x-road-instance: CLIENT-TEST
   registries:
     edr-registry:
-      x-road-instance: EDR-TEST
+      trembita-url: http://localhost:7788/trembita-mock-server
+      user-id: MDTUDDM
+      protocol-version: 4.0
+      authorization-token: token
+      client:
+        x-road-instance: CLIENT-TEST
+        member-class: GOV
+        member-code: 666777666
+        subsystem-code: GOV_test
+      service:
+        x-road-instance: EDR-TEST
+        member-class: GOV
+        member-code: 11115888
+        subsystem-code: EDR_test
+    dracs-registry:
+      trembita-url: http://localhost:7789/trembita-mock-server
+      user-id: MDTUDDM
+      protocol-version: 4.0
+      client:
+        x-road-instance: CLIENT-TEST
+        member-class: GOV
+        member-code: 666777666
+        subsystem-code: GOV_test
+      service:
+        x-road-instance: DRACS-TEST
+        member-class: GOV
+        member-code: 11115887
+        subsystem-code: DRACS_test

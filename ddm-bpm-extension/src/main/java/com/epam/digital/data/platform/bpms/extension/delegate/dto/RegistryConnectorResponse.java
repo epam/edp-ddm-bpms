@@ -8,7 +8,7 @@ import org.camunda.spin.json.SpinJsonNode;
 @Builder
 @Getter
 @ToString
-public class EdrRegistryConnectorResponse {
+public class RegistryConnectorResponse {
 
   private final int statusCode;
   private final transient SpinJsonNode responseBody;

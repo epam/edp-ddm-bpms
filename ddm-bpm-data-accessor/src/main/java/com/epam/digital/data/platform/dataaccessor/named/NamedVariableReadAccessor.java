@@ -21,6 +21,13 @@ public interface NamedVariableReadAccessor<T> {
   T get();
 
   /**
+   * Get name of variable
+   *
+   * @return variable name
+   */
+  String getName();
+
+  /**
    * Get optional variable value from storage
    *
    * @return return optional variable value object
@@ -39,5 +46,16 @@ public interface NamedVariableReadAccessor<T> {
   @NonNull
   default T getOrDefault(T defaultValue) {
     return Objects.requireNonNullElse(get(), defaultValue);
+  }
+
+  /**
+   * Get variable value or else throw {@link IllegalArgumentException}
+   *
+   * @return variable value if the variable present and not null or else throw exception
+   */
+  @NonNull
+  default T getOrThrow() {
+    return this.getOptional().orElseThrow(
+        () -> new IllegalArgumentException(String.format("Variable %s not found", getName())));
   }
 }

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:xro="http://x-road.eu/xsd/xroad.xsd" xmlns:iden="http://x-road.eu/xsd/identifiers"
+  xmlns:tem="http://tempuri.org/">
+  <soapenv:Header>
+    <xro:client iden:objectType="SUBSYSTEM">
+      <iden:xRoadInstance>SEVDEIR-TEST</iden:xRoadInstance>
+      <iden:memberClass>GOV</iden:memberClass>
+      <iden:memberCode>12395123</iden:memberCode>
+      <iden:subsystemCode>TEST1</iden:subsystemCode>
+    </xro:client>
+    <xro:service iden:objectType="SERVICE">
+      <iden:xRoadInstance>TEST</iden:xRoadInstance>
+      <iden:memberClass>GOV</iden:memberClass>
+      <iden:memberCode>22212358</iden:memberCode>
+      <iden:subsystemCode>TEST_DRAC</iden:subsystemCode>
+      <iden:serviceCode>GetCertByNumRoleNames</iden:serviceCode>
+    </xro:service>
+    <xro:userId>userId</xro:userId>
+    <xro:id>1234</xro:id>
+    <xro:protocolVersion>4.0</xro:protocolVersion>
+  </soapenv:Header>
+  <soapenv:Body>
+    <tem:CeServiceAnswer>
+      <tem:ResultData><![CDATA[<?xml version="1.0" encoding="utf-8"?>
+			<CE_LIST>
+        <CERTIFICATE>
+          <CertStatus>1</CertStatus>
+          <CertRepeat>0</CertRepeat>
+          <CertSerial>1-CC</CertSerial>
+          <CertNumber>231046</CertNumber>
+          <CertOrg>Відділ реєстрації актів цивільного стану Горохівського районного управління юстиції</CertOrg>
+          <CertDate>02.02.2010</CertDate>
+          <ArOrg>Відділ реєстрації актів цивільного стану Головного управління юстиції у Волинській області</ArOrg>
+          <AR_NUMB>26</AR_NUMB>
+          <AR_COMPOSEDATE>01.02.2010</AR_COMPOSEDATE>
+          <HusbandOld_Surname>Самкін</HusbandOld_Surname>
+          <HusbandSurname>husbandSurname</HusbandSurname>
+          <HusbandName>husbandName</HusbandName>
+          <HusbandPatronymic>husbandPatronymic</HusbandPatronymic>
+          <HusbandCitizenship>83</HusbandCitizenship>
+          <HusbandBirthdate>12.01.1975</HusbandBirthdate>
+          <HusbandPlaceofBirth>Україна, м. Київ</HusbandPlaceofBirth>
+          <WifeOld_Surname>Самигіна</WifeOld_Surname>
+          <WifeSurname>Самкіна</WifeSurname>
+          <WifeName>Леонелла</WifeName>
+          <WifePatronymic>Аркадіївна</WifePatronymic>
+          <WifeCitizenship>84</WifeCitizenship>
+          <WifeBirthdate>12.12.1978</WifeBirthdate>
+          <WifePlaceofBirth>Україна, м. Київ</WifePlaceofBirth>
+        </CERTIFICATE>
+			</CE_LIST>]]>
+      </tem:ResultData>
+    </tem:CeServiceAnswer>
+  </soapenv:Body>
+</soapenv:Envelope>

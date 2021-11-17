@@ -80,8 +80,11 @@ public abstract class BaseIT {
   @Qualifier("userSettingsWireMock")
   protected WireMockServer userSettingsWireMock;
   @Inject
-  @Qualifier("trembitaMockServer")
-  protected WireMockServer trembitaMockServer;
+  @Qualifier("trembitaMockServerEdr")
+  protected WireMockServer trembitaMockServerEdr;
+  @Inject
+  @Qualifier("trembitaMockServerDracs")
+  protected WireMockServer trembitaMockServerDracs;
   @Value("${keycloak.citizen.realm}")
   protected String citizenRealm;
   @Value("${keycloak.officer.realm}")
@@ -121,19 +124,30 @@ public abstract class BaseIT {
 
   @SneakyThrows
   protected void stubSearchSubjects(String responseXmlFilePath) {
-    stubTrembita(responseXmlFilePath, "SearchSubjects");
+    stubTrembita(responseXmlFilePath, "SearchSubjects", trembitaMockServerEdr);
   }
 
   protected void stubSubjectDetail(String responseXmlFilePath) throws Exception {
-    stubTrembita(responseXmlFilePath, "SubjectDetail");
+    stubTrembita(responseXmlFilePath, "SubjectDetail", trembitaMockServerEdr);
   }
 
-  private void stubTrembita(String responseXmlFilePath, String serviceCode) throws Exception {
+  @SneakyThrows
+  protected void stubGetCertByNumRoleBirthDate(String responseXmlFilePath) {
+    stubTrembita(responseXmlFilePath, "GetCertByNumRoleBirthDate", trembitaMockServerDracs);
+  }
+
+  @SneakyThrows
+  protected void stubGetCertByNumRoleNames(String responseXmlFilePath) {
+    stubTrembita(responseXmlFilePath, "GetCertByNumRoleNames", trembitaMockServerDracs);
+  }
+
+  protected void stubTrembita(String responseXmlFilePath, String serviceCode,
+      WireMockServer server) throws Exception {
     String response = Files.readString(
         Paths.get(TestUtils.class.getResource(responseXmlFilePath).toURI()),
         StandardCharsets.UTF_8);
 
-    trembitaMockServer.addStubMapping(
+    server.addStubMapping(
         stubFor(post(urlPathEqualTo("/trembita-mock-server"))
             .withRequestBody(matching(String.format(".*%s.*", serviceCode)))
             .willReturn(aResponse().withStatus(200)

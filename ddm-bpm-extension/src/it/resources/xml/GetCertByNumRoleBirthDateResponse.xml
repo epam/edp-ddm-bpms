@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xro="http://x-road.eu/xsd/xroad.xsd" xmlns:iden="http://x-road.eu/xsd/identifiers" xmlns:tem="http://tempuri.org/">
+  <soapenv:Header>
+    <xro:client iden:objectType="SUBSYSTEM">
+      <iden:xRoadInstance>SEVDEIR-TEST</iden:xRoadInstance>
+      <iden:memberClass>GOV</iden:memberClass>
+      <iden:memberCode>12395123</iden:memberCode>
+      <iden:subsystemCode>TEST1</iden:subsystemCode>
+    </xro:client>
+    <xro:service iden:objectType="SERVICE">
+      <iden:xRoadInstance>TEST</iden:xRoadInstance>
+      <iden:memberClass>GOV</iden:memberClass>
+      <iden:memberCode>22212358</iden:memberCode>
+      <iden:subsystemCode>TEST_DRAC</iden:subsystemCode>
+      <iden:serviceCode>GetCertByNumRoleBirthDate</iden:serviceCode>
+    </xro:service>
+    <xro:userId>userId</xro:userId>
+    <xro:id>1234</xro:id>
+    <xro:protocolVersion>4.0</xro:protocolVersion>
+  </soapenv:Header>
+  <soapenv:Body>
+    <tem:CeServiceAnswer>
+      <tem:ResultData><![CDATA[<?xml version="1.0" encoding="utf-8"?>
+			<CE_LIST>
+			  <CERTIFICATE>
+			    <CertStatus>1</CertStatus>
+			    <CertRepeat>0</CertRepeat>
+			    <CertSerial>AA</CertSerial>
+			    <CertNumber>333444</CertNumber>
+			    <CertOrg>Горохівський районний відділ державної реєстрації актів цивільного стану Головного територіального управління юстиції у Волинській області</CertOrg>
+			    <CertDate>24.09.2020</CertDate>
+			    <ArOrg>Відділ реєстрації актів цивільного стану Оболонського районного управління юстиції у м. Києві</ArOrg>
+			    <AR_NUMB>2</AR_NUMB>
+			    <AR_COMPOSEDATE>05.12.2016</AR_COMPOSEDATE>
+			    <Old_Surname>Семеновська</Old_Surname>
+			    <Old_Name>Юлія</Old_Name>
+			    <Old_Patronymic>Костянинівна</Old_Patronymic>
+			    <New_Surname>Семен</New_Surname>
+			    <New_Name>Юлія</New_Name>
+			    <New_Patronymic>Костянинівна</New_Patronymic>
+			    <DateofBirth>01.01.2010</DateofBirth>
+			    <PlaceofBirth>Україна, м. Київ</PlaceofBirth>
+			  </CERTIFICATE>
+			</CE_LIST>]]>
+      </tem:ResultData>
+    </tem:CeServiceAnswer>
+  </soapenv:Body>
+</soapenv:Envelope>

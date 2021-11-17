@@ -16,4 +16,9 @@ public class BaseNamedVariableReadAccessor<T> implements NamedVariableReadAccess
   public T get() {
     return accessor.getVariable(name);
   }
+
+  @Override
+  public String getName() {
+    return this.name;
+  }
 }
