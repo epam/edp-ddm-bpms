@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0fripaq" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.11.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:process id="test_get_certificate_by_name" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_1nbjnph</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1nbjnph" sourceRef="StartEvent_1" targetRef="Activity_169ygzf" />
+    <bpmn:sequenceFlow id="Flow_1xd3z3n" sourceRef="Activity_169ygzf" targetRef="Activity_193qmbo" />
+    <bpmn:endEvent id="Event_1nt1rep">
+      <bpmn:incoming>Flow_1okd5cq</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1okd5cq" sourceRef="Activity_193qmbo" targetRef="Event_1nt1rep" />
+    <bpmn:serviceTask id="Activity_169ygzf" name="Get Certificate By Name" camunda:modelerTemplate="getCertificateByNameDracsRegistryDelegate" camunda:delegateExpression="${getCertificateByNameDracsRegistryDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="certSerial">1-CC</camunda:inputParameter>
+          <camunda:inputParameter name="certNumber">231046</camunda:inputParameter>
+          <camunda:inputParameter name="role">7</camunda:inputParameter>
+          <camunda:inputParameter name="name">Name</camunda:inputParameter>
+          <camunda:inputParameter name="surname">Surname</camunda:inputParameter>
+          <camunda:inputParameter name="patronymic">Patronymic</camunda:inputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1nbjnph</bpmn:incoming>
+      <bpmn:outgoing>Flow_1xd3z3n</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Activity_193qmbo" name="Assert" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1xd3z3n</bpmn:incoming>
+      <bpmn:outgoing>Flow_1okd5cq</bpmn:outgoing>
+      <bpmn:script>assert response.statusCode == 200
+assert response.responseBody.prop('certificate').elements().get(0).prop("certNumber").value().equals('231046')
+assert response.responseBody.prop('certificate').elements().get(0).prop("certSerial").value().equals('1-CC')
+assert response.responseBody.prop('certificate').elements().get(0).prop("husbandName").value().equals('husbandName')
+assert response.responseBody.prop('certificate').elements().get(0).prop("husbandSurname").value().equals('husbandSurname')
+assert response.responseBody.prop('certificate').elements().get(0).prop("husbandPatronymic").value().equals('husbandPatronymic')</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="test_get_certificate_by_name">
+      <bpmndi:BPMNEdge id="Flow_1okd5cq_di" bpmnElement="Flow_1okd5cq">
+        <di:waypoint x="530" y="117" />
+        <di:waypoint x="592" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1xd3z3n_di" bpmnElement="Flow_1xd3z3n">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="430" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1nbjnph_di" bpmnElement="Flow_1nbjnph">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1nt1rep_di" bpmnElement="Event_1nt1rep">
+        <dc:Bounds x="592" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0c1iy53_di" bpmnElement="Activity_169ygzf">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ingewj_di" bpmnElement="Activity_193qmbo">
+        <dc:Bounds x="430" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

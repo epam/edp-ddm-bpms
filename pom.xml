@@ -35,7 +35,7 @@
     <ddm-starter-localization.version>1.2.0</ddm-starter-localization.version>
     <ddm-starter-logging.version>1.5.0-SNAPSHOT</ddm-starter-logging.version>
     <ddm-starter-security.version>1.5.0-SNAPSHOT</ddm-starter-security.version>
-    <ddm-starter-trembita-integration.version>1.5.0-SNAPSHOT</ddm-starter-trembita-integration.version>
+    <ddm-starter-trembita-integration.version>1.5.3-SNAPSHOT</ddm-starter-trembita-integration.version>
     <excerpt-model.version>1.4.0</excerpt-model.version>
     <p6spy-spring-boot-starter.version>1.7.1</p6spy-spring-boot-starter.version>
     <dso.version>1.4.5</dso.version>
