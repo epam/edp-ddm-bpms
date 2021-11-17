@@ -42,8 +42,8 @@ import com.epam.digital.data.platform.bpms.extension.delegate.connector.UserSett
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloak.citizen.KeycloakAddCitizenRoleConnectorDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloak.citizen.KeycloakRemoveCitizenRoleConnectorDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloak.officer.KeycloakGetOfficerUsersConnectorDelegate;
-import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.SearchSubjectsEdrRegistryConnectorDelegate;
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.EdrRegistryConnectorResponse;
+import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.edr.SearchSubjectsEdrRegistryConnectorDelegate;
+import com.epam.digital.data.platform.bpms.extension.delegate.dto.RegistryConnectorResponse;
 import com.epam.digital.data.platform.bpms.extension.delegate.dto.KeycloakUserDto;
 import com.epam.digital.data.platform.bpms.extension.exception.handler.ConnectorResponseErrorHandler;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
@@ -510,7 +510,7 @@ public abstract class BaseBpmnTest {
     doAnswer(invocation -> {
       var execution = (AbstractVariableScope) invocation.getArgument(0);
       execution.setVariableLocalTransient("response",
-          EdrRegistryConnectorResponse.builder().responseBody(
+          RegistryConnectorResponse.builder().responseBody(
               Spin.JSON(TestUtils.getContent(responseBody))).build());
       return null;
     }).when(searchSubjectsEdrRegistryConnectorDelegate).execute(any(DelegateExecution.class));

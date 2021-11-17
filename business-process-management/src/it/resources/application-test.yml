@@ -55,20 +55,22 @@ keycloak:
     client-secret: system-user-client-secret
 
 trembita-exchange-gateway:
-  userId: MDTUDDM
-  protocol-version: 4.0
-  url: http://localhost:7788/trembita-mock-server
-  client:
-    x-road-instance: CLIENT-TEST
-    member-class: GOV
-    member-code: 666777666
-    subsystem-code: GOV_TEST
   registries:
     edr-registry:
-      x-road-instance: EDR-TEST
-      member-class: GOV
-      member-code: 11115888
-      subsystem-code: EDR_test
+      trembita-url: http://localhost:7788/trembita-mock-server
+      userId: MDTUDDM
+      protocol-version: 4.0
+      authorization-token: token
+      client:
+        x-road-instance: CLIENT-TEST
+        member-class: GOV
+        member-code: 666777666
+        subsystem-code: GOV_TEST
+      service:
+        x-road-instance: EDR-TEST
+        member-class: GOV
+        member-code: 11115888
+        subsystem-code: EDR_test
 
 registry-regulation:
   officer:

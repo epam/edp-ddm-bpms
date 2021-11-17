@@ -1,10 +1,10 @@
-package com.epam.digital.data.platform.bpms.extension.delegate.connector.registry;
+package com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.edr;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.EdrRegistryConnectorResponse;
+import com.epam.digital.data.platform.bpms.extension.delegate.dto.RegistryConnectorResponse;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
-import com.epam.digital.data.platform.starter.trembita.integration.dto.SubjectInfoDto;
-import com.epam.digital.data.platform.starter.trembita.integration.service.EdrRemoteService;
+import com.epam.digital.data.platform.starter.trembita.integration.edr.dto.SubjectInfoDto;
+import com.epam.digital.data.platform.starter.trembita.integration.edr.service.EdrRemoteService;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -31,18 +31,17 @@ public class SearchSubjectsEdrRegistryConnectorDelegate extends BaseEdrRegistryC
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
     var code = codeVariable.from(execution).get();
-    var authorizationToken = authorizationTokenVariable.from(execution).get();
 
     log.debug("Start searching subjects by code {}", code);
-    var response = edrRemoteService.searchSubjects(code, authorizationToken);
+    var response = edrRemoteService.searchSubjects(code);
     var connectorResponse = prepareConnectorResponse(response);
     log.debug("Got subjects response with status: {}", connectorResponse.getStatusCode());
 
     responseVariable.on(execution).set(connectorResponse);
   }
 
-  private EdrRegistryConnectorResponse prepareConnectorResponse(List<SubjectInfoDto> response) {
-    return EdrRegistryConnectorResponse.builder()
+  private RegistryConnectorResponse prepareConnectorResponse(List<SubjectInfoDto> response) {
+    return RegistryConnectorResponse.builder()
         .responseBody(Spin.JSON(response))
         .statusCode(CollectionUtils.isEmpty(response) ? 404 : 200)
         .build();
