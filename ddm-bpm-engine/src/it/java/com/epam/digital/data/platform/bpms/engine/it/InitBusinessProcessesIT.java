@@ -6,17 +6,17 @@ import com.epam.digital.data.platform.bpms.engine.config.CamundaProperties;
 import java.util.Map;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class InitBusinessProcessesIT extends BaseIT {
+class InitBusinessProcessesIT extends BaseIT {
 
   @Autowired
   private CamundaProperties camundaProperties;
 
   @Test
   @Deployment(resources = {"bpmn/testInitSystemVariablesProcess.bpmn"})
-  public void shouldInitDataFactoryBaseUrlDuringDeploy() {
+  void shouldInitDataFactoryBaseUrlDuringDeploy() {
     String varDataFactoryBaseUrl = "const_dataFactoryBaseUrl";
 
     ProcessInstance process = runtimeService
