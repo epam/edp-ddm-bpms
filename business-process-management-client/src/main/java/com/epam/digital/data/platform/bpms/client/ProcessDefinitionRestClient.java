@@ -1,6 +1,7 @@
 package com.epam.digital.data.platform.bpms.client;
 
 import com.epam.digital.data.platform.bpms.api.dto.ProcessDefinitionQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmProcessDefinitionDto;
 import com.epam.digital.data.platform.bpms.client.exception.ClientValidationException;
 import com.epam.digital.data.platform.bpms.client.exception.ProcessDefinitionNotFoundException;
 import feign.error.ErrorCodes;
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * The interface extends {@link BaseFeignClient} and used to perform operations on camunda process
  * definition
  */
-@FeignClient(name = "camunda-process-definition-client", url = "${bpms.url}/api/process-definition")
+@FeignClient(name = "camunda-process-definition-client", url = "${bpms.url}/api")
 public interface ProcessDefinitionRestClient extends BaseFeignClient {
 
   /**
@@ -33,7 +34,7 @@ public interface ProcessDefinitionRestClient extends BaseFeignClient {
    * @param requestDto object with search parameters
    * @return the number of process definitions
    */
-  @GetMapping("/count")
+  @GetMapping("/process-definition/count")
   @ErrorHandling
   @CollectionFormat(feign.CollectionFormat.CSV)
   CountResultDto getProcessDefinitionsCount(
@@ -42,14 +43,14 @@ public interface ProcessDefinitionRestClient extends BaseFeignClient {
   /**
    * Method for getting list of camunda process definitions
    *
-   * @param requestDto bject with search parameters
+   * @param requestDto object with search parameters
    * @return the list of camunda process definitions
    */
-  @GetMapping
+  @PostMapping("/extended/process-definition")
   @ErrorHandling
   @CollectionFormat(feign.CollectionFormat.CSV)
-  List<ProcessDefinitionDto> getProcessDefinitionsByParams(
-      @SpringQueryMap ProcessDefinitionQueryDto requestDto);
+  List<DdmProcessDefinitionDto> getProcessDefinitionsByParams(
+      @RequestBody ProcessDefinitionQueryDto requestDto);
 
   /**
    * Method for getting camunda process definition by id
@@ -57,7 +58,7 @@ public interface ProcessDefinitionRestClient extends BaseFeignClient {
    * @param id process definition identifier
    * @return a camunda process definition
    */
-  @GetMapping("/{id}")
+  @GetMapping("/process-definition/{id}")
   @ErrorHandling(codeSpecific = {
       @ErrorCodes(codes = {404}, generate = ProcessDefinitionNotFoundException.class)
   })
@@ -69,11 +70,11 @@ public interface ProcessDefinitionRestClient extends BaseFeignClient {
    * @param key process definition key
    * @return a camunda process definition
    */
-  @GetMapping("/key/{key}")
+  @GetMapping("/extended/process-definition/key/{key}")
   @ErrorHandling(codeSpecific = {
       @ErrorCodes(codes = {404}, generate = ProcessDefinitionNotFoundException.class)
   })
-  ProcessDefinitionDto getProcessDefinitionByKey(@PathVariable("key") String key);
+  DdmProcessDefinitionDto getProcessDefinitionByKey(@PathVariable("key") String key);
 
   /**
    * Method for starting process instance by process definition id
@@ -82,7 +83,7 @@ public interface ProcessDefinitionRestClient extends BaseFeignClient {
    * @param startProcessInstanceDto {@link StartProcessInstanceDto} entity
    * @return a started process instance
    */
-  @PostMapping("/{id}/start")
+  @PostMapping("/process-definition/{id}/start")
   @ErrorHandling(codeSpecific = {
       @ErrorCodes(codes = {422}, generate = ClientValidationException.class)
   })
@@ -96,7 +97,7 @@ public interface ProcessDefinitionRestClient extends BaseFeignClient {
    * @param startProcessInstanceDto {@link StartProcessInstanceDto} entity
    * @return a started process instance with variables
    */
-  @PostMapping("key/{key}/start")
+  @PostMapping("/process-definition/key/{key}/start")
   @ErrorHandling(codeSpecific = {
       @ErrorCodes(codes = {422}, generate = ClientValidationException.class)
   })
@@ -110,7 +111,7 @@ public interface ProcessDefinitionRestClient extends BaseFeignClient {
    * @param id process definition identifier
    * @return start form representation
    */
-  @GetMapping("/{id}/startForm")
+  @GetMapping("/process-definition/{id}/startForm")
   @ErrorHandling
   FormDto getStartForm(@PathVariable("id") String id);
 
@@ -120,7 +121,7 @@ public interface ProcessDefinitionRestClient extends BaseFeignClient {
    * @param key process definition key
    * @return start form representation
    */
-  @GetMapping("/key/{key}/startForm")
+  @GetMapping("/process-definition/key/{key}/startForm")
   @ErrorHandling
   FormDto getStartFormByKey(@PathVariable("key") String key);
 }
