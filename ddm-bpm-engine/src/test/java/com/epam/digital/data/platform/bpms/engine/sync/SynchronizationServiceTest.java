@@ -8,18 +8,18 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import lombok.SneakyThrows;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
-public class SynchronizationServiceTest {
+@ExtendWith(MockitoExtension.class)
+class SynchronizationServiceTest {
 
   private final SynchronizationService service = new SynchronizationService();
   private final ExecutorService threadPool = Executors.newFixedThreadPool(2);
 
   @Test
-  public void testConsistentOperations() throws ExecutionException, InterruptedException {
+  void testConsistentOperations() throws ExecutionException, InterruptedException {
     var list = new ArrayList<Integer>();
 
     threadPool.execute(() -> service.execute(1, () -> {
@@ -38,7 +38,7 @@ public class SynchronizationServiceTest {
   }
 
   @Test
-  public void testThrowsIfLocked() throws ExecutionException, InterruptedException {
+  void testThrowsIfLocked() throws ExecutionException, InterruptedException {
     var list = new ArrayList<Integer>();
 
     var future1 = threadPool.submit(() -> service.executeOrThrow(1, () -> {

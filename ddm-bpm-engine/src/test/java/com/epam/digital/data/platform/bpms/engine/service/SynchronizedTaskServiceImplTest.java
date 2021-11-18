@@ -14,30 +14,30 @@ import com.epam.digital.data.platform.bpms.engine.sync.SynchronizationService;
 import java.util.function.Supplier;
 import org.camunda.bpm.engine.impl.cmd.CompleteTaskCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
-public class SynchronizedTaskServiceImplTest {
+@ExtendWith(MockitoExtension.class)
+class SynchronizedTaskServiceImplTest {
 
+  @InjectMocks
+  private SynchronizedTaskServiceImpl service;
   @Mock
   private SynchronizationService synchronizationService;
   @Mock
   private CommandExecutor commandExecutor;
-  @InjectMocks
-  private SynchronizedTaskServiceImpl service;
 
-  @Before
-  public void setUp() {
+  @BeforeEach
+  void setUp() {
     service.setCommandExecutor(commandExecutor);
   }
 
   @Test
-  public void testCompleteTask() {
+  void testCompleteTask() {
     var taskId = "taskId";
 
     doAnswer(invocation -> {
@@ -52,7 +52,7 @@ public class SynchronizedTaskServiceImplTest {
   }
 
   @Test
-  public void testCompleteTaskAndReturn() {
+  void testCompleteTaskAndReturn() {
     var taskId = "taskId";
 
     doAnswer(invocation -> {

@@ -69,3 +69,9 @@ trembita-exchange-gateway:
       member-class: GOV
       member-code: 11115888
       subsystem-code: EDR_test
+
+registry-regulation:
+  officer:
+    roles:
+      - name: task-dispatcher
+      - name: head-officer
