@@ -19,6 +19,8 @@ spring:
         paths:
           - /app/config/main/application.yml
           - /app/config/camunda/camunda-global-system-vars.yml
+          - /app/config/registry-regulation/officer-roles.yml
+          - /app/config/registry-regulation/citizen-roles.yml
       secrets:
         enabled: true
         enable-api: false

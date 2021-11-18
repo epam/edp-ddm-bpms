@@ -1,3 +1,15 @@
 camunda:
   system-variables:
     const_dataFactoryBaseUrl: http://localhost:8877/mock-server
+
+registry-regulation:
+  officer:
+    roles:
+      - name: officer
+        description: 'Officer role'
+      - name: head-officer
+        description: 'Head officer role'
+      - name: task-dispatcher
+        description: 'Task dispatcher role'
+  citizen:
+    roles: [ ]

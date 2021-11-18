@@ -4,13 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.camunda.bpm.engine.test.Deployment;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class CamundaVariableElIT extends BaseIT {
+class CamundaVariableElIT extends BaseIT {
 
   @Test
   @Deployment(resources = {"bpmn/testNonTransientBooleanExpressionLanguage.bpmn"})
-  public void shouldThrowAnExceptionIfBucketNotExists() {
+  void shouldThrowAnExceptionIfBucketNotExists() {
     var processInstance = runtimeService
         .startProcessInstanceByKey("testNonTransientBooleanExpressionLanguage_key");
 
