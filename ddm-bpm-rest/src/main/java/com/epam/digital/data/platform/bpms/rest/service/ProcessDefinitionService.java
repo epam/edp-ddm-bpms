@@ -1,8 +1,8 @@
 package com.epam.digital.data.platform.bpms.rest.service;
 
+import com.epam.digital.data.platform.bpms.api.dto.DdmProcessDefinitionDto;
 import java.util.List;
-import java.util.Map;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
 
 /**
  * The service with operations for managing and getting process definition data.
@@ -10,18 +10,19 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 public interface ProcessDefinitionService {
 
   /**
-   * Get process definition names map.
+   * Get process definition key
    *
-   * @param processDefinitionIds specified process definition ids.
+   * @param processDefinitionKey specified process definition key
    * @return map of process definition id and name.
    */
-  Map<String, String> getProcessDefinitionsNames(List<String> processDefinitionIds);
+  DdmProcessDefinitionDto getUserProcessDefinitionDtoByKey(String processDefinitionKey);
 
   /**
-   * Get process definition by id.
+   * Get process definition list by specified query
    *
-   * @param id specified process definition id
-   * @return process definition object
+   * @param queryDto specified process definition key
+   * @return map of process definition id and name.
    */
-  ProcessDefinition getProcessDefinition(String id);
+  List<DdmProcessDefinitionDto> getUserProcessDefinitionDtos(ProcessDefinitionQueryDto queryDto);
+
 }

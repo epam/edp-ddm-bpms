@@ -4,7 +4,7 @@ import com.epam.digital.data.platform.bpms.api.dto.HistoryUserTaskDto;
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
 import com.epam.digital.data.platform.bpms.rest.mapper.TaskMapper;
 import com.epam.digital.data.platform.bpms.rest.service.HistoricTaskService;
-import com.epam.digital.data.platform.bpms.rest.service.ProcessDefinitionService;
+import com.epam.digital.data.platform.bpms.rest.service.ProcessDefinitionImpersonatedService;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 public class HistoricTaskServiceImpl implements HistoricTaskService {
 
   private final HistoricTaskInstanceRestService historicTaskInstanceRestService;
-  private final ProcessDefinitionService processDefinitionService;
+  private final ProcessDefinitionImpersonatedService processDefinitionImpersonatedService;
   private final TaskMapper taskMapper;
 
   @Override
@@ -36,7 +36,7 @@ public class HistoricTaskServiceImpl implements HistoricTaskService {
         .map(HistoricTaskInstanceDto::getProcessDefinitionId).collect(Collectors.toList());
     log.trace("Found {} process definition ids from task list. Result - {}",
         processDefinitionIds.size(), processDefinitionIds);
-    var processDefinitionsIdAndNameMap = processDefinitionService.getProcessDefinitionsNames(
+    var processDefinitionsIdAndNameMap = processDefinitionImpersonatedService.getProcessDefinitionsNames(
         processDefinitionIds);
     log.debug("Found process definition names - {}", processDefinitionsIdAndNameMap.values());
 
