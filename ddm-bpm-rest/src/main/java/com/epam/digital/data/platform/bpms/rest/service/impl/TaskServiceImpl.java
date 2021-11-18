@@ -4,7 +4,7 @@ import com.epam.digital.data.platform.bpms.api.dto.SignableUserTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.UserTaskDto;
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
 import com.epam.digital.data.platform.bpms.rest.mapper.TaskMapper;
-import com.epam.digital.data.platform.bpms.rest.service.ProcessDefinitionService;
+import com.epam.digital.data.platform.bpms.rest.service.ProcessDefinitionImpersonatedService;
 import com.epam.digital.data.platform.bpms.rest.service.TaskPropertyService;
 import com.epam.digital.data.platform.bpms.rest.service.TaskService;
 import com.epam.digital.data.platform.dso.api.dto.Subject;
@@ -31,7 +31,7 @@ public class TaskServiceImpl implements TaskService {
   private static final String FORM_VARIABLES_PROPERTY = "formVariables";
   private static final String FORM_VARIABLES_REGEX = "\\s*,\\s*";
 
-  private final ProcessDefinitionService processDefinitionService;
+  private final ProcessDefinitionImpersonatedService processDefinitionImpersonatedService;
   private final TaskPropertyService taskPropertyService;
   private final TaskRestService taskRestService;
   private final TaskMapper taskMapper;
@@ -47,7 +47,7 @@ public class TaskServiceImpl implements TaskService {
         .collect(Collectors.toList());
     log.trace("Found {} process definition ids from task list. Result - {}",
         processDefinitionIds.size(), processDefinitionIds);
-    var processDefinitionsIdAndNameMap = processDefinitionService.getProcessDefinitionsNames(
+    var processDefinitionsIdAndNameMap = processDefinitionImpersonatedService.getProcessDefinitionsNames(
         processDefinitionIds);
     log.trace("Found process definition names - {}", processDefinitionsIdAndNameMap.values());
 
@@ -66,7 +66,7 @@ public class TaskServiceImpl implements TaskService {
     var signableUserTaskDto = taskMapper.toSignableUserTaskDto(taskDto);
     log.trace("Camunda task has been found");
 
-    var processDefinition = processDefinitionService
+    var processDefinition = processDefinitionImpersonatedService
         .getProcessDefinition(taskDto.getProcessDefinitionId());
     signableUserTaskDto.setProcessDefinitionName(processDefinition.getName());
     log.trace("Task was filled with process definition name");

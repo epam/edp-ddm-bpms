@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 
 import com.epam.digital.data.platform.bpms.rest.mapper.LocalDateTimeMapper;
 import com.epam.digital.data.platform.bpms.rest.mapper.TaskMapper;
-import com.epam.digital.data.platform.bpms.rest.service.ProcessDefinitionService;
+import com.epam.digital.data.platform.bpms.rest.service.ProcessDefinitionImpersonatedService;
 import com.epam.digital.data.platform.bpms.rest.service.TaskPropertyService;
 import com.epam.digital.data.platform.dso.api.dto.Subject;
 import java.util.Map;
@@ -34,7 +34,7 @@ class TaskServiceImplTest {
   @InjectMocks
   private TaskServiceImpl taskService;
   @Mock
-  private ProcessDefinitionService processDefinitionService;
+  private ProcessDefinitionImpersonatedService processDefinitionImpersonatedService;
   @Mock
   private TaskPropertyService taskPropertyService;
   @Mock
@@ -66,7 +66,7 @@ class TaskServiceImplTest {
 
     when(taskRestService.getTask(taskId)).thenReturn(taskResource);
     when(taskResource.getTask(request)).thenReturn(taskDto);
-    when(processDefinitionService.getProcessDefinition(processDefinitionId))
+    when(processDefinitionImpersonatedService.getProcessDefinition(processDefinitionId))
         .thenReturn(processDefinition);
 
     var result = taskService.getTaskById(taskId, request);
@@ -94,7 +94,7 @@ class TaskServiceImplTest {
 
     when(taskRestService.getTask(taskId)).thenReturn(taskResource);
     when(taskResource.getTask(request)).thenReturn(taskDto);
-    when(processDefinitionService.getProcessDefinition(processDefinitionId))
+    when(processDefinitionImpersonatedService.getProcessDefinition(processDefinitionId))
         .thenReturn(processDefinition);
     when(taskResource.getVariables()).thenReturn(variableResource);
     when(variableResource.getVariables(true)).thenReturn(Map.of(

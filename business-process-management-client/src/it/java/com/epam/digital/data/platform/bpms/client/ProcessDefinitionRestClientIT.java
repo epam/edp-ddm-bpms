@@ -1,7 +1,7 @@
 package com.epam.digital.data.platform.bpms.client;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
@@ -62,10 +62,10 @@ class ProcessDefinitionRestClientIT extends BaseIT {
     processDefinitionEntity.setId("testId");
     var processDefinitionDto = ProcessDefinitionDto.fromProcessDefinition(processDefinitionEntity);
     restClientWireMock.addStubMapping(
-        stubFor(get(urlPathEqualTo("/api/process-definition"))
-            .withQueryParam("latestVersion", equalTo("true"))
-            .withQueryParam("sortBy", equalTo("name"))
-            .withQueryParam("sortOrder", equalTo("asc"))
+        stubFor(post(urlPathEqualTo("/api/extended/process-definition"))
+            .withRequestBody(equalToJson("{\"active\":false,\"latestVersion\":true,"
+                + "\"suspended\":false,\"sortBy\":\"name\",\"sortOrder\":\"asc\","
+                + "\"processDefinitionId\":null,\"processDefinitionIdIn\":null}"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(200)
@@ -105,7 +105,7 @@ class ProcessDefinitionRestClientIT extends BaseIT {
     processDefinitionEntity.setKey("testKey");
     var processDefinitionDto = ProcessDefinitionDto.fromProcessDefinition(processDefinitionEntity);
     restClientWireMock.addStubMapping(
-        stubFor(get(urlEqualTo("/api/process-definition/key/testKey"))
+        stubFor(get(urlEqualTo("/api/extended/process-definition/key/testKey"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(200)
@@ -199,10 +199,10 @@ class ProcessDefinitionRestClientIT extends BaseIT {
     processDefinitionEntity.setId("testId");
     var processDefinitionDto = ProcessDefinitionDto.fromProcessDefinition(processDefinitionEntity);
     restClientWireMock.addStubMapping(
-        stubFor(get(urlPathEqualTo("/api/process-definition"))
-            .withQueryParam("active", equalTo("true"))
-            .withQueryParam("latestVersion", equalTo("false"))
-            .withQueryParam("suspended", equalTo("false"))
+        stubFor(post(urlPathEqualTo("/api/extended/process-definition"))
+            .withRequestBody(equalToJson("{\"active\":true,\"latestVersion\":false,"
+                + "\"suspended\":false,\"sortBy\":null,\"sortOrder\":null,"
+                + "\"processDefinitionId\":null,\"processDefinitionIdIn\":null}"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(200)
