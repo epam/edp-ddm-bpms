@@ -18,6 +18,7 @@ package com.epam.digital.data.platform.bpms.extension.service;
 
 import com.epam.digital.data.platform.bpms.extension.delegate.dto.KeycloakUserDto;
 import com.epam.digital.data.platform.bpms.extension.exception.KeycloakException;
+import com.epam.digital.data.platform.starter.security.dto.constants.KeycloakSystemAttribute;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -34,9 +35,6 @@ import org.keycloak.representations.idm.UserRepresentation;
 @Slf4j
 @RequiredArgsConstructor
 public class KeycloakClientServiceImpl implements KeycloakClientService {
-
-  private static final String FULL_NAME_ATTRIBUTE = "fullName";
-  private static final int FULL_NAME_ATTRIBUTE_INDEX = 0;
 
   private final String realmName;
   private final Keycloak keycloak;
@@ -93,8 +91,8 @@ public class KeycloakClientServiceImpl implements KeycloakClientService {
     var users = roleUserMembers.stream()
         .filter(this::hasFullNameAttribute)
         .map(user -> new KeycloakUserDto(user.getUsername(),
-            user.getAttributes().get(FULL_NAME_ATTRIBUTE)
-                .get(FULL_NAME_ATTRIBUTE_INDEX)))
+            user.getAttributes().get(KeycloakSystemAttribute.FULL_NAME_ATTRIBUTE)
+                .get(KeycloakSystemAttribute.FULL_NAME_ATTRIBUTE_INDEX)))
         .sorted(Comparator.comparing(KeycloakUserDto::getFullName))
         .collect(Collectors.toList());
     log.info("Selected {} users with role {} in realm {}", users.size(), role, realmName);
@@ -139,7 +137,7 @@ public class KeycloakClientServiceImpl implements KeycloakClientService {
   private boolean hasFullNameAttribute(UserRepresentation user) {
     var attribute = user.getAttributes();
     return Objects.nonNull(attribute) && Objects
-        .nonNull(attribute.get(FULL_NAME_ATTRIBUTE));
+        .nonNull(attribute.get(KeycloakSystemAttribute.FULL_NAME_ATTRIBUTE));
   }
 
   private <T> T wrapKeycloakRequest(Supplier<T> supplier, Supplier<String> failMessageSupplier) {
