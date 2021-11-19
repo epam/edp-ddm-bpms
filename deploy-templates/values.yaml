@@ -20,6 +20,8 @@ officerKeycloakClientSecretsMountPath: "/app/secrets/officer-realm-admin-client"
 prometheusScrapePath: "/actuator/prometheus"
 readinessPath: "/actuator/health/readiness"
 livenessPath: "/actuator/health/liveness"
+officerConfigMountPath: "/app/config/registry-regulation/officer-roles"
+citizenConfigMountPath: "/app/config/registry-regulation/citizen-roles"
 
 javaOpts: "-Xms1536m -Xmx1536m -Duser.timezone=UTC"
 
