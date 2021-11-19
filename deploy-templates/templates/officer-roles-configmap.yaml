@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: officer-roles
+  annotations:
+    helm.sh/hook: "pre-install"
+data:
+  officer-roles.yml: |-
+    roles:
+      officer
