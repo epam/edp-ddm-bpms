@@ -1,6 +1,7 @@
 package com.epam.digital.data.platform.bpms.engine.config;
 
 import com.epam.digital.data.platform.starter.security.SystemRole;
+import com.epam.digital.data.platform.starter.security.dto.enums.KeycloakPlatformRole;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -40,11 +41,13 @@ public class CamundaRegistryRoles {
     var citizenStream = getRoleNameStream(citizen);
     var camundaAdminStream = Stream.of(camundaAdminRole);
     var systemRolesStream = Stream.of(SystemRole.getRoleNames());
+    var platformRolesStream = Stream.of(KeycloakPlatformRole.values())
+        .map(KeycloakPlatformRole::getName);
 
-    this.availableAuthorizedRoles =
-        Stream.of(officerStream, citizenStream, camundaAdminStream, systemRolesStream)
-            .flatMap(Function.identity())
-            .collect(Collectors.toUnmodifiableSet());
+    this.availableAuthorizedRoles = Stream.of(officerStream, citizenStream, camundaAdminStream,
+            systemRolesStream, platformRolesStream)
+        .flatMap(Function.identity())
+        .collect(Collectors.toUnmodifiableSet());
   }
 
   private Stream<String> getRoleNameStream(RegistryRolesDto registryRolesDto) {
