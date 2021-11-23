@@ -117,7 +117,7 @@ public abstract class BaseBpmnTest {
   protected final String userSettingsBaseUrl = "http://user-setings:8080/";
   protected final String digitalSignatureUrl = "http://digital-signature-ops:8080/";
   protected final String excerptServiceBaseUrl = "http://excerpt-service-api:8080/";
-  protected final String springAppName = "business-process-management";
+  protected final String springAppName = "ddm-bpm";
 
   // init mocks
   protected final MessageResolver messageResolver = mock(MessageResolver.class);

@@ -6,7 +6,7 @@
 
   <parent>
     <groupId>com.epam.digital.data.platform</groupId>
-    <artifactId>business-process-management-parent</artifactId>
+    <artifactId>ddm-bpm-parent</artifactId>
     <version>1.5.2-SNAPSHOT</version>
   </parent>
 
@@ -17,8 +17,8 @@
     </sonar.coverage.exclusions>
   </properties>
 
-  <artifactId>business-process-management-api</artifactId>
-  <name>business-process-management-api</name>
+  <artifactId>ddm-bpm-api</artifactId>
+  <name>ddm-bpm-api</name>
 
   <dependencies>
     <dependency>
