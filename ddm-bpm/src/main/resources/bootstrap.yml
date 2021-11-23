@@ -10,7 +10,7 @@ logging:
 ---
 spring:
   application:
-    name: business-process-management
+    name: ddm-bpm
   cloud:
     kubernetes:
       config:

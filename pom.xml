@@ -11,14 +11,14 @@
     <relativePath/>
   </parent>
 
-  <artifactId>business-process-management-parent</artifactId>
+  <artifactId>ddm-bpm-parent</artifactId>
   <version>1.5.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
-    <module>business-process-management</module>
-    <module>business-process-management-api</module>
-    <module>business-process-management-client</module>
+    <module>ddm-bpm</module>
+    <module>ddm-bpm-api</module>
+    <module>ddm-bpm-client</module>
     <module>ddm-bpm-data-accessor</module>
     <module>ddm-bpm-engine</module>
     <module>ddm-bpm-extension</module>
@@ -40,7 +40,7 @@
     <p6spy-spring-boot-starter.version>1.7.1</p6spy-spring-boot-starter.version>
     <dso.version>1.4.5</dso.version>
 
-    <deployable.module>business-process-management</deployable.module>
+    <deployable.module>ddm-bpm</deployable.module>
 
     <!-- This property is set by jacoco and used in the surefire config
 			Set it to empty to avoid JVM startup error related to "@{argLine}" when run without jacoco -->

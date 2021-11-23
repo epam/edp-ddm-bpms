@@ -1,8 +1,8 @@
-# business-process-management
+# ddm-bpm
 
 ### Overview
 
-* The main purpose of the business-process-management service is to extend the Camunda API.
+* The main purpose of the ddm-bpm service is to extend the Camunda API.
 * execution of business processes described in BPMN notation;
 * execution of business rules described in DMN notation;
 * execution of scripts in the scope of business process tasks.
@@ -100,5 +100,5 @@ keycloak:
 
 ### License
 
-The business-process-management is Open Source software released under
+The ddm-bpm is Open Source software released under
 the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0).

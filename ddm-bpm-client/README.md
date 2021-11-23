@@ -1,4 +1,4 @@
-# business-process-management-client
+# ddm-bpm-client
 
 ### Overview
 
@@ -14,7 +14,7 @@
   ...
   <dependency>
     <groupId>com.epam.digital.data.platform</groupId>
-    <artifactId>business-process-management-client</artifactId>
+    <artifactId>ddm-bpm-client</artifactId>
     <version>...</version>
   </dependency>
   ...
@@ -32,5 +32,5 @@
 
 ### License
 
-The business-process-management-client is Open Source software released under
+The ddm-bpm-client is Open Source software released under
 the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0).
