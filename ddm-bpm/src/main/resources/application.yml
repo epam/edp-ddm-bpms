@@ -19,7 +19,7 @@ spring:
   jersey:
     application-path: api
   application:
-    name: business-process-management
+    name: ddm-bpm
   sleuth:
     opentracing:
       enabled: true

@@ -6,12 +6,12 @@
 
   <parent>
     <groupId>com.epam.digital.data.platform</groupId>
-    <artifactId>business-process-management-parent</artifactId>
+    <artifactId>ddm-bpm-parent</artifactId>
     <version>1.5.2-SNAPSHOT</version>
   </parent>
 
-  <artifactId>business-process-management-client</artifactId>
-  <name>business-process-management-client</name>
+  <artifactId>ddm-bpm-client</artifactId>
+  <name>ddm-bpm-client</name>
 
   <properties>
     <feign-annotation-error-decoder.version>1.4.0</feign-annotation-error-decoder.version>
@@ -20,7 +20,7 @@
   <dependencies>
     <dependency>
       <groupId>com.epam.digital.data.platform</groupId>
-      <artifactId>business-process-management-api</artifactId>
+      <artifactId>ddm-bpm-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
