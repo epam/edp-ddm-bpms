@@ -72,16 +72,10 @@ keycloak:
 
 ### Local development
 
-1. Create `low-code/mock-server` image:
-    * download [low-code/mock-server](https://gitbud.epam.com/mdtu-ddm/low-code-platform/mock/data-factory-mock-server) project;
-    * open `data-factory-mock-server` project folder then create a docker
-      image: `mvn package -P docker`;
-2. Run docker compose: `docker-compose -f docker-compose-local.yml up`;
-
-3. Run spring boot application using 'local' profile:
+1. Run spring boot application using 'local' profile:
     * `mvn spring-boot:run -Drun.profiles=local` OR using appropriate functions of your IDE;
     * `application-local.yml` - configuration file for local profile.
-4. The application will be available on: http://localhost:8080.
+2. The application will be available on: http://localhost:8080.
 
 ### Test execution
 

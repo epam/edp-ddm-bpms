@@ -38,7 +38,7 @@ trembita-exchange-gateway:
   registries:
     edr-registry:
       trembita-url: http://localhost:7788/trembita-mock-server
-      user-id: MDTUDDM
+      user-id: DDM
       protocol-version: 4.0
       authorization-token: token
       client:
@@ -53,7 +53,7 @@ trembita-exchange-gateway:
         subsystem-code: EDR_test
     dracs-registry:
       trembita-url: http://localhost:7789/trembita-mock-server
-      user-id: MDTUDDM
+      user-id: DDM
       protocol-version: 4.0
       client:
         x-road-instance: CLIENT-TEST
