@@ -2,7 +2,7 @@
 <soap11env:Envelope xmlns:soap11env="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tns="http://nais.gov.ua/api/sevdeir/EDR" xmlns:xroad="http://x-road.eu/xsd/xroad.xsd" xmlns:id="http://x-road.eu/xsd/identifiers">
   <soap11env:Header>
     <tns:AuthorizationToken>token</tns:AuthorizationToken>
-    <xroad:userId>MDTUDDM</xroad:userId>
+    <xroad:userId>DDM</xroad:userId>
     <xroad:client id:objectType="SUBSYSTEM">
       <id:xRoadInstance>SEVDEIR-TEST</id:xRoadInstance>
       <id:memberClass>GOV</id:memberClass>
@@ -17,7 +17,7 @@
       <id:serviceCode>SubjectDetail</id:serviceCode>
     </xroad:service>
     <xroad:protocolVersion>4.0</xroad:protocolVersion>
-    <xroad:id>MDTUDDM</xroad:id>
+    <xroad:id>DDM</xroad:id>
     <xroad:requestHash algorithmId="http://www.w3.org/2001/04/xmldsig-more#gost34311">nI/slzwogn1V1Bavq7/5PFcZgJWjXaJMzICFyan3bQc=</xroad:requestHash>
   </soap11env:Header>
   <soap11env:Body>

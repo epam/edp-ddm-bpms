@@ -383,7 +383,7 @@
     </bpmn:textAnnotation>
     <bpmn:textAnnotation id="TextAnnotation_1kx8etg">
       <bpmn:text>by laboratoryID 
-        MDTUDDM-7325</bpmn:text>
+        DDM-7325</bpmn:text>
     </bpmn:textAnnotation>
     <bpmn:association id="Association_1czuh4d" sourceRef="Activity_10ds9tt" targetRef="TextAnnotation_1kx8etg" />
     <bpmn:association id="Association_10im77a" sourceRef="Activity_1gkudgq" targetRef="TextAnnotation_0300eqd" />

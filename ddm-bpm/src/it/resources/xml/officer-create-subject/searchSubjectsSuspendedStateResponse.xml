@@ -16,7 +16,7 @@
       <id:serviceCode>SearchSubjects</id:serviceCode>
     </xroad:service>
     <xroad:protocolVersion>4.0</xroad:protocolVersion>
-    <xroad:id>MDTUDDM</xroad:id>
+    <xroad:id>DDM</xroad:id>
     <xroad:requestHash algorithmId="http://www.w3.org/2001/04/xmldsig-more#gost34311">SuEiKUUEdrX5HcRCxIqPgYi01EmQai4q2POEOMJGJLc=</xroad:requestHash>
   </soap11env:Header>
   <soap11env:Body>
