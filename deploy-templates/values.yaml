@@ -83,7 +83,7 @@ trembitaExchangeGateway:
         member-code: '00015622'
         subsystem-code: '2_MJU_EDR_prod'
     dracs-registry:
-      trembita-url: 'https://trembita-dracs-registry-mock.apps.cicd2.mdtu-ddm.projects.epam.com/mockDracsService'
+      trembita-url: 'https://trembita-dracs-registry-mock.apps.cicd2.mdtu-ddm.projects.epam.com/dracsMock'
       user-id: 'MDTUDDM'
       protocol-version: '4.0'
       client:
