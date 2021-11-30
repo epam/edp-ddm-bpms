@@ -1,15 +1,12 @@
-{{- $configmap := (lookup "v1" "ConfigMap" .Values.namespace .Values.camundaGlobalSystemVarsConfigMapName) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Values.camundaGlobalSystemVarsConfigMapName }}
+  name: {{ .Chart.Name }}-camunda-global-system-vars
+  annotations:
+    "helm.sh/hook": "pre-install"
 data:
   # Values of this config map will be uploaded by registry regulations publication pipeline
   camunda-global-system-vars.yml: |-
-  {{- if $configmap }}
-    {{- index $configmap "data" "camunda-global-system-vars.yml" | nindent 4 }}
-  {{- else }}
     camunda:
       system-variables:
         const_dataFactoryBaseUrl: http://mock
-  {{- end -}}
