@@ -1,10 +1,13 @@
+{{- $configmap := (lookup "v1" "ConfigMap" .Values.namespace .Values.citizenConfigMapName) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: citizen-roles
-  annotations:
-    helm.sh/hook: "pre-install"
+  name: {{ .Values.citizenConfigMapName }}
 data:
   citizen-roles.yml: |-
+  {{- if $configmap }}
+    {{- index $configmap "data" "citizen-roles.yml" | nindent 4 }}
+  {{- else }}
     roles:
       citizen
+  {{- end -}}
