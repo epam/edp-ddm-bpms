@@ -22,9 +22,6 @@ readinessPath: "/actuator/health/readiness"
 livenessPath: "/actuator/health/liveness"
 officerConfigMountPath: "/app/config/registry-regulation/officer-roles"
 citizenConfigMountPath: "/app/config/registry-regulation/citizen-roles"
-officerConfigMapName: officer-roles
-citizenConfigMapName: citizen-roles
-camundaGlobalSystemVarsConfigMapName: bpms-camunda-global-system-vars
 
 javaOpts: "-Xms1536m -Xmx1536m -Duser.timezone=UTC"
 

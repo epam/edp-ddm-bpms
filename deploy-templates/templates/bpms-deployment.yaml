@@ -112,7 +112,7 @@ spec:
             mountPath: {{ .Values.appConfigMountPath }}
           - name: {{ .Values.db.secret }}
             mountPath: {{ .Values.appSecretsMountPath }}
-          - name: {{ .Values.camundaGlobalSystemVarsConfigMapName }}
+          - name: {{ .Chart.Name }}-camunda-global-system-vars
             mountPath: {{ .Values.camundaVarsMountPath }}
           - name: {{ .Chart.Name }}-ceph-bucket-credentials
             mountPath: {{ .Values.cephSecretMountPath }}
@@ -124,9 +124,9 @@ spec:
             mountPath: {{ .Values.officerKeycloakClientSecretsMountPath }}
           - name: {{ .Values.keycloak.systemUserClient.secretName }}
             mountPath: {{ .Values.systemUserKeycloakClientSecretsMountPath }}
-          - name: {{ .Values.officerConfigMapName }}
+          - name: officer-roles
             mountPath: {{ .Values.officerConfigMountPath }}
-          - name: {{ .Values.citizenConfigMapName }}
+          - name: citizen-roles
             mountPath: {{ .Values.citizenConfigMountPath }}
       serviceAccountName: {{ .Chart.Name }}
       {{- if .Values.nodeSelector }}
@@ -163,9 +163,9 @@ spec:
               path: ceph.file-storage-access-key
             - key: AWS_SECRET_ACCESS_KEY
               path: ceph.file-storage-secret-key
-        - name: {{ .Values.camundaGlobalSystemVarsConfigMapName }}
+        - name: {{ .Chart.Name }}-camunda-global-system-vars
           configMap:
-            name: {{ .Values.camundaGlobalSystemVarsConfigMapName }}
+            name: {{ .Chart.Name }}-camunda-global-system-vars
         - name: {{ .Values.keycloak.citizenClient.secretName }}
           secret:
             secretName: {{ .Values.keycloak.citizenClient.secretName }}
@@ -184,9 +184,9 @@ spec:
             items:
             - key: clientSecret
               path: keycloak.system-user.client-secret
-        - name: {{ .Values.officerConfigMapName }}
+        - name: officer-roles
           configMap:
-            name: {{ .Values.officerConfigMapName }}
-        - name: {{ .Values.citizenConfigMapName }}
+            name: officer-roles
+        - name: citizen-roles
           configMap:
-            name: {{ .Values.citizenConfigMapName }}
+            name: citizen-roles
