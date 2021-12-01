@@ -63,7 +63,7 @@
         <camunda:inputOutput>
           <camunda:inputParameter name="passport" />
           <camunda:inputParameter name="name" />
-          <camunda:inputParameter name="authorizationToken">1dc9f1f9b1e5be4d37c2b68993af243923ea7620</camunda:inputParameter>
+          <camunda:inputParameter name="authorizationToken">token</camunda:inputParameter>
           <camunda:inputParameter name="code">${!submission('start_event').formData.hasProp('edrpou') ? submission('start_event').formData.prop('rnokppCode').value() : submission('start_event').formData.prop('edrpou').value()}</camunda:inputParameter>
           <camunda:outputParameter name="responseEdr">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
