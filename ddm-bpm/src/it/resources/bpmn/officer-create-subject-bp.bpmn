@@ -197,7 +197,7 @@ return absentEdrFlagEdrExist || absentEdrFlagEdrNotExist || notAbsentEdrFlagEdrE
         <camunda:inputOutput>
           <camunda:inputParameter name="passport" />
           <camunda:inputParameter name="name" />
-          <camunda:inputParameter name="authorizationToken">1dc9f1f9b1e5be4d37c2b68993af243923ea7620</camunda:inputParameter>
+          <camunda:inputParameter name="authorizationToken">token</camunda:inputParameter>
           <camunda:inputParameter name="code">${subjectCode.value}</camunda:inputParameter>
           <camunda:outputParameter name="responseEdr">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
