@@ -72,7 +72,7 @@ trembitaExchangeGateway:
     edr-registry:
       userId: 'DDM'
       protocol-version: '4.0'
-      trembita-url: 'https://trembita-edr-registry-mock:8080/mockEDRService'
+      trembita-url: 'https://trembita-edr-registry-mock.apps.cicd2.mdtu-ddm.projects.epam.com/mockEDRService'
       authorization-token: 'token'
       client:
         x-road-instance: 'SEVDEIR-TEST'
@@ -85,7 +85,7 @@ trembitaExchangeGateway:
         member-code: '00015622'
         subsystem-code: '2_MJU_EDR_prod'
     dracs-registry:
-      trembita-url: 'https://trembita-dracs-registry-mock:8080/dracsMock'
+      trembita-url: 'https://trembita-dracs-registry-mock.apps.cicd2.mdtu-ddm.projects.epam.com/dracsMock'
       user-id: 'DDM'
       protocol-version: '4.0'
       client:
