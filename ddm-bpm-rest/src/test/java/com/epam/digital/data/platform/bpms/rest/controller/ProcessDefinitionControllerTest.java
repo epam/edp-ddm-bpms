@@ -43,7 +43,7 @@ class ProcessDefinitionControllerTest {
     var key = "key";
     var expected = mock(DdmProcessDefinitionDto.class);
 
-    when(service.getUserProcessDefinitionDtoByKey(key)).thenReturn(expected);
+    when(service.getDdmProcessDefinitionDtoByKey(key)).thenReturn(expected);
 
     var result = controller.getByKey(key);
 
@@ -55,7 +55,7 @@ class ProcessDefinitionControllerTest {
     var params = mock(ProcessDefinitionQueryDto.class);
     var expected = mock(DdmProcessDefinitionDto.class);
 
-    when(service.getUserProcessDefinitionDtos(params)).thenReturn(List.of(expected));
+    when(service.getDdmProcessDefinitionDtos(params)).thenReturn(List.of(expected));
 
     var result = controller.getByParams(params);
 

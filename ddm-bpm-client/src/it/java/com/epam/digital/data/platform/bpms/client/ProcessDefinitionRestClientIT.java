@@ -26,7 +26,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 
-import com.epam.digital.data.platform.bpms.api.dto.ProcessDefinitionQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmProcessDefinitionQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.enums.SortOrder;
 import com.epam.digital.data.platform.bpms.client.exception.ProcessDefinitionNotFoundException;
 import com.epam.digital.data.platform.starter.errorhandling.dto.SystemErrorDto;
@@ -63,15 +63,15 @@ class ProcessDefinitionRestClientIT extends BaseIT {
 
     var processDefinitionsCount = processDefinitionRestClient
         .getProcessDefinitionsCount(
-            ProcessDefinitionQueryDto.builder().latestVersion(true).build());
+            DdmProcessDefinitionQueryDto.builder().latestVersion(true).build());
 
     assertThat(processDefinitionsCount.getCount()).isOne();
   }
 
   @Test
    void shouldReturnListOfProcessDefinitions() throws JsonProcessingException {
-    var requestDto = ProcessDefinitionQueryDto.builder().latestVersion(true)
-        .sortBy(ProcessDefinitionQueryDto.SortByConstants.SORT_BY_NAME)
+    var requestDto = DdmProcessDefinitionQueryDto.builder().latestVersion(true)
+        .sortBy(DdmProcessDefinitionQueryDto.SortByConstants.SORT_BY_NAME)
         .sortOrder(SortOrder.ASC.stringValue()).build();
 
     var processDefinitionEntity = new ProcessDefinitionEntity();
@@ -209,7 +209,7 @@ class ProcessDefinitionRestClientIT extends BaseIT {
 
   @Test
   void shouldReturnActiveProcessDefinitions() throws JsonProcessingException {
-    var requestDto = ProcessDefinitionQueryDto.builder().active(true).build();
+    var requestDto = DdmProcessDefinitionQueryDto.builder().active(true).build();
 
     var processDefinitionEntity = new ProcessDefinitionEntity();
     processDefinitionEntity.setId("testId");
