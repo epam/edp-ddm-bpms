@@ -16,6 +16,8 @@
 
 package com.epam.digital.data.platform.bpms.api.dto;
 
+import com.epam.digital.data.platform.bpms.api.dto.enums.ProcessInstanceStatus;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -25,11 +27,11 @@ import lombok.ToString;
 @Builder
 @ToString
 @EqualsAndHashCode
-public class DdmProcessDefinitionDto {
+public class ProcessInstanceDto {
 
-  private final String id;
-  private final String key;
-  private final String name;
-  private final boolean suspended;
-  private final String formKey;
+  private String id;
+  private String processDefinitionId;
+  private String processDefinitionName;
+  private LocalDateTime startTime;
+  private ProcessInstanceStatus state;
 }
