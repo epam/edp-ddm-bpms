@@ -35,6 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.google.common.io.ByteStreams;
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 import javax.inject.Inject;
@@ -45,8 +46,7 @@ import javax.ws.rs.core.Response.Status.Family;
 import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.AuthorizationService;
-import org.camunda.bpm.engine.HistoryService;
-import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.authorization.Permission;
@@ -77,19 +77,19 @@ public abstract class BaseIT {
   @Inject
   protected RuntimeService runtimeService;
   @Inject
-  protected HistoryService historyService;
-  @Inject
   protected TaskService taskService;
-  @Inject
-  protected ProcessEngine engine;
-  @Inject
-  protected ObjectMapper objectMapper;
   @Inject
   protected TestCephServiceImpl cephService;
   @Inject
   protected CephKeyProvider cephKeyProvider;
+
+  @Inject
+  private ObjectMapper objectMapper;
   @Inject
   private AuthorizationService authorizationService;
+  @Inject
+  private IdentityService identityService;
+
   @Inject
   @Qualifier("keycloakMockServer")
   protected WireMockServer keycloakMockServer;
@@ -115,6 +115,8 @@ public abstract class BaseIT {
     SecurityContextHolder.getContext().setAuthentication(null);
     Stream.of(SystemRole.getRoleNames()).forEach(this::createAuthorizationsIfNotExists);
     cephService.clearStorage();
+
+    identityService.setAuthentication("testUser", List.of("camunda-admin"));
   }
 
   protected <T> T getForObject(String url, Class<T> targetClass) throws IOException {

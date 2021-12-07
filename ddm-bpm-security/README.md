@@ -35,8 +35,7 @@ camunda:
 
 * `com.epam.digital.data.platform.bpms.security.CamundaAuthorizationFilter` - a filter that sets
   camunda authorizations for authenticated user;
-* `com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory` - creating camunda user
-  impersonation;
+* `com.epam.digital.data.platform.bpms.security.CamundaImpersonation` - camunda user impersonation;
 * `com.epam.digital.data.platform.bpms.security.listener.AuthorizationStartEventListener` - set
   authorizations for current user before process instance starts;
 * `com.epam.digital.data.platform.bpms.security.listener.CompleterTaskEventListener` - set completer

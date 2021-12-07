@@ -26,7 +26,7 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class ProcessDefinitionQueryDto {
+public class DdmProcessDefinitionQueryDto {
 
   private boolean latestVersion;
   private String sortBy;
