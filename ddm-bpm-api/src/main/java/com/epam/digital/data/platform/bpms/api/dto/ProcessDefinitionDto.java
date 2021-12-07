@@ -14,8 +14,22 @@
  * limitations under the License.
  */
 
-package com.epam.digital.data.platform.bpms.api.dto.enums;
+package com.epam.digital.data.platform.bpms.api.dto;
 
-public enum HistoryProcessInstanceStatus {
-  ACTIVE, SUSPENDED, COMPLETED, EXTERNALLY_TERMINATED, INTERNALLY_TERMINATED
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+
+@Getter
+@Builder
+@ToString
+@EqualsAndHashCode
+public class ProcessDefinitionDto {
+
+  private final String id;
+  private final String key;
+  private final String name;
+  private final boolean suspended;
+  private final String formKey;
 }

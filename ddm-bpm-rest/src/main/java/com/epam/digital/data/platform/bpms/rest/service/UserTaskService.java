@@ -16,8 +16,8 @@
 
 package com.epam.digital.data.platform.bpms.rest.service;
 
-import com.epam.digital.data.platform.bpms.api.dto.DdmSignableTaskDto;
-import com.epam.digital.data.platform.bpms.api.dto.DdmTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.SignableUserTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.UserTaskDto;
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
 import com.epam.digital.data.platform.bpms.rest.mapper.TaskMapper;
 import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessDefinitionRepositoryService;
@@ -64,9 +64,9 @@ public class UserTaskService {
    *
    * @param taskQueryDto       object with search parameters.
    * @param paginationQueryDto object with pagination parameters.
-   * @return list of {@link DdmTaskDto}.
+   * @return list of {@link UserTaskDto}.
    */
-  public List<DdmTaskDto> getTasksByParams(TaskQueryDto taskQueryDto,
+  public List<UserTaskDto> getTasksByParams(TaskQueryDto taskQueryDto,
       PaginationQueryDto paginationQueryDto) {
     log.info("Getting user tasks");
 
@@ -80,7 +80,7 @@ public class UserTaskService {
     var processDefinitionNames = getProcessDefinitionNames(taskDtos);
     log.trace("Found process definition names - {}", processDefinitionNames.values());
 
-    var result = taskMapper.toDdmTaskDtos(taskDtos, processDefinitionNames);
+    var result = taskMapper.toUserTaskDtos(taskDtos, processDefinitionNames);
     log.trace("Found user task list - {}", result);
 
     log.info("Found {} user tasks", result.size());
@@ -91,9 +91,9 @@ public class UserTaskService {
    * Get signable user task by id
    *
    * @param id task id
-   * @return {@link DdmSignableTaskDto}
+   * @return {@link SignableUserTaskDto}
    */
-  public DdmSignableTaskDto getTaskById(String id) {
+  public SignableUserTaskDto getTaskById(String id) {
     log.info("Getting user task with id {}", id);
 
     var taskDto = getTask(id);
