@@ -16,7 +16,7 @@
 
 package com.epam.digital.data.platform.bpms.rest.controller;
 
-import com.epam.digital.data.platform.bpms.api.dto.DdmProcessDefinitionDto;
+import com.epam.digital.data.platform.bpms.api.dto.ProcessDefinitionDto;
 import com.epam.digital.data.platform.bpms.rest.service.ProcessDefinitionService;
 import java.util.List;
 import javax.ws.rs.GET;
@@ -43,12 +43,12 @@ public class ProcessDefinitionController {
    * Get process definition by key
    *
    * @param key process definition key
-   * @return {@link DdmProcessDefinitionDto process definition object}
+   * @return {@link ProcessDefinitionDto process definition object}
    */
   @GET
   @Path("/key/{key}")
   @Produces(MediaType.APPLICATION_JSON)
-  public DdmProcessDefinitionDto getByKey(@PathParam("key") String key) {
+  public ProcessDefinitionDto getByKey(@PathParam("key") String key) {
     return processDefinitionService.getDdmProcessDefinitionDtoByKey(key);
   }
 
@@ -56,11 +56,11 @@ public class ProcessDefinitionController {
    * Get process definition by params
    *
    * @param params process definition params
-   * @return list of {@link DdmProcessDefinitionDto process definition objects}
+   * @return list of {@link ProcessDefinitionDto process definition objects}
    */
   @POST
   @Produces(MediaType.APPLICATION_JSON)
-  public List<DdmProcessDefinitionDto> getByParams(ProcessDefinitionQueryDto params) {
+  public List<ProcessDefinitionDto> getByParams(ProcessDefinitionQueryDto params) {
     return processDefinitionService.getDdmProcessDefinitionDtos(params);
   }
 }

@@ -16,59 +16,43 @@
 
 package com.epam.digital.data.platform.bpms.rest.controller;
 
-import com.epam.digital.data.platform.bpms.api.dto.SignableUserTaskDto;
-import com.epam.digital.data.platform.bpms.api.dto.UserTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.ProcessInstanceDto;
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
-import com.epam.digital.data.platform.bpms.rest.service.UserTaskService;
+import com.epam.digital.data.platform.bpms.rest.service.ProcessInstanceService;
 import java.util.List;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import lombok.RequiredArgsConstructor;
-import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.springframework.stereotype.Component;
 
 /**
- * The controller that contains additional and extended endpoints for managing and getting user
- * tasks.
+ * The controller that contains additional and extended endpoints for managing and getting
+ * historical process instances.
  */
 @Component
 @RequiredArgsConstructor
-@Path("/extended/task")
-public class TaskController {
+@Path("/extended/process-instance")
+public class ProcessInstanceController {
 
-  private final UserTaskService taskService;
+  private final ProcessInstanceService processInstanceService;
 
   /**
-   * Get list of user tasks by provided query params.
+   * Get list of historical process-instances by provided query params
    *
-   * @param taskQueryDto       contains query params.
+   * @param queryDto           contains query params.
    * @param paginationQueryDto specified pagination.
-   * @return list of {@link UserTaskDto}
+   * @return list of {@link ProcessInstanceDto}
    */
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  public List<UserTaskDto> getByParams(TaskQueryDto taskQueryDto,
+  public List<ProcessInstanceDto> getByParams(ProcessInstanceQueryDto queryDto,
       @BeanParam PaginationQueryDto paginationQueryDto) {
-    return taskService.getTasksByParams(taskQueryDto, paginationQueryDto);
-  }
-
-  /**
-   * Get user task by provided id
-   *
-   * @param id the task id
-   * @return {@link UserTaskDto}
-   */
-  @GET
-  @Path("/{id}")
-  @Produces(MediaType.APPLICATION_JSON)
-  public SignableUserTaskDto getById(@PathParam("id") String id) {
-    return taskService.getTaskById(id);
+    return processInstanceService.getProcessInstancesByParams(queryDto, paginationQueryDto);
   }
 }

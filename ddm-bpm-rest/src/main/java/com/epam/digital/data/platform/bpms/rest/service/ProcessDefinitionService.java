@@ -16,7 +16,7 @@
 
 package com.epam.digital.data.platform.bpms.rest.service;
 
-import com.epam.digital.data.platform.bpms.api.dto.DdmProcessDefinitionDto;
+import com.epam.digital.data.platform.bpms.api.dto.ProcessDefinitionDto;
 import com.epam.digital.data.platform.bpms.engine.service.BatchFormService;
 import com.epam.digital.data.platform.bpms.rest.mapper.ProcessDefinitionMapper;
 import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessDefinitionRepositoryService;
@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.Response.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.springframework.stereotype.Component;
@@ -50,9 +49,9 @@ public class ProcessDefinitionService {
    * Get extended process definition by key
    *
    * @param processDefinitionKey specified process definition key
-   * @return {@link DdmProcessDefinitionDto}
+   * @return {@link ProcessDefinitionDto}
    */
-  public DdmProcessDefinitionDto getDdmProcessDefinitionDtoByKey(String processDefinitionKey) {
+  public ProcessDefinitionDto getDdmProcessDefinitionDtoByKey(String processDefinitionKey) {
     log.info("Starting selecting process definition by key {}", processDefinitionKey);
 
     var processDefinition = getProcessDefinitionByKey(processDefinitionKey);
@@ -76,7 +75,7 @@ public class ProcessDefinitionService {
    * @param queryDto specified process definition key
    * @return list of process definitions
    */
-  public List<DdmProcessDefinitionDto> getDdmProcessDefinitionDtos(
+  public List<ProcessDefinitionDto> getDdmProcessDefinitionDtos(
       ProcessDefinitionQueryDto queryDto) {
     log.info("Starting selecting user process definitions");
 
@@ -94,7 +93,8 @@ public class ProcessDefinitionService {
     return result;
   }
 
-  private ProcessDefinitionDto getProcessDefinitionByKey(String processDefinitionKey) {
+  private org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto getProcessDefinitionByKey(
+      String processDefinitionKey) {
     log.debug("Selecting camunda process definition by key {}", processDefinitionKey);
 
     var result = processDefinitionRepositoryService.getProcessDefinitionDtoByKey(
@@ -121,9 +121,10 @@ public class ProcessDefinitionService {
     return result;
   }
 
-  private Map<String, String> getStartForms(List<ProcessDefinitionDto> processDefinitions) {
+  private Map<String, String> getStartForms(
+      List<org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto> processDefinitions) {
     var processDefinitionIds = processDefinitions.stream()
-        .map(ProcessDefinitionDto::getId)
+        .map(org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto::getId)
         .collect(Collectors.toSet());
     log.debug("Selecting start forms for process definitions {}", processDefinitionIds);
 

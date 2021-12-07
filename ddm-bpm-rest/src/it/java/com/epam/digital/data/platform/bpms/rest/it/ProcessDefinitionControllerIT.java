@@ -18,7 +18,7 @@ package com.epam.digital.data.platform.bpms.rest.it;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.epam.digital.data.platform.bpms.api.dto.DdmProcessDefinitionDto;
+import com.epam.digital.data.platform.bpms.api.dto.ProcessDefinitionDto;
 import java.io.IOException;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ class ProcessDefinitionControllerIT extends BaseIT {
   void getProcessDefinitionsByParams() throws IOException {
 
     var result = postForObject("api/extended/process-definition",
-        "{\"key\":\"testStartFormKey\"}", DdmProcessDefinitionDto[].class);
+        "{\"key\":\"testStartFormKey\"}", ProcessDefinitionDto[].class);
 
     assertThat(result).hasSize(1);
     assertThat(result[0])
@@ -46,7 +46,7 @@ class ProcessDefinitionControllerIT extends BaseIT {
   void getProcessDefinitionsByKey() throws IOException {
 
     var result = getForObject("api/extended/process-definition/key/testStartFormKey",
-        DdmProcessDefinitionDto.class);
+        ProcessDefinitionDto.class);
 
     assertThat(result)
         .hasFieldOrProperty("id")

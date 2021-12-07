@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.epam.digital.data.platform.bpms.api.dto.DdmProcessDefinitionDto;
+import com.epam.digital.data.platform.bpms.api.dto.ProcessDefinitionDto;
 import com.epam.digital.data.platform.bpms.engine.service.BatchFormService;
 import com.epam.digital.data.platform.bpms.rest.mapper.ProcessDefinitionMapper;
 import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessDefinitionRepositoryService;
@@ -97,8 +97,8 @@ class ProcessDefinitionServiceTest {
     assertThat(result.get(0)).isEqualTo(expectedResult);
   }
 
-  private DdmProcessDefinitionDto createUserProcessDefinitionDto(String key) {
-    return DdmProcessDefinitionDto.builder()
+  private ProcessDefinitionDto createUserProcessDefinitionDto(String key) {
+    return ProcessDefinitionDto.builder()
         .id("id")
         .key(key)
         .name("name")
@@ -107,7 +107,7 @@ class ProcessDefinitionServiceTest {
         .build();
   }
 
-  private void mockProcessInstanceByKey(DdmProcessDefinitionDto expectedResult) {
+  private void mockProcessInstanceByKey(ProcessDefinitionDto expectedResult) {
     var processDefinition = mockProcessDefinition(expectedResult);
 
     when(processDefinitionRepositoryService.getProcessDefinitionDtoByKey(expectedResult.getKey()))
@@ -115,7 +115,7 @@ class ProcessDefinitionServiceTest {
   }
 
   private org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto mockProcessDefinition(
-      DdmProcessDefinitionDto expectedResult) {
+      ProcessDefinitionDto expectedResult) {
     var processDefinition = new ProcessDefinitionEntity();
     processDefinition.setId(expectedResult.getId());
     processDefinition.setKey(expectedResult.getKey());
@@ -126,13 +126,13 @@ class ProcessDefinitionServiceTest {
     return org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto.fromProcessDefinition(processDefinition);
   }
 
-  private void mockFormKeys(DdmProcessDefinitionDto expectedResult) {
+  private void mockFormKeys(ProcessDefinitionDto expectedResult) {
     when(batchFormService.getStartFormKeys(Set.of(expectedResult.getId())))
         .thenReturn(Map.of(expectedResult.getId(), expectedResult.getFormKey()));
   }
 
   private ProcessDefinitionQueryDto mockGetCamundaProcessDefinitions(
-      DdmProcessDefinitionDto expectedResult) {
+      ProcessDefinitionDto expectedResult) {
     var processDefinition = mockProcessDefinition(expectedResult);
 
     var queryDto = mock(ProcessDefinitionQueryDto.class);

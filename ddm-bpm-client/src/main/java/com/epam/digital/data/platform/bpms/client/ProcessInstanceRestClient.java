@@ -16,16 +16,21 @@
 
 package com.epam.digital.data.platform.bpms.client;
 
-import com.epam.digital.data.platform.bpms.api.dto.DdmProcessInstanceCountQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.ProcessInstanceDto;
+import com.epam.digital.data.platform.bpms.api.dto.PaginationQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.ProcessInstanceCountQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.ProcessInstanceQueryDto;
 import com.epam.digital.data.platform.bpms.client.exception.ProcessInstanceVariableNotFoundException;
 import feign.error.ErrorCodes;
 import feign.error.ErrorHandling;
+import java.util.List;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -33,7 +38,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * The interface extends {@link BaseFeignClient} and used to perform operations on camunda process
  * instance
  */
-@FeignClient(name = "camunda-process-instance-client", url = "${bpms.url}/api/process-instance")
+@FeignClient(name = "camunda-process-instance-client", url = "${bpms.url}/api")
 public interface ProcessInstanceRestClient extends BaseFeignClient {
 
   /**
@@ -42,9 +47,9 @@ public interface ProcessInstanceRestClient extends BaseFeignClient {
    * @param query object with search parameters
    * @return the number of camunda process instances
    */
-  @GetMapping("/count")
+  @GetMapping("/process-instance/count")
   @ErrorHandling
-  CountResultDto getProcessInstancesCount(@SpringQueryMap DdmProcessInstanceCountQueryDto query);
+  CountResultDto getProcessInstancesCount(@SpringQueryMap ProcessInstanceCountQueryDto query);
 
   /**
    * Method for getting {@link VariableValueDto} entity
@@ -53,7 +58,7 @@ public interface ProcessInstanceRestClient extends BaseFeignClient {
    * @param variableName      variable name
    * @return {@link VariableValueDto} entity
    */
-  @GetMapping("/{processInstanceId}/variables/{variableName}")
+  @GetMapping("/process-instance/{processInstanceId}/variables/{variableName}")
   @ErrorHandling(codeSpecific = {
       @ErrorCodes(codes = {404}, generate = ProcessInstanceVariableNotFoundException.class)
   })
@@ -68,10 +73,16 @@ public interface ProcessInstanceRestClient extends BaseFeignClient {
    * @param variableName      variable name
    * @param variableValueDto  {@link VariableValueDto} entity
    */
-  @PutMapping("/{processInstanceId}/variables/{variableName}")
+  @PutMapping("/process-instance/{processInstanceId}/variables/{variableName}")
   @ErrorHandling
   void putProcessInstanceVariable(
       @PathVariable("processInstanceId") String processInstanceId,
       @PathVariable("variableName") String variableName,
       @RequestBody VariableValueDto variableValueDto);
+
+  @PostMapping("/extended/process-instance")
+  @ErrorHandling
+  List<ProcessInstanceDto> getProcessInstances(
+      @RequestBody ProcessInstanceQueryDto processInstanceQueryDto,
+      @SpringQueryMap PaginationQueryDto paginationQueryDto);
 }

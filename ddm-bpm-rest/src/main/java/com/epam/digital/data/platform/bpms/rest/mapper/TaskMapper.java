@@ -16,9 +16,9 @@
 
 package com.epam.digital.data.platform.bpms.rest.mapper;
 
-import com.epam.digital.data.platform.bpms.api.dto.DdmSignableTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.HistoryUserTaskDto;
-import com.epam.digital.data.platform.bpms.api.dto.DdmTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.SignableUserTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.UserTaskDto;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,13 +38,13 @@ public interface TaskMapper {
   @Mapping(target = "created", qualifiedByName = "toLocalDateTime")
   @Mapping(target = "processDefinitionName", expression = "java(processDefinitionNames.get(dto.getProcessDefinitionId()))")
   @Named("toUserTaskDto")
-  DdmTaskDto toDdmTaskDto(TaskDto dto, @Context Map<String, String> processDefinitionNames);
+  UserTaskDto toUserTaskDto(TaskDto dto, @Context Map<String, String> processDefinitionNames);
 
   @IterableMapping(qualifiedByName = "toUserTaskDto")
-  List<DdmTaskDto> toDdmTaskDtos(List<TaskDto> dtos, @Context Map<String, String> processDefinitionNames);
+  List<UserTaskDto> toUserTaskDtos(List<TaskDto> dtos, @Context Map<String, String> processDefinitionNames);
 
   @Mapping(target = "created", qualifiedByName = "toLocalDateTime")
-  DdmSignableTaskDto toSignableUserTaskDto(TaskDto taskDto);
+  SignableUserTaskDto toSignableUserTaskDto(TaskDto taskDto);
 
   @Mapping(target = "startTime", qualifiedByName = "toLocalDateTime")
   @Mapping(target = "endTime", qualifiedByName = "toLocalDateTime")
