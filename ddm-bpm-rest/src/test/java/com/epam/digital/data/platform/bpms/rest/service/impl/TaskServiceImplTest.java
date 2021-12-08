@@ -14,37 +14,27 @@
  * limitations under the License.
  */
 
-package com.epam.digital.data.platform.bpms.rest.service;
+package com.epam.digital.data.platform.bpms.rest.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.variable.Variables.stringValue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
 import com.epam.digital.data.platform.bpms.rest.mapper.LocalDateTimeMapper;
 import com.epam.digital.data.platform.bpms.rest.mapper.TaskMapper;
-import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessDefinitionRepositoryService;
-import com.epam.digital.data.platform.bpms.rest.service.repository.TaskRuntimeService;
-import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
+import com.epam.digital.data.platform.bpms.rest.service.ProcessDefinitionImpersonatedService;
+import com.epam.digital.data.platform.bpms.rest.service.TaskPropertyService;
 import com.epam.digital.data.platform.dso.api.dto.Subject;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
-import javax.ws.rs.core.Response.Status;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import javax.ws.rs.core.Request;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
-import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
-import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.sub.VariableResource;
+import org.camunda.bpm.engine.rest.sub.task.TaskResource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -55,14 +45,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-class UserTaskServiceTest {
+class TaskServiceImplTest {
 
   @InjectMocks
-  private UserTaskService service;
+  private TaskServiceImpl taskService;
   @Mock
-  private TaskRuntimeService taskRuntimeService;
+  private ProcessDefinitionImpersonatedService processDefinitionImpersonatedService;
   @Mock
-  private ProcessDefinitionRepositoryService processDefinitionRepositoryService;
+  private TaskPropertyService taskPropertyService;
+  @Mock
+  private TaskRestService taskRestService;
   @Spy
   private LocalDateTimeMapper localDateTimeMapper = Mappers.getMapper(LocalDateTimeMapper.class);
   @Spy
@@ -70,7 +62,11 @@ class UserTaskServiceTest {
   private TaskMapper taskMapper = Mappers.getMapper(TaskMapper.class);
 
   @Mock
-  private CamundaImpersonation camundaAdminImpersonation;
+  private TaskResource taskResource;
+  @Mock
+  private VariableResource variableResource;
+  @Mock
+  private Request request;
 
   @Test
   void getTaskById_emptyFormVariables() {
@@ -84,16 +80,12 @@ class UserTaskServiceTest {
     taskDto.setId(taskId);
     ReflectionTestUtils.setField(taskDto, "processDefinitionId", processDefinitionId);
 
-    when(taskRuntimeService.getTaskById(taskId)).thenReturn(Optional.of(taskDto));
-    when(processDefinitionRepositoryService.getProcessDefinitionById(processDefinitionId))
+    when(taskRestService.getTask(taskId)).thenReturn(taskResource);
+    when(taskResource.getTask(request)).thenReturn(taskDto);
+    when(processDefinitionImpersonatedService.getProcessDefinition(processDefinitionId))
         .thenReturn(processDefinition);
 
-    doAnswer(invocation -> {
-      Supplier<?> supplier = invocation.getArgument(0);
-      return supplier.get();
-    }).when(camundaAdminImpersonation).execute(any());
-
-    var result = service.getTaskById(taskId);
+    var result = taskService.getTaskById(taskId, request);
 
     assertThat(result)
         .hasFieldOrPropertyWithValue("id", taskId)
@@ -102,19 +94,6 @@ class UserTaskServiceTest {
         .hasFieldOrPropertyWithValue("eSign", false)
         .hasFieldOrPropertyWithValue("signatureValidationPack", Set.of())
         .hasFieldOrPropertyWithValue("formVariables", Map.of());
-  }
-
-  @Test
-  void getTaskById_noTaskFound() {
-    var taskId = "taskId";
-
-    when(taskRuntimeService.getTaskById(taskId)).thenReturn(Optional.empty());
-
-    var ex = assertThrows(RestException.class, () -> service.getTaskById(taskId));
-
-    assertThat(ex)
-        .hasFieldOrPropertyWithValue("message", "No matching task with id taskId")
-        .hasFieldOrPropertyWithValue("status", Status.NOT_FOUND);
   }
 
   @Test
@@ -129,20 +108,17 @@ class UserTaskServiceTest {
     taskDto.setId(taskId);
     ReflectionTestUtils.setField(taskDto, "processDefinitionId", processDefinitionId);
 
-    when(taskRuntimeService.getTaskById(taskId)).thenReturn(Optional.of(taskDto));
-    when(processDefinitionRepositoryService.getProcessDefinitionById(processDefinitionId))
+    when(taskRestService.getTask(taskId)).thenReturn(taskResource);
+    when(taskResource.getTask(request)).thenReturn(taskDto);
+    when(processDefinitionImpersonatedService.getProcessDefinition(processDefinitionId))
         .thenReturn(processDefinition);
-    when(taskRuntimeService.getVariables(taskId)).thenReturn(Map.of(
+    when(taskResource.getVariables()).thenReturn(variableResource);
+    when(variableResource.getVariables(true)).thenReturn(Map.of(
         "var1", VariableValueDto.fromTypedValue(stringValue("value1")),
         "var3", VariableValueDto.fromTypedValue(stringValue("value3"))
     ));
 
-    doAnswer(invocation -> {
-      Supplier<?> supplier = invocation.getArgument(0);
-      return supplier.get();
-    }).when(camundaAdminImpersonation).execute(any());
-
-    when(taskRuntimeService.getTaskProperty(taskId)).thenReturn(
+    when(taskPropertyService.getTaskProperty(taskId)).thenReturn(
         Map.of(
             "eSign", "true",
             "formVariables", "var1,var2",
@@ -151,7 +127,7 @@ class UserTaskServiceTest {
             Subject.INDIVIDUAL.name(), "false"
         ));
 
-    var result = service.getTaskById(taskId);
+    var result = taskService.getTaskById(taskId, request);
 
     assertThat(result)
         .hasFieldOrPropertyWithValue("id", taskId)
@@ -161,39 +137,5 @@ class UserTaskServiceTest {
         .hasFieldOrPropertyWithValue("signatureValidationPack",
             Set.of(Subject.ENTREPRENEUR, Subject.LEGAL))
         .hasFieldOrPropertyWithValue("formVariables", Map.of("var1", "value1"));
-  }
-
-  @Test
-  void getTasksByParams() {
-    var queryDto = mock(TaskQueryDto.class);
-    var paginationQueryDto = PaginationQueryDto.builder().firstResult(1).maxResults(2).build();
-
-    var task = new TaskEntity();
-    task.setId("id");
-    task.setProcessDefinitionId("processDefinitionId");
-    var taskDto = TaskDto.fromEntity(task);
-    when(taskRuntimeService.getTasksByParams(queryDto, paginationQueryDto))
-        .thenReturn(List.of(taskDto)).thenReturn(List.of());
-
-    doAnswer(invocation -> {
-      Supplier<?> supplier = invocation.getArgument(0);
-      return supplier.get();
-    }).when(camundaAdminImpersonation).execute(any());
-
-    when(processDefinitionRepositoryService.getProcessDefinitionsNames("processDefinitionId"))
-        .thenReturn(Map.of("processDefinitionId", "processDefinitionName"));
-
-    var result = service.getTasksByParams(queryDto, paginationQueryDto);
-
-    assertThat(result).hasSize(1).element(0)
-        .hasFieldOrPropertyWithValue("id", "id")
-        .hasFieldOrPropertyWithValue("processDefinitionId", "processDefinitionId")
-        .hasFieldOrPropertyWithValue("processDefinitionName", "processDefinitionName");
-
-    assertThat(service.getTasksByParams(queryDto, paginationQueryDto)).isEmpty();
-
-    verify(taskRuntimeService, times(2)).getTasksByParams(queryDto, paginationQueryDto);
-    verify(camundaAdminImpersonation).execute(any());
-    verify(processDefinitionRepositoryService).getProcessDefinitionsNames("processDefinitionId");
   }
 }

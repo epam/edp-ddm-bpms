@@ -18,8 +18,8 @@ package com.epam.digital.data.platform.bpms.security.listener;
 
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
 
-import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
-import javax.annotation.Resource;
+import com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.authorization.Authorization;
@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,24 +38,30 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class AuthorizationStartEventListener implements ExecutionListener {
 
-  @Resource(name = "camundaAdminImpersonation")
-  private CamundaImpersonation camundaAdminImpersonation;
+  @Qualifier("camundaAdminImpersonationFactory")
+  private final CamundaImpersonationFactory camundaImpersonationFactory;
 
   @Override
   public void notify(DelegateExecution execution) throws Exception {
     log.debug("AuthorizationStartEventListener started...");
-    var processEngine = camundaAdminImpersonation.getProcessEngine();
-    var impersonator = camundaAdminImpersonation.getImpersonator();
+    var optionalCamundaImpersonation = camundaImpersonationFactory.getCamundaImpersonation();
+    if (optionalCamundaImpersonation.isEmpty()) {
+      return;
+    }
+    var camundaImpersonation = optionalCamundaImpersonation.get();
+    var processEngine = camundaImpersonation.getProcessEngine();
+    var impersonator = camundaImpersonation.getImpersonator();
 
     //only admin user has rights for creation authorizations
     try {
-      camundaAdminImpersonation.impersonate();
+      camundaImpersonation.impersonate();
       addPermissionForProcessInstances(processEngine, execution, impersonator.getUserId());
       addPermissionReadHistory(processEngine, execution, impersonator.getUserId());
     } finally {
-      camundaAdminImpersonation.revertToSelf();
+      camundaImpersonation.revertToSelf();
     }
     log.debug("AuthorizationStartEventListener finished...");
   }

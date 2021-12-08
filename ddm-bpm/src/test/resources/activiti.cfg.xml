@@ -12,11 +12,18 @@
     <constructor-arg value="bucket"/>
     <constructor-arg ref="objectMapper"/>
   </bean>
+  <bean id="camundaAdminImpersonationFactory"
+    class="com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory">
+    <constructor-arg value="administratorUserId"/>
+    <constructor-arg value="administratorGroup"/>
+  </bean>
 
   <bean id="camundaProperties"
     class="com.epam.digital.data.platform.bpms.engine.config.CamundaProperties"/>
   <bean id="authListener"
-    class="com.epam.digital.data.platform.bpms.security.listener.AuthorizationStartEventListener"/>
+    class="com.epam.digital.data.platform.bpms.security.listener.AuthorizationStartEventListener">
+    <constructor-arg ref="camundaAdminImpersonationFactory"/>
+  </bean>
   <bean id="initiatorVariablesAccessor"
     class="com.epam.digital.data.platform.dataaccessor.initiator.BaseInitiatorVariablesAccessor">
     <constructor-arg ref="variableAccessorFactory"/>

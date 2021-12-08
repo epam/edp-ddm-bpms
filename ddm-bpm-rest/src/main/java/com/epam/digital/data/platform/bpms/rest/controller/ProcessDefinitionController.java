@@ -49,7 +49,7 @@ public class ProcessDefinitionController {
   @Path("/key/{key}")
   @Produces(MediaType.APPLICATION_JSON)
   public DdmProcessDefinitionDto getByKey(@PathParam("key") String key) {
-    return processDefinitionService.getDdmProcessDefinitionDtoByKey(key);
+    return processDefinitionService.getUserProcessDefinitionDtoByKey(key);
   }
 
   /**
@@ -61,6 +61,6 @@ public class ProcessDefinitionController {
   @POST
   @Produces(MediaType.APPLICATION_JSON)
   public List<DdmProcessDefinitionDto> getByParams(ProcessDefinitionQueryDto params) {
-    return processDefinitionService.getDdmProcessDefinitionDtos(params);
+    return processDefinitionService.getUserProcessDefinitionDtos(params);
   }
 }

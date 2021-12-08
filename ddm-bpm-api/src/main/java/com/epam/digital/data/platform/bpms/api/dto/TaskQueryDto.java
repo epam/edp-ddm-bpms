@@ -16,28 +16,25 @@
 
 package com.epam.digital.data.platform.bpms.api.dto;
 
-import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import java.util.List;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
- * Representation of the user task.
+ * The class represents a data transfer object for building query to get task.
  */
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class DdmTaskDto {
+@Builder
+@JsonInclude(Include.NON_NULL)
+public class TaskQueryDto {
 
-  private String id;
-  private String taskDefinitionKey;
-  private String name;
+  private String taskId;
   private String assignee;
-  private LocalDateTime created;
-  private String description;
-  private String processDefinitionName;
+  private Boolean unassigned;
   private String processInstanceId;
-  private String processDefinitionId;
-  private String formKey;
-  private boolean suspended;
+  private List<TaskQueryDto> orQueries;
+  private List<String> processInstanceIdIn;
+  private List<SortingDto> sorting;
 }
