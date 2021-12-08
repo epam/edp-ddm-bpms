@@ -16,10 +16,10 @@
 
 package com.epam.digital.data.platform.bpms.client;
 
-import com.epam.digital.data.platform.bpms.api.dto.ClaimTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmClaimTaskQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmTaskCountQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmTaskQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.PaginationQueryDto;
-import com.epam.digital.data.platform.bpms.api.dto.TaskCountQueryDto;
-import com.epam.digital.data.platform.bpms.api.dto.TaskQueryDto;
 import com.epam.digital.data.platform.bpms.client.exception.ClientValidationException;
 import com.epam.digital.data.platform.bpms.client.exception.TaskNotFoundException;
 import feign.error.ErrorCodes;
@@ -47,22 +47,22 @@ public interface CamundaTaskRestClient extends BaseFeignClient {
   /**
    * Method for getting the number of camunda user tasks
    *
-   * @param taskCountQueryDto object with search parameters
+   * @param ddmTaskCountQueryDto object with search parameters
    * @return the number of camunda user tasks
    */
   @PostMapping("/count")
   @ErrorHandling
-  CountResultDto getTaskCountByParams(@RequestBody TaskCountQueryDto taskCountQueryDto);
+  CountResultDto getTaskCountByParams(@RequestBody DdmTaskCountQueryDto ddmTaskCountQueryDto);
 
   /**
    * Method for getting list of camunda user tasks
    *
-   * @param taskQueryDto object with search parameters
+   * @param ddmTaskQueryDto object with search parameters
    * @return the list of camunda user tasks
    */
   @PostMapping
   @ErrorHandling
-  List<TaskDto> getTasksByParams(@RequestBody TaskQueryDto taskQueryDto, @SpringQueryMap
+  List<TaskDto> getTasksByParams(@RequestBody DdmTaskQueryDto ddmTaskQueryDto, @SpringQueryMap
       PaginationQueryDto paginationQueryDto);
 
   /**
@@ -93,7 +93,8 @@ public interface CamundaTaskRestClient extends BaseFeignClient {
 
   @PostMapping("/{id}/claim")
   @ErrorHandling
-  void claimTaskById(@PathVariable("id") String taskId, @RequestBody ClaimTaskDto claimTaskDto);
+  void claimTaskById(@PathVariable("id") String taskId,
+      @RequestBody DdmClaimTaskQueryDto ddmClaimTaskQueryDto);
 
   /**
    * Returns a map containing task variables

@@ -18,21 +18,63 @@ package com.epam.digital.data.platform.bpms.rest.service;
 
 import com.epam.digital.data.platform.bpms.api.dto.HistoryUserTaskDto;
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
+import com.epam.digital.data.platform.bpms.rest.mapper.TaskMapper;
+import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessDefinitionRepositoryService;
+import com.epam.digital.data.platform.bpms.rest.service.repository.TaskInstanceHistoricService;
+import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
 import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.rest.dto.history.HistoricTaskInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricTaskInstanceQueryDto;
+import org.springframework.stereotype.Service;
 
 /**
- * The service for managing historical user tasks.
+ * The service for managing historical user tasks extended with process definition name
  */
-public interface HistoricTaskService {
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class HistoricTaskService {
+
+  private final TaskInstanceHistoricService taskInstanceHistoricService;
+  private final ProcessDefinitionRepositoryService processDefinitionRepositoryService;
+
+  @Resource(name = "camundaAdminImpersonation")
+  private final CamundaImpersonation camundaAdminImpersonation;
+  private final TaskMapper taskMapper;
 
   /**
-   * Get historical user tasks by query params.
+   * Get historical user tasks extended with process definition name by query params
    *
    * @param queryDto           object with search parameters.
    * @param paginationQueryDto object with pagination parameters.
    * @return list of {@link HistoryUserTaskDto}
    */
-  List<HistoryUserTaskDto> getHistoryUserTasksByParams(HistoricTaskInstanceQueryDto queryDto,
-      PaginationQueryDto paginationQueryDto);
+  public List<HistoryUserTaskDto> getHistoryUserTasksByParams(HistoricTaskInstanceQueryDto queryDto,
+      PaginationQueryDto paginationQueryDto) {
+    log.info("Getting historical user tasks...");
+    var historicTaskInstanceDtos = taskInstanceHistoricService.getHistoryUserTasksByParams(queryDto,
+        paginationQueryDto);
+    log.trace("Found {} historic tasks", historicTaskInstanceDtos.size());
+
+    var processDefinitionNames = getProcessDefinitionNames(historicTaskInstanceDtos);
+    log.trace("Found process definition names - {}", processDefinitionNames);
+
+    var result = taskMapper.toHistoryUserTaskDtos(historicTaskInstanceDtos, processDefinitionNames);
+    log.trace("Found historic task list - {}", result);
+
+    log.info("Found {} historic user tasks", result.size());
+    return result;
+  }
+
+  private Map<String, String> getProcessDefinitionNames(List<HistoricTaskInstanceDto> dtos) {
+    var processDefinitionIds = dtos.stream()
+        .map(HistoricTaskInstanceDto::getProcessDefinitionId)
+        .toArray(String[]::new);
+    return camundaAdminImpersonation.execute(
+        () -> processDefinitionRepositoryService.getProcessDefinitionsNames(processDefinitionIds));
+  }
 }

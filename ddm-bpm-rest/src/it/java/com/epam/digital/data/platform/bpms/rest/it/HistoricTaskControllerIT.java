@@ -51,6 +51,6 @@ class HistoricTaskControllerIT extends BaseIT {
     assertThat(result).isNotNull();
     assertThat(result.get(0).getAssignee()).isEqualTo("testuser");
     assertThat(result.get(0).getEndTime()).isNotNull();
-    assertThat(result.get(0).getProcessDefinitionName()).isNotNull();
+    assertThat(result.get(0).getProcessDefinitionName()).isEqualTo("Test Name");
   }
 }
