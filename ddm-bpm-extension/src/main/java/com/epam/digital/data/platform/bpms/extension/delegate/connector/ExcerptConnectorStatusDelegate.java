@@ -16,57 +16,51 @@
 
 package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
+import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
+import com.epam.digital.data.platform.bpms.extension.delegate.connector.header.builder.HeaderBuilderFactory;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
+import com.epam.digital.data.platform.datafactory.feign.client.ExcerptFeignClient;
+import com.epam.digital.data.platform.datafactory.feign.model.response.ConnectorResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * The class represents an implementation of {@link BaseConnectorDelegate} that is used for getting
+ * The class represents an implementation of {@link BaseJavaDelegate} that is used for getting
  * excerpt status
  */
 @Slf4j
+@RequiredArgsConstructor
 @Component(ExcerptConnectorStatusDelegate.DELEGATE_NAME)
-public class ExcerptConnectorStatusDelegate extends BaseConnectorDelegate {
+public class ExcerptConnectorStatusDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "excerptConnectorStatusDelegate";
 
-  private final String excerptServiceBaseUrl;
-
   @SystemVariable(name = "excerptIdentifier")
   private NamedVariableAccessor<String> excerptIdentifierVariable;
+  @SystemVariable(name = "response", isTransient = true)
+  protected NamedVariableAccessor<ConnectorResponse> responseVariable;
 
-  @Autowired
-  public ExcerptConnectorStatusDelegate(RestTemplate restTemplate,
-      @Value("${spring.application.name}") String springAppName,
-      @Value("${excerpt-service-api.url}") String excerptServiceBaseUrl) {
-    super(restTemplate, springAppName);
-    this.excerptServiceBaseUrl = excerptServiceBaseUrl;
-  }
+  private final ExcerptFeignClient excerptFeignClient;
+  private final HeaderBuilderFactory headerBuilderFactory;
 
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
     var excerptIdentifier = excerptIdentifierVariable.from(execution).get();
+    log.debug("Start getting excerpt status by id {}", excerptIdentifier);
 
-    log.debug("Start getting excerpt status by id {} on resource {}", excerptIdentifier,
-        RESOURCE_EXCERPTS);
-    var response = performGet(execution, excerptIdentifier);
+    var headers = headerBuilderFactory.builder()
+        .contentTypeJson()
+        .processExecutionHttpHeaders()
+        .digitalSignatureHttpHeaders()
+        .accessTokenHeader()
+        .build();
+    var response = excerptFeignClient.performGet(excerptIdentifier, headers);
     log.debug("Got excerpt status by id {}", excerptIdentifier);
 
     responseVariable.on(execution).set(response);
-  }
-
-  protected ConnectorResponse performGet(DelegateExecution delegateExecution, String id) {
-    var uri = UriComponentsBuilder.fromHttpUrl(excerptServiceBaseUrl).pathSegment(RESOURCE_EXCERPTS)
-        .pathSegment(id).pathSegment("status").build().toUri();
-    return perform(RequestEntity.get(uri).headers(getHeaders(delegateExecution)).build());
   }
 
   @Override

@@ -12,7 +12,7 @@
   </parent>
 
   <artifactId>ddm-bpm-parent</artifactId>
-  <version>1.5.3-SNAPSHOT</version>
+  <version>1.5.4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -24,6 +24,7 @@
     <module>ddm-bpm-extension</module>
     <module>ddm-bpm-rest</module>
     <module>ddm-bpm-security</module>
+    <module>ddm-data-factory-client</module>
   </modules>
 
   <properties>

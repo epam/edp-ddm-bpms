@@ -16,70 +16,62 @@
 
 package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
+import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
+import com.epam.digital.data.platform.bpms.extension.delegate.connector.header.builder.HeaderBuilderFactory;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
+import com.epam.digital.data.platform.dso.api.dto.SignRequestDto;
+import com.epam.digital.data.platform.dso.client.DigitalSealRestClient;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Objects;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.spin.json.SpinJsonNode;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * The class represents an implementation of {@link BaseConnectorDelegate} that is used for digital
+ * The class represents an implementation of {@link BaseJavaDelegate} that is used for digital
  * signature of data
  */
 @Slf4j
+@RequiredArgsConstructor
 @Component(DigitalSignatureConnectorDelegate.DELEGATE_NAME)
-public class DigitalSignatureConnectorDelegate extends BaseConnectorDelegate {
+public class DigitalSignatureConnectorDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "digitalSignatureConnectorDelegate";
-
-  private final String dsoBaseUrl;
+  public static final String PROP_DATA = "data";
 
   @Getter
   @SystemVariable(name = "response", isTransient = true)
   private NamedVariableAccessor<SpinJsonNode> dsoResponseVariable;
+  @SystemVariable(name = "payload", isTransient = true)
+  protected NamedVariableAccessor<SpinJsonNode> payloadVariable;
 
-  @Autowired
-  public DigitalSignatureConnectorDelegate(RestTemplate restTemplate,
-      @Value("${spring.application.name}") String springAppName,
-      @Value("${dso.url}") String dsoBaseUrl) {
-    super(restTemplate, springAppName);
-    this.dsoBaseUrl = dsoBaseUrl;
-  }
+  private final DigitalSealRestClient digitalSealRestClient;
+  private final HeaderBuilderFactory headerBuilderFactory;
 
   @Override
-  public void executeInternal(DelegateExecution execution) {
-    var payload = payloadVariable.from(execution).getOptional();
+  public void executeInternal(DelegateExecution execution) throws JsonProcessingException {
+    var payload = payloadVariable.from(execution).get();
 
     log.debug("Start sending data to sign");
-    var response = performPost(execution, payload.map(Objects::toString).orElse(null));
+
+    if (Objects.isNull(payload) || !payload.hasProp(PROP_DATA)){
+      log.debug("Payload is null or property 'data' is missing");
+      return;
+    }
+    var data = payload.prop("data").stringValue();
+    var reqBody = SignRequestDto.builder().data(data).build();
+    var headers = headerBuilderFactory.builder()
+        .contentTypeJson()
+        .accessTokenHeader()
+        .build();
+    var response = digitalSealRestClient.sign(reqBody, headers);
     log.debug("Got digital signature");
 
-    dsoResponseVariable.on(execution).set(response.getResponseBody());
-  }
-
-  private ConnectorResponse performPost(DelegateExecution execution, String body) {
-    var uri = UriComponentsBuilder.fromHttpUrl(dsoBaseUrl).pathSegment("api", "eseal", "sign")
-        .build().toUri();
-    return perform(RequestEntity.post(uri).headers(getHeadersForSign(execution)).body(body));
-  }
-
-  private HttpHeaders getHeadersForSign(DelegateExecution execution) {
-    var headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    getAccessToken(execution)
-        .ifPresent(xAccessToken -> headers.add("X-Access-Token", xAccessToken));
-    return headers;
+    dsoResponseVariable.on(execution).set(SpinJsonNode.JSON(response));
   }
 
   @Override

@@ -1,0 +1,9 @@
+camunda:
+  system-variables:
+    const_dataFactoryBaseUrl: http://localhost:8777
+
+user-settings-service-api:
+  url: http://localhost:8778
+
+excerpt-service-api:
+  url: http://localhost:9799

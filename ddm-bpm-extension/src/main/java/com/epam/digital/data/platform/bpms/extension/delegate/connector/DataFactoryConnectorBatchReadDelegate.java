@@ -16,18 +16,18 @@
 
 package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
+import com.epam.digital.data.platform.bpms.extension.delegate.connector.header.builder.HeaderBuilderFactory;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
+import com.epam.digital.data.platform.datafactory.feign.client.DataFactoryFeignClient;
+import com.epam.digital.data.platform.datafactory.feign.model.response.ConnectorResponse;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.spin.Spin;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Component(DataFactoryConnectorBatchReadDelegate.DELEGATE_NAME)
@@ -38,11 +38,9 @@ public class DataFactoryConnectorBatchReadDelegate extends DataFactoryConnectorR
   @SystemVariable(name = "resourceIds")
   private NamedVariableAccessor<List<String>> resourceIdsVariable;
 
-  @Autowired
-  public DataFactoryConnectorBatchReadDelegate(RestTemplate restTemplate,
-      @Value("${spring.application.name}") String springAppName,
-      @Value("${camunda.system-variables.const_dataFactoryBaseUrl}") String dataFactoryBaseUrl) {
-    super(restTemplate, springAppName, dataFactoryBaseUrl);
+  public DataFactoryConnectorBatchReadDelegate(DataFactoryFeignClient dataFactoryFeignClient,
+      HeaderBuilderFactory headerBuilderFactory) {
+    super(dataFactoryFeignClient, headerBuilderFactory);
   }
 
   @Override
@@ -51,18 +49,25 @@ public class DataFactoryConnectorBatchReadDelegate extends DataFactoryConnectorR
     var resourceIds = resourceIdsVariable.from(execution).getOrDefault(List.of());
 
     log.debug("Start executing batch read entities on resource {}", resource);
-    var response = executeBatchGetOperation(execution, resource, resourceIds);
+    var headers = headerBuilderFactory.builder()
+        .contentTypeJson()
+        .processExecutionHttpHeaders()
+        .digitalSignatureHttpHeaders()
+        .accessTokenHeader()
+        .build();
+
+    var response = executeBatchGetOperation(resource, resourceIds, headers);
     log.debug("Finished batch read operation");
 
     responseVariable.on(execution).set(response);
   }
 
-  private ConnectorResponse executeBatchGetOperation(DelegateExecution execution,
-      String resource, List<String> resourceIds) {
+  private ConnectorResponse executeBatchGetOperation(String resource, List<String> resourceIds,
+      HttpHeaders headers) {
     var json = Spin.JSON("[]");
 
     resourceIds.stream()
-        .map(id -> performGet(execution, resource, id))
+        .map(id -> dataFactoryFeignClient.performGet(resource, id, headers))
         .map(ConnectorResponse::getResponseBody).forEach(json::append);
 
     return ConnectorResponse.builder()

@@ -16,53 +16,52 @@
 
 package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
+import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
+import com.epam.digital.data.platform.bpms.extension.delegate.connector.header.builder.HeaderBuilderFactory;
+import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
+import com.epam.digital.data.platform.datafactory.feign.client.UserSettingsFeignClient;
+import com.epam.digital.data.platform.datafactory.feign.model.response.ConnectorResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.RequestEntity;
+import org.camunda.spin.json.SpinJsonNode;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * The class represents an implementation of {@link BaseConnectorDelegate} that is used to create or
+ * The class represents an implementation of {@link BaseJavaDelegate} that is used to create or
  * update user settings.
  */
 @Slf4j
+@RequiredArgsConstructor
 @Component(UserSettingsConnectorUpdateDelegate.DELEGATE_NAME)
-public class UserSettingsConnectorUpdateDelegate extends BaseConnectorDelegate {
+public class UserSettingsConnectorUpdateDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "userSettingsConnectorUpdateDelegate";
 
-  private final String userSettingsBaseUrl;
+  @SystemVariable(name = "payload", isTransient = true)
+  protected NamedVariableAccessor<SpinJsonNode> payloadVariable;
+  @SystemVariable(name = "response", isTransient = true)
+  protected NamedVariableAccessor<ConnectorResponse> responseVariable;
 
-  @Autowired
-  public UserSettingsConnectorUpdateDelegate(
-      RestTemplate restTemplate,
-      @Value("${spring.application.name}") String springAppName,
-      @Value("${user-settings-service-api.url}") String userSettingsBaseUrl) {
-    super(restTemplate, springAppName);
-    this.userSettingsBaseUrl = userSettingsBaseUrl;
-  }
+  private final UserSettingsFeignClient userSettingsFeignClient;
+  private final HeaderBuilderFactory headerBuilderFactory;
 
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
     var payload = payloadVariable.from(execution).getOptional();
 
-    log.debug("Start creating or updating user settings on resource {}", RESOURCE_SETTINGS);
-    var response = performPut(execution, payload.map(Object::toString).orElse(null));
+    log.debug("Start creating or updating user settings");
+    var requestBody = payload.map(Object::toString).orElse(null);
+
+    var headers = headerBuilderFactory.builder()
+        .contentTypeJson()
+        .accessTokenHeader()
+        .build();
+    var response = userSettingsFeignClient.performPut(requestBody, headers);
     log.debug("User settings successfully created or updated");
 
     responseVariable.on(execution).set(response);
-  }
-
-  private ConnectorResponse performPut(DelegateExecution execution, String body) {
-    var uri = UriComponentsBuilder.fromHttpUrl(userSettingsBaseUrl).pathSegment(RESOURCE_SETTINGS)
-        .build().toUri();
-
-    return perform(RequestEntity.put(uri).headers(getHeaders(execution)).body(body));
   }
 
   @Override

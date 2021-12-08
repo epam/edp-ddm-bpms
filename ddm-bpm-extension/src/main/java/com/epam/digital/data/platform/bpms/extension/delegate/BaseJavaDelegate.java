@@ -20,7 +20,6 @@ import java.util.Objects;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class BaseJavaDelegate implements JavaDelegate {

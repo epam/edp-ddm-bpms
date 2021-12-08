@@ -20,18 +20,15 @@ import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.dracs.GetCertificateByNameDracsRegistryDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.edr.SearchSubjectsEdrRegistryConnectorDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.edr.SubjectDetailEdrRegistryConnectorDelegate;
-import com.epam.digital.data.platform.bpms.extension.exception.handler.ConnectorResponseErrorHandler;
+import com.epam.digital.data.platform.datafactory.feign.config.DataFactoryFeignConfiguration;
+import com.epam.digital.data.platform.dso.client.DigitalSealRestClient;
 import com.epam.digital.data.platform.starter.trembita.integration.dracs.service.DracsRemoteService;
 import com.epam.digital.data.platform.starter.trembita.integration.edr.service.EdrRemoteService;
-import java.util.Collection;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.BufferingClientHttpRequestFactory;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.context.annotation.Import;
 
 /**
  * The class represents a holder for beans of the general configuration. Each method produces a bean
@@ -39,18 +36,9 @@ import org.springframework.web.client.RestTemplate;
  * should create, set up and return an instance of a bean.
  */
 @Configuration
+@EnableFeignClients(clients = DigitalSealRestClient.class)
+@Import(DataFactoryFeignConfiguration.class)
 public class ExtensionGeneralConfig {
-
-  @Bean
-  public RestTemplate restTemplate(Collection<ClientHttpRequestInterceptor> interceptors,
-      ConnectorResponseErrorHandler responseErrorHandler) {
-    return new RestTemplateBuilder()
-        .requestFactory(
-            () -> new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()))
-        .interceptors(interceptors)
-        .errorHandler(responseErrorHandler)
-        .build();
-  }
 
   @ConditionalOnProperty(prefix = "trembita-exchange-gateway.registries.edr-registry",
       value = {"client.x-road-instance", "service.x-road-instance"})

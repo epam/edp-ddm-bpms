@@ -173,11 +173,10 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
             .withHeader("Content-Type", equalTo("application/json"))
             .withHeader("X-Source-System", equalTo("Low-code Platform"))
             .withHeader("X-Source-Application", equalTo("ddm-bpm-extension"))
-            .withHeader("X-Digital-Signature", matching(".*"))
             .withHeader("X-Digital-Signature-Derived", equalTo("cephKey"))
             .withRequestBody(equalTo("{\"var\":\"value\"}"))
-            .willReturn(aResponse().withStatus(422)
-                .withBody("{\"traceId\":\"traceId1\",\"code\":\"VALIDATION_ERROR\","
+            .willReturn(aResponse().withHeader("Content-Type", "application/json")
+                .withStatus(422).withBody("{\"traceId\":\"traceId1\",\"code\":\"VALIDATION_ERROR\","
                     + "\"details\":{\"errors\":[{\"field\":\"field1\",\"value\":\"value1\","
                     + "\"message\":\"message1\"}]}}"))));
 
@@ -207,7 +206,6 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
             .withHeader("Content-Type", equalTo("application/json"))
             .withHeader("X-Source-System", equalTo("Low-code Platform"))
             .withHeader("X-Source-Application", equalTo("ddm-bpm-extension"))
-            .withHeader("x-custom-header", equalTo("custom header value"))
             .willReturn(aResponse().withStatus(200))));
 
     dataFactoryMockServer.addStubMapping(
@@ -235,7 +233,8 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
             .withHeader("X-Access-Token", equalTo(validAccessToken))
             .withRequestBody(equalTo(
                 "{\"data\":\"{\\\"data\\\":\\\"test data\\\",\\\"description\\\":\\\"some description\\\"}\"}"))
-            .willReturn(aResponse().withStatus(200).withBody("{\"signature\":\"signature\"}"))));
+            .willReturn(aResponse().withHeader("Content-Type", "application/json").withStatus(200)
+                .withBody("{\"signature\":\"signature\"}"))));
 
     dataFactoryMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo("/mock-server/test"))
@@ -253,7 +252,8 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
             .withHeader("X-Access-Token", equalTo(validAccessToken))
             .withRequestBody(equalTo(
                 "{\"data\":\"{\\\"data2\\\":\\\"test data2\\\",\\\"description2\\\":\\\"some description2\\\"}\"}"))
-            .willReturn(aResponse().withStatus(200).withBody("{\"signature\":\"signature2\"}"))));
+            .willReturn(aResponse().withHeader("Content-Type", "application/json").withStatus(200)
+                .withBody("{\"signature\":\"signature2\"}"))));
 
     dataFactoryMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo("/mock-server/test"))

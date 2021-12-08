@@ -9,11 +9,6 @@
     <bpmn:serviceTask id="Activity_1uev980" name="Test Search" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="headers">
-            <camunda:map>
-              <camunda:entry key="x-custom-header">custom header value</camunda:entry>
-            </camunda:map>
-          </camunda:inputParameter>
           <camunda:inputParameter name="resource">laboratory</camunda:inputParameter>
           <camunda:inputParameter name="searchConditions">
             <camunda:map>
