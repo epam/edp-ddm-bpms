@@ -17,7 +17,7 @@
 package com.epam.digital.data.platform.dataaccessor.sysvar;
 
 /**
- * Class that represents public bpms constants for clients.
+ * Class that represents public system variable constants
  */
 public final class Constants {
 

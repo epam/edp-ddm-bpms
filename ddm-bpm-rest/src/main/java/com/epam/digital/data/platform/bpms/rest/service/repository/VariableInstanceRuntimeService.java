@@ -8,23 +8,20 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.camunda.bpm.engine.HistoryService;
-import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.springframework.stereotype.Service;
 
 /**
- * History service that is used for creating variable value queries to Camunda {@link
- * HistoryService}
- *
- * @deprecated
+ * Runtime service that is used for creating variable value queries to Camunda {@link
+ * RuntimeService}
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Deprecated(forRemoval = true)
-public class VariableInstanceHistoricService {
+public class VariableInstanceRuntimeService {
 
-  private final HistoryService historyService;
+  private final RuntimeService runtimeService;
 
   /**
    * Get system variables value map by process instance id array
@@ -40,14 +37,14 @@ public class VariableInstanceHistoricService {
       String... processInstanceIds) {
     log.debug("Selecting system variables for process instances {}",
         Arrays.toString(processInstanceIds));
-    var result = historyService.createHistoricVariableInstanceQuery()
+    var result = runtimeService.createVariableInstanceQuery()
         .variableNameLike(Constants.SYS_VAR_PREFIX_LIKE)
         .processInstanceIdIn(processInstanceIds)
         .list().stream()
         .filter(variable -> Objects.nonNull(variable.getValue()))
-        .collect(Collectors.groupingBy(HistoricVariableInstance::getProcessInstanceId,
-            Collectors.collectingAndThen(Collectors.toMap(HistoricVariableInstance::getName,
-                HistoricVariableInstance::getValue), SystemVariablesDto::new)));
+        .collect(Collectors.groupingBy(VariableInstance::getProcessInstanceId,
+            Collectors.collectingAndThen(Collectors.toMap(VariableInstance::getName,
+                VariableInstance::getValue), SystemVariablesDto::new)));
 
     log.debug("Selected system variables for {} history process instances", result.size());
     return result;
