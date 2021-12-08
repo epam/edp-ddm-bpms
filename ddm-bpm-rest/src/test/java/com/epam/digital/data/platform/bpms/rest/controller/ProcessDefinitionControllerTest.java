@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.epam.digital.data.platform.bpms.api.dto.ProcessDefinitionDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmProcessDefinitionDto;
 import com.epam.digital.data.platform.bpms.rest.service.ProcessDefinitionService;
 import java.util.List;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
@@ -41,7 +41,7 @@ class ProcessDefinitionControllerTest {
   @Test
   void getByKey() {
     var key = "key";
-    var expected = mock(ProcessDefinitionDto.class);
+    var expected = mock(DdmProcessDefinitionDto.class);
 
     when(service.getDdmProcessDefinitionDtoByKey(key)).thenReturn(expected);
 
@@ -53,7 +53,7 @@ class ProcessDefinitionControllerTest {
   @Test
   void getByParams() {
     var params = mock(ProcessDefinitionQueryDto.class);
-    var expected = mock(ProcessDefinitionDto.class);
+    var expected = mock(DdmProcessDefinitionDto.class);
 
     when(service.getDdmProcessDefinitionDtos(params)).thenReturn(List.of(expected));
 
