@@ -16,47 +16,49 @@
 
 package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
+import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
+import com.epam.digital.data.platform.bpms.extension.delegate.connector.header.builder.HeaderBuilderFactory;
+import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
+import com.epam.digital.data.platform.datafactory.feign.client.DataFactoryFeignClient;
+import com.epam.digital.data.platform.datafactory.feign.model.response.ConnectorResponse;
 import com.epam.digital.data.platform.integration.ceph.service.CephService;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.spin.Spin;
 import org.camunda.spin.json.SpinJsonNode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * The class represents an implementation of {@link BaseConnectorDelegate} that is used to execute
- * data batch creation in Data Factory
+ * The class represents an implementation of {@link BaseJavaDelegate} that is used to execute data
+ * batch creation in Data Factory
  */
 @Slf4j
+@RequiredArgsConstructor
 @Component(DataFactoryConnectorBatchCreateDelegate.DELEGATE_NAME)
-public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelegate {
+public class DataFactoryConnectorBatchCreateDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "dataFactoryConnectorBatchCreateDelegate";
 
-  private final String dataFactoryBaseUrl;
+  @SystemVariable(name = "resource")
+  protected NamedVariableAccessor<String> resourceVariable;
+  @SystemVariable(name = "payload", isTransient = true)
+  protected NamedVariableAccessor<SpinJsonNode> payloadVariable;
+  @SystemVariable(name = "response", isTransient = true)
+  protected NamedVariableAccessor<ConnectorResponse> responseVariable;
+  @SystemVariable(name = "x_digital_signature_derived_ceph_key")
+  private NamedVariableAccessor<String> xDigitalSignatureDerivedCephKeyVariable;
+
   private final DigitalSignatureConnectorDelegate digitalSignatureConnectorDelegate;
   private final CephService cephService;
-
+  private final DataFactoryFeignClient dataFactoryFeignClient;
+  @Value("${ceph.bucket}")
   private final String cephBucketName;
-
-  public DataFactoryConnectorBatchCreateDelegate(RestTemplate restTemplate, CephService cephService,
-      DigitalSignatureConnectorDelegate digitalSignatureConnectorDelegate,
-      @Value("${spring.application.name}") String springAppName,
-      @Value("${ceph.bucket}") String cephBucketName,
-      @Value("${camunda.system-variables.const_dataFactoryBaseUrl}") String dataFactoryBaseUrl) {
-    super(restTemplate, springAppName);
-    this.dataFactoryBaseUrl = dataFactoryBaseUrl;
-    this.digitalSignatureConnectorDelegate = digitalSignatureConnectorDelegate;
-    this.cephService = cephService;
-    this.cephBucketName = cephBucketName;
-  }
+  private final HeaderBuilderFactory headerBuilderFactory;
 
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
@@ -84,7 +86,13 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelega
       log.debug("Signature put successfully for {} entity", nodeIndex);
 
       log.debug("Start creating {} entity", nodeIndex);
-      performPost(execution, resource, stringJsonNode);
+      var headers = headerBuilderFactory.builder()
+          .contentTypeJson()
+          .processExecutionHttpHeaders()
+          .digitalSignatureHttpHeaders()
+          .accessTokenHeader()
+          .build();
+      dataFactoryFeignClient.performPost(resource, stringJsonNode, headers);
       log.debug("Entity {} was created successfully", nodeIndex);
     }
     return ConnectorResponse.builder()
@@ -115,13 +123,6 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseConnectorDelega
     var stringSystemSignature = responseVariable.from(execution).get();
     responseVariable.on(execution).remove();
     return Spin.JSON(stringSystemSignature).prop("signature").value();
-  }
-
-  private void performPost(DelegateExecution delegateExecution, String resourceName, String body) {
-    var uri = UriComponentsBuilder.fromHttpUrl(dataFactoryBaseUrl).pathSegment(resourceName).build()
-        .toUri();
-
-    perform(RequestEntity.post(uri).headers(getHeaders(delegateExecution)).body(body));
   }
 
   @Override
