@@ -18,20 +18,27 @@ package com.epam.digital.data.platform.bpms.client;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.matching.RequestPatternBuilder.newRequestPattern;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.epam.digital.data.platform.bpms.api.dto.PaginationQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmProcessInstanceCountQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmProcessInstanceQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.enums.DdmProcessInstanceStatus;
 import com.epam.digital.data.platform.bpms.client.exception.ProcessInstanceVariableNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.http.RequestMethod;
 import com.github.tomakehurst.wiremock.matching.EqualToPattern;
 import com.github.tomakehurst.wiremock.matching.UrlPattern;
+import java.time.LocalDateTime;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.junit.jupiter.api.Test;
@@ -127,5 +134,38 @@ class ProcessInstanceRestClientIT extends BaseIT {
 
     UrlPattern lowcodeKeyUrlPattern = new UrlPattern(new EqualToPattern(url), false);
     restClientWireMock.verify(1, newRequestPattern(RequestMethod.PUT, lowcodeKeyUrlPattern));
+  }
+
+  @Test
+  void getProcessInstances() {
+    var processInstanceQuery = DdmProcessInstanceQueryDto.builder()
+        .rootProcessInstances(true)
+        .build();
+    var paginationQueryDto = PaginationQueryDto.builder()
+        .firstResult(1).maxResults(2).build();
+
+    restClientWireMock.addStubMapping(
+        stubFor(post(urlPathEqualTo("/api/extended/process-instance"))
+            .withQueryParam("firstResult", equalTo("1"))
+            .withQueryParam("maxResults", equalTo("2"))
+            .withRequestBody(
+                equalToJson("{\"rootProcessInstances\":true,\"sortBy\":null,\"sortOrder\":null}"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withBody("[{\"id\":\"id\",\"processDefinitionId\":\"processDefinitionId\","
+                    + "\"processDefinitionName\":\"processDefinitionName\","
+                    + "\"startTime\":\"2021-12-07T13:51:31.000Z\","
+                    + "\"state\":\"PENDING\"}]")))
+    );
+
+    var result = processInstanceRestClient.getProcessInstances(processInstanceQuery,
+        paginationQueryDto);
+
+    assertThat(result).hasSize(1)
+        .element(0).hasFieldOrPropertyWithValue("id", "id")
+        .hasFieldOrPropertyWithValue("processDefinitionId", "processDefinitionId")
+        .hasFieldOrPropertyWithValue("processDefinitionName", "processDefinitionName")
+        .hasFieldOrPropertyWithValue("startTime", LocalDateTime.of(2021, 12, 7, 13, 51, 31))
+        .hasFieldOrPropertyWithValue("state", DdmProcessInstanceStatus.PENDING);
   }
 }
