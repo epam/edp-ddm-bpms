@@ -36,10 +36,11 @@ public class UserTaskElementTemplateIT extends BaseIT {
     var taskForUserWithAccess = getForTasks("/json/testuserAccessToken.json",
         processInstance.getId());
     var task = taskForUserWithAccess[0];
-    var identityLinksForTask = taskService.getIdentityLinksForTask(task.getId());
+    var identityLinksForTask = engine.getTaskService()
+        .getIdentityLinksForTask(task.getId());
 
-    assertThat(taskForUserWithoutAccess).isEmpty();
-    assertThat(taskForUserWithAccess).hasSize(1);
+    assertThat(taskForUserWithoutAccess.length).isEqualTo(0);
+    assertThat(taskForUserWithAccess.length).isEqualTo(1);
     assertThat(identityLinksForTask.get(0).getUserId()).isEqualTo("testuser");
     assertThat(task.getAssignee()).isNull();
   }

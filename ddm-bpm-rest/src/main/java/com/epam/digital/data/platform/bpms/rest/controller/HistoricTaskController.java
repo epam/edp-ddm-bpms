@@ -16,8 +16,8 @@
 
 package com.epam.digital.data.platform.bpms.rest.controller;
 
-import com.epam.digital.data.platform.bpms.api.dto.DdmTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.HistoryUserTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.UserTaskDto;
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
 import com.epam.digital.data.platform.bpms.rest.service.HistoricTaskService;
 import java.util.List;
@@ -47,7 +47,7 @@ public class HistoricTaskController {
    *
    * @param queryDto           contains query params.
    * @param paginationQueryDto specified pagination.
-   * @return list of {@link HistoryUserTaskDto}
+   * @return list of {@link UserTaskDto}
    */
   @POST
   @Consumes(MediaType.APPLICATION_JSON)

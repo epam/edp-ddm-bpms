@@ -59,12 +59,6 @@ public class HistoricProcessInstanceController {
         paginationQueryDto);
   }
 
-  /**
-   * Get historical process-instance by id
-   *
-   * @param id the process-instance id
-   * @return {@link HistoryProcessInstanceDto}
-   */
   @GET
   @Path("/{id}")
   @Produces(MediaType.APPLICATION_JSON)

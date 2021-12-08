@@ -19,8 +19,8 @@ package com.epam.digital.data.platform.bpms.rest.it;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.epam.digital.data.platform.bpms.api.dto.DdmSignableTaskDto;
-import com.epam.digital.data.platform.bpms.api.dto.DdmTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.SignableUserTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.UserTaskDto;
 import com.epam.digital.data.platform.dso.api.dto.Subject;
 import java.util.Map;
 import org.camunda.bpm.engine.test.Deployment;
@@ -37,7 +37,7 @@ class TaskControllerIT extends BaseIT {
 
     var result = postForObject("api/extended/task",
         "{\"assignee\": \"testuser\", \"processInstanceId\": \"" + processId + "\"}",
-        DdmTaskDto[].class);
+        UserTaskDto[].class);
 
     assertThat(result).isNotNull();
     assertThat(result[0].getAssignee()).isEqualTo("testuser");
@@ -53,7 +53,7 @@ class TaskControllerIT extends BaseIT {
     var task = taskService.createTaskQuery().processInstanceId(processId).list().get(0);
     var taskId = task.getId();
 
-    var result = getForObject("api/extended/task/" + taskId, DdmSignableTaskDto.class);
+    var result = getForObject("api/extended/task/" + taskId, SignableUserTaskDto.class);
 
     assertThat(result.getProcessDefinitionName()).isEqualTo("Test Name");
     assertThat(result.getFormVariables()).hasSize(2)

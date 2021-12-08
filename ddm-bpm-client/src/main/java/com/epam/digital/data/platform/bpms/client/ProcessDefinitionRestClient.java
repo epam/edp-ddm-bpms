@@ -16,8 +16,8 @@
 
 package com.epam.digital.data.platform.bpms.client;
 
+import com.epam.digital.data.platform.bpms.api.dto.ProcessDefinitionQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmProcessDefinitionDto;
-import com.epam.digital.data.platform.bpms.api.dto.DdmProcessDefinitionQueryDto;
 import com.epam.digital.data.platform.bpms.client.exception.ClientValidationException;
 import com.epam.digital.data.platform.bpms.client.exception.ProcessDefinitionNotFoundException;
 import feign.error.ErrorCodes;
@@ -54,7 +54,7 @@ public interface ProcessDefinitionRestClient extends BaseFeignClient {
   @ErrorHandling
   @CollectionFormat(feign.CollectionFormat.CSV)
   CountResultDto getProcessDefinitionsCount(
-      @SpringQueryMap DdmProcessDefinitionQueryDto requestDto);
+      @SpringQueryMap ProcessDefinitionQueryDto requestDto);
 
   /**
    * Method for getting list of camunda process definitions
@@ -66,7 +66,7 @@ public interface ProcessDefinitionRestClient extends BaseFeignClient {
   @ErrorHandling
   @CollectionFormat(feign.CollectionFormat.CSV)
   List<DdmProcessDefinitionDto> getProcessDefinitionsByParams(
-      @RequestBody DdmProcessDefinitionQueryDto requestDto);
+      @RequestBody ProcessDefinitionQueryDto requestDto);
 
   /**
    * Method for getting camunda process definition by id

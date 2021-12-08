@@ -16,7 +16,7 @@
 
 package com.epam.digital.data.platform.bpms.security;
 
-import java.util.function.Supplier;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.identity.Authentication;
  * Class that is used for camunda user impersonation (acting on another user's behalf)
  */
 @Slf4j
+@Builder
 @Getter
 public class CamundaImpersonation {
 
@@ -44,17 +45,10 @@ public class CamundaImpersonation {
    */
   private final Authentication impersonator;
 
-  public CamundaImpersonation(ProcessEngine processEngine, Authentication impersonatee) {
-    this.processEngine = processEngine;
-    this.impersonatee = impersonatee;
-    this.impersonator = processEngine.getIdentityService().getCurrentAuthentication();
-  }
-
   /**
    * Authenticate using impersonatee user
    */
   public void impersonate() {
-    log.trace("Authenticate as {} user", impersonatee.getGroupIds());
     processEngine.getIdentityService().setAuthentication(impersonatee);
   }
 
@@ -62,43 +56,6 @@ public class CamundaImpersonation {
    * Authenticate back using impersonator user
    */
   public void revertToSelf() {
-    log.trace("Authenticate back to current user");
     processEngine.getIdentityService().setAuthentication(impersonator);
-  }
-
-  /**
-   * Executing retrieving data on impersonated behalf
-   *
-   * @param supplier supplier which needs to be executed on impersonated behalf
-   * @param <T>      the supplier type
-   * @return the supplier result
-   */
-  public <T> T execute(Supplier<T> supplier) {
-    log.debug("Executing retrieving data on impersonated behalf");
-    impersonate();
-    try {
-      var result = supplier.get();
-
-      log.debug("Data retrieved on impersonated behalf");
-      return result;
-    } finally {
-      revertToSelf();
-    }
-  }
-
-  /**
-   * Executing the process on impersonated behalf
-   *
-   * @param runnable the process itself
-   */
-  public void run(Runnable runnable) {
-    log.debug("Executing process on impersonated behalf");
-    impersonate();
-    try {
-      runnable.run();
-      log.debug("The process finished on impersonated behalf");
-    } finally {
-      revertToSelf();
-    }
   }
 }

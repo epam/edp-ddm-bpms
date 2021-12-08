@@ -59,15 +59,13 @@ import com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloak
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloak.citizen.KeycloakRemoveCitizenRoleConnectorDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloak.officer.KeycloakGetOfficerUsersConnectorDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.edr.SearchSubjectsEdrRegistryConnectorDelegate;
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.KeycloakUserDto;
 import com.epam.digital.data.platform.bpms.extension.delegate.dto.RegistryConnectorResponse;
+import com.epam.digital.data.platform.bpms.extension.delegate.dto.KeycloakUserDto;
 import com.epam.digital.data.platform.bpms.extension.exception.handler.ConnectorResponseErrorHandler;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
 import com.epam.digital.data.platform.bpms.it.config.TestCephServiceImpl;
 import com.epam.digital.data.platform.bpms.it.util.TestUtils;
 import com.epam.digital.data.platform.bpms.listener.PutFormDataToCephTaskListener;
-import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
-import com.epam.digital.data.platform.bpms.security.listener.AuthorizationStartEventListener;
 import com.epam.digital.data.platform.dataaccessor.VariableAccessorFactory;
 import com.epam.digital.data.platform.dataaccessor.named.BaseNamedVariableAccessorFactory;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessorFactory;
@@ -81,7 +79,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -89,7 +86,6 @@ import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
-import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.mock.Mocks;
@@ -166,13 +162,6 @@ public abstract class BaseBpmnTest {
     varAccessorFactory = (VariableAccessorFactory) beans.get("variableAccessorFactory");
     namedVarAccessorFactory = new BaseNamedVariableAccessorFactory(varAccessorFactory);
     initPutFormDataToCephTaskListener(beans);
-
-    var authListener = (AuthorizationStartEventListener) beans.get("authListener");
-    processEngineRule.getProcessEngine().getIdentityService()
-        .setAuthentication(testUserName, List.of());
-    var impersonation = new CamundaImpersonation(processEngineRule.getProcessEngine(),
-        new Authentication("user", List.of("camunda-admin")));
-    ReflectionTestUtils.setField(authListener, "camundaAdminImpersonation", impersonation);
 
     var connectorResponseErrorHandler = new ConnectorResponseErrorHandler(objectMapper,
         messageResolver);

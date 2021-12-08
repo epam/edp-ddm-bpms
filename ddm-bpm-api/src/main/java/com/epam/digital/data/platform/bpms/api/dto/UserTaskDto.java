@@ -16,10 +16,7 @@
 
 package com.epam.digital.data.platform.bpms.api.dto;
 
-import com.epam.digital.data.platform.dso.api.dto.Subject;
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,7 +27,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DdmSignableTaskDto {
+public class UserTaskDto {
 
   private String id;
   private String taskDefinitionKey;
@@ -43,8 +40,4 @@ public class DdmSignableTaskDto {
   private String processDefinitionId;
   private String formKey;
   private boolean suspended;
-
-  private boolean eSign;
-  private Set<Subject> signatureValidationPack = Set.of();
-  private Map<String, Object> formVariables = Map.of();
 }

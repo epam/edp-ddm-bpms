@@ -16,18 +16,12 @@
 
 package com.epam.digital.data.platform.bpms.rest.dto;
 
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Query dto that contains pagination query parameters
- * <li>firstResult - default value {@code 0}</li>
- * <li>maxResults - default value {@code 2147483647} ({@code Integer.MAX_VALUE})</li>
- */
 @Data
 @Builder
 @AllArgsConstructor
@@ -35,12 +29,8 @@ import lombok.NoArgsConstructor;
 public class PaginationQueryDto {
 
   @QueryParam("firstResult")
-  @DefaultValue("0")
-  @Builder.Default
-  private Integer firstResult = 0;
+  private Integer firstResult;
 
   @QueryParam("maxResults")
-  @DefaultValue("2147483647")
-  @Builder.Default
-  private Integer maxResults = Integer.MAX_VALUE;
+  private Integer maxResults;
 }
