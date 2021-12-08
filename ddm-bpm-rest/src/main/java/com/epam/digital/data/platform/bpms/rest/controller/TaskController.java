@@ -16,8 +16,8 @@
 
 package com.epam.digital.data.platform.bpms.rest.controller;
 
-import com.epam.digital.data.platform.bpms.api.dto.SignableUserTaskDto;
-import com.epam.digital.data.platform.bpms.api.dto.UserTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmSignableTaskDto;
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
 import com.epam.digital.data.platform.bpms.rest.service.UserTaskService;
 import java.util.List;
@@ -49,12 +49,12 @@ public class TaskController {
    *
    * @param taskQueryDto       contains query params.
    * @param paginationQueryDto specified pagination.
-   * @return list of {@link UserTaskDto}
+   * @return list of {@link DdmTaskDto}
    */
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  public List<UserTaskDto> getByParams(TaskQueryDto taskQueryDto,
+  public List<DdmTaskDto> getByParams(TaskQueryDto taskQueryDto,
       @BeanParam PaginationQueryDto paginationQueryDto) {
     return taskService.getTasksByParams(taskQueryDto, paginationQueryDto);
   }
@@ -63,12 +63,12 @@ public class TaskController {
    * Get user task by provided id
    *
    * @param id the task id
-   * @return {@link UserTaskDto}
+   * @return {@link DdmTaskDto}
    */
   @GET
   @Path("/{id}")
   @Produces(MediaType.APPLICATION_JSON)
-  public SignableUserTaskDto getById(@PathParam("id") String id) {
+  public DdmSignableTaskDto getById(@PathParam("id") String id) {
     return taskService.getTaskById(id);
   }
 }

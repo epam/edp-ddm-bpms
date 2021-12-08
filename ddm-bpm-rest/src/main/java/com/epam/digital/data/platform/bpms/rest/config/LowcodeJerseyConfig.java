@@ -19,7 +19,6 @@ package com.epam.digital.data.platform.bpms.rest.config;
 import com.epam.digital.data.platform.bpms.rest.controller.HistoricProcessInstanceController;
 import com.epam.digital.data.platform.bpms.rest.controller.HistoricTaskController;
 import com.epam.digital.data.platform.bpms.rest.controller.ProcessDefinitionController;
-import com.epam.digital.data.platform.bpms.rest.controller.ProcessInstanceController;
 import com.epam.digital.data.platform.bpms.rest.controller.TaskController;
 import com.epam.digital.data.platform.bpms.rest.exception.mapper.CamundaRestExceptionMapper;
 import com.epam.digital.data.platform.bpms.rest.exception.mapper.CamundaSystemExceptionMapper;
@@ -49,7 +48,6 @@ public class LowcodeJerseyConfig extends CamundaJerseyResourceConfig {
     register(TaskController.class);
     register(HistoricTaskController.class);
     register(HistoricProcessInstanceController.class);
-    register(ProcessInstanceController.class);
     register(ProcessDefinitionController.class);
 
     register(UserDataValidationExceptionMapper.class);

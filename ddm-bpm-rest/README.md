@@ -25,16 +25,13 @@
 
 ### Available controllers
 
-* `com.epam.digital.data.platform.bpms.rest.controller.HistoricProcessInstanceController` - for
-  accessing extended historic process instances;
 * `com.epam.digital.data.platform.bpms.rest.controller.HistoricTaskController` - for getting
-  extended historical user tasks;
-* `com.epam.digital.data.platform.bpms.rest.controller.ProcessDefinitionController` - for accessing
-  extended process definitions;
-* `com.epam.digital.data.platform.bpms.rest.controller.ProcessInstanceController` - for accessing
-  extended process instances;
-* `com.epam.digital.data.platform.bpms.rest.controller.TaskController` - for getting extended user
-  tasks;
+  historical user tasks;
+* `com.epam.digital.data.platform.bpms.rest.controller.StartFormController` - for getting
+  process-definition start-forms;
+* `com.epam.digital.data.platform.bpms.rest.controller.TaskController` - for getting user tasks;
+* `com.epam.digital.data.platform.bpms.rest.controller.TaskPropertyController` - for getting
+  extended task property.
 
 ### Test execution
 

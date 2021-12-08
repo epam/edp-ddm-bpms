@@ -16,9 +16,10 @@
 
 package com.epam.digital.data.platform.bpms.rest.mapper;
 
-import com.epam.digital.data.platform.bpms.api.dto.ProcessDefinitionDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmProcessDefinitionDto;
 import java.util.List;
 import java.util.Map;
+import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.mapstruct.Context;
 import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
@@ -30,18 +31,14 @@ import org.mapstruct.ReportingPolicy;
 public interface ProcessDefinitionMapper {
 
   @Mapping(source = "startForm", target = "formKey")
-  ProcessDefinitionDto toDdmProcessDefinitionDto(
-      org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto dto,
-      String startForm);
+  DdmProcessDefinitionDto toDdmProcessDefinitionDto(ProcessDefinitionDto dto, String startForm);
 
   @Mapping(target = "formKey", expression = "java(startForms.get(dto.getId()))")
   @Named("toDdmProcessDefinitionDto")
-  ProcessDefinitionDto toDdmProcessDefinitionDto(
-      org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto dto,
+  DdmProcessDefinitionDto toDdmProcessDefinitionDto(ProcessDefinitionDto dto,
       @Context Map<String, String> startForms);
 
   @IterableMapping(qualifiedByName = "toDdmProcessDefinitionDto")
-  List<ProcessDefinitionDto> toDdmProcessDefinitionDtos(
-      List<org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto> dtos,
+  List<DdmProcessDefinitionDto> toDdmProcessDefinitionDtos(List<ProcessDefinitionDto> dtos,
       @Context Map<String, String> startForms);
 }

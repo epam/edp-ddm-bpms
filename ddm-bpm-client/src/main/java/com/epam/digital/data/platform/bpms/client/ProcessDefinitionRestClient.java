@@ -16,14 +16,15 @@
 
 package com.epam.digital.data.platform.bpms.client;
 
-import com.epam.digital.data.platform.bpms.api.dto.ProcessDefinitionDto;
-import com.epam.digital.data.platform.bpms.api.dto.ProcessDefinitionQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmProcessDefinitionDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmProcessDefinitionQueryDto;
 import com.epam.digital.data.platform.bpms.client.exception.ClientValidationException;
 import com.epam.digital.data.platform.bpms.client.exception.ProcessDefinitionNotFoundException;
 import feign.error.ErrorCodes;
 import feign.error.ErrorHandling;
 import java.util.List;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceWithVariablesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
@@ -53,7 +54,7 @@ public interface ProcessDefinitionRestClient extends BaseFeignClient {
   @ErrorHandling
   @CollectionFormat(feign.CollectionFormat.CSV)
   CountResultDto getProcessDefinitionsCount(
-      @SpringQueryMap ProcessDefinitionQueryDto requestDto);
+      @SpringQueryMap DdmProcessDefinitionQueryDto requestDto);
 
   /**
    * Method for getting list of camunda process definitions
@@ -64,8 +65,8 @@ public interface ProcessDefinitionRestClient extends BaseFeignClient {
   @PostMapping("/extended/process-definition")
   @ErrorHandling
   @CollectionFormat(feign.CollectionFormat.CSV)
-  List<ProcessDefinitionDto> getProcessDefinitionsByParams(
-      @RequestBody ProcessDefinitionQueryDto requestDto);
+  List<DdmProcessDefinitionDto> getProcessDefinitionsByParams(
+      @RequestBody DdmProcessDefinitionQueryDto requestDto);
 
   /**
    * Method for getting camunda process definition by id
@@ -77,7 +78,7 @@ public interface ProcessDefinitionRestClient extends BaseFeignClient {
   @ErrorHandling(codeSpecific = {
       @ErrorCodes(codes = {404}, generate = ProcessDefinitionNotFoundException.class)
   })
-  org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto getProcessDefinition(@PathVariable("id") String id);
+  ProcessDefinitionDto getProcessDefinition(@PathVariable("id") String id);
 
   /**
    * Method for getting camunda process definition by key
@@ -89,7 +90,7 @@ public interface ProcessDefinitionRestClient extends BaseFeignClient {
   @ErrorHandling(codeSpecific = {
       @ErrorCodes(codes = {404}, generate = ProcessDefinitionNotFoundException.class)
   })
-  ProcessDefinitionDto getProcessDefinitionByKey(@PathVariable("key") String key);
+  DdmProcessDefinitionDto getProcessDefinitionByKey(@PathVariable("key") String key);
 
   /**
    * Method for starting process instance by process definition id
