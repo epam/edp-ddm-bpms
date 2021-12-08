@@ -45,6 +45,10 @@
   </bean>
   <bean id="variableAccessorFactory"
     class="com.epam.digital.data.platform.dataaccessor.BaseVariableAccessorFactory"/>
+  <bean id="processStartTimeVariable"
+    class="com.epam.digital.data.platform.dataaccessor.sysvar.ProcessStartTimeVariable">
+    <constructor-arg ref="variableAccessorFactory"/>
+  </bean>
   <bean id="startFormCephKeyVariable"
     class="com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable">
     <constructor-arg ref="variableAccessorFactory"/>
@@ -109,6 +113,7 @@
           class="com.epam.digital.data.platform.bpms.engine.config.CamundaEngineSystemVariablesSupportListener">
           <constructor-arg ref="camundaProperties"/>
           <constructor-arg ref="variableAccessorFactory"/>
+          <constructor-arg ref="processStartTimeVariable"/>
         </bean>
       </list>
     </property>
