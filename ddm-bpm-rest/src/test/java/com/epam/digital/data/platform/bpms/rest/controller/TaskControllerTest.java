@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.epam.digital.data.platform.bpms.api.dto.SignableUserTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmSignableTaskDto;
 import com.epam.digital.data.platform.bpms.rest.service.UserTaskService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,7 +39,7 @@ class TaskControllerTest {
   @Test
   void getById() {
     var id = "taskId";
-    var expected = new SignableUserTaskDto();
+    var expected = new DdmSignableTaskDto();
     when(taskService.getTaskById(id)).thenReturn(expected);
 
     var result = taskController.getById(id);
