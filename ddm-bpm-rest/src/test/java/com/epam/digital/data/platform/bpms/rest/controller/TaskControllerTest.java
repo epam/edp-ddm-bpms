@@ -20,8 +20,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.epam.digital.data.platform.bpms.api.dto.DdmSignableTaskDto;
-import com.epam.digital.data.platform.bpms.rest.service.UserTaskService;
+import com.epam.digital.data.platform.bpms.api.dto.SignableUserTaskDto;
+import com.epam.digital.data.platform.bpms.rest.service.TaskService;
+import javax.ws.rs.core.Request;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,16 +35,19 @@ class TaskControllerTest {
   @InjectMocks
   private TaskController taskController;
   @Mock
-  private UserTaskService taskService;
+  private TaskService taskService;
+
+  @Mock
+  private Request request;
 
   @Test
   void getById() {
     var id = "taskId";
-    var expected = new DdmSignableTaskDto();
-    when(taskService.getTaskById(id)).thenReturn(expected);
+    var expected = new SignableUserTaskDto();
+    when(taskService.getTaskById(id, request)).thenReturn(expected);
 
-    var result = taskController.getById(id);
+    var result = taskController.getById(id, request);
     assertThat(result).isSameAs(expected);
-    verify(taskService).getTaskById(id);
+    verify(taskService).getTaskById(id, request);
   }
 }

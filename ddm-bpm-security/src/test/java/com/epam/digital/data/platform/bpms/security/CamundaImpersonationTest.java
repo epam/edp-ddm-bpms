@@ -41,8 +41,11 @@ public class CamundaImpersonationTest {
     var impersonator = new Authentication("impersonator", null);
     var impersonatee = new Authentication("impersonatee", null);
     when(processEngine.getIdentityService()).thenReturn(identityService);
-    when(identityService.getCurrentAuthentication()).thenReturn(impersonator);
-    var camundaImpersonation = new CamundaImpersonation(processEngine, impersonatee);
+    var camundaImpersonation = CamundaImpersonation.builder()
+        .processEngine(processEngine)
+        .impersonator(impersonator)
+        .impersonatee(impersonatee)
+        .build();
 
     camundaImpersonation.impersonate();
     camundaImpersonation.revertToSelf();

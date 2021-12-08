@@ -22,7 +22,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.epam.digital.data.platform.bpms.api.dto.DdmSignableTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.SignableUserTaskDto;
 import com.epam.digital.data.platform.dso.api.dto.Subject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Set;
@@ -39,7 +39,7 @@ class ExtendedUserTaskRestClientIT extends BaseIT {
     var id = "taskId";
     var processDefinitionName = "processDefinitionName";
     var signatureValidationPack = Set.of(Subject.ENTREPRENEUR);
-    var dto = new DdmSignableTaskDto();
+    var dto = new SignableUserTaskDto();
     dto.setId(id);
     dto.setProcessDefinitionName(processDefinitionName);
     dto.setSignatureValidationPack(signatureValidationPack);

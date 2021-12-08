@@ -16,7 +16,8 @@
 
 package com.epam.digital.data.platform.bpms.client;
 
-import com.epam.digital.data.platform.bpms.api.dto.DdmProcessInstanceCountQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.HistoryProcessInstanceQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.ProcessInstanceCountQueryDto;
 import com.epam.digital.data.platform.bpms.client.exception.ProcessInstanceVariableNotFoundException;
 import feign.error.ErrorCodes;
 import feign.error.ErrorHandling;
@@ -44,7 +45,7 @@ public interface ProcessInstanceRestClient extends BaseFeignClient {
    */
   @GetMapping("/count")
   @ErrorHandling
-  CountResultDto getProcessInstancesCount(@SpringQueryMap DdmProcessInstanceCountQueryDto query);
+  CountResultDto getProcessInstancesCount(@SpringQueryMap ProcessInstanceCountQueryDto query);
 
   /**
    * Method for getting {@link VariableValueDto} entity

@@ -62,7 +62,7 @@ class HistoricProcessInstanceControllerIT extends BaseIT {
         .hasFieldOrPropertyWithValue("processDefinitionName", "Test Pending Process Instance")
         .hasFieldOrProperty("startTime")
         .hasFieldOrProperty("endTime")
-        .hasFieldOrPropertyWithValue("state", HistoryProcessInstanceStatus.ACTIVE)
+        .hasFieldOrPropertyWithValue("state", HistoryProcessInstanceStatus.PENDING)
         .hasFieldOrPropertyWithValue("processCompletionResult", null)
         .hasFieldOrPropertyWithValue("excerptId", null);
   }
@@ -90,7 +90,7 @@ class HistoricProcessInstanceControllerIT extends BaseIT {
 
   @Test
   @Deployment(resources = "/bpmn/testPendingProcessInstance.bpmn")
-  void getHistoryProcessInstanceById_active() throws IOException {
+  void getHistoryProcessInstanceById_pending() throws IOException {
     var startResult = postForObject("api/process-definition/key/testPendingProcessInstance/start",
         "", Map.class);
     var id = (String) startResult.get("id");
@@ -104,7 +104,7 @@ class HistoricProcessInstanceControllerIT extends BaseIT {
         .hasFieldOrPropertyWithValue("processDefinitionName", "Test Pending Process Instance")
         .hasFieldOrProperty("startTime")
         .hasFieldOrProperty("endTime")
-        .hasFieldOrPropertyWithValue("state", HistoryProcessInstanceStatus.ACTIVE)
+        .hasFieldOrPropertyWithValue("state", HistoryProcessInstanceStatus.PENDING)
         .hasFieldOrPropertyWithValue("processCompletionResult", null)
         .hasFieldOrPropertyWithValue("excerptId", null);
   }
