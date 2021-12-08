@@ -18,11 +18,15 @@ package com.epam.digital.data.platform.bpms.engine.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.epam.digital.data.platform.dataaccessor.VariableAccessor;
 import com.epam.digital.data.platform.dataaccessor.VariableAccessorFactory;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableWriteAccessor;
+import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessStartTimeVariable;
+import java.time.LocalDateTime;
 import org.assertj.core.util.Maps;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
@@ -30,6 +34,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -43,27 +48,38 @@ class CamundaEngineSystemVariablesSupportListenerTest {
   private CamundaProperties camundaProperties;
   @Mock
   private VariableAccessorFactory variableAccessorFactory;
+  @Mock
+  private ProcessStartTimeVariable processStartTimeVariable;
 
-  @Mock
-  private DelegateExecution delegateExecution;
-  @Mock
-  private ActivityImpl activity;
-  @Mock
-  private VariableAccessor variableAccessor;
+  @Captor
+  private ArgumentCaptor<ExecutionListener> executionListenerArgumentCaptor;
+  @Captor
+  private ArgumentCaptor<LocalDateTime> localDateTimeArgumentCaptor;
 
+  @SuppressWarnings("unchecked")
   @Test
   void shouldAddListenerThatAddsCamundaSystemPropertiesToBpmn() throws Exception {
     when(camundaProperties.getSystemVariables()).thenReturn(Maps.newHashMap("var1", "value1"));
+
+    var delegateExecution = mock(DelegateExecution.class);
+    var variableAccessor = mock(VariableAccessor.class);
     when(variableAccessorFactory.from(delegateExecution)).thenReturn(variableAccessor);
 
+    var startTimeAccessor = mock(NamedVariableWriteAccessor.class);
+    when(processStartTimeVariable.on(delegateExecution)).thenReturn(startTimeAccessor);
+
+    var activity = mock(ActivityImpl.class);
     camundaSystemVariablesSupportListener.parseStartEvent(null, null, activity);
 
-    var captor = ArgumentCaptor.forClass(ExecutionListener.class);
-    verify(activity).addListener(eq(ExecutionListener.EVENTNAME_START), captor.capture());
-    var allValues = captor.getAllValues();
-    var executionListener = allValues.stream().findFirst().get();
+    verify(activity).addListener(eq(ExecutionListener.EVENTNAME_START),
+        executionListenerArgumentCaptor.capture());
+    var executionListener = executionListenerArgumentCaptor.getValue();
     assertThat(executionListener).isNotNull();
     executionListener.notify(delegateExecution);
     verify(variableAccessor).setVariable("var1", "value1");
+    verify(processStartTimeVariable).on(delegateExecution);
+    verify(startTimeAccessor).set(localDateTimeArgumentCaptor.capture());
+
+    assertThat(localDateTimeArgumentCaptor.getValue()).isNotNull();
   }
 }
