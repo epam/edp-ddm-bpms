@@ -29,6 +29,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
@@ -37,6 +39,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 
 public class JuelFunctionsIT extends BaseIT {
+
+  @Inject
+  protected HistoryService historyService;
 
   @Test
   @Deployment(resources = "bpmn/initiator_juel_function.bpmn")

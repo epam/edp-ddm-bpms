@@ -28,10 +28,10 @@ import static com.github.tomakehurst.wiremock.matching.RequestPatternBuilder.new
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 
-import com.epam.digital.data.platform.bpms.api.dto.ClaimTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmClaimTaskQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.PaginationQueryDto;
-import com.epam.digital.data.platform.bpms.api.dto.TaskCountQueryDto;
-import com.epam.digital.data.platform.bpms.api.dto.TaskQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmTaskCountQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmTaskQueryDto;
 import com.epam.digital.data.platform.bpms.client.exception.AuthorizationException;
 import com.epam.digital.data.platform.bpms.client.exception.TaskNotFoundException;
 import com.epam.digital.data.platform.starter.errorhandling.dto.ErrorDetailDto;
@@ -70,7 +70,7 @@ class CamundaTaskRestClientIT extends BaseIT {
         )
     );
 
-    var taskCount = camundaTaskRestClient.getTaskCountByParams(TaskCountQueryDto.builder().build());
+    var taskCount = camundaTaskRestClient.getTaskCountByParams(DdmTaskCountQueryDto.builder().build());
 
     assertThat(taskCount.getCount()).isOne();
   }
@@ -90,7 +90,7 @@ class CamundaTaskRestClientIT extends BaseIT {
     );
 
     var tasksByParams = camundaTaskRestClient
-        .getTasksByParams(TaskQueryDto.builder().assignee("testAssignee").build(),
+        .getTasksByParams(DdmTaskQueryDto.builder().assignee("testAssignee").build(),
             paginationQueryDto);
 
     assertThat(tasksByParams.size()).isOne();
@@ -190,7 +190,7 @@ class CamundaTaskRestClientIT extends BaseIT {
   @Test
   void shouldReturnTasksByProcessInstanceIdIn() throws JsonProcessingException {
     var paginationQueryDto = PaginationQueryDto.builder().build();
-    var requestDto = TaskQueryDto.builder()
+    var requestDto = DdmTaskQueryDto.builder()
         .processInstanceIdIn(
             Lists.newArrayList("testProcessInstanceId", "testProcessInstanceId2")).build();
 
@@ -224,7 +224,7 @@ class CamundaTaskRestClientIT extends BaseIT {
   @Test
   void shouldReturnTasksByProcessInstanceId() throws JsonProcessingException {
     var paginationQueryDto = PaginationQueryDto.builder().build();
-    var requestDto = TaskQueryDto.builder().processInstanceId("testProcessInstanceId").build();
+    var requestDto = DdmTaskQueryDto.builder().processInstanceId("testProcessInstanceId").build();
 
     var task = new TaskEntity();
     task.setProcessInstanceId("testProcessInstanceId");
@@ -240,7 +240,7 @@ class CamundaTaskRestClientIT extends BaseIT {
         )
     );
 
-    var tasksByParams = camundaTaskRestClient.getTasksByParams(TaskQueryDto.builder()
+    var tasksByParams = camundaTaskRestClient.getTasksByParams(DdmTaskQueryDto.builder()
         .processInstanceId("testProcessInstanceId").build(), paginationQueryDto);
 
     assertThat(tasksByParams.size()).isOne();
@@ -279,8 +279,8 @@ class CamundaTaskRestClientIT extends BaseIT {
     var paginationQueryDto = PaginationQueryDto.builder().build();
     String expectedBody = "{\"orQueries\":[{\"assignee\": \"testuser\",\"unassigned\": true}]}";
 
-    var requestDto = TaskQueryDto.builder()
-        .orQueries(List.of(TaskQueryDto.builder()
+    var requestDto = DdmTaskQueryDto.builder()
+        .orQueries(List.of(DdmTaskQueryDto.builder()
             .assignee("testuser")
             .unassigned(true)
             .build()))
@@ -304,7 +304,7 @@ class CamundaTaskRestClientIT extends BaseIT {
 
   @Test
   void shouldClaimTaskByIdSuccessfulWhenHttpStatus204() throws JsonProcessingException {
-    var claimTaskDto = ClaimTaskDto.builder().userId("userId").build();
+    var claimTaskDto = DdmClaimTaskQueryDto.builder().userId("userId").build();
     var stubMapping = stubFor(post(urlEqualTo("/api/task/testId204/claim"))
         .withRequestBody(equalTo(objectMapper.writeValueAsString(claimTaskDto)))
         .willReturn(aResponse().withStatus(204)));
