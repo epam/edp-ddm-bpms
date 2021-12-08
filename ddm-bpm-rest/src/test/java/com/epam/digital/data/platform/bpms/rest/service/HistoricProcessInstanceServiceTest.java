@@ -26,7 +26,6 @@ import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
 import com.epam.digital.data.platform.bpms.rest.dto.SystemVariablesDto;
 import com.epam.digital.data.platform.bpms.rest.mapper.LocalDateTimeMapper;
 import com.epam.digital.data.platform.bpms.rest.mapper.ProcessInstanceMapper;
-import com.epam.digital.data.platform.bpms.rest.service.HistoricProcessInstanceService;
 import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessInstanceHistoricService;
 import com.epam.digital.data.platform.bpms.rest.service.repository.VariableInstanceHistoricService;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
@@ -165,7 +164,8 @@ class HistoricProcessInstanceServiceTest {
   }
 
   private void mockVariables(HistoryProcessInstanceDto expected) {
-    var variables = Map.of(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
+    Map<String, Object> variables = Map.of(
+        ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
         expected.getProcessCompletionResult(),
         ProcessExcerptIdVariable.SYS_VAR_PROCESS_EXCERPT_ID, expected.getExcerptId());
     when(variableInstanceHistoricService.getSystemVariablesForProcessInstanceIds(expected.getId()))

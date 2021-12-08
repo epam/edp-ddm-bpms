@@ -18,11 +18,12 @@ package com.epam.digital.data.platform.bpms.rest.service;
 
 import com.epam.digital.data.platform.bpms.api.dto.DdmProcessInstanceDto;
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
+import com.epam.digital.data.platform.bpms.rest.dto.SystemVariablesDto;
 import com.epam.digital.data.platform.bpms.rest.mapper.ProcessInstanceMapper;
 import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessDefinitionRepositoryService;
-import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessInstanceHistoricService;
 import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessInstanceRuntimeService;
 import com.epam.digital.data.platform.bpms.rest.service.repository.TaskRuntimeService;
+import com.epam.digital.data.platform.bpms.rest.service.repository.VariableInstanceRuntimeService;
 import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
@@ -48,7 +48,7 @@ import org.springframework.stereotype.Service;
 public class ProcessInstanceService {
 
   private final ProcessInstanceRuntimeService processInstanceRuntimeService;
-  private final ProcessInstanceHistoricService processInstanceHistoricService;
+  private final VariableInstanceRuntimeService variableInstanceRuntimeService;
   private final ProcessDefinitionRepositoryService processDefinitionRepositoryService;
   private final TaskRuntimeService taskRuntimeService;
 
@@ -74,8 +74,8 @@ public class ProcessInstanceService {
       return List.of();
     }
 
-    var historicalProcessInstances = getHistoricProcessInstances(dtos);
-    log.trace("Found {} historic process instances", historicalProcessInstances.size());
+    var systemVariablesDtos = getSystemVariablesDtos(dtos);
+    log.trace("Found system variables for {} process instances", systemVariablesDtos.size());
 
     var processDefinitionNames = getProcessDefinitionNames(dtos);
     log.trace("Found {} process definition names", processDefinitionNames.size());
@@ -83,20 +83,21 @@ public class ProcessInstanceService {
     var pendingProcessInstanceIds = getProcessInstanceIdsWithPendingTasks(dtos);
     log.trace("Found {} pending process instances", pendingProcessInstanceIds.size());
 
-    var result = processInstanceMapper.toDdmProcessInstanceDtos(dtos, historicalProcessInstances,
+    var result = processInstanceMapper.toDdmProcessInstanceDtos(dtos, systemVariablesDtos,
         processDefinitionNames, pendingProcessInstanceIds);
     log.info("Found {} process instances", dtos.size());
 
     return result;
   }
 
-  private Map<String, HistoricProcessInstance> getHistoricProcessInstances(
+  private Map<String, SystemVariablesDto> getSystemVariablesDtos(
       List<ProcessInstanceDto> dtos) {
     var processInstanceIds = dtos.stream()
         .map(ProcessInstanceDto::getId)
-        .collect(Collectors.toSet());
+        .toArray(String[]::new);
 
-    return processInstanceHistoricService.getHistoricProcessInstances(processInstanceIds);
+    return variableInstanceRuntimeService.getSystemVariablesForProcessInstanceIds(
+        processInstanceIds);
   }
 
   private Map<String, String> getProcessDefinitionNames(

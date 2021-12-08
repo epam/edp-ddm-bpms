@@ -19,6 +19,10 @@ package com.epam.digital.data.platform.dataaccessor.sysvar;
 import com.epam.digital.data.platform.dataaccessor.VariableAccessorFactory;
 import com.epam.digital.data.platform.dataaccessor.named.BaseNamedVariableAccessor;
 
+/**
+ * Named variable accessor for system variable with name {@code sys-var-process-excerpt-id} and type
+ * {@link String}
+ */
 public class ProcessExcerptIdVariable extends BaseNamedVariableAccessor<String> {
 
   public static final String SYS_VAR_PROCESS_EXCERPT_ID = "sys-var-process-excerpt-id";
