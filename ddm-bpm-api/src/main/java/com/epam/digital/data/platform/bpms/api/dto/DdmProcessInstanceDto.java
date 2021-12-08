@@ -14,8 +14,24 @@
  * limitations under the License.
  */
 
-package com.epam.digital.data.platform.bpms.api.dto.enums;
+package com.epam.digital.data.platform.bpms.api.dto;
 
-public enum HistoryProcessInstanceStatus {
-  ACTIVE, SUSPENDED, COMPLETED, EXTERNALLY_TERMINATED, INTERNALLY_TERMINATED
+import com.epam.digital.data.platform.bpms.api.dto.enums.DdmProcessInstanceStatus;
+import java.time.LocalDateTime;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+
+@Getter
+@Builder
+@ToString
+@EqualsAndHashCode
+public class DdmProcessInstanceDto {
+
+  private String id;
+  private String processDefinitionId;
+  private String processDefinitionName;
+  private LocalDateTime startTime;
+  private DdmProcessInstanceStatus state;
 }
