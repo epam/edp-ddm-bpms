@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.mapstruct.Context;
@@ -37,7 +36,7 @@ import org.mapstruct.ReportingPolicy;
     uses = LocalDateTimeMapper.class)
 public interface ProcessInstanceMapper {
 
-  @Mapping(target = "startTime", qualifiedByName = "toLocalDateTime")
+  @Mapping(target = "startTime", source = "dto.startTime", qualifiedByName = "toLocalDateTime")
   @Mapping(target = "endTime", qualifiedByName = "toLocalDateTime")
   @Mapping(target = "state", source = "dto.state")
   @Mapping(target = "processCompletionResult", source = "variables.processCompletionResult")
@@ -60,11 +59,13 @@ public interface ProcessInstanceMapper {
   @Mapping(target = "id", source = "dto.id")
   @Mapping(target = "processDefinitionId", source = "dto.definitionId")
   @Mapping(target = "processDefinitionName", source = "processDefinitionName")
-  @Mapping(target = "startTime", source = "history.startTime", qualifiedByName = "toLocalDateTime")
+  @Mapping(target = "startTime", source = "systemVariablesDto.startTime")
   @Mapping(target = "state", source = "dto.suspended", qualifiedByName = "toProcessInstanceStatus")
   DdmProcessInstanceDto toDdmProcessInstanceDto(
       ProcessInstanceDto dto,
-      HistoricProcessInstance history, String processDefinitionName, @Context boolean isPending);
+      SystemVariablesDto systemVariablesDto,
+      String processDefinitionName,
+      @Context boolean isPending);
 
   @Named("toProcessInstanceStatus")
   default DdmProcessInstanceStatus toProcessInstanceStatus(boolean isSuspended,
@@ -77,16 +78,16 @@ public interface ProcessInstanceMapper {
 
   default List<DdmProcessInstanceDto> toDdmProcessInstanceDtos(
       List<ProcessInstanceDto> dtos,
-      Map<String, HistoricProcessInstance> historicProcessInstances,
+      Map<String, SystemVariablesDto> systemVariablesDtos,
       Map<String, String> processDefinitionNames,
       Set<String> pendingProcessInstanceIds) {
     return dtos.stream()
         .map(dto -> {
-          var history = historicProcessInstances.get(dto.getId());
+          var variablesDto = systemVariablesDtos.get(dto.getId());
           var processDefinitionName = processDefinitionNames.get(dto.getDefinitionId());
           var isPending = pendingProcessInstanceIds.contains(dto.getId());
 
-          return toDdmProcessInstanceDto(dto, history, processDefinitionName, isPending);
+          return toDdmProcessInstanceDto(dto, variablesDto, processDefinitionName, isPending);
         })
         .collect(Collectors.toList());
   }

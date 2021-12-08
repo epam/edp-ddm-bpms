@@ -2,7 +2,6 @@ package com.epam.digital.data.platform.bpms.rest.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -13,22 +12,20 @@ import static org.mockito.Mockito.when;
 import com.epam.digital.data.platform.bpms.api.dto.DdmProcessInstanceDto;
 import com.epam.digital.data.platform.bpms.api.dto.enums.DdmProcessInstanceStatus;
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
+import com.epam.digital.data.platform.bpms.rest.dto.SystemVariablesDto;
 import com.epam.digital.data.platform.bpms.rest.mapper.LocalDateTimeMapper;
 import com.epam.digital.data.platform.bpms.rest.mapper.ProcessInstanceMapper;
 import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessDefinitionRepositoryService;
-import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessInstanceHistoricService;
 import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessInstanceRuntimeService;
 import com.epam.digital.data.platform.bpms.rest.service.repository.TaskRuntimeService;
+import com.epam.digital.data.platform.bpms.rest.service.repository.VariableInstanceRuntimeService;
 import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
+import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessStartTimeVariable;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Supplier;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
@@ -52,7 +49,7 @@ class ProcessInstanceServiceTest {
   @Mock
   private ProcessInstanceRuntimeService processInstanceRuntimeService;
   @Mock
-  private ProcessInstanceHistoricService processInstanceHistoricService;
+  private VariableInstanceRuntimeService variableInstanceRuntimeService;
   @Mock
   private ProcessDefinitionRepositoryService processDefinitionRepositoryService;
   @Mock
@@ -76,7 +73,7 @@ class ProcessInstanceServiceTest {
     var paginationQueryDto = PaginationQueryDto.builder().firstResult(1).maxResults(2).build();
 
     mockQueryProcessInstances(queryDto, paginationQueryDto);
-    mockQueryHistoryProcessInstances();
+    mockQuerySystemVariablesForProcessInstanceIds();
     mockGetProcessDefinitionNames();
     mockQueryTasks();
 
@@ -116,7 +113,7 @@ class ProcessInstanceServiceTest {
     verify(processInstanceRuntimeService).getProcessInstanceDtos(queryDto, paginationQueryDto);
     verify(camundaAdminImpersonation, never()).execute(any());
     verify(processDefinitionRepositoryService, never()).getProcessDefinitionsNames(any());
-    verify(processInstanceHistoricService, never()).getHistoricProcessInstances(anySet());
+    verify(variableInstanceRuntimeService, never()).getSystemVariablesForProcessInstanceIds(any());
     verify(taskRuntimeService, never()).getTasksByParams(any(), any());
   }
 
@@ -129,15 +126,14 @@ class ProcessInstanceServiceTest {
         .thenReturn(List.of(ProcessInstanceDto.fromProcessInstance(processInstance)));
   }
 
-  private void mockQueryHistoryProcessInstances() {
-    var historyEntity = new HistoricProcessInstanceEntity();
-    historyEntity.setId("id1");
-    historyEntity.setProcessDefinitionId("processDefinitionId1");
+  private void mockQuerySystemVariablesForProcessInstanceIds() {
     var startTime = LocalDateTime.of(2020, 12, 1, 11, 11, 11);
-    historyEntity.setStartTime(new Date(startTime.toInstant(ZoneOffset.UTC).toEpochMilli()));
+    Map<String, Object> variables = Map.of(ProcessStartTimeVariable.SYS_VAR_PROCESS_START_TIME,
+        startTime);
+    var systemVariablesDto = new SystemVariablesDto(variables);
 
-    when(processInstanceHistoricService.getHistoricProcessInstances(Set.of("id1")))
-        .thenReturn(Map.of("id1", historyEntity));
+    when(variableInstanceRuntimeService.getSystemVariablesForProcessInstanceIds("id1"))
+        .thenReturn(Map.of("id1", systemVariablesDto));
   }
 
   private void mockQueryTasks() {
