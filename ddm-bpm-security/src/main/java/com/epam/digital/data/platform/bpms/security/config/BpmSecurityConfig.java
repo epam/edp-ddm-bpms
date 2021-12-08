@@ -16,11 +16,15 @@
 
 package com.epam.digital.data.platform.bpms.security.config;
 
-import com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory;
+import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
+import java.util.List;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.context.annotation.RequestScope;
 
 /**
  * The class represents a holder for beans of the security configuration.
@@ -29,10 +33,13 @@ import org.springframework.context.annotation.Configuration;
 public class BpmSecurityConfig {
 
   @Bean
-  @Qualifier("camundaAdminImpersonationFactory")
-  public CamundaImpersonationFactory camundaAdminImpersonationFactory(
+  @RequestScope
+  @Qualifier("camundaAdminImpersonation")
+  public CamundaImpersonation camundaAdminImpersonation(
       @Value("${camunda.admin-user-id}") String administratorUserId,
-      @Value("${camunda.admin-group-id}") String administratorGroupName) {
-    return new CamundaImpersonationFactory(administratorUserId, administratorGroupName);
+      @Value("${camunda.admin-group-id}") String administratorGroupName,
+      ProcessEngine processEngine) {
+    var impersonatee = new Authentication(administratorUserId, List.of(administratorGroupName));
+    return new CamundaImpersonation(processEngine, impersonatee);
   }
 }

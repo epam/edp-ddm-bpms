@@ -26,7 +26,7 @@ import static com.github.tomakehurst.wiremock.matching.RequestPatternBuilder.new
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.epam.digital.data.platform.bpms.api.dto.ProcessInstanceCountQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmProcessInstanceCountQueryDto;
 import com.epam.digital.data.platform.bpms.client.exception.ProcessInstanceVariableNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.http.RequestMethod;
@@ -54,7 +54,7 @@ class ProcessInstanceRestClientIT extends BaseIT {
     );
 
     CountResultDto processInstancesCount = processInstanceRestClient.getProcessInstancesCount(
-        ProcessInstanceCountQueryDto.builder()
+        DdmProcessInstanceCountQueryDto.builder()
             .rootProcessInstances(true)
             .build()
     );

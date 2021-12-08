@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.epam.digital.data.platform.bpms.rest.service.impl;
+package com.epam.digital.data.platform.bpms.rest.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -24,14 +24,14 @@ import static org.mockito.Mockito.when;
 import com.epam.digital.data.platform.bpms.api.dto.DdmProcessDefinitionDto;
 import com.epam.digital.data.platform.bpms.engine.service.BatchFormService;
 import com.epam.digital.data.platform.bpms.rest.mapper.ProcessDefinitionMapper;
+import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessDefinitionRepositoryService;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import javax.ws.rs.core.Response.Status;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.junit.jupiter.api.Test;
@@ -43,12 +43,12 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class ProcessDefinitionServiceImplTest {
+class ProcessDefinitionServiceTest {
 
   @InjectMocks
-  private ProcessDefinitionServiceImpl processDefinitionService;
+  private ProcessDefinitionService processDefinitionService;
   @Mock
-  private ProcessEngine processEngine;
+  private ProcessDefinitionRepositoryService processDefinitionRepositoryService;
   @Mock
   private BatchFormService batchFormService;
   @Spy
@@ -63,7 +63,7 @@ class ProcessDefinitionServiceImplTest {
     mockProcessInstanceByKey(expectedResult);
     mockFormKeys(expectedResult);
 
-    var result = processDefinitionService.getUserProcessDefinitionDtoByKey(key);
+    var result = processDefinitionService.getDdmProcessDefinitionDtoByKey(key);
 
     assertThat(result).isEqualTo(expectedResult);
   }
@@ -72,18 +72,11 @@ class ProcessDefinitionServiceImplTest {
   void getUserProcessDefinitionDtoByKey_throwsRestException() {
     var key = "key";
 
-    var repoService = mock(RepositoryService.class);
-    when(processEngine.getRepositoryService()).thenReturn(repoService);
-
-    var query = mock(ProcessDefinitionQuery.class);
-    when(repoService.createProcessDefinitionQuery()).thenReturn(query);
-    when(query.latestVersion()).thenReturn(query);
-    when(query.withoutTenantId()).thenReturn(query);
-    when(query.processDefinitionKey(key)).thenReturn(query);
-    when(query.list()).thenReturn(List.of());
+    when(processDefinitionRepositoryService.getProcessDefinitionDtoByKey(key))
+        .thenReturn(Optional.empty());
 
     var ex = assertThrows(RestException.class,
-        () -> processDefinitionService.getUserProcessDefinitionDtoByKey(key));
+        () -> processDefinitionService.getDdmProcessDefinitionDtoByKey(key));
 
     assertThat(ex)
         .hasFieldOrPropertyWithValue("message",
@@ -98,7 +91,7 @@ class ProcessDefinitionServiceImplTest {
     var queryDto = mockGetCamundaProcessDefinitions(expectedResult);
     mockFormKeys(expectedResult);
 
-    var result = processDefinitionService.getUserProcessDefinitionDtos(queryDto);
+    var result = processDefinitionService.getDdmProcessDefinitionDtos(queryDto);
 
     assertThat(result).hasSize(1);
     assertThat(result.get(0)).isEqualTo(expectedResult);
@@ -117,24 +110,20 @@ class ProcessDefinitionServiceImplTest {
   private void mockProcessInstanceByKey(DdmProcessDefinitionDto expectedResult) {
     var processDefinition = mockProcessDefinition(expectedResult);
 
-    var repoService = mock(RepositoryService.class);
-    when(processEngine.getRepositoryService()).thenReturn(repoService);
-
-    var query = mock(ProcessDefinitionQuery.class);
-    when(repoService.createProcessDefinitionQuery()).thenReturn(query);
-    when(query.latestVersion()).thenReturn(query);
-    when(query.withoutTenantId()).thenReturn(query);
-    when(query.processDefinitionKey(expectedResult.getKey())).thenReturn(query);
-    when(query.list()).thenReturn(List.of(processDefinition));
+    when(processDefinitionRepositoryService.getProcessDefinitionDtoByKey(expectedResult.getKey()))
+        .thenReturn(Optional.of(processDefinition));
   }
 
-  private ProcessDefinition mockProcessDefinition(DdmProcessDefinitionDto expectedResult) {
-    var processDefinition = mock(ProcessDefinition.class);
-    when(processDefinition.getId()).thenReturn(expectedResult.getId());
-    when(processDefinition.getKey()).thenReturn(expectedResult.getKey());
-    when(processDefinition.getName()).thenReturn(expectedResult.getName());
-    when(processDefinition.isSuspended()).thenReturn(expectedResult.isSuspended());
-    return processDefinition;
+  private org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto mockProcessDefinition(
+      DdmProcessDefinitionDto expectedResult) {
+    var processDefinition = new ProcessDefinitionEntity();
+    processDefinition.setId(expectedResult.getId());
+    processDefinition.setKey(expectedResult.getKey());
+    processDefinition.setName(expectedResult.getName());
+    processDefinition.setSuspensionState(
+        expectedResult.isSuspended() ? SuspensionState.SUSPENDED.getStateCode()
+            : SuspensionState.ACTIVE.getStateCode());
+    return org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto.fromProcessDefinition(processDefinition);
   }
 
   private void mockFormKeys(DdmProcessDefinitionDto expectedResult) {
@@ -147,10 +136,8 @@ class ProcessDefinitionServiceImplTest {
     var processDefinition = mockProcessDefinition(expectedResult);
 
     var queryDto = mock(ProcessDefinitionQueryDto.class);
-    var query = mock(ProcessDefinitionQuery.class);
-    when(queryDto.toQuery(processEngine)).thenReturn(query);
-
-    when(query.list()).thenReturn(List.of(processDefinition));
+    when(processDefinitionRepositoryService.getProcessDefinitionDtos(queryDto))
+        .thenReturn(List.of(processDefinition));
     return queryDto;
   }
 }
