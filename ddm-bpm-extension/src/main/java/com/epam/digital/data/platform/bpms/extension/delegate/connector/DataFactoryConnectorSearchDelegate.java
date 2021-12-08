@@ -16,41 +16,38 @@
 
 package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
+import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
+import com.epam.digital.data.platform.bpms.extension.delegate.connector.header.builder.HeaderBuilderFactory;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
+import com.epam.digital.data.platform.datafactory.feign.client.DataFactoryFeignClient;
+import com.epam.digital.data.platform.datafactory.feign.model.response.ConnectorResponse;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * The class represents an implementation of {@link BaseConnectorDelegate} that is used to search
- * data in Data Factory
+ * The class represents an implementation of {@link BaseJavaDelegate} that is used to search data in
+ * Data Factory
  */
 @Slf4j
+@RequiredArgsConstructor
 @Component(DataFactoryConnectorSearchDelegate.DELEGATE_NAME)
-public class DataFactoryConnectorSearchDelegate extends BaseConnectorDelegate {
+public class DataFactoryConnectorSearchDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "dataFactoryConnectorSearchDelegate";
 
-  private final String dataFactoryBaseUrl;
-
+  @SystemVariable(name = "resource")
+  protected NamedVariableAccessor<String> resourceVariable;
+  @SystemVariable(name = "response", isTransient = true)
+  protected NamedVariableAccessor<ConnectorResponse> responseVariable;
   @SystemVariable(name = "searchConditions")
   private NamedVariableAccessor<Map<String, String>> searchConditionsVariable;
 
-  @Autowired
-  public DataFactoryConnectorSearchDelegate(RestTemplate restTemplate,
-      @Value("${spring.application.name}") String springAppName,
-      @Value("${camunda.system-variables.const_dataFactoryBaseUrl}") String dataFactoryBaseUrl) {
-    super(restTemplate, springAppName);
-    this.dataFactoryBaseUrl = dataFactoryBaseUrl;
-  }
+  private final DataFactoryFeignClient dataFactoryFeignClient;
+  private final HeaderBuilderFactory headerBuilderFactory;
 
   @Override
   public void executeInternal(DelegateExecution execution) {
@@ -58,20 +55,17 @@ public class DataFactoryConnectorSearchDelegate extends BaseConnectorDelegate {
     var searchConditions = searchConditionsVariable.from(execution).getOrDefault(Map.of());
 
     log.debug("Start searching entities on resource {}", resource);
-    var response = performSearch(execution, resource, searchConditions);
+    var headers = headerBuilderFactory.builder()
+        .contentTypeJson()
+        .processExecutionHttpHeaders()
+        .digitalSignatureHttpHeaders()
+        .accessTokenHeader()
+        .build();
+
+    var response = dataFactoryFeignClient.performSearch(resource, searchConditions, headers);
     log.debug("Found entities on resource {}", resource);
 
     responseVariable.on(execution).set(response);
-  }
-
-  private ConnectorResponse performSearch(DelegateExecution delegateExecution, String resourceName,
-      Map<String, String> searchCriteria) {
-    var uriBuilder = UriComponentsBuilder.fromHttpUrl(dataFactoryBaseUrl).pathSegment(resourceName)
-        .encode();
-    searchCriteria.forEach(uriBuilder::queryParam);
-
-    return perform(RequestEntity.get(uriBuilder.build().toUri())
-        .headers(getHeaders(delegateExecution)).build());
   }
 
   @Override

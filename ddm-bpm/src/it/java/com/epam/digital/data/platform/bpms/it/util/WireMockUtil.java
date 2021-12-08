@@ -20,15 +20,17 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import java.net.MalformedURLException;
 import java.net.URL;
+import org.junit.Rule;
 
 public final class WireMockUtil {
 
   public static WireMockServer createAndStartMockServerForUrl(String urlStr)
       throws MalformedURLException {
     URL url = new URL(urlStr);
-    WireMockServer wireMockServer = new WireMockServer(wireMockConfig().port(url.getPort()));
+    WireMockServer wireMockServer = new WireMockRule(wireMockConfig().port(url.getPort()));
     WireMock.configureFor(url.getHost(), url.getPort());
     wireMockServer.start();
     return wireMockServer;

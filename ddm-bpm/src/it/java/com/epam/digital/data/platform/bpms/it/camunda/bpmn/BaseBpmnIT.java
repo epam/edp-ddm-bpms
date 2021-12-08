@@ -31,8 +31,8 @@ import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.history
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.managementService;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
 
-import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
-import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
+import com.epam.digital.data.platform.bpms.it.dto.CompleteActivityDto;
+import com.epam.digital.data.platform.bpms.it.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.extension.delegate.ceph.CephKeyProvider;
 import com.epam.digital.data.platform.bpms.it.BaseIT;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;

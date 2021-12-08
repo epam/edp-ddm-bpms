@@ -16,55 +16,60 @@
 
 package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
+import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
+import com.epam.digital.data.platform.bpms.extension.delegate.connector.header.builder.HeaderBuilderFactory;
+import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
+import com.epam.digital.data.platform.datafactory.feign.client.DataFactoryFeignClient;
+import com.epam.digital.data.platform.datafactory.feign.model.response.ConnectorResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.RequestEntity;
+import org.camunda.spin.json.SpinJsonNode;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * The class represents an implementation of {@link BaseConnectorDelegate} that is used to update
+ * The class represents an implementation of {@link BaseJavaDelegate} that is used to update
  * data in Data Factory
  */
 @Slf4j
+@RequiredArgsConstructor
 @Component("dataFactoryConnectorUpdateDelegate")
-public class DataFactoryConnectorUpdateDelegate extends BaseConnectorDelegate {
+public class DataFactoryConnectorUpdateDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "dataFactoryConnectorUpdateDelegate";
 
-  private final String dataFactoryBaseUrl;
+  @SystemVariable(name = "resource")
+  protected NamedVariableAccessor<String> resourceVariable;
+  @SystemVariable(name = "id")
+  protected NamedVariableAccessor<String> resourceIdVariable;
+  @SystemVariable(name = "payload", isTransient = true)
+  protected NamedVariableAccessor<SpinJsonNode> payloadVariable;
+  @SystemVariable(name = "response", isTransient = true)
+  protected NamedVariableAccessor<ConnectorResponse> responseVariable;
 
-  @Autowired
-  public DataFactoryConnectorUpdateDelegate(RestTemplate restTemplate,
-      @Value("${spring.application.name}") String springAppName,
-      @Value("${camunda.system-variables.const_dataFactoryBaseUrl}") String dataFactoryBaseUrl) {
-    super(restTemplate, springAppName);
-    this.dataFactoryBaseUrl = dataFactoryBaseUrl;
-  }
+  private final DataFactoryFeignClient dataFactoryFeignClient;
+  private final HeaderBuilderFactory headerBuilderFactory;
 
   @Override
-  public void executeInternal(DelegateExecution execution) {
+  public void executeInternal(DelegateExecution execution) throws JsonProcessingException {
     var resource = resourceVariable.from(execution).get();
     var id = resourceIdVariable.from(execution).get();
     var payload = payloadVariable.from(execution).getOptional();
 
     log.debug("Start updating entity with id {} on resource {}", id, resource);
-    var response = performPut(execution, resource, id, payload.map(Object::toString).orElse(null));
+    var requestBody = payload.map(Object::toString).orElse(null);
+    var headers = headerBuilderFactory.builder()
+        .contentTypeJson()
+        .processExecutionHttpHeaders()
+        .digitalSignatureHttpHeaders()
+        .accessTokenHeader()
+        .build();
+    var response = dataFactoryFeignClient.performPut(resource, id, requestBody, headers);
     log.debug("Entity with id {} successfully updated", id);
 
     responseVariable.on(execution).set(response);
-  }
-
-  private ConnectorResponse performPut(DelegateExecution delegateExecution, String resourceName,
-      String resourceId, String body) {
-    var uri = UriComponentsBuilder.fromHttpUrl(dataFactoryBaseUrl).pathSegment(resourceName)
-        .pathSegment(resourceId).build().toUri();
-
-    return perform(RequestEntity.put(uri).headers(getHeaders(delegateExecution)).body(body));
   }
 
   @Override

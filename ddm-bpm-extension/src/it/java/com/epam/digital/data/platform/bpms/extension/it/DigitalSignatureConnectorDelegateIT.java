@@ -22,7 +22,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 
+import com.epam.digital.data.platform.dso.api.dto.SignResponseDto;
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import java.util.LinkedHashMap;
 import javax.inject.Inject;
@@ -39,13 +41,16 @@ public class DigitalSignatureConnectorDelegateIT extends BaseIT {
 
   @Test
   @Deployment(resources = {"bpmn/connector/testDigitalSignatureConnectorDelegate.bpmn"})
-  public void testDigitalSignatureConnectorDelegate() {
+  public void testDigitalSignatureConnectorDelegate() throws JsonProcessingException {
+    var response = SignResponseDto.builder().signature("test").build();
     digitalSignatureMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo("/api/eseal/sign"))
             .withHeader("Content-Type", equalTo("application/json"))
             .withHeader("X-Access-Token", equalTo(validAccessToken))
             .withRequestBody(equalTo("{\"data\":\"data to sign\"}"))
-            .willReturn(aResponse().withStatus(200).withBody("{\"signature\": \"test\"}"))));
+            .willReturn(
+                aResponse().withHeader("Content-Type", "application/json").withStatus(200)
+                    .withBody(objectMapper.writeValueAsString(response)))));
 
     var processInstance = runtimeService
         .startProcessInstanceByKey("testDigitalSignatureConnectorDelegate_key");
@@ -55,7 +60,8 @@ public class DigitalSignatureConnectorDelegateIT extends BaseIT {
     cephService.putFormData(cephKey, FormDataDto.builder().accessToken(validAccessToken)
         .data(new LinkedHashMap<>()).build());
 
-    String taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionTaskForDso").singleResult().getId();
+    String taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionTaskForDso")
+        .singleResult().getId();
     taskService.complete(taskId);
 
     BpmnAwareTests.assertThat(processInstance).isEnded();

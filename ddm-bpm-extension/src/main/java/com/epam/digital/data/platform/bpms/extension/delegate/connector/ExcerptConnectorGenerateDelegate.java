@@ -16,33 +16,31 @@
 
 package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
+import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
+import com.epam.digital.data.platform.bpms.extension.delegate.connector.header.builder.HeaderBuilderFactory;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
+import com.epam.digital.data.platform.datafactory.feign.client.ExcerptFeignClient;
+import com.epam.digital.data.platform.datafactory.feign.model.response.ConnectorResponse;
 import com.epam.digital.data.platform.excerpt.model.ExcerptEventDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * The class represents an implementation of {@link BaseConnectorDelegate} that is used for excerpt
+ * The class represents an implementation of {@link BaseJavaDelegate} that is used for excerpt
  * generation
  */
 @Slf4j
+@RequiredArgsConstructor
 @Component(ExcerptConnectorGenerateDelegate.DELEGATE_NAME)
-public class ExcerptConnectorGenerateDelegate extends BaseConnectorDelegate {
+public class ExcerptConnectorGenerateDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "excerptConnectorGenerateDelegate";
 
-  private final String excerptServiceBaseUrl;
-  private final ObjectMapper objectMapper;
 
   @SystemVariable(name = "excerptType")
   private NamedVariableAccessor<String> excerptTypeVariable;
@@ -50,16 +48,12 @@ public class ExcerptConnectorGenerateDelegate extends BaseConnectorDelegate {
   private NamedVariableAccessor<Map<String, Object>> excerptInputDataVariable;
   @SystemVariable(name = "requiresSystemSignature")
   private NamedVariableAccessor<String> requiresSystemSignatureVariable;
+  @SystemVariable(name = "response", isTransient = true)
+  protected NamedVariableAccessor<ConnectorResponse> responseVariable;
 
-  @Autowired
-  public ExcerptConnectorGenerateDelegate(RestTemplate restTemplate,
-      @Value("${spring.application.name}") String springAppName,
-      @Value("${excerpt-service-api.url}") String excerptServiceBaseUrl,
-      ObjectMapper objectMapper) {
-    super(restTemplate, springAppName);
-    this.excerptServiceBaseUrl = excerptServiceBaseUrl;
-    this.objectMapper = objectMapper;
-  }
+  private final ExcerptFeignClient excerptFeignClient;
+  private final ObjectMapper objectMapper;
+  private final HeaderBuilderFactory headerBuilderFactory;
 
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
@@ -71,18 +65,18 @@ public class ExcerptConnectorGenerateDelegate extends BaseConnectorDelegate {
     var requestBody = new ExcerptEventDto(null, excerptType, excerptInputData,
         requiresSystemSignature);
 
-    log.debug("Start generating excerpt on resource {}", RESOURCE_EXCERPTS);
-    var response = performPost(execution, objectMapper.writeValueAsString(requestBody));
+    var headers = headerBuilderFactory.builder()
+        .contentTypeJson()
+        .processExecutionHttpHeaders()
+        .digitalSignatureHttpHeaders()
+        .accessTokenHeader()
+        .build();
+    log.debug("Start generating excerpt");
+    var response = excerptFeignClient
+        .performPost(objectMapper.writeValueAsString(requestBody), headers);
     log.debug("Excerpt successfully generated");
 
     responseVariable.on(execution).set(response);
-  }
-
-  private ConnectorResponse performPost(DelegateExecution delegateExecution,
-      String body) {
-    var uri = UriComponentsBuilder.fromHttpUrl(excerptServiceBaseUrl).pathSegment(RESOURCE_EXCERPTS)
-        .build().toUri();
-    return perform(RequestEntity.post(uri).headers(getHeaders(delegateExecution)).body(body));
   }
 
   @Override

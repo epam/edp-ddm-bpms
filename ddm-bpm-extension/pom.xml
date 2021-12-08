@@ -5,7 +5,7 @@
   <parent>
     <artifactId>ddm-bpm-parent</artifactId>
     <groupId>com.epam.digital.data.platform</groupId>
-    <version>1.5.3-SNAPSHOT</version>
+    <version>1.5.4-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -15,9 +15,21 @@
   <properties>
     <camunda.bpm.assert.version>7.0.0</camunda.bpm.assert.version>
     <keycloak.version>13.0.1</keycloak.version>
+    <dso.version>1.5.1-SNAPSHOT</dso.version>
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>com.epam.digital.data.platform</groupId>
+      <artifactId>ddm-data-factory-client</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.epam.digital.data.platform</groupId>
+      <artifactId>digital-signature-ops-client</artifactId>
+      <version>${dso.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
@@ -42,11 +54,6 @@
       <groupId>com.epam.digital.data.platform</groupId>
       <artifactId>ddm-bpm-data-accessor</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.epam.digital.data.platform</groupId>
-      <artifactId>ddm-starter-localization</artifactId>
-      <version>${ddm-starter-localization.version}</version>
     </dependency>
     <dependency>
       <groupId>com.epam.digital.data.platform</groupId>

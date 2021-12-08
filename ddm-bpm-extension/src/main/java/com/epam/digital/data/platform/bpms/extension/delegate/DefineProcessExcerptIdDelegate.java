@@ -33,7 +33,6 @@ import org.springframework.stereotype.Component;
 public class DefineProcessExcerptIdDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_EXECUTION = "defineProcessExcerptIdDelegate";
-  public static final String EXCERPT_ID_PARAMETER = "excerptId";
 
   @SystemVariable(name = "excerptId")
   private NamedVariableAccessor<String> excerptIdVariable;

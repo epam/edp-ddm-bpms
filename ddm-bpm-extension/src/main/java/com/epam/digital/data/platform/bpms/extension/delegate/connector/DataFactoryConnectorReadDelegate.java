@@ -16,35 +16,37 @@
 
 package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.ConnectorResponse;
+import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
+import com.epam.digital.data.platform.bpms.extension.delegate.connector.header.builder.HeaderBuilderFactory;
+import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
+import com.epam.digital.data.platform.datafactory.feign.client.DataFactoryFeignClient;
+import com.epam.digital.data.platform.datafactory.feign.model.response.ConnectorResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * The class represents an implementation of {@link BaseConnectorDelegate} that is used to read data
- * from Data Factory
+ * The class represents an implementation of {@link BaseJavaDelegate} that is used to read data from
+ * Data Factory
  */
 @Slf4j
+@RequiredArgsConstructor
 @Component(DataFactoryConnectorReadDelegate.DELEGATE_NAME)
-public class DataFactoryConnectorReadDelegate extends BaseConnectorDelegate {
+public class DataFactoryConnectorReadDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "dataFactoryConnectorReadDelegate";
 
-  private final String dataFactoryBaseUrl;
+  @SystemVariable(name = "resource")
+  protected NamedVariableAccessor<String> resourceVariable;
+  @SystemVariable(name = "response", isTransient = true)
+  protected NamedVariableAccessor<ConnectorResponse> responseVariable;
+  @SystemVariable(name = "id")
+  protected NamedVariableAccessor<String> resourceIdVariable;
 
-  @Autowired
-  public DataFactoryConnectorReadDelegate(RestTemplate restTemplate,
-      @Value("${spring.application.name}") String springAppName,
-      @Value("${camunda.system-variables.const_dataFactoryBaseUrl}") String dataFactoryBaseUrl) {
-    super(restTemplate, springAppName);
-    this.dataFactoryBaseUrl = dataFactoryBaseUrl;
-  }
+  protected final DataFactoryFeignClient dataFactoryFeignClient;
+  protected final HeaderBuilderFactory headerBuilderFactory;
 
   @Override
   public void executeInternal(DelegateExecution execution) {
@@ -52,18 +54,17 @@ public class DataFactoryConnectorReadDelegate extends BaseConnectorDelegate {
     var id = resourceIdVariable.from(execution).get();
 
     log.debug("Start getting entity by id {} on resource {}", id, resource);
-    var response = performGet(execution, resource, id);
+    var headers = headerBuilderFactory.builder()
+        .contentTypeJson()
+        .processExecutionHttpHeaders()
+        .digitalSignatureHttpHeaders()
+        .accessTokenHeader()
+        .build();
+
+    var response = dataFactoryFeignClient.performGet(resource, id, headers);
     log.debug("Got entity by id {}", id);
 
     responseVariable.on(execution).set(response);
-  }
-
-  protected ConnectorResponse performGet(DelegateExecution delegateExecution, String resourceName,
-      String resourceId) {
-    var uri = UriComponentsBuilder.fromHttpUrl(dataFactoryBaseUrl).pathSegment(resourceName)
-        .pathSegment(resourceId).build().toUri();
-
-    return perform(RequestEntity.get(uri).headers(getHeaders(delegateExecution)).build());
   }
 
   @Override

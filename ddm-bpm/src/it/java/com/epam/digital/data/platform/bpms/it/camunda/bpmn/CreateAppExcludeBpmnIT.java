@@ -16,11 +16,11 @@
 
 package com.epam.digital.data.platform.bpms.it.camunda.bpmn;
 
-import static com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil.processInstance;
+import static com.epam.digital.data.platform.bpms.it.util.CamundaAssertionUtil.processInstance;
 
-import com.epam.digital.data.platform.bpms.camunda.dto.AssertWaitingActivityDto;
-import com.epam.digital.data.platform.bpms.camunda.dto.CompleteActivityDto;
-import com.epam.digital.data.platform.bpms.camunda.util.CamundaAssertionUtil;
+import com.epam.digital.data.platform.bpms.it.dto.AssertWaitingActivityDto;
+import com.epam.digital.data.platform.bpms.it.dto.CompleteActivityDto;
+import com.epam.digital.data.platform.bpms.it.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
 import java.io.IOException;
 import java.util.Map;
