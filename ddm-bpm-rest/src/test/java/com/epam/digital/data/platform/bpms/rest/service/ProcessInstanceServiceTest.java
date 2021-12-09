@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import com.epam.digital.data.platform.bpms.api.dto.DdmProcessInstanceDto;
 import com.epam.digital.data.platform.bpms.api.dto.enums.DdmProcessInstanceStatus;
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
+import com.epam.digital.data.platform.bpms.rest.dto.ProcessInstanceExtendedQueryDto;
 import com.epam.digital.data.platform.bpms.rest.dto.SystemVariablesDto;
 import com.epam.digital.data.platform.bpms.rest.mapper.LocalDateTimeMapper;
 import com.epam.digital.data.platform.bpms.rest.mapper.ProcessInstanceMapper;
@@ -69,7 +70,7 @@ class ProcessInstanceServiceTest {
 
   @Test
   void getProcessInstancesByParams() {
-    var queryDto = mock(ProcessInstanceQueryDto.class);
+    var queryDto = mock(ProcessInstanceExtendedQueryDto.class);
     var paginationQueryDto = PaginationQueryDto.builder().firstResult(1).maxResults(2).build();
 
     mockQueryProcessInstances(queryDto, paginationQueryDto);
@@ -101,7 +102,7 @@ class ProcessInstanceServiceTest {
 
   @Test
   void getProcessInstancesByParams_emptyList() {
-    var queryDto = mock(ProcessInstanceQueryDto.class);
+    var queryDto = mock(ProcessInstanceExtendedQueryDto.class);
     var paginationQueryDto = PaginationQueryDto.builder().firstResult(1).maxResults(2).build();
 
     when(processInstanceRuntimeService.getProcessInstanceDtos(queryDto, paginationQueryDto))

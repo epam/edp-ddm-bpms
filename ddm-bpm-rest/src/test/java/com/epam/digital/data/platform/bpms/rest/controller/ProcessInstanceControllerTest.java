@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import com.epam.digital.data.platform.bpms.api.dto.DdmProcessInstanceDto;
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
+import com.epam.digital.data.platform.bpms.rest.dto.ProcessInstanceExtendedQueryDto;
 import com.epam.digital.data.platform.bpms.rest.service.ProcessInstanceService;
 import java.util.List;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
@@ -25,7 +26,7 @@ class ProcessInstanceControllerTest {
 
   @Test
   void getByParams() {
-    var queryDto = mock(ProcessInstanceQueryDto.class);
+    var queryDto = mock(ProcessInstanceExtendedQueryDto.class);
     var paginationDto = mock(PaginationQueryDto.class);
 
     List<DdmProcessInstanceDto> expectedList = List.of();

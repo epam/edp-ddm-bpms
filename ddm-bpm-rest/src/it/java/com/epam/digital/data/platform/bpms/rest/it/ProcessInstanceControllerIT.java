@@ -28,7 +28,8 @@ class ProcessInstanceControllerIT extends BaseIT {
     postForObject("api/process-definition/key/testPendingProcessInstance/start", "", Map.class);
 
     var result = postForObject("api/extended/process-instance",
-        "{\"rootProcessInstances\":true, \"unfinished\":true}", DdmProcessInstanceDto[].class);
+        "{\"rootProcessInstances\":true,\"sortBy\":\"startTime\",\"sortOrder\":\"asc\"}",
+        DdmProcessInstanceDto[].class);
 
     assertThat(result).hasSize(1);
     assertThat(result[0])
