@@ -18,6 +18,7 @@ package com.epam.digital.data.platform.bpms.rest.controller;
 
 import com.epam.digital.data.platform.bpms.api.dto.DdmProcessInstanceDto;
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
+import com.epam.digital.data.platform.bpms.rest.dto.ProcessInstanceExtendedQueryDto;
 import com.epam.digital.data.platform.bpms.rest.service.ProcessInstanceService;
 import java.util.List;
 import javax.ws.rs.BeanParam;
@@ -27,7 +28,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import lombok.RequiredArgsConstructor;
-import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.springframework.stereotype.Component;
 
 /**
@@ -51,7 +51,7 @@ public class ProcessInstanceController {
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  public List<DdmProcessInstanceDto> getByParams(ProcessInstanceQueryDto queryDto,
+  public List<DdmProcessInstanceDto> getByParams(ProcessInstanceExtendedQueryDto queryDto,
       @BeanParam PaginationQueryDto paginationQueryDto) {
     return processInstanceService.getProcessInstancesByParams(queryDto, paginationQueryDto);
   }

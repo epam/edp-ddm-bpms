@@ -18,6 +18,7 @@ package com.epam.digital.data.platform.bpms.rest.service;
 
 import com.epam.digital.data.platform.bpms.api.dto.DdmProcessInstanceDto;
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
+import com.epam.digital.data.platform.bpms.rest.dto.ProcessInstanceExtendedQueryDto;
 import com.epam.digital.data.platform.bpms.rest.dto.SystemVariablesDto;
 import com.epam.digital.data.platform.bpms.rest.mapper.ProcessInstanceMapper;
 import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessDefinitionRepositoryService;
@@ -27,13 +28,13 @@ import com.epam.digital.data.platform.bpms.rest.service.repository.VariableInsta
 import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
-import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.springframework.stereotype.Service;
@@ -64,7 +65,7 @@ public class ProcessInstanceService {
    * @return list of {@link DdmProcessInstanceDto}
    */
   public List<DdmProcessInstanceDto> getProcessInstancesByParams(
-      ProcessInstanceQueryDto queryDto, PaginationQueryDto paginationQueryDto) {
+      ProcessInstanceExtendedQueryDto queryDto, PaginationQueryDto paginationQueryDto) {
     log.info("Getting process instances");
 
     var dtos = processInstanceRuntimeService.getProcessInstanceDtos(queryDto, paginationQueryDto);
@@ -85,8 +86,10 @@ public class ProcessInstanceService {
 
     var result = processInstanceMapper.toDdmProcessInstanceDtos(dtos, systemVariablesDtos,
         processDefinitionNames, pendingProcessInstanceIds);
+    if (Objects.nonNull(queryDto.getCustomComparator())) {
+      result.sort(queryDto.getCustomComparator());
+    }
     log.info("Found {} process instances", dtos.size());
-
     return result;
   }
 
