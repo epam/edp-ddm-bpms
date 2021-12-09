@@ -24,6 +24,7 @@ officerConfigMountPath: "/app/config/registry-regulation/officer-roles"
 citizenConfigMountPath: "/app/config/registry-regulation/citizen-roles"
 officerConfigMapName: officer-roles
 citizenConfigMapName: citizen-roles
+trembitaConfConfigmapName: trembita-configuration
 
 javaOpts: "-Xms1536m -Xmx1536m -Duser.timezone=UTC"
 
