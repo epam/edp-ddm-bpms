@@ -26,7 +26,7 @@ HistoryTaskRestClient  --[hidden]> HistoryVariableInstanceClient
 ----
 
 - `BaseFeignClient` - базовий клієнт з базовими налаштуваннями на error decoder
-- `CamundaTaskRestClient` - клієнт який надає доступ до ресурсу `/api/task` (задачі користувача)
+- `TaskRestClient` - клієнт який надає доступ до ресурсу `/api/task` (задачі користувача)
 - `HistoryTaskRestClient` - клієнт який надає доступ до ресурсу `/api/history/task` (історія о виконаних/відмінених задачах користувача)
 - `CamundaVariableInstanceClient` - клієнт який надає доступ до ресурсу `/api/history/variable-instance` (історія про змінні бізнес-процесу)
 - `ProcessDefinitionRestClient` - клієнт який надає доступ до ресурсу `/api/process-definition` (бізнес-процеси)

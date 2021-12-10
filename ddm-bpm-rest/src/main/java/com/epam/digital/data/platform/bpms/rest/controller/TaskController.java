@@ -16,8 +16,9 @@
 
 package com.epam.digital.data.platform.bpms.rest.controller;
 
-import com.epam.digital.data.platform.bpms.api.dto.DdmTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmCompletedTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmSignableTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmTaskDto;
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
 import com.epam.digital.data.platform.bpms.rest.service.UserTaskService;
 import java.util.List;
@@ -30,6 +31,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import lombok.RequiredArgsConstructor;
+import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.springframework.stereotype.Component;
 
@@ -70,5 +72,19 @@ public class TaskController {
   @Produces(MediaType.APPLICATION_JSON)
   public DdmSignableTaskDto getById(@PathParam("id") String id) {
     return taskService.getTaskById(id);
+  }
+
+  /**
+   * Complete user task by id
+   *
+   * @param id  the task id
+   * @param dto dto with request variables
+   * @return {@link DdmCompletedTaskDto}
+   */
+  @POST
+  @Path("/{id}/complete")
+  @Produces(MediaType.APPLICATION_JSON)
+  public DdmCompletedTaskDto completeTask(@PathParam("id") String id, CompleteTaskDto dto) {
+    return taskService.completeTask(id, dto);
   }
 }
