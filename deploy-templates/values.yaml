@@ -109,7 +109,7 @@ storage:
         http-endpoint: ${ceph.http-endpoint}
         access-key: ${ceph.access-key}
         secret-key: ${ceph.secret-key}
-        bucket: ${ceph.bucketName}
+        bucket: ${ceph.bucket}
   file-data:
     type: ceph
     backend:
@@ -117,4 +117,4 @@ storage:
         http-endpoint: ${ceph.http-endpoint}
         access-key: ${ceph.file-storage-access-key}
         secret-key: ${ceph.file-storage-secret-key}
-        bucket: ${fileStorage.bucketName}
+        bucket: ${ceph.file-storage-bucket}
