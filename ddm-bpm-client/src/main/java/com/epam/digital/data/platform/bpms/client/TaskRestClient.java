@@ -19,7 +19,10 @@ package com.epam.digital.data.platform.bpms.client;
 import com.epam.digital.data.platform.bpms.api.dto.DdmClaimTaskQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmCompleteTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmCompletedTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmCountResultDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmSignableTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmTaskCountQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmTaskQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmVariableValueDto;
 import com.epam.digital.data.platform.bpms.api.dto.PaginationQueryDto;
@@ -29,8 +32,6 @@ import feign.error.ErrorCodes;
 import feign.error.ErrorHandling;
 import java.util.List;
 import java.util.Map;
-import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,30 +54,7 @@ public interface TaskRestClient extends BaseFeignClient {
    */
   @PostMapping("/task/count")
   @ErrorHandling
-  CountResultDto getTaskCountByParams(@RequestBody DdmTaskCountQueryDto ddmTaskCountQueryDto);
-
-  /**
-   * Method for getting list of camunda user tasks
-   *
-   * @param ddmTaskQueryDto object with search parameters
-   * @return the list of camunda user tasks
-   */
-  @PostMapping("/task")
-  @ErrorHandling
-  List<TaskDto> getTasksByParams(@RequestBody DdmTaskQueryDto ddmTaskQueryDto, @SpringQueryMap
-      PaginationQueryDto paginationQueryDto);
-
-  /**
-   * Method for getting camunda user task by task identifier
-   *
-   * @param taskId task identifier
-   * @return the camunda user task
-   */
-  @GetMapping("/task/{id}")
-  @ErrorHandling(codeSpecific = {
-      @ErrorCodes(codes = {404}, generate = TaskNotFoundException.class)
-  })
-  TaskDto getTaskById(@PathVariable("id") String taskId);
+  DdmCountResultDto getTaskCountByParams(@RequestBody DdmTaskCountQueryDto ddmTaskCountQueryDto);
 
   /**
    * Method for completing camunda user task by id
@@ -106,4 +84,27 @@ public interface TaskRestClient extends BaseFeignClient {
   @GetMapping("/task/{taskId}/variables")
   @ErrorHandling
   Map<String, DdmVariableValueDto> getTaskVariables(@PathVariable("taskId") String taskId);
+
+  /**
+   * Method for getting list of camunda user tasks
+   *
+   * @param ddmTaskQueryDto object with search parameters
+   * @return the list of {@link DdmTaskDto}
+   */
+  @PostMapping("/extended/task")
+  @ErrorHandling
+  List<DdmTaskDto> getTasksByParams(@RequestBody DdmTaskQueryDto ddmTaskQueryDto,
+      @SpringQueryMap PaginationQueryDto paginationQueryDto);
+
+  /**
+   * Method for getting extended camunda user task
+   *
+   * @param id task instance id
+   * @return {@link DdmSignableTaskDto} object
+   */
+  @GetMapping("/extended/task/{id}")
+  @ErrorHandling(codeSpecific = {
+      @ErrorCodes(codes = {404}, generate = TaskNotFoundException.class)
+  })
+  DdmSignableTaskDto getTaskById(@PathVariable("id") String id);
 }
