@@ -17,11 +17,13 @@
 package com.epam.digital.data.platform.bpms.rest.mapper;
 
 import com.epam.digital.data.platform.bpms.api.dto.DdmSignableTaskDto;
-import com.epam.digital.data.platform.bpms.api.dto.HistoryUserTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmVariableValueDto;
+import com.epam.digital.data.platform.bpms.api.dto.HistoryUserTaskDto;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricTaskInstanceDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.mapstruct.Context;
@@ -61,4 +63,6 @@ public interface TaskMapper {
         })
         .collect(Collectors.toList());
   }
+
+  Map<String, DdmVariableValueDto> toDdmVariableValueDtoMap(Map<String, VariableValueDto> dtoMap);
 }

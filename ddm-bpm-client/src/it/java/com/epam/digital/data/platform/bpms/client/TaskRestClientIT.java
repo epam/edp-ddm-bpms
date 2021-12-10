@@ -29,9 +29,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 
 import com.epam.digital.data.platform.bpms.api.dto.DdmClaimTaskQueryDto;
-import com.epam.digital.data.platform.bpms.api.dto.PaginationQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmCompleteTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmCompletedTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmTaskCountQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmTaskQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmVariableValueDto;
+import com.epam.digital.data.platform.bpms.api.dto.PaginationQueryDto;
 import com.epam.digital.data.platform.bpms.client.exception.AuthorizationException;
 import com.epam.digital.data.platform.bpms.client.exception.TaskNotFoundException;
 import com.epam.digital.data.platform.starter.errorhandling.dto.ErrorDetailDto;
@@ -42,22 +45,19 @@ import com.epam.digital.data.platform.starter.errorhandling.exception.Validation
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.http.RequestMethod;
 import com.github.tomakehurst.wiremock.matching.UrlPathPattern;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.util.Lists;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.VariableValueDto;
-import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-class CamundaTaskRestClientIT extends BaseIT {
+class TaskRestClientIT extends BaseIT {
 
   @Autowired
-  private CamundaTaskRestClient camundaTaskRestClient;
+  private TaskRestClient taskRestClient;
 
   @Test
   void shouldReturnTaskCount() throws JsonProcessingException {
@@ -70,7 +70,7 @@ class CamundaTaskRestClientIT extends BaseIT {
         )
     );
 
-    var taskCount = camundaTaskRestClient.getTaskCountByParams(DdmTaskCountQueryDto.builder().build());
+    var taskCount = taskRestClient.getTaskCountByParams(DdmTaskCountQueryDto.builder().build());
 
     assertThat(taskCount.getCount()).isOne();
   }
@@ -89,7 +89,7 @@ class CamundaTaskRestClientIT extends BaseIT {
         )
     );
 
-    var tasksByParams = camundaTaskRestClient
+    var tasksByParams = taskRestClient
         .getTasksByParams(DdmTaskQueryDto.builder().assignee("testAssignee").build(),
             paginationQueryDto);
 
@@ -110,7 +110,7 @@ class CamundaTaskRestClientIT extends BaseIT {
         )
     );
 
-    var taskById = camundaTaskRestClient.getTaskById("tid");
+    var taskById = taskRestClient.getTaskById("tid");
 
     assertThat(taskById.getId()).isEqualTo("tid");
   }
@@ -128,7 +128,7 @@ class CamundaTaskRestClientIT extends BaseIT {
     );
 
     var exception = assertThrows(AuthorizationException.class,
-        () -> camundaTaskRestClient.getTaskById("tid403"));
+        () -> taskRestClient.getTaskById("tid403"));
 
     assertThat(exception.getTraceId()).isEqualTo("testTraceId");
     assertThat(exception.getCode()).isEqualTo("type");
@@ -149,7 +149,7 @@ class CamundaTaskRestClientIT extends BaseIT {
     );
 
     var exception = assertThrows(TaskNotFoundException.class,
-        () -> camundaTaskRestClient.getTaskById("tid404"));
+        () -> taskRestClient.getTaskById("tid404"));
 
     assertThat(exception.getTraceId()).isEqualTo("testTraceId");
     assertThat(exception.getCode()).isEqualTo("type");
@@ -158,33 +158,62 @@ class CamundaTaskRestClientIT extends BaseIT {
   }
 
   @Test
-  void shouldCompleteTaskById() throws JsonProcessingException {
-    Map<String, VariableValueDto> completeVariables = new HashMap<>();
-    completeVariables.put("var1", new VariableValueDto());
+  void shouldCompleteTaskById() {
+    var requestBody = "{\"withVariablesInReturn\":true, "
+        + "\"variables\":{\"inputVar\":{\"value\":\"inputVariable\",\"type\":null,\"valueInfo\":null}}}";
     restClientWireMock.addStubMapping(
-        stubFor(post(urlEqualTo("/api/task/testId/complete"))
+        stubFor(post(urlEqualTo("/api/extended/task/testId/complete"))
+            .withRequestBody(equalToJson(requestBody))
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader("Content-Type", "application/json")
-                .withBody(objectMapper.writeValueAsString(completeVariables))))
+                .withBody("{\"id\":\"id\", \"processInstanceId\":\"processInstanceId\","
+                    + "\"rootProcessInstanceId\":\"rootProcessInstanceId\", "
+                    + "\"rootProcessInstanceEnded\":false,"
+                    + "\"variables\":{\"var1\":{\"value\":\"variable\"}}}")))
     );
 
-    var variables = camundaTaskRestClient.completeTaskById("testId", new CompleteTaskDto());
+    var expected = DdmCompletedTaskDto.builder()
+        .id("id")
+        .processInstanceId("processInstanceId")
+        .rootProcessInstanceId("rootProcessInstanceId")
+        .rootProcessInstanceEnded(false)
+        .variables(Map.of("var1", DdmVariableValueDto.builder().value("variable").build()))
+        .build();
+    var actual = taskRestClient.completeTaskById("testId",
+        DdmCompleteTaskDto.builder()
+            .withVariablesInReturn(true)
+            .variables(Map.of("inputVar",
+                DdmVariableValueDto.builder().value("inputVariable").build()))
+            .build());
 
-    assertThat(variables).isNotEmpty();
+    assertThat(actual).isEqualTo(expected);
   }
 
   @Test
-  void shouldCompleteTaskByIdSuccessfulWhenHttpStatus204() {
+  void shouldCompleteTaskByIdSuccessfulWhenNoVariablesInReturn() {
     restClientWireMock.addStubMapping(
-        stubFor(post(urlEqualTo("/api/task/testId204/complete"))
+        stubFor(post(urlEqualTo("/api/extended/task/testId200/complete"))
+            .withRequestBody(equalToJson("{\"withVariablesInReturn\":false,\"variables\":null}"))
             .willReturn(aResponse()
-                .withStatus(204)
-                .withHeader("Content-Type", "application/json")))
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{\"id\":\"id\", \"processInstanceId\":\"processInstanceId\","
+                    + "\"rootProcessInstanceId\":\"rootProcessInstanceId\", "
+                    + "\"rootProcessInstanceEnded\":true,\"variables\":{}}")))
     );
-    var variables = camundaTaskRestClient.completeTaskById("testId204", new CompleteTaskDto());
 
-    assertThat(variables).isNull();
+    var expected = DdmCompletedTaskDto.builder()
+        .id("id")
+        .processInstanceId("processInstanceId")
+        .rootProcessInstanceId("rootProcessInstanceId")
+        .rootProcessInstanceEnded(true)
+        .variables(Map.of())
+        .build();
+    var actual = taskRestClient.completeTaskById("testId200",
+        DdmCompleteTaskDto.builder().build());
+
+    assertThat(actual).isEqualTo(expected);
   }
 
   @Test
@@ -210,7 +239,7 @@ class CamundaTaskRestClientIT extends BaseIT {
         )
     );
 
-    var tasksByParams = camundaTaskRestClient.getTasksByParams(requestDto, paginationQueryDto);
+    var tasksByParams = taskRestClient.getTasksByParams(requestDto, paginationQueryDto);
 
     assertThat(tasksByParams.size()).isEqualTo(2);
     assertThat(
@@ -240,7 +269,7 @@ class CamundaTaskRestClientIT extends BaseIT {
         )
     );
 
-    var tasksByParams = camundaTaskRestClient.getTasksByParams(DdmTaskQueryDto.builder()
+    var tasksByParams = taskRestClient.getTasksByParams(DdmTaskQueryDto.builder()
         .processInstanceId("testProcessInstanceId").build(), paginationQueryDto);
 
     assertThat(tasksByParams.size()).isOne();
@@ -254,7 +283,7 @@ class CamundaTaskRestClientIT extends BaseIT {
         "key1", "val1")));
     var errorDto422 = ValidationErrorDto.builder().details(details).build();
     restClientWireMock.addStubMapping(
-        stubFor(post(urlPathEqualTo("/api/task/taskId/complete"))
+        stubFor(post(urlPathEqualTo("/api/extended/task/taskId/complete"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(422)
@@ -262,9 +291,9 @@ class CamundaTaskRestClientIT extends BaseIT {
         )
     );
 
-    var completeTaskDto = new CompleteTaskDto();
+    var completeTaskDto = DdmCompleteTaskDto.builder().build();
     var exception = assertThrows(ValidationException.class,
-        () -> camundaTaskRestClient.completeTaskById("taskId", completeTaskDto));
+        () -> taskRestClient.completeTaskById("taskId", completeTaskDto));
 
     assertThat(exception.getDetails().getErrors().get(0).getMessage())
         .isEqualTo("test msg");
@@ -296,7 +325,7 @@ class CamundaTaskRestClientIT extends BaseIT {
                 .withStatus(200)
                 .withBody((objectMapper.writeValueAsString(List.of(TaskDto.fromEntity(task))))))));
 
-    List<TaskDto> tasks = camundaTaskRestClient.getTasksByParams(requestDto, paginationQueryDto);
+    List<TaskDto> tasks = taskRestClient.getTasksByParams(requestDto, paginationQueryDto);
 
     assertThat(tasks).isNotEmpty();
     assertThat(tasks.get(0).getId()).isEqualTo("testId");
@@ -309,7 +338,7 @@ class CamundaTaskRestClientIT extends BaseIT {
         .withRequestBody(equalTo(objectMapper.writeValueAsString(claimTaskDto)))
         .willReturn(aResponse().withStatus(204)));
     restClientWireMock.addStubMapping(stubMapping);
-    camundaTaskRestClient.claimTaskById("testId204", claimTaskDto);
+    taskRestClient.claimTaskById("testId204", claimTaskDto);
     restClientWireMock.verify(newRequestPattern(RequestMethod.POST,
         new UrlPathPattern(equalTo("/api/task/testId204/claim"), false)));
   }
@@ -319,11 +348,11 @@ class CamundaTaskRestClientIT extends BaseIT {
     var taskId = "taskId";
     var variableValue = "variableValue";
     var type = "String";
-    var varValueDto = new VariableValueDto();
-    varValueDto.setType(type);
-    varValueDto.setValue(variableValue);
-    Map<String, VariableValueDto> expectedVariables = new HashMap<>();
-    expectedVariables.put(variableValue, varValueDto);
+    var varValueDto = DdmVariableValueDto.builder()
+        .type(type)
+        .value(variableValue)
+        .build();
+    var expectedVariables = Map.of(variableValue, varValueDto);
 
     restClientWireMock.addStubMapping(
         stubFor(get(urlEqualTo(String.format("/api/task/%s/variables", taskId)))
@@ -334,7 +363,7 @@ class CamundaTaskRestClientIT extends BaseIT {
         )
     );
 
-    var result = camundaTaskRestClient.getTaskVariables(taskId);
+    var result = taskRestClient.getTaskVariables(taskId);
 
     var resultVariables = result.get(variableValue);
     assertThat(resultVariables.getValue()).isEqualTo(variableValue);

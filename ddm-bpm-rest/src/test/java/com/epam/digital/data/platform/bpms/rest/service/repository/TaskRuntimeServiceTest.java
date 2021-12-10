@@ -1,18 +1,25 @@
 package com.epam.digital.data.platform.bpms.rest.service.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
+import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.Query;
@@ -38,6 +45,8 @@ class TaskRuntimeServiceTest {
   private TaskService taskService;
   @Mock
   private RepositoryService repositoryService;
+  @Mock
+  private ObjectMapper objectMapper;
 
   @Test
   void getTasksByParams() {
@@ -135,5 +144,29 @@ class TaskRuntimeServiceTest {
         .containsEntry("name", "value");
 
     assertThat(service.getTaskProperty("id")).isEmpty();
+  }
+
+  @Test
+  void completeTaskWithVariablesInReturn() {
+    var completeTaskDto = new CompleteTaskDto();
+    completeTaskDto.setWithVariablesInReturn(true);
+
+    when(taskService.completeWithVariablesInReturn("taskId", null, false))
+        .thenReturn(mock(VariableMap.class));
+
+    service.completeTask("taskId", completeTaskDto);
+
+    verify(taskService, never()).complete(any(), any());
+    verify(taskService).completeWithVariablesInReturn("taskId", null, false);
+  }
+
+  @Test
+  void completeTask() {
+    var completeTaskDto = new CompleteTaskDto();
+    completeTaskDto.setWithVariablesInReturn(false);
+    service.completeTask("taskId", completeTaskDto);
+
+    verify(taskService).complete("taskId", null);
+    verify(taskService, never()).completeWithVariablesInReturn(any(), any(), anyBoolean());
   }
 }
