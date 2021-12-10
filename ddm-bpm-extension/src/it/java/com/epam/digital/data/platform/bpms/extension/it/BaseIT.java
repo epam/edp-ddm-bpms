@@ -27,11 +27,13 @@ import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.ceph.CephKeyProvider;
 import com.epam.digital.data.platform.bpms.extension.it.builder.StubData;
 import com.epam.digital.data.platform.bpms.extension.it.config.TestCephServiceImpl;
 import com.epam.digital.data.platform.bpms.extension.it.util.TestUtils;
-import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.service.FormDataKeyProvider;
+import com.epam.digital.data.platform.storage.form.service.FormDataKeyProviderImpl;
+import com.epam.digital.data.platform.storage.form.service.FormDataStorageService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -83,7 +85,8 @@ public abstract class BaseIT {
   @Inject
   protected TestCephServiceImpl cephService;
   @Inject
-  protected CephKeyProvider cephKeyProvider;
+  protected FormDataStorageService formDataStorageService;
+  protected FormDataKeyProvider cephKeyProvider;
   @Inject
   private AuthorizationService authorizationService;
   @Inject
@@ -121,11 +124,12 @@ public abstract class BaseIT {
     runtimeService.createProcessInstanceQuery().list().forEach(
         processInstance -> runtimeService
             .deleteProcessInstance(processInstance.getId(), "test clear"));
+    cephKeyProvider = new FormDataKeyProviderImpl();
   }
 
   protected void completeTask(String taskId, String processInstanceId, String formData) {
     var cephKey = cephKeyProvider.generateKey(taskId, processInstanceId);
-    cephService.putFormData(cephKey, deserializeFormData(formData));
+    cephService.put(cephService.getCephBucketName(), cephKey, formData);
     String id = taskService.createTaskQuery().taskDefinitionKey(taskId).singleResult().getId();
     taskService.complete(id);
   }

@@ -19,7 +19,7 @@ package com.epam.digital.data.platform.bpms.extension.delegate;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.ceph.PutContentToCephDelegate;
+import com.epam.digital.data.platform.bpms.extension.delegate.storage.PutContentToCephDelegate;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableReadAccessor;
 import com.epam.digital.data.platform.integration.ceph.service.CephService;
@@ -72,7 +72,7 @@ public class PutContentToCephDelegateTest {
 
     putContentToCephDelegate.execute(delegateExecution);
 
-    verify(cephService).putContent(CEPH_BUCKET_NAME, "someKey", "someContent");
+    verify(cephService).put(CEPH_BUCKET_NAME, "someKey", "someContent");
   }
 
 }

@@ -23,7 +23,7 @@
       <bpmn:outgoing>Flow_1y7yep8</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_0on3fs3" sourceRef="Activity_0me4tx4" targetRef="waitCheckPutFormData" />
-    <bpmn:serviceTask id="Activity_0me4tx4" name="Get formData from ceph" camunda:class="com.epam.digital.data.platform.bpms.extension.delegate.ceph.GetFormDataFromCephDelegate">
+    <bpmn:serviceTask id="Activity_0me4tx4" name="Get formData from ceph" camunda:class="com.epam.digital.data.platform.bpms.extension.delegate.storage.GetFormDataFromCephDelegate">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="taskDefinitionKey">userTask</camunda:inputParameter>

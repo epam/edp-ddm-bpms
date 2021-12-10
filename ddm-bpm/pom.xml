@@ -167,11 +167,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
-      <groupId>com.epam.digital.data.platform</groupId>
-      <artifactId>ddm-ceph-client</artifactId>
-      <version>${ddm-ceph-client.version}</version>
-    </dependency>
 
     <dependency>
       <groupId>org.codehaus.groovy</groupId>

@@ -16,6 +16,15 @@
 
 package com.epam.digital.data.platform.bpms.it.config;
 
+import com.epam.digital.data.platform.integration.ceph.service.CephService;
+import com.epam.digital.data.platform.storage.file.repository.CephFormDataFileRepository;
+import com.epam.digital.data.platform.storage.file.repository.FormDataFileRepository;
+import com.epam.digital.data.platform.storage.file.service.FormDataFileKeyProviderImpl;
+import com.epam.digital.data.platform.storage.file.service.FormDataFileStorageService;
+import com.epam.digital.data.platform.storage.form.repository.CephFormDataRepository;
+import com.epam.digital.data.platform.storage.form.repository.FormDataRepository;
+import com.epam.digital.data.platform.storage.form.service.FormDataKeyProviderImpl;
+import com.epam.digital.data.platform.storage.form.service.FormDataStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,5 +44,39 @@ public class TestCephConfig {
   @Primary
   public TestCephServiceImpl cephService() {
     return new TestCephServiceImpl(cephBucketName, objectMapper);
+  }
+
+  @Bean
+  public FormDataRepository formDataRepository(CephService cephService) {
+    return CephFormDataRepository.builder()
+        .cephBucketName(cephBucketName)
+        .objectMapper(objectMapper)
+        .cephService(cephService)
+        .build();
+  }
+
+  @Bean
+  public FormDataFileRepository formDataFileRepository(CephService cephService) {
+    return CephFormDataFileRepository.builder()
+        .cephBucketName(cephBucketName)
+        .cephService(cephService)
+        .build();
+  }
+
+  @Bean
+  public FormDataStorageService formDataStorageService(FormDataRepository formDataRepository) {
+    return FormDataStorageService.builder()
+        .keyProvider(new FormDataKeyProviderImpl())
+        .repository(formDataRepository)
+        .build();
+  }
+
+  @Bean
+  public FormDataFileStorageService formDataFileStorageService(
+      FormDataFileRepository formDataFileRepository) {
+    return FormDataFileStorageService.builder()
+        .keyProvider(new FormDataFileKeyProviderImpl())
+        .repository(formDataFileRepository)
+        .build();
   }
 }

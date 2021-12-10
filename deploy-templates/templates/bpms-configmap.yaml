@@ -23,3 +23,4 @@ data:
     {{- if eq .Values.deployProfile "dev" }}
     management.endpoints.web.exposure.include: '*'
     {{- end }}
+    storage: {{ toYaml .Values.storage | nindent 6 }}

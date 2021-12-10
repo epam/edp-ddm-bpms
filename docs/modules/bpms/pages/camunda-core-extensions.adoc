@@ -261,12 +261,12 @@ CamundaSystemVariablesSupportListener o- PutFormDataToCephTaskListener
 @enduml
 ----
 
-- `PutFormDataToCephTaskListener` бере інпут параметр задачі з ім'ям `userTaskInputFormDataPrepopulate` та зберігає його у Ceph під ключем що має відношення до користувацької задачі
-- `LowcodeBpmnParseListener` містить екземпляр класу `PutFormDataToCephTaskListener` та у методі `parseUserTask` додає цей об'єкт до загального списку `taskListeners` кожної користувацької задачі
+- `PutFormDataToStorageTaskListener` бере інпут параметр задачі з ім'ям `userTaskInputFormDataPrepopulate` та зберігає його у Ceph під ключем що має відношення до користувацької задачі
+- `StorageBpmnParseListener` містить екземпляр класу `PutFormDataToStorageTaskListener` та у методі `parseUserTask` додає цей об'єкт до загального списку `taskListeners` кожної користувацької задачі
 
 [NOTE]
 --
-Якщо інпут параметр `userTaskInputFormDataPrepopulate` буде `null` або іншого від `SpinJsonNode` типу, то `PutFormDataToCephTaskListener` не збереже його у Ceph
+Якщо інпут параметр `userTaskInputFormDataPrepopulate` буде `null` або іншого від `SpinJsonNode` типу, то `PutFormDataToStorageTaskListener` не збереже його у Ceph
 --
 
 == Видалення файлів з Ceph перед завершенням бізнес-процесу
@@ -297,7 +297,7 @@ CamundaSystemVariablesSupportListener o- FileCleanerEndEventListener
 ----
 
 - `FileCleanerEndEventListener` отримує ідентифікатор екземпляра бізнес-процесу та формує префікс формату `process/{processInstanceId}/` за яким отримує перелік ключів файлів збережених у Ceph, після чого видаляє файли за цим переліком.
-- `LowcodeBpmnParseListener` містить екземпляр класу `FileCleanerEndEventListener` та у методі `parseEndEvent` додає цей об'єкт до загального списку `executionListeners` кінцевого івенту.
+- `StorageBpmnParseListener` містить екземпляр класу `FileCleanerEndEventListener` та у методі `parseEndEvent` додає цей об'єкт до загального списку `executionListeners` кінцевого івенту.
 
 == Видалення користувацьких даних з Ceph перед завершенням бізнес-процесу
 
@@ -327,7 +327,7 @@ CamundaSystemVariablesSupportListener o- FormDataCleanerEndEventListener
 ----
 
 - `FormDataCleanerEndEventListener` отримує ідентифікатор екземпляра бізнес-процесу та формує префікс формату `process/{processInstanceId}/` за яким отримує перелік ключів користувацьких даних збережених у Ceph, та додає до цього переліку ключ користувацьких даних стартової форми якщо він присутній, після чого видаляє дані за цим переліком.
-- `LowcodeBpmnParseListener` містить екземпляр класу `FormDataCleanerEndEventListener` та у методі `parseEndEvent` додає цей об'єкт до загального списку `executionListeners` кінцевого івенту.
+- `StorageBpmnParseListener` містить екземпляр класу `FormDataCleanerEndEventListener` та у методі `parseEndEvent` додає цей об'єкт до загального списку `executionListeners` кінцевого івенту.
 
 == Маппинг виключень на HTTP відповідь
 
