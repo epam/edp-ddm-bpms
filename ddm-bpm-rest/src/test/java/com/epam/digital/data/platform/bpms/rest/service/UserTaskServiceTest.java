@@ -20,16 +20,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.variable.Variables.stringValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.epam.digital.data.platform.bpms.api.dto.DdmVariableValueDto;
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
 import com.epam.digital.data.platform.bpms.rest.mapper.LocalDateTimeMapper;
 import com.epam.digital.data.platform.bpms.rest.mapper.TaskMapper;
 import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessDefinitionRepositoryService;
+import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessInstanceRuntimeService;
 import com.epam.digital.data.platform.bpms.rest.service.repository.TaskRuntimeService;
 import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
 import com.epam.digital.data.platform.dso.api.dto.Subject;
@@ -39,12 +42,17 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import javax.ws.rs.core.Response.Status;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
+import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -62,6 +70,8 @@ class UserTaskServiceTest {
   @Mock
   private TaskRuntimeService taskRuntimeService;
   @Mock
+  private ProcessInstanceRuntimeService processInstanceRuntimeService;
+  @Mock
   private ProcessDefinitionRepositoryService processDefinitionRepositoryService;
   @Spy
   private LocalDateTimeMapper localDateTimeMapper = Mappers.getMapper(LocalDateTimeMapper.class);
@@ -71,6 +81,14 @@ class UserTaskServiceTest {
 
   @Mock
   private CamundaImpersonation camundaAdminImpersonation;
+
+  @BeforeEach
+  void setUp() {
+    lenient().doAnswer(invocation -> {
+      Supplier<?> supplier = invocation.getArgument(0);
+      return supplier.get();
+    }).when(camundaAdminImpersonation).execute(any());
+  }
 
   @Test
   void getTaskById_emptyFormVariables() {
@@ -87,11 +105,6 @@ class UserTaskServiceTest {
     when(taskRuntimeService.getTaskById(taskId)).thenReturn(Optional.of(taskDto));
     when(processDefinitionRepositoryService.getProcessDefinitionById(processDefinitionId))
         .thenReturn(processDefinition);
-
-    doAnswer(invocation -> {
-      Supplier<?> supplier = invocation.getArgument(0);
-      return supplier.get();
-    }).when(camundaAdminImpersonation).execute(any());
 
     var result = service.getTaskById(taskId);
 
@@ -137,11 +150,6 @@ class UserTaskServiceTest {
         "var3", VariableValueDto.fromTypedValue(stringValue("value3"))
     ));
 
-    doAnswer(invocation -> {
-      Supplier<?> supplier = invocation.getArgument(0);
-      return supplier.get();
-    }).when(camundaAdminImpersonation).execute(any());
-
     when(taskRuntimeService.getTaskProperty(taskId)).thenReturn(
         Map.of(
             "eSign", "true",
@@ -175,11 +183,6 @@ class UserTaskServiceTest {
     when(taskRuntimeService.getTasksByParams(queryDto, paginationQueryDto))
         .thenReturn(List.of(taskDto)).thenReturn(List.of());
 
-    doAnswer(invocation -> {
-      Supplier<?> supplier = invocation.getArgument(0);
-      return supplier.get();
-    }).when(camundaAdminImpersonation).execute(any());
-
     when(processDefinitionRepositoryService.getProcessDefinitionsNames("processDefinitionId"))
         .thenReturn(Map.of("processDefinitionId", "processDefinitionName"));
 
@@ -195,5 +198,93 @@ class UserTaskServiceTest {
     verify(taskRuntimeService, times(2)).getTasksByParams(queryDto, paginationQueryDto);
     verify(camundaAdminImpersonation).execute(any());
     verify(processDefinitionRepositoryService).getProcessDefinitionsNames("processDefinitionId");
+  }
+
+  @Test
+  void completeTask() {
+    var task = new TaskEntity();
+    task.setId("id");
+    task.setProcessInstanceId("processInstance");
+    var taskDto = TaskDto.fromEntity(task);
+    when(taskRuntimeService.getTaskById("id")).thenReturn(Optional.of(taskDto));
+
+    var processInstance = new ExecutionEntity();
+    processInstance.setId("processInstance");
+    processInstance.setRootProcessInstanceId("rootProcessInstance");
+    when(processInstanceRuntimeService.getProcessInstance("processInstance"))
+        .thenReturn(Optional.of(processInstance));
+
+    var completeTaskDto = new CompleteTaskDto();
+    when(taskRuntimeService.completeTask("id", completeTaskDto))
+        .thenReturn(Map.of("var", new VariableValueDto()));
+
+    var rootProcessInstance = new ExecutionEntity();
+    rootProcessInstance.setId("rootProcessInstance");
+    when(processInstanceRuntimeService.getProcessInstance("rootProcessInstance"))
+        .thenReturn(Optional.of(rootProcessInstance));
+
+    var result = service.completeTask("id", completeTaskDto);
+
+    assertThat(result).isNotNull()
+        .hasFieldOrPropertyWithValue("id", "id")
+        .hasFieldOrPropertyWithValue("processInstanceId", "processInstance")
+        .hasFieldOrPropertyWithValue("rootProcessInstanceId", "rootProcessInstance")
+        .hasFieldOrPropertyWithValue("rootProcessInstanceEnded", false);
+    assertThat(result.getVariables()).hasSize(1)
+        .containsEntry("var", DdmVariableValueDto.builder().build());
+  }
+
+  @Test
+  void completeTask_missingProcessInstance() {
+    var task = new TaskEntity();
+    task.setId("id");
+    task.setProcessInstanceId("processInstance");
+    var taskDto = TaskDto.fromEntity(task);
+    when(taskRuntimeService.getTaskById("id")).thenReturn(Optional.of(taskDto));
+
+    when(processInstanceRuntimeService.getProcessInstance("processInstance"))
+        .thenReturn(Optional.empty());
+
+    var ex = assertThrows(IllegalStateException.class, () -> service.completeTask("id", null));
+
+    assertThat(ex).isNotNull()
+        .hasMessage("Process instance processInstance is missed before task id completion");
+
+    verify(taskRuntimeService, never()).completeTask(any(), any());
+    verify(processInstanceRuntimeService).getProcessInstance(any());
+  }
+
+  @Test
+  void completeTask_completionException() {
+    var task = new TaskEntity();
+    task.setId("id");
+    task.setProcessInstanceId("processInstance");
+    var taskDto = TaskDto.fromEntity(task);
+    when(taskRuntimeService.getTaskById("id")).thenReturn(Optional.of(taskDto));
+
+    var processInstance = new ExecutionEntity();
+    processInstance.setId("processInstance");
+    processInstance.setRootProcessInstanceId("processInstance");
+    when(processInstanceRuntimeService.getProcessInstance("processInstance"))
+        .thenReturn(Optional.of(processInstance));
+
+    var completeTaskDto = new CompleteTaskDto();
+    when(taskRuntimeService.completeTask("id", completeTaskDto))
+        .thenThrow(new RestException(Status.CONFLICT, "Conflict"))
+        .thenThrow(new ProcessEngineException("Engine error"));
+
+    var invalidRequestException = assertThrows(InvalidRequestException.class,
+        () -> service.completeTask("id", completeTaskDto));
+
+    assertThat(invalidRequestException).isNotNull()
+        .hasMessage("Cannot complete task id: Conflict")
+        .hasFieldOrPropertyWithValue("status", Status.CONFLICT);
+
+    var restException = assertThrows(RestException.class,
+        () -> service.completeTask("id", completeTaskDto));
+
+    assertThat(restException).isNotNull()
+        .hasMessage("Cannot complete task id: Engine error")
+        .hasFieldOrPropertyWithValue("status", Status.INTERNAL_SERVER_ERROR);
   }
 }

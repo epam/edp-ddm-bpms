@@ -17,11 +17,18 @@
 package com.epam.digital.data.platform.bpms.rest.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.epam.digital.data.platform.bpms.api.dto.DdmCompletedTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmSignableTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmTaskDto;
+import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
 import com.epam.digital.data.platform.bpms.rest.service.UserTaskService;
+import java.util.List;
+import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
+import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -45,5 +52,31 @@ class TaskControllerTest {
     var result = taskController.getById(id);
     assertThat(result).isSameAs(expected);
     verify(taskService).getTaskById(id);
+  }
+
+  @Test
+  void getByParams() {
+    var taskQueryDto = mock(TaskQueryDto.class);
+    var paginationQuery = mock(PaginationQueryDto.class);
+
+    List<DdmTaskDto> expected = List.of();
+    when(taskService.getTasksByParams(taskQueryDto, paginationQuery)).thenReturn(expected);
+
+    var actual = taskController.getByParams(taskQueryDto, paginationQuery);
+
+    assertThat(actual).isSameAs(expected);
+  }
+
+  @Test
+  void completeTask() {
+    var id = "id";
+    var completeTaskDto = mock(CompleteTaskDto.class);
+
+    var expected = DdmCompletedTaskDto.builder().build();
+    when(taskService.completeTask(id, completeTaskDto)).thenReturn(expected);
+
+    var actual = taskController.completeTask(id, completeTaskDto);
+
+    assertThat(actual).isSameAs(expected);
   }
 }

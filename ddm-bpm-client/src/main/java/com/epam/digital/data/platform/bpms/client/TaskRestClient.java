@@ -17,8 +17,11 @@
 package com.epam.digital.data.platform.bpms.client;
 
 import com.epam.digital.data.platform.bpms.api.dto.DdmClaimTaskQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmCompleteTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmCompletedTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmTaskCountQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmTaskQueryDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmVariableValueDto;
 import com.epam.digital.data.platform.bpms.api.dto.PaginationQueryDto;
 import com.epam.digital.data.platform.bpms.client.exception.ClientValidationException;
 import com.epam.digital.data.platform.bpms.client.exception.TaskNotFoundException;
@@ -27,8 +30,6 @@ import feign.error.ErrorHandling;
 import java.util.List;
 import java.util.Map;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.VariableValueDto;
-import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
@@ -41,8 +42,8 @@ import org.springframework.web.bind.annotation.RequestBody;
  * The interface extends {@link BaseFeignClient} and used to perform operations on camunda user
  * tasks
  */
-@FeignClient(name = "camunda-task-client", url = "${bpms.url}/api/task")
-public interface CamundaTaskRestClient extends BaseFeignClient {
+@FeignClient(name = "camunda-task-client", url = "${bpms.url}/api")
+public interface TaskRestClient extends BaseFeignClient {
 
   /**
    * Method for getting the number of camunda user tasks
@@ -50,7 +51,7 @@ public interface CamundaTaskRestClient extends BaseFeignClient {
    * @param ddmTaskCountQueryDto object with search parameters
    * @return the number of camunda user tasks
    */
-  @PostMapping("/count")
+  @PostMapping("/task/count")
   @ErrorHandling
   CountResultDto getTaskCountByParams(@RequestBody DdmTaskCountQueryDto ddmTaskCountQueryDto);
 
@@ -60,7 +61,7 @@ public interface CamundaTaskRestClient extends BaseFeignClient {
    * @param ddmTaskQueryDto object with search parameters
    * @return the list of camunda user tasks
    */
-  @PostMapping
+  @PostMapping("/task")
   @ErrorHandling
   List<TaskDto> getTasksByParams(@RequestBody DdmTaskQueryDto ddmTaskQueryDto, @SpringQueryMap
       PaginationQueryDto paginationQueryDto);
@@ -71,7 +72,7 @@ public interface CamundaTaskRestClient extends BaseFeignClient {
    * @param taskId task identifier
    * @return the camunda user task
    */
-  @GetMapping("/{id}")
+  @GetMapping("/task/{id}")
   @ErrorHandling(codeSpecific = {
       @ErrorCodes(codes = {404}, generate = TaskNotFoundException.class)
   })
@@ -81,17 +82,17 @@ public interface CamundaTaskRestClient extends BaseFeignClient {
    * Method for completing camunda user task by id
    *
    * @param taskId          task identifier
-   * @param completeTaskDto {@link CompleteTaskDto} object
-   * @return a map of {@link VariableValueDto} entities
+   * @param completeTaskDto {@link DdmCompleteTaskDto} object
+   * @return {@link DdmCompletedTaskDto} entity with root process instance info and task variables
    */
-  @PostMapping("/{id}/complete")
+  @PostMapping("/extended/task/{id}/complete")
   @ErrorHandling(codeSpecific = {
       @ErrorCodes(codes = {422}, generate = ClientValidationException.class)
   })
-  Map<String, VariableValueDto> completeTaskById(@PathVariable("id") String taskId,
-      @RequestBody CompleteTaskDto completeTaskDto);
+  DdmCompletedTaskDto completeTaskById(@PathVariable("id") String taskId,
+      @RequestBody DdmCompleteTaskDto completeTaskDto);
 
-  @PostMapping("/{id}/claim")
+  @PostMapping("/task/{id}/claim")
   @ErrorHandling
   void claimTaskById(@PathVariable("id") String taskId,
       @RequestBody DdmClaimTaskQueryDto ddmClaimTaskQueryDto);
@@ -100,9 +101,9 @@ public interface CamundaTaskRestClient extends BaseFeignClient {
    * Returns a map containing task variables
    *
    * @param taskId task identifier
-   * @return a map containing the {@link VariableValueDto} entities
+   * @return a map containing the {@link DdmCompleteTaskDto} entities
    */
-  @GetMapping("/{taskId}/variables")
+  @GetMapping("/task/{taskId}/variables")
   @ErrorHandling
-  Map<String, VariableValueDto> getTaskVariables(@PathVariable("taskId") String taskId);
+  Map<String, DdmVariableValueDto> getTaskVariables(@PathVariable("taskId") String taskId);
 }

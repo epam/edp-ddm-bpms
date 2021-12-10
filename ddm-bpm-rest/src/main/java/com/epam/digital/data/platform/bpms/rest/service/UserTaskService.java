@@ -16,11 +16,13 @@
 
 package com.epam.digital.data.platform.bpms.rest.service;
 
+import com.epam.digital.data.platform.bpms.api.dto.DdmCompletedTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmSignableTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmTaskDto;
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
 import com.epam.digital.data.platform.bpms.rest.mapper.TaskMapper;
 import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessDefinitionRepositoryService;
+import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessInstanceRuntimeService;
 import com.epam.digital.data.platform.bpms.rest.service.repository.TaskRuntimeService;
 import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
 import com.epam.digital.data.platform.dso.api.dto.Subject;
@@ -29,15 +31,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import javax.ws.rs.core.Response.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
+import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.springframework.stereotype.Service;
 
 /**
@@ -53,7 +61,9 @@ public class UserTaskService {
   private static final String FORM_VARIABLES_REGEX = "\\s*,\\s*";
 
   private final ProcessDefinitionRepositoryService processDefinitionRepositoryService;
+  private final ProcessInstanceRuntimeService processInstanceRuntimeService;
   private final TaskRuntimeService taskRuntimeService;
+
   private final TaskMapper taskMapper;
 
   @Resource(name = "camundaAdminImpersonation")
@@ -116,6 +126,64 @@ public class UserTaskService {
 
     log.info("User task with id {} found", id);
     return signableUserTaskDto;
+  }
+
+  /**
+   * Complete user task by id and check if root process instance id is ended
+   *
+   * @param id  the task id
+   * @param dto dto with request variables
+   * @return {@link DdmCompletedTaskDto}
+   *
+   * @throws RestException           in case of any process engine exception
+   * @throws InvalidRequestException in case of any rest exception
+   */
+  public DdmCompletedTaskDto completeTask(String id, CompleteTaskDto dto) {
+    log.info("Completing user task with id {}", id);
+
+    var processInstanceId = getTask(id).getProcessInstanceId();
+    log.trace("Found user task process-instance id {}", processInstanceId);
+
+    var rootProcessInstanceId = getProcessInstance(processInstanceId)
+        .map(ProcessInstance::getRootProcessInstanceId)
+        .orElseThrow(() -> {
+          var message = String.format("Process instance %s is missed before task %s completion",
+              processInstanceId, id);
+          return new IllegalStateException(message);
+        });
+    log.trace("Found user task root process-instance id {}", rootProcessInstanceId);
+
+    var responseVariables = completeRuntimeTask(id, dto);
+    log.trace("Task completed. Returned {} variables", responseVariables.size());
+
+    var rootProcessInstanceEnded = getProcessInstance(rootProcessInstanceId).isEmpty();
+    log.trace("Checked if root process instance {} is completed.", rootProcessInstanceId);
+
+    log.info("User task {} was completed.", id);
+    return DdmCompletedTaskDto.builder()
+        .id(id)
+        .processInstanceId(processInstanceId)
+        .rootProcessInstanceId(rootProcessInstanceId)
+        .rootProcessInstanceEnded(rootProcessInstanceEnded)
+        .variables(taskMapper.toDdmVariableValueDtoMap(responseVariables))
+        .build();
+  }
+
+  private Optional<ProcessInstance> getProcessInstance(String processInstanceId) {
+    return camundaAdminImpersonation.execute(
+        () -> processInstanceRuntimeService.getProcessInstance(processInstanceId));
+  }
+
+  private Map<String, VariableValueDto> completeRuntimeTask(String id, CompleteTaskDto dto) {
+    try {
+      return taskRuntimeService.completeTask(id, dto);
+    } catch (RestException e) {
+      String errorMessage = String.format("Cannot complete task %s: %s", id, e.getMessage());
+      throw new InvalidRequestException(e.getStatus(), e, errorMessage);
+    } catch (ProcessEngineException e) {
+      String errorMessage = String.format("Cannot complete task %s: %s", id, e.getMessage());
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
+    }
   }
 
   private TaskDto getTask(String id) {

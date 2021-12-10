@@ -19,9 +19,11 @@ package com.epam.digital.data.platform.bpms.rest.it;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.epam.digital.data.platform.bpms.api.dto.DdmCompletedTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmSignableTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmTaskDto;
 import com.epam.digital.data.platform.dso.api.dto.Subject;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Map;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.jupiter.api.Test;
@@ -60,5 +62,26 @@ class TaskControllerIT extends BaseIT {
         .containsAllEntriesOf(Map.of("formVariable", "var1", "formVariable2", "var2"));
     assertThat(result.getSignatureValidationPack()).hasSize(1).contains(Subject.ENTREPRENEUR);
     assertThat(result.isESign()).isTrue();
+  }
+
+  @Deployment(resources = "bpmn/rootBpWith3Layers.bpmn")
+  @Test
+  void shouldReturnRootProcessInstanceIdAndEndedOnTaskCompletion() throws JsonProcessingException {
+    var startResult = postForObject("api/process-definition/key/root_bp_with_3_layers/start", "",
+        Map.class);
+    var rootProcessInstanceId = (String) startResult.get("id");
+    var task = taskService.createTaskQuery().taskDefinitionKey("user_task_on_layer_3")
+        .singleResult();
+    var taskId = task.getId();
+
+    var result = postForObject("api/extended/task/" + taskId + "/complete", "{}",
+        DdmCompletedTaskDto.class);
+
+    assertThat(result).isNotNull()
+        .hasFieldOrPropertyWithValue("id", taskId)
+        .hasFieldOrPropertyWithValue("processInstanceId", task.getProcessInstanceId())
+        .hasFieldOrPropertyWithValue("rootProcessInstanceId", rootProcessInstanceId)
+        .hasFieldOrPropertyWithValue("rootProcessInstanceEnded", true)
+        .hasFieldOrPropertyWithValue("variables", Map.of());
   }
 }

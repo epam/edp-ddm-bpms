@@ -18,7 +18,7 @@ public class ProcessStartTimeIT extends BaseIT {
     var processInstanceId = (String) startedProcessInstance.get("id");
 
     var result = postForObject("api/extended/process-instance",
-        "{\"processInstanceId\":\"" + processInstanceId + "\"}", DdmProcessInstanceDto[].class);
+        "{\"processInstanceIds\":[\"" + processInstanceId + "\"]}", DdmProcessInstanceDto[].class);
 
     assertThat(result).hasSize(1);
     assertThat(result[0].getStartTime()).isNotNull();

@@ -1,12 +1,14 @@
 package com.epam.digital.data.platform.bpms.rest.service.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
 import java.util.List;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -23,6 +25,8 @@ class ProcessInstanceRuntimeServiceTest {
   private ProcessInstanceRuntimeService service;
   @Mock
   private ProcessEngine processEngine;
+  @Mock
+  private RuntimeService runtimeService;
 
   @Test
   void getProcessInstanceDtos() {
@@ -45,4 +49,33 @@ class ProcessInstanceRuntimeServiceTest {
         .element(0).hasFieldOrPropertyWithValue("id", "id");
   }
 
+  @Test
+  void getProcessInstance() {
+    var query = mock(ProcessInstanceQuery.class);
+    when(runtimeService.createProcessInstanceQuery()).thenReturn(query);
+    when(query.processInstanceId("processInstanceId")).thenReturn(query);
+
+    var instance = new ExecutionEntity();
+    instance.setId("processInstanceId");
+    when(query.list()).thenReturn(List.of(instance)).thenReturn(List.of());
+
+    assertThat(service.getProcessInstance("processInstanceId")).isNotEmpty()
+        .get().hasFieldOrPropertyWithValue("id", "processInstanceId");
+
+    assertThat(service.getProcessInstance("processInstanceId")).isEmpty();
+  }
+
+  @Test
+  void getProcessInstance_illegalState() {
+    var query = mock(ProcessInstanceQuery.class);
+    when(runtimeService.createProcessInstanceQuery()).thenReturn(query);
+    when(query.processInstanceId("processInstanceId")).thenReturn(query);
+    when(query.list()).thenReturn(List.of(new ExecutionEntity(), new ExecutionEntity()));
+
+    var ex = assertThrows(IllegalStateException.class,
+        () -> service.getProcessInstance("processInstanceId"));
+
+    assertThat(ex).isNotNull()
+        .hasMessage("Found more than one process instances by id");
+  }
 }

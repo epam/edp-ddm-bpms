@@ -1,6 +1,7 @@
 package com.epam.digital.data.platform.bpms.rest.service.repository;
 
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
+import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -34,6 +36,7 @@ public class TaskRuntimeService {
   private final TaskService taskService;
   private final RepositoryService repositoryService;
   private final ProcessEngine processEngine;
+  private final ObjectMapper objectMapper;
 
   /**
    * Get task list by given parameters
@@ -91,6 +94,30 @@ public class TaskRuntimeService {
 
     log.debug("Found {} variables by task id {}...", result.size(), taskId);
     return VariableValueDto.fromMap((VariableMap) result);
+  }
+
+  /**
+   * Complete task by id
+   *
+   * @param id  the task id
+   * @param dto the dto with request variables
+   * @return map with task variables that present in business process on task completion moment
+   * (empty map if {@link CompleteTaskDto#isWithVariablesInReturn()} is false)
+   */
+  public Map<String, VariableValueDto> completeTask(String id, CompleteTaskDto dto) {
+    log.debug("Completing task by id {}...", id);
+    final var requestVariables = VariableValueDto.toMap(dto.getVariables(), processEngine,
+        objectMapper);
+
+    if (dto.isWithVariablesInReturn()) {
+      var taskVariables = taskService.completeWithVariablesInReturn(id, requestVariables, false);
+      log.debug("Task {} was completed. {} variables found", id, taskVariables.size());
+      return VariableValueDto.fromMap(taskVariables, true);
+    }
+
+    taskService.complete(id, requestVariables);
+    log.debug("Task {} was completed without variables in return", id);
+    return Map.of();
   }
 
   /**
