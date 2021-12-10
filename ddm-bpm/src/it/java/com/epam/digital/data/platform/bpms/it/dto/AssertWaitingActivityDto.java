@@ -16,7 +16,7 @@
 
 package com.epam.digital.data.platform.bpms.it.dto;
 
-import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;

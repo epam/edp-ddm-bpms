@@ -19,7 +19,7 @@ package com.epam.digital.data.platform.bpms.extension.delegate;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.ceph.GetContentFromCephDelegate;
+import com.epam.digital.data.platform.bpms.extension.delegate.storage.GetContentFromCephDelegate;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableReadAccessor;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableWriteAccessor;
@@ -70,7 +70,7 @@ public class GetContentFromCephDelegateTest {
   @Test
   public void execute() throws Exception {
     when(keyVariableReadAccessor.get()).thenReturn("key");
-    when(cephService.getContent(CEPH_BUCKET_NAME, "key")).thenReturn(Optional.of("someContent"));
+    when(cephService.getAsString(CEPH_BUCKET_NAME, "key")).thenReturn(Optional.of("someContent"));
 
     getContentFromCephDelegate.execute(delegateExecution);
 

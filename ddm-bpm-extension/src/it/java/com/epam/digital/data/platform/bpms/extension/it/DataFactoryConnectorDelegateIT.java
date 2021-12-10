@@ -29,9 +29,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.epam.digital.data.platform.starter.errorhandling.exception.SystemException;
 import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
+import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.google.common.collect.ImmutableMap;
 import java.util.LinkedHashMap;
@@ -165,7 +165,7 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
   @Test
   @Deployment(resources = {"bpmn/connector/testDataFactoryConnectorUpdateDelegate.bpmn"})
   public void testDataFactoryConnectorUpdateDelegate() {
-    cephService.putFormData("cephKey", FormDataDto.builder()
+    formDataStorageService.putFormData("cephKey", FormDataDto.builder()
         .accessToken("token").build());
 
     dataFactoryMockServer.addStubMapping(
@@ -271,7 +271,7 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
 
     var cephKeyToken = cephKeyProvider
         .generateKey("test_token", processInstance.getProcessInstanceId());
-    cephService.putFormData(cephKeyToken, FormDataDto.builder().accessToken(validAccessToken)
+    formDataStorageService.putFormData(cephKeyToken, FormDataDto.builder().accessToken(validAccessToken)
         .data(new LinkedHashMap<>()).build());
 
     var taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionTask").singleResult()
@@ -325,7 +325,7 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
 
     var cephKeyToken = cephKeyProvider
         .generateKey("test_token", processInstance.getProcessInstanceId());
-    cephService.putFormData(cephKeyToken, FormDataDto.builder().accessToken(validAccessToken)
+    formDataStorageService.putFormData(cephKeyToken, FormDataDto.builder().accessToken(validAccessToken)
         .data(new LinkedHashMap<>()).build());
 
     var taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionCreateDelegateTask")
