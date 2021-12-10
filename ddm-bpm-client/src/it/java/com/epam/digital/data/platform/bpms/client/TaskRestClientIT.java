@@ -31,12 +31,14 @@ import static org.junit.Assert.assertThrows;
 import com.epam.digital.data.platform.bpms.api.dto.DdmClaimTaskQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmCompleteTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmCompletedTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmSignableTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmTaskCountQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmTaskQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmVariableValueDto;
 import com.epam.digital.data.platform.bpms.api.dto.PaginationQueryDto;
 import com.epam.digital.data.platform.bpms.client.exception.AuthorizationException;
 import com.epam.digital.data.platform.bpms.client.exception.TaskNotFoundException;
+import com.epam.digital.data.platform.dso.api.dto.Subject;
 import com.epam.digital.data.platform.starter.errorhandling.dto.ErrorDetailDto;
 import com.epam.digital.data.platform.starter.errorhandling.dto.ErrorsListDto;
 import com.epam.digital.data.platform.starter.errorhandling.dto.SystemErrorDto;
@@ -47,10 +49,8 @@ import com.github.tomakehurst.wiremock.http.RequestMethod;
 import com.github.tomakehurst.wiremock.matching.UrlPathPattern;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.assertj.core.util.Lists;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -60,13 +60,13 @@ class TaskRestClientIT extends BaseIT {
   private TaskRestClient taskRestClient;
 
   @Test
-  void shouldReturnTaskCount() throws JsonProcessingException {
+  void shouldReturnTaskCount() {
     restClientWireMock.addStubMapping(
         stubFor(post(urlPathEqualTo("/api/task/count"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(200)
-                .withBody(objectMapper.writeValueAsString(new CountResultDto(1L))))
+                .withBody("{\"count\":1}"))
         )
     );
 
@@ -76,16 +76,15 @@ class TaskRestClientIT extends BaseIT {
   }
 
   @Test
-  void shouldReturnListOfTasks() throws JsonProcessingException {
+  void shouldReturnListOfTasks() {
     var paginationQueryDto = PaginationQueryDto.builder().build();
-    var taskDto = new TaskDto();
-    taskDto.setAssignee("testAssignee");
     restClientWireMock.addStubMapping(
-        stubFor(post(urlPathEqualTo("/api/task"))
+        stubFor(post(urlPathEqualTo("/api/extended/task"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(200)
-                .withBody(objectMapper.writeValueAsString(Lists.newArrayList(taskDto))))
+                .withBody("[{\"id\":\"id\",\"assignee\":\"testAssignee\"}]")
+            )
         )
     );
 
@@ -98,15 +97,14 @@ class TaskRestClientIT extends BaseIT {
   }
 
   @Test
-  void shouldReturnTaskById() throws JsonProcessingException {
-    var taskDtoById = new TaskDto();
-    taskDtoById.setId("tid");
+  void shouldReturnTaskById() {
     restClientWireMock.addStubMapping(
-        stubFor(get(urlPathEqualTo("/api/task/tid"))
+        stubFor(get(urlPathEqualTo("/api/extended/task/tid"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(200)
-                .withBody(objectMapper.writeValueAsString(taskDtoById)))
+                .withBody("{\"id\":\"tid\"}")
+            )
         )
     );
 
@@ -119,7 +117,7 @@ class TaskRestClientIT extends BaseIT {
   void shouldReturn403TaskById() throws JsonProcessingException {
     var errorDto403 = new SystemErrorDto("testTraceId", "type", "message403", "testLocalizedMsg");
     restClientWireMock.addStubMapping(
-        stubFor(get(urlPathEqualTo("/api/task/tid403"))
+        stubFor(get(urlPathEqualTo("/api/extended/task/tid403"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(403)
@@ -140,7 +138,7 @@ class TaskRestClientIT extends BaseIT {
   void shouldReturn404TaskById() throws JsonProcessingException {
     var errorDto404 = new SystemErrorDto("testTraceId", "type", "message404", "testLocalizedMsg");
     restClientWireMock.addStubMapping(
-        stubFor(get(urlPathEqualTo("/api/task/tid404"))
+        stubFor(get(urlPathEqualTo("/api/extended/task/tid404"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(404)
@@ -223,19 +221,15 @@ class TaskRestClientIT extends BaseIT {
         .processInstanceIdIn(
             Lists.newArrayList("testProcessInstanceId", "testProcessInstanceId2")).build();
 
-    var task = new TaskEntity();
-    task.setProcessInstanceId("testProcessInstanceId");
-    var task2 = new TaskEntity();
-    task2.setProcessInstanceId("testProcessInstanceId2");
     restClientWireMock.addStubMapping(
-        stubFor(post(urlPathEqualTo("/api/task"))
+        stubFor(post(urlPathEqualTo("/api/extended/task"))
             .withRequestBody(equalTo(objectMapper.writeValueAsString(requestDto)))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(200)
-                .withBody(
-                    objectMapper.writeValueAsString(
-                        Lists.newArrayList(TaskDto.fromEntity(task), TaskDto.fromEntity(task2)))))
+                .withBody("[{\"id\":\"id1\",\"processInstanceId\":\"testProcessInstanceId\"},"
+                    + "{\"id\":\"id2\",\"processInstanceId\":\"testProcessInstanceId2\"}]")
+            )
         )
     );
 
@@ -255,17 +249,14 @@ class TaskRestClientIT extends BaseIT {
     var paginationQueryDto = PaginationQueryDto.builder().build();
     var requestDto = DdmTaskQueryDto.builder().processInstanceId("testProcessInstanceId").build();
 
-    var task = new TaskEntity();
-    task.setProcessInstanceId("testProcessInstanceId");
     restClientWireMock.addStubMapping(
-        stubFor(post(urlPathEqualTo("/api/task"))
+        stubFor(post(urlPathEqualTo("/api/extended/task"))
             .withRequestBody(equalTo(objectMapper.writeValueAsString(requestDto)))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(200)
-                .withBody(
-                    objectMapper.writeValueAsString(
-                        Lists.newArrayList(TaskDto.fromEntity(task)))))
+                .withBody("[{\"id\":\"id\",\"processInstanceId\":\"testProcessInstanceId\"}]")
+            )
         )
     );
 
@@ -304,9 +295,16 @@ class TaskRestClientIT extends BaseIT {
   }
 
   @Test
-  void shouldReturnTasksByOrQueries() throws JsonProcessingException {
-    var paginationQueryDto = PaginationQueryDto.builder().build();
-    String expectedBody = "{\"orQueries\":[{\"assignee\": \"testuser\",\"unassigned\": true}]}";
+  void shouldReturnTasksByOrQueries() {
+    var expectedBody = "{\"orQueries\":[{\"assignee\": \"testuser\",\"unassigned\": true}]}";
+
+    restClientWireMock.addStubMapping(
+        stubFor(post(urlPathEqualTo("/api/extended/task"))
+            .withRequestBody(equalToJson(expectedBody))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withStatus(200)
+                .withBody("[{\"id\":\"testId\"}]"))));
 
     var requestDto = DdmTaskQueryDto.builder()
         .orQueries(List.of(DdmTaskQueryDto.builder()
@@ -314,21 +312,11 @@ class TaskRestClientIT extends BaseIT {
             .unassigned(true)
             .build()))
         .build();
+    var paginationQueryDto = PaginationQueryDto.builder().build();
+    var tasks = taskRestClient.getTasksByParams(requestDto, paginationQueryDto);
 
-    var task = new TaskEntity();
-    task.setId("testId");
-    restClientWireMock.addStubMapping(
-        stubFor(post(urlPathEqualTo("/api/task"))
-            .withRequestBody(equalToJson(expectedBody))
-            .willReturn(aResponse()
-                .withHeader("Content-Type", "application/json")
-                .withStatus(200)
-                .withBody((objectMapper.writeValueAsString(List.of(TaskDto.fromEntity(task))))))));
-
-    List<TaskDto> tasks = taskRestClient.getTasksByParams(requestDto, paginationQueryDto);
-
-    assertThat(tasks).isNotEmpty();
-    assertThat(tasks.get(0).getId()).isEqualTo("testId");
+    assertThat(tasks).hasSize(1)
+        .element(0).hasFieldOrPropertyWithValue("id", "testId");
   }
 
   @Test
@@ -368,5 +356,30 @@ class TaskRestClientIT extends BaseIT {
     var resultVariables = result.get(variableValue);
     assertThat(resultVariables.getValue()).isEqualTo(variableValue);
     assertThat(resultVariables.getType()).isEqualTo(type);
+  }
+
+  @Test
+  void getUserTaskById() throws JsonProcessingException {
+    var id = "taskId";
+    var processDefinitionName = "processDefinitionName";
+    var signatureValidationPack = Set.of(Subject.ENTREPRENEUR);
+    var dto = new DdmSignableTaskDto();
+    dto.setId(id);
+    dto.setProcessDefinitionName(processDefinitionName);
+    dto.setSignatureValidationPack(signatureValidationPack);
+    restClientWireMock.addStubMapping(
+        stubFor(get(urlPathEqualTo("/api/extended/task/taskId"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withStatus(200)
+                .withBody(objectMapper.writeValueAsString(dto))))
+    );
+
+    var result = taskRestClient.getTaskById(id);
+
+    assertThat(result)
+        .hasFieldOrPropertyWithValue("id", id)
+        .hasFieldOrPropertyWithValue("processDefinitionName", processDefinitionName)
+        .hasFieldOrPropertyWithValue("signatureValidationPack", signatureValidationPack);
   }
 }
