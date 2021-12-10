@@ -52,6 +52,11 @@
     </dependency>
     <dependency>
       <groupId>com.epam.digital.data.platform</groupId>
+      <artifactId>ddm-bpm-storage</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.epam.digital.data.platform</groupId>
       <artifactId>ddm-bpm-data-accessor</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -64,11 +69,6 @@
       <groupId>com.epam.digital.data.platform</groupId>
       <artifactId>excerpt-model</artifactId>
       <version>${excerpt-model.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.epam.digital.data.platform</groupId>
-      <artifactId>ddm-ceph-client</artifactId>
-      <version>${ddm-ceph-client.version}</version>
     </dependency>
     <dependency>
       <groupId>com.epam.digital.data.platform</groupId>

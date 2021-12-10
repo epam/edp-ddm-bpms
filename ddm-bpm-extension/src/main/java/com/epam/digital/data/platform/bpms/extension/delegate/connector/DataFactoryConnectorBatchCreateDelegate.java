@@ -108,7 +108,7 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseJavaDelegate {
     var processInstanceId = execution.getProcessInstanceId();
     var systemSignatureCephKey =
         "lowcode_" + processInstanceId + "_system_signature_ceph_key_" + nodeIndex;
-    cephService.putContent(cephBucketName, systemSignatureCephKey, cephContent);
+    cephService.put(cephBucketName, systemSignatureCephKey, cephContent);
     xDigitalSignatureDerivedCephKeyVariable.on(execution).set(systemSignatureCephKey);
   }
 

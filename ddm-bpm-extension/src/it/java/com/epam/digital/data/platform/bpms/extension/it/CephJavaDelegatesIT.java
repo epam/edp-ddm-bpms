@@ -23,8 +23,8 @@ import static org.junit.Assert.assertTrue;
 
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
 import com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable;
-import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.epam.digital.data.platform.integration.ceph.exception.MisconfigurationException;
+import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
 import com.google.common.collect.ImmutableMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -78,7 +78,7 @@ public class CephJavaDelegatesIT extends BaseIT {
 
     assertTrue(process.isEnded());
 
-    String content = cephService.getContent(cephBucketName, "testKey").get();
+    String content = cephService.getAsString(cephBucketName, "testKey").get();
     assertThat(content).isNotNull()
         .isEqualTo(contentToPut);
   }
@@ -94,7 +94,7 @@ public class CephJavaDelegatesIT extends BaseIT {
 
     var expectedCephKey = cephKeyProvider.generateKey("userTask", processInstance.getProcessInstanceId());
 
-    var data = cephService.getFormData(expectedCephKey);
+    var data = formDataStorageService.getFormData(expectedCephKey);
     assertThat(data).isNotEmpty();
     assertThat(data.get().getData().get("name")).isEqualTo("value ek");
 
@@ -140,7 +140,7 @@ public class CephJavaDelegatesIT extends BaseIT {
     var data = new LinkedHashMap<String, Object>();
     data.put("prop1", "value1");
 
-    cephService.putFormData("cephKey", FormDataDto.builder().data(data).build());
+    formDataStorageService.putFormData("cephKey", FormDataDto.builder().data(data).build());
 
     var processInstance = runtimeService
         .startProcessInstanceByKey("testStartFormKey", "key", vars);

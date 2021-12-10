@@ -16,6 +16,11 @@
 
 package com.epam.digital.data.platform.bpms.extension.it.config;
 
+import com.epam.digital.data.platform.integration.ceph.service.CephService;
+import com.epam.digital.data.platform.storage.form.repository.CephFormDataRepository;
+import com.epam.digital.data.platform.storage.form.repository.FormDataRepository;
+import com.epam.digital.data.platform.storage.form.service.FormDataKeyProviderImpl;
+import com.epam.digital.data.platform.storage.form.service.FormDataStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +38,25 @@ public class TestCephConfig {
 
   @Bean
   @Primary
-  public TestCephServiceImpl cephService() {
+  public CephService cephService() {
     return new TestCephServiceImpl(cephBucketName, objectMapper);
+  }
+
+  @Bean
+  public FormDataRepository formDataRepository(CephService cephService) {
+    return CephFormDataRepository.builder()
+        .cephBucketName(cephBucketName)
+        .objectMapper(objectMapper)
+        .cephService(cephService)
+        .build();
+  }
+
+  @Bean
+  @Primary
+  public FormDataStorageService formDataStorageService(FormDataRepository formDataRepository) {
+    return FormDataStorageService.builder()
+        .keyProvider(new FormDataKeyProviderImpl())
+        .repository(formDataRepository)
+        .build();
   }
 }

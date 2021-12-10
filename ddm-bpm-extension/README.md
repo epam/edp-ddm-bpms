@@ -44,6 +44,7 @@ excerpt-service-api:
 user-settings-service-api:
   url: base url for user settings connectors;
 
+# for working with GetContentFromCephDelegate and PutContentToCephDelegate
 ceph:
   http-endpoint: base ceph url
   access-key: access key for working with objects
@@ -60,6 +61,25 @@ keycloak:
     realm: officer user realm name
     client-id: officer user client identifier
     client-secret: officer user client secret
+
+# for working with delegates in com.epam.digital.data.platform.bpms.extension.delegate.storage package
+storage:
+  form-data:
+    type: ceph # storage type
+    backend: # contains specific properties for each storage type
+      ceph:
+        http-endpoint: http-endpoint
+        access-key: access-key
+        secret-key: secret-key
+        bucket: bucket
+  file-data:
+    type: ceph
+    backend:
+      ceph:
+        http-endpoint: http-endpoint
+        access-key: access-key
+        secret-key: secret-key
+        bucket: bucket
 ```
 
 ### Available extensions
@@ -70,8 +90,8 @@ keycloak:
   for working with EDR registry;
 * `com.epam.digital.data.platform.bpms.extension.delegate.connector` - contains connectors for
   working with data factory;
-* `com.epam.digital.data.platform.bpms.extension.delegate.ceph` - contains connectors for working
-  with ceph-storage;
+* `com.epam.digital.data.platform.bpms.extension.delegate.storage` - contains connectors for working
+  with storage;
 * `com.epam.digital.data.platform.bpms.extension.delegate.CamundaSystemErrorDelegate` - used to
   throw a camunda system exception;
 * `com.epam.digital.data.platform.bpms.extension.delegate.DefineBusinessProcessStatusDelegate` -

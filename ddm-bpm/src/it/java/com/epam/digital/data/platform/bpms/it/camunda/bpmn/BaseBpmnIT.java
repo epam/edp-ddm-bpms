@@ -31,14 +31,15 @@ import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.history
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.managementService;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
 
-import com.epam.digital.data.platform.bpms.it.dto.CompleteActivityDto;
-import com.epam.digital.data.platform.bpms.it.util.CamundaAssertionUtil;
-import com.epam.digital.data.platform.bpms.extension.delegate.ceph.CephKeyProvider;
 import com.epam.digital.data.platform.bpms.it.BaseIT;
 import com.epam.digital.data.platform.bpms.it.builder.StubData;
+import com.epam.digital.data.platform.bpms.it.dto.CompleteActivityDto;
+import com.epam.digital.data.platform.bpms.it.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpms.it.util.TestUtils;
 import com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable;
-import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.service.FormDataKeyProvider;
+import com.epam.digital.data.platform.storage.form.service.FormDataKeyProviderImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -93,8 +94,7 @@ public abstract class BaseBpmnIT extends BaseIT {
 
   @Inject
   protected ObjectMapper objectMapper;
-  @Inject
-  protected CephKeyProvider cephKeyProvider;
+  protected FormDataKeyProvider cephKeyProvider;
 
   protected String testUserName = "testuser";
   protected String testUserToken;
@@ -110,9 +110,10 @@ public abstract class BaseBpmnIT extends BaseIT {
         processInstance -> runtimeService
             .deleteProcessInstance(processInstance.getId(), "test clear"));
     testUserToken = TestUtils.getContent("/json/testuserAccessToken.json");
+    cephKeyProvider = new FormDataKeyProviderImpl();
     SecurityContextHolder.getContext().setAuthentication(
         new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
-    CamundaAssertionUtil.setCephService(cephService);
+    CamundaAssertionUtil.setFromDataStorageService(formDataStorageService);
   }
 
   @After
@@ -125,8 +126,7 @@ public abstract class BaseBpmnIT extends BaseIT {
   }
 
   protected void completeTask(String taskId, String processInstanceId, String formData) {
-    var cephKey = cephKeyProvider.generateKey(taskId, processInstanceId);
-    cephService.putFormData(cephKey, deserializeFormData(formData));
+    formDataStorageService.putFormData(taskId, processInstanceId, deserializeFormData(formData));
     String id = taskService.createTaskQuery().taskDefinitionKey(taskId).singleResult().getId();
     taskService.complete(id);
   }
@@ -154,7 +154,7 @@ public abstract class BaseBpmnIT extends BaseIT {
     var activityDefinitionId = completeActivityDto.getActivityDefinitionId();
     var processInstanceId = completeActivityDto.getProcessInstanceId();
     var cephKey = cephKeyProvider.generateKey(activityDefinitionId, processInstanceId);
-    cephService.putContent(cephBucketName, cephKey,
+    cephService.put(cephBucketName, cephKey,
         TestUtils.getContent(completeActivityDto.getExpectedFormData()));
   }
 
@@ -246,7 +246,7 @@ public abstract class BaseBpmnIT extends BaseIT {
 
   protected void assertCephContent() {
     expectedCephStorage.forEach((key, value) -> {
-      var actualMap = cephService.getFormData(key);
+      var actualMap = cephService.get(cephBucketName, key);
 
       Assertions.assertThat(actualMap).get().isEqualTo(value);
     });
@@ -299,7 +299,7 @@ public abstract class BaseBpmnIT extends BaseIT {
 
   protected Map startProcessInstanceWithStartForm(String processDefinitionKey, String token,
       FormDataDto formDataDto) throws JsonProcessingException {
-    cephService.putFormData(START_FORM_CEPH_KEY, formDataDto);
+    formDataStorageService.putFormData(START_FORM_CEPH_KEY, formDataDto);
 
     var startProcessInstanceDto = new StartProcessInstanceDto();
     var variableValueDto = new VariableValueDto();
@@ -346,7 +346,7 @@ public abstract class BaseBpmnIT extends BaseIT {
 
   @SneakyThrows
   private void assertSignature(String systemSignatureCephKey, String cephContent) {
-    var signature = cephService.getContent(cephBucketName, systemSignatureCephKey);
+    var signature = cephService.getAsString(cephBucketName, systemSignatureCephKey);
     Assertions.assertThat(signature).isNotEmpty();
 
     var signatureMap = objectMapper.readerForMapOf(Object.class).readValue(signature.get());

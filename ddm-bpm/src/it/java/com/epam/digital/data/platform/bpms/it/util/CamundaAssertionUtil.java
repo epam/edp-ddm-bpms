@@ -22,8 +22,8 @@ import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.process
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
 
 import com.epam.digital.data.platform.bpms.it.dto.AssertWaitingActivityDto;
-import com.epam.digital.data.platform.bpms.it.config.TestCephServiceImpl;
-import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.service.FormDataStorageService;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -40,17 +40,17 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperty;
 @Slf4j
 public final class CamundaAssertionUtil {
 
-  private static final ThreadLocal<TestCephServiceImpl> cephService = new ThreadLocal<>();
+  private static final ThreadLocal<FormDataStorageService> fromDataStorageService = new ThreadLocal<>();
 
   private CamundaAssertionUtil() {
   }
 
-  public static TestCephServiceImpl cephService() {
-    return cephService.get();
+  public static FormDataStorageService formDataStorageService() {
+    return fromDataStorageService.get();
   }
 
-  public static void setCephService(TestCephServiceImpl testCephService) {
-    cephService.set(testCephService);
+  public static void setFromDataStorageService(FormDataStorageService formDataStorageService) {
+    fromDataStorageService.set(formDataStorageService);
   }
 
   public static ProcessInstance processInstance(String processInstanceId) {
@@ -88,7 +88,8 @@ public final class CamundaAssertionUtil {
   }
 
   public static void assertCephContains(String cephKey, FormDataDto cephContent) {
-    Assertions.assertThat(cephService().getFormData(cephKey)).get().isEqualTo(cephContent);
+    Assertions.assertThat(formDataStorageService().getFormData(cephKey)).get()
+        .isEqualTo(cephContent);
   }
 
   private static void assertUserTask(AssertWaitingActivityDto assertWaitingActivityDto,

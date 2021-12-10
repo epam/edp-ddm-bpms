@@ -23,7 +23,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 
 import com.epam.digital.data.platform.dso.api.dto.SignResponseDto;
-import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import java.util.LinkedHashMap;
@@ -57,7 +57,7 @@ public class DigitalSignatureConnectorDelegateIT extends BaseIT {
 
     var cephKey = cephKeyProvider
         .generateKey("testActivity", processInstance.getProcessInstanceId());
-    cephService.putFormData(cephKey, FormDataDto.builder().accessToken(validAccessToken)
+    formDataStorageService.putFormData(cephKey, FormDataDto.builder().accessToken(validAccessToken)
         .data(new LinkedHashMap<>()).build());
 
     String taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionTaskForDso")

@@ -24,7 +24,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable;
-import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -72,8 +72,7 @@ public class JuelFunctionsIT extends BaseIT {
 
     var processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
 
-    var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, processInstance.getId());
-    cephService.putFormData(cephKey, FormDataDto.builder().accessToken(validAccessToken).build());
+    formDataStorageService.putFormData(taskDefinitionKey, processInstance.getId(), FormDataDto.builder().accessToken(validAccessToken).build());
 
     String taskId = taskService.createTaskQuery().taskDefinitionKey(taskDefinitionKey).singleResult().getId();
     taskService.complete(taskId);
@@ -94,9 +93,8 @@ public class JuelFunctionsIT extends BaseIT {
 
     var processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey, vars);
 
-    var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, processInstance.getId());
-    cephService.putFormData(cephKey, FormDataDto.builder().data(formData).build());
-    cephService.putFormData(startFormCephKey, FormDataDto.builder().data(formData).build());
+    formDataStorageService.putFormData(taskDefinitionKey, processInstance.getId(), FormDataDto.builder().data(formData).build());
+    formDataStorageService.putFormData(startFormCephKey, FormDataDto.builder().data(formData).build());
 
     String taskId = taskService.createTaskQuery().taskDefinitionKey(taskDefinitionKey)
         .singleResult().getId();
@@ -119,9 +117,8 @@ public class JuelFunctionsIT extends BaseIT {
 
     var processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey, vars);
 
-    var cephKey = cephKeyProvider.generateKey(taskDefinitionKey, processInstance.getId());
-    cephService.putFormData(cephKey, FormDataDto.builder().data(data).signature(signature).build());
-    cephService.putFormData(startFormCephKey, FormDataDto.builder().data(data).signature(signature).build());
+    formDataStorageService.putFormData(taskDefinitionKey, processInstance.getId(), FormDataDto.builder().data(data).signature(signature).build());
+    formDataStorageService.putFormData(startFormCephKey, FormDataDto.builder().data(data).signature(signature).build());
 
     String taskId = taskService.createTaskQuery().taskDefinitionKey(taskDefinitionKey).singleResult().getId();
     taskService.complete(taskId);
