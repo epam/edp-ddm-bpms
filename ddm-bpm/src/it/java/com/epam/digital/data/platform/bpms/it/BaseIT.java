@@ -62,6 +62,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -70,6 +71,8 @@ import org.springframework.util.CollectionUtils;
 @ActiveProfiles("test")
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092",
+    "port=9092"})
 public abstract class BaseIT {
 
   protected final String TOKEN_HEADER = "x-access-token";
