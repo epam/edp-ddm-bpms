@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2021 EPAM Systems.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~    https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0mjf8rg" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:process id="test_history_handler" name="test_history_handler" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="start" camunda:initiator="initiator">
+      <bpmn:outgoing>Flow_1rctwy7</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1rctwy7" sourceRef="StartEvent_1" targetRef="user_task" />
+    <bpmn:endEvent id="Event_12eyttm" name="end">
+      <bpmn:incoming>Flow_13m4ud4</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_13m4ud4" sourceRef="Activity_1g96anl" targetRef="Event_12eyttm" />
+    <bpmn:scriptTask id="Activity_1g96anl" name="script" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1v4tkwy</bpmn:incoming>
+      <bpmn:outgoing>Flow_13m4ud4</bpmn:outgoing>
+      <bpmn:script>execution.setVariable('sys-var-process-excerpt-id', 'excerpt')
+        execution.setVariable('sys-var-process-completion-result', 'completion result')</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_1v4tkwy" sourceRef="user_task" targetRef="Activity_1g96anl" />
+    <bpmn:userTask id="user_task" name="task" camunda:assignee="${initiator}">
+      <bpmn:incoming>Flow_1rctwy7</bpmn:incoming>
+      <bpmn:outgoing>Flow_1v4tkwy</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="test_history_handler">
+      <bpmndi:BPMNEdge id="Flow_1rctwy7_di" bpmnElement="Flow_1rctwy7">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="260" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13m4ud4_di" bpmnElement="Flow_13m4ud4">
+        <di:waypoint x="520" y="117" />
+        <di:waypoint x="582" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1v4tkwy_di" bpmnElement="Flow_1v4tkwy">
+        <di:waypoint x="360" y="117" />
+        <di:waypoint x="420" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="142" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_12eyttm_di" bpmnElement="Event_12eyttm">
+        <dc:Bounds x="582" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="591" y="142" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ad2hco_di" bpmnElement="Activity_1g96anl">
+        <dc:Bounds x="420" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1na88mh_di" bpmnElement="user_task">
+        <dc:Bounds x="260" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

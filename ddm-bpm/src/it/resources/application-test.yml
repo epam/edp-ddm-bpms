@@ -21,6 +21,9 @@ camunda:
       password: camunda
     job-execution:
       enabled: false
+    history-publisher:
+      kafka:
+        bootstrap: localhost:9092
   system-variables:
     const_dataFactoryBaseUrl: http://localhost:8877/mock-server
 dso:

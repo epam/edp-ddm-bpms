@@ -118,3 +118,6 @@ storage:
         access-key: ${ceph.file-storage-access-key}
         secret-key: ${ceph.file-storage-secret-key}
         bucket: ${ceph.file-storage-bucket}
+
+kafka:
+  service: kafka-cluster-kafka-bootstrap:9092
