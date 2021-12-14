@@ -14,23 +14,27 @@
  * limitations under the License.
  */
 
-package com.epam.digital.data.platform.bpms.it.config;
+package com.epam.digital.data.platform.bpm.it.util;
 
-import com.epam.digital.data.platform.bpms.it.util.WireMockUtil;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import java.net.MalformedURLException;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import java.net.URL;
 
-@Configuration
-public class WireMockConfig {
+public final class WireMockUtil {
 
-  @Bean(destroyMethod = "stop")
-  @Qualifier("keycloakMockServer")
-  public WireMockServer keycloakMockServer(@Value("${keycloak.url}") String urlStr)
+  public static WireMockServer createAndStartMockServerForUrl(String urlStr)
       throws MalformedURLException {
-    return WireMockUtil.createAndStartMockServerForUrl(urlStr);
+    URL url = new URL(urlStr);
+    WireMockServer wireMockServer = new WireMockRule(wireMockConfig().port(url.getPort()));
+    WireMock.configureFor(url.getHost(), url.getPort());
+    wireMockServer.start();
+    return wireMockServer;
+  }
+
+  private WireMockUtil() {
   }
 }
