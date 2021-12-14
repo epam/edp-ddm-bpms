@@ -14,11 +14,20 @@
  * limitations under the License.
  */
 
-package com.epam.digital.data.platform.bpms.it;
+package com.epam.digital.data.platform.bpm.it.bpmn;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.delete;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
 
-import com.epam.digital.data.platform.bpms.it.util.TestUtils;
+import com.epam.digital.data.platform.bpm.it.config.TestCephServiceImpl;
+import com.epam.digital.data.platform.bpm.it.util.TestUtils;
 import com.epam.digital.data.platform.starter.security.SystemRole;
 import com.epam.digital.data.platform.storage.form.service.FormDataStorageService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,7 +42,9 @@ import javax.inject.Inject;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status.Family;
 import lombok.SneakyThrows;
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -47,6 +58,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -70,9 +82,11 @@ public abstract class BaseIT {
   @Inject
   protected TaskService taskService;
   @Inject
+  protected TestCephServiceImpl cephService;
+  @Inject
   protected FormDataStorageService formDataStorageService;
   @Inject
-  private ObjectMapper objectMapper;
+  protected ObjectMapper objectMapper;
   @Inject
   private AuthorizationService authorizationService;
   @Inject
@@ -81,6 +95,10 @@ public abstract class BaseIT {
   @Inject
   @Qualifier("keycloakMockServer")
   protected WireMockServer keycloakMockServer;
+  @Value("${keycloak.citizen.realm}")
+  protected String citizenRealm;
+  @Value("${keycloak.officer.realm}")
+  protected String officerRealm;
 
   @LocalServerPort
   protected int port;
@@ -98,13 +116,9 @@ public abstract class BaseIT {
   public void setAuthorization() {
     SecurityContextHolder.getContext().setAuthentication(null);
     Stream.of(SystemRole.getRoleNames()).forEach(this::createAuthorizationsIfNotExists);
+    cephService.clearStorage();
 
     identityService.setAuthentication("testUser", List.of("camunda-admin"));
-  }
-
-  protected <T> T postForObject(String url, String body, Class<T> targetClass)
-      throws JsonProcessingException {
-    return this.postForObject(url, body, targetClass, validAccessToken);
   }
 
   protected <T> T getForObject(String url, Class<T> targetClass, String accessToken)
@@ -125,6 +139,15 @@ public abstract class BaseIT {
         .post(Entity.entity(body, MediaType.APPLICATION_JSON))
         .readEntity(String.class);
     return objectMapper.readValue(jsonResponse, targetClass);
+  }
+
+  protected void postForNoContent(String url, String body, String token) {
+    var response = jerseyClient.target(String.format("http://localhost:%d/%s", port, url))
+        .request()
+        .header(TOKEN_HEADER, token)
+        .post(Entity.entity(body, MediaType.APPLICATION_JSON));
+
+    Assertions.assertThat(response.getStatusInfo().getFamily()).isEqualTo(Family.SUCCESSFUL);
   }
 
   private void createAuthorizationsIfNotExists(String groupId) {
@@ -151,5 +174,59 @@ public abstract class BaseIT {
   @SneakyThrows
   protected String convertJsonToString(String jsonFilePath) {
     return TestUtils.getContent(jsonFilePath);
+  }
+
+  protected void mockConnectToKeycloak(String realmName) {
+    keycloakMockServer.addStubMapping(
+        stubFor(post(urlPathEqualTo("/auth/realms/" + realmName + "/protocol/openid-connect/token"))
+            .withRequestBody(equalTo("grant_type=client_credentials"))
+            .willReturn(aResponse().withStatus(200)
+                .withHeader("Content-type", "application/json")
+                .withBody(convertJsonToString("/json/keycloak/keycloakConnectResponse.json")))));
+  }
+
+  protected void mockKeycloakGetUsers(String userName, String responseBody) {
+    keycloakMockServer.addStubMapping(
+        stubFor(get(urlPathEqualTo("/auth/admin/realms/citizen-realm/users"))
+            .withQueryParam("username", equalTo(userName))
+            .withQueryParam("exact", equalTo(Boolean.TRUE.toString()))
+            .willReturn(aResponse().withStatus(200)
+                .withHeader("Content-type", "application/json")
+                .withBody(convertJsonToString(responseBody)))));
+  }
+
+  protected void mockKeycloakGetUsersByRole(String role, String response) {
+    var getUsersUrl = String.format("/auth/admin/realms/officer-realm/roles/%s/users", role);
+    keycloakMockServer.addStubMapping(
+        stubFor(get(urlPathEqualTo(getUsersUrl))
+            .willReturn(aResponse().withStatus(200)
+                .withHeader("Content-type", "application/json")
+                .withBody(convertJsonToString(response)))));
+  }
+
+  protected void mockKeycloakGetRole(String role, String responseBody, int status) {
+    keycloakMockServer.addStubMapping(
+        stubFor(get(urlPathEqualTo("/auth/admin/realms/citizen-realm/roles/" + role))
+            .willReturn(aResponse().withStatus(status)
+                .withHeader("Content-type", "application/json")
+                .withBody(convertJsonToString(responseBody)))));
+  }
+
+  protected void mockKeycloakAddRole(String userId, String request) {
+    var roleMappingsUrl = String
+        .format("/auth/admin/realms/citizen-realm/users/%s/role-mappings/realm", userId);
+
+    keycloakMockServer.addStubMapping(
+        stubFor(post(urlPathEqualTo(roleMappingsUrl)).withRequestBody(
+            equalToJson(convertJsonToString(request))).willReturn(aResponse().withStatus(200))));
+  }
+
+  protected void mockKeycloakDeleteRole(String userId, String request) {
+    var roleMappingsUrl = String
+        .format("/auth/admin/realms/citizen-realm/users/%s/role-mappings/realm", userId);
+
+    keycloakMockServer.addStubMapping(
+        stubFor(delete(urlPathEqualTo(roleMappingsUrl)).withRequestBody(
+            equalToJson(convertJsonToString(request))).willReturn(aResponse().withStatus(200))));
   }
 }

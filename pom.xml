@@ -12,7 +12,7 @@
   </parent>
 
   <artifactId>ddm-bpm-parent</artifactId>
-  <version>1.5.5-SNAPSHOT</version>
+  <version>1.5.6-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -27,6 +27,7 @@
     <module>ddm-data-factory-client</module>
     <module>ddm-bpm-history-event-handler</module>
     <module>ddm-bpm-storage</module>
+    <module>ddm-bpm-integration-tests</module>
   </modules>
 
   <properties>

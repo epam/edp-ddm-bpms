@@ -127,6 +127,7 @@ public class JuelFunctionsIT extends BaseIT {
   }
 
   @Test
+  @Deployment(resources = "bpmn/system_user_juel_function.bpmn")
   public void testSystemUserFunction() {
     keycloakMockServer.resetAll();
     keycloakMockServer.addStubMapping(

@@ -2,35 +2,43 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-
   <parent>
-    <groupId>com.epam.digital.data.platform</groupId>
     <artifactId>ddm-bpm-parent</artifactId>
+    <groupId>com.epam.digital.data.platform</groupId>
     <version>1.5.6-SNAPSHOT</version>
   </parent>
+  <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>ddm-bpm-data-accessor</artifactId>
-  <name>ddm-bpm-data-accessor</name>
+  <artifactId>ddm-bpm-integration-tests</artifactId>
+  <name>ddm-bpm-integration-tests</name>
+
+  <properties>
+    <camunda.bpm.assert.version>7.0.0</camunda.bpm.assert.version>
+  </properties>
 
   <dependencies>
     <dependency>
       <groupId>com.epam.digital.data.platform</groupId>
-      <artifactId>ddm-bpm-api</artifactId>
+      <artifactId>ddm-bpm</artifactId>
       <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-plugin-spin</artifactId>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy</artifactId>
+      <version>${groovy.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.camunda.bpm.assert</groupId>
+      <artifactId>camunda-bpm-assert</artifactId>
+      <version>${camunda.bpm.assert.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
