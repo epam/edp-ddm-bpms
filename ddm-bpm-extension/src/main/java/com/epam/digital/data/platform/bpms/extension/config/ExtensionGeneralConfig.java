@@ -88,9 +88,9 @@ public class ExtensionGeneralConfig {
   @Bean
   @ConditionalOnMissingBean(CephService.class)
   public CephService cephService(
-      @Value("ceph.http-endpoint") String cephEndpoint,
-      @Value("ceph.access-key") String cephAccessKey,
-      @Value("ceph.secret-key") String cephSecretKey) {
+      @Value("${ceph.http-endpoint}") String cephEndpoint,
+      @Value("${ceph.access-key}") String cephAccessKey,
+      @Value("${ceph.secret-key}") String cephSecretKey) {
     return CephServiceS3Impl.builder()
         .cephAccessKey(cephAccessKey)
         .cephSecretKey(cephSecretKey)
