@@ -157,7 +157,7 @@
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="resource">laboratory</camunda:inputParameter>
-          <camunda:inputParameter name="x_access_token">${completer('searchLabFormActivity').accessToken}</camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token">${initiator().accessToken}</camunda:inputParameter>
           <camunda:inputParameter name="id">${submission('start_event').formData.prop('laboratory').prop('laboratoryId').stringValue()}</camunda:inputParameter>
           <camunda:outputParameter name="labResponse">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
