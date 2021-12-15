@@ -46,7 +46,7 @@ public interface DataFactoryFeignClient {
    * @return mapped response
    * @see ConnectorResponse
    */
-  @GetMapping("/{resource}/{id}")
+  @GetMapping(path = "/{resource}/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   ConnectorResponse performGet(@PathVariable("resource") String resource,
       @PathVariable("id") String id, @RequestHeader HttpHeaders headers);
 
@@ -72,7 +72,7 @@ public interface DataFactoryFeignClient {
    * @return mapped response
    * @see ConnectorResponse
    */
-  @PutMapping("/{resource}/{id}")
+  @PutMapping(path = "/{resource}/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   ConnectorResponse performPut(@PathVariable("resource") String resource,
       @PathVariable("id") String id, @RequestBody String body, @RequestHeader HttpHeaders headers);
 
@@ -85,7 +85,7 @@ public interface DataFactoryFeignClient {
    * @return mapped response
    * @see ConnectorResponse
    */
-  @DeleteMapping("/{resource}/{id}")
+  @DeleteMapping(path = "/{resource}/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   ConnectorResponse performDelete(@PathVariable("resource") String resource,
       @PathVariable("id") String id, @RequestHeader HttpHeaders headers);
 
@@ -98,7 +98,7 @@ public interface DataFactoryFeignClient {
    * @return mapped response
    * @see ConnectorResponse
    */
-  @GetMapping("/{resource}")
+  @GetMapping(path = "/{resource}", produces = MediaType.APPLICATION_JSON_VALUE)
   ConnectorResponse performSearch(@PathVariable("resource") String resource,
       @SpringQueryMap Map<String, String> params, @RequestHeader HttpHeaders headers);
 }
