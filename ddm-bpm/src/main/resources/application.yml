@@ -26,7 +26,7 @@ spring:
     baggage:
       correlation-enabled: true
       correlation-fields: x-request-id, X-Primary-Request-URL
-      remote-fields: x-request-id, x-access-token, X-Primary-Request-URL
+      remote-fields: x-request-id, X-Primary-Request-URL
   datasource:
     hikari:
       minimum-idle: 5
