@@ -22,6 +22,7 @@ import java.util.Map;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -57,7 +58,7 @@ public interface DataFactoryFeignClient {
    * @return mapped response
    * @see ConnectorResponse
    */
-  @PostMapping("/{resource}")
+  @PostMapping(path = "/{resource}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   ConnectorResponse performPost(@PathVariable("resource") String resource,
       @RequestBody String body, @RequestHeader HttpHeaders headers);
 
