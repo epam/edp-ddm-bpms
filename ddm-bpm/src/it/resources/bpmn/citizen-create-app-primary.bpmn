@@ -897,7 +897,7 @@ execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))<
               <camunda:entry key="constantCode">ADD</camunda:entry>
             </camunda:map>
           </camunda:inputParameter>
-          <camunda:inputParameter name="x_access_token">${completer('Activity_shared-sign-app-deny').accessToken}</camunda:inputParameter>
+          <camunda:inputParameter name="x_access_token">${completer('Activity_citizen-shared-sign-app-deny').accessToken}</camunda:inputParameter>
           <camunda:outputParameter name="applicationTypeResponse">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
