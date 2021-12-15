@@ -20,6 +20,7 @@ import com.epam.digital.data.platform.datafactory.feign.config.FeignDecoderConfi
 import com.epam.digital.data.platform.datafactory.feign.model.response.ConnectorResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,7 +39,7 @@ public interface UserSettingsFeignClient {
    * @return mapped user-settings response
    * @see ConnectorResponse
    */
-  @GetMapping
+  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   ConnectorResponse performGet(@RequestHeader HttpHeaders headers);
 
   /**
@@ -49,6 +50,6 @@ public interface UserSettingsFeignClient {
    * @return mapped user-settings response
    * @see ConnectorResponse
    */
-  @PutMapping
+  @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   ConnectorResponse performPut(@RequestBody String body, @RequestHeader HttpHeaders headers);
 }

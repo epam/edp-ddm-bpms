@@ -20,6 +20,7 @@ import com.epam.digital.data.platform.datafactory.feign.config.FeignDecoderConfi
 import com.epam.digital.data.platform.datafactory.feign.model.response.ConnectorResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,7 +41,7 @@ public interface ExcerptFeignClient {
    * @return mapped excerpt response
    * @see ConnectorResponse
    */
-  @GetMapping("/{id}/status")
+  @GetMapping(path = "/{id}/status", produces = MediaType.APPLICATION_JSON_VALUE)
   ConnectorResponse performGet(@PathVariable("id") String id, @RequestHeader HttpHeaders headers);
 
   /**
@@ -51,6 +52,6 @@ public interface ExcerptFeignClient {
    * @return mapped excerpt response
    * @see ConnectorResponse
    */
-  @PostMapping
+  @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   ConnectorResponse performPost(@RequestBody String body, @RequestHeader HttpHeaders headers);
 }
