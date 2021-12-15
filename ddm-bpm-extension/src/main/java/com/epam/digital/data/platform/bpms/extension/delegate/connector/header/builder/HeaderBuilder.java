@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.context.DelegateExecutionContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 /**
  * The class represents a builder that is used for collecting headers from the delegate execution
@@ -76,7 +77,7 @@ public class HeaderBuilder {
   }
 
   public HeaderBuilder contentTypeJson() {
-    httpHeadersList.add(HttpHeaders.CONTENT_TYPE, "application/json");
+    httpHeadersList.setContentType(MediaType.APPLICATION_JSON);
     return this;
   }
 
