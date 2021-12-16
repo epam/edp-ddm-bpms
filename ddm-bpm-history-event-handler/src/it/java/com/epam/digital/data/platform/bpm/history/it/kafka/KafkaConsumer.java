@@ -19,8 +19,11 @@ package com.epam.digital.data.platform.bpm.history.it.kafka;
 import com.epam.digital.data.platform.bpm.history.base.dto.HistoryProcessInstanceDto;
 import com.epam.digital.data.platform.bpm.history.base.dto.HistoryTaskDto;
 import com.epam.digital.data.platform.bpm.history.it.storage.TestHistoryEventStorage;
+import com.epam.digital.data.platform.bpm.history.kafka.StartupHistoryProcessKafkaTopicCreator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import lombok.Getter;
@@ -32,6 +35,7 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @Slf4j
 @Getter
@@ -41,6 +45,8 @@ public class KafkaConsumer {
   private final TestHistoryEventStorage storage = new TestHistoryEventStorage();
 
   @Inject
+  private StartupHistoryProcessKafkaTopicCreator startupHistoryProcessKafkaTopicCreator;
+  @Inject
   private EmbeddedKafkaBroker embeddedKafkaBroker;
   @Inject
   private ObjectMapper objectMapper;
@@ -49,14 +55,16 @@ public class KafkaConsumer {
 
   @PostConstruct
   public void setUp() {
-    embeddedKafkaBroker.addTopics("bpm-history-process", "bpm-history-task");
+    ReflectionTestUtils.setField(embeddedKafkaBroker, "topics",
+        new HashSet<>(Set.of("bpm-history-process", "bpm-history-task")));
     var props = KafkaTestUtils.consumerProps("bpm", "false", embeddedKafkaBroker);
     var consumerFactory = new DefaultKafkaConsumerFactory<String, String>(props);
     consumer = consumerFactory.createConsumer();
-    embeddedKafkaBroker.consumeFromAllEmbeddedTopics(consumer);
   }
 
   public void consumeAll() {
+    embeddedKafkaBroker.consumeFromEmbeddedTopics(consumer,
+        "bpm-history-process", "bpm-history-task");
     KafkaTestUtils.getRecords(consumer).forEach(record -> {
       if (record.topic().equals("bpm-history-process")) {
         consumeHistoryProcessInstanceDto(record);
