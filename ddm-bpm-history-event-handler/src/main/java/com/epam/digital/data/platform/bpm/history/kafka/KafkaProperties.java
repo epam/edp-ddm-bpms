@@ -32,8 +32,14 @@ import org.springframework.stereotype.Component;
  *   topics:
  *     history-process-instance-topic:
  *       name: history-process-instance-topic-name # name of the topic
+ *       num-partitions: 1
+ *       replication-factor: 1
+ *       retention-policy-in-days: 7
  *     history-task-topic:
  *       name: history-task-topic-name
+ *       num-partitions: 1
+ *       replication-factor: 1
+ *       retention-policy-in-days: 7
  * </pre>
  */
 @Data
@@ -57,5 +63,8 @@ public class KafkaProperties {
   public static class TopicProperties {
 
     private String name;
+    private Integer numPartitions;
+    private Short replicationFactor;
+    private Integer retentionPolicyInDays;
   }
 }

@@ -8,5 +8,11 @@ camunda:
         topics:
           history-process-instance-topic:
             name: bpm-history-process
+            num-partitions: 1
+            replication-factor: 1
+            retention-policy-in-days: 7
           history-task-topic:
             name: bpm-history-task
+            num-partitions: 1
+            replication-factor: 1
+            retention-policy-in-days: 7

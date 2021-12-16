@@ -20,9 +20,10 @@ import com.epam.digital.data.platform.bpm.history.base.handler.ProcessHistoryEve
 import com.epam.digital.data.platform.bpm.history.base.publisher.ProcessHistoryEventPublisher;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -39,13 +40,13 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
  * ProcessHistoryEventKafkaPublisher Kafka implementation} of the {@link
  * ProcessHistoryEventPublisher}
  */
+@RequiredArgsConstructor
 @Configuration
 @EnableConfigurationProperties(KafkaProperties.class)
 @ConditionalOnProperty(prefix = "camunda.bpm.history-publisher.kafka", name = "enabled", havingValue = "true")
 public class KafkaConfig {
 
-  @Autowired
-  private KafkaProperties kafkaProperties;
+  private final KafkaProperties kafkaProperties;
 
   @Bean
   public Map<String, Object> producerConfigs() {
@@ -53,6 +54,7 @@ public class KafkaConfig {
     props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrap());
     props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
     props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+    props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
     return props;
   }
 
@@ -65,6 +67,19 @@ public class KafkaConfig {
   @Bean
   public KafkaTemplate<String, Object> replyingKafkaTemplate(ProducerFactory<String, Object> pf) {
     return new KafkaTemplate<>(pf);
+  }
+
+  @Bean
+  public AdminClient kafkaAdminClient() {
+    Map<String, Object> props = new HashMap<>();
+    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrap());
+    return AdminClient.create(props);
+  }
+
+  @Bean
+  public StartupHistoryProcessKafkaTopicCreator startupHistoryProcessKafkaTopicCreator(
+      AdminClient adminClient) {
+    return new StartupHistoryProcessKafkaTopicCreator(adminClient, kafkaProperties);
   }
 
   @Bean
