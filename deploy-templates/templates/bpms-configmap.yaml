@@ -24,4 +24,5 @@ data:
     management.endpoints.web.exposure.include: '*'
     {{- end }}
     storage: {{ toYaml .Values.storage | nindent 6 }}
+    s3: {{ .Values.s3 | toYaml | nindent6 }}
     camunda.bpm.history-publisher.kafka.bootstrap: {{ .Values.kafka.service }}
