@@ -1,5 +1,7 @@
 package com.epam.digital.data.platform.bpms.storage.config;
 
+import com.epam.digital.data.platform.integration.ceph.config.S3ConfigProperties;
+import com.epam.digital.data.platform.integration.ceph.factory.CephS3Factory;
 import com.epam.digital.data.platform.storage.base.config.CephStorageConfiguration;
 import com.epam.digital.data.platform.storage.base.factory.StorageServiceFactory;
 import com.epam.digital.data.platform.storage.file.service.FormDataFileStorageService;
@@ -17,8 +19,19 @@ import org.springframework.context.annotation.Configuration;
 public class FormDataStorageServiceConfig {
 
   @Bean
-  public StorageServiceFactory storageServiceFactory(ObjectMapper objectMapper) {
-    return new StorageServiceFactory(objectMapper);
+  @ConfigurationProperties(prefix = "s3.config")
+  public S3ConfigProperties s3ConfigProperties() {
+    return new S3ConfigProperties();
+  }
+
+  @Bean
+  public CephS3Factory cephS3Factory() {
+    return new CephS3Factory(s3ConfigProperties());
+  }
+
+  @Bean
+  public StorageServiceFactory storageServiceFactory(ObjectMapper objectMapper, CephS3Factory cephS3Factory) {
+    return new StorageServiceFactory(objectMapper, cephS3Factory);
   }
 
   @Bean
