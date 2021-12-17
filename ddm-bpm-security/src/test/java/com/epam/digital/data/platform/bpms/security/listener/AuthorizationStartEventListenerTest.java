@@ -23,6 +23,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
+import com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory;
+import java.util.Optional;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.identity.Authentication;
@@ -43,6 +45,8 @@ public class AuthorizationStartEventListenerTest {
   @Mock
   private ExecutionEntity execution;
   @Mock
+  private CamundaImpersonationFactory camundaImpersonationFactory;
+  @Mock
   private ProcessEngine processEngine;
   @Mock
   private AuthorizationService authorizationService;
@@ -54,6 +58,8 @@ public class AuthorizationStartEventListenerTest {
   @Test
   public void testAuthorizationCreation() throws Exception {
     var userId = "userId";
+    when(camundaImpersonationFactory.getCamundaImpersonation()).thenReturn(
+        Optional.of(camundaImpersonation));
     when(camundaImpersonation.getImpersonator()).thenReturn(impersonator);
     when(impersonator.getUserId()).thenReturn(userId);
     when(camundaImpersonation.getProcessEngine()).thenReturn(processEngine);

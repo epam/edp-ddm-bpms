@@ -17,6 +17,8 @@
 package com.epam.digital.data.platform.bpms.security;
 
 import java.util.function.Supplier;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -27,6 +29,8 @@ import org.camunda.bpm.engine.impl.identity.Authentication;
  */
 @Slf4j
 @Getter
+@Builder
+@AllArgsConstructor
 public class CamundaImpersonation {
 
   /**

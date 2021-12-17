@@ -17,6 +17,7 @@
 package com.epam.digital.data.platform.bpms.security.config;
 
 import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
+import com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory;
 import java.util.List;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.identity.Authentication;
@@ -41,5 +42,13 @@ public class BpmSecurityConfig {
       ProcessEngine processEngine) {
     var impersonatee = new Authentication(administratorUserId, List.of(administratorGroupName));
     return new CamundaImpersonation(processEngine, impersonatee);
+  }
+
+  @Bean
+  @Qualifier("camundaAdminImpersonationFactory")
+  public CamundaImpersonationFactory camundaAdminImpersonationFactory(
+      @Value("${camunda.admin-user-id}") String administratorUserId,
+      @Value("${camunda.admin-group-id}") String administratorGroupName) {
+    return new CamundaImpersonationFactory(administratorUserId, administratorGroupName);
   }
 }
