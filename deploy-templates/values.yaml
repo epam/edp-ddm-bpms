@@ -120,5 +120,12 @@ storage:
         secret-key: ${ceph.file-storage-secret-key}
         bucket: ${ceph.file-storage-bucket}
 
+s3:
+  config:
+    client:
+      protocol: http
+    options:
+      pathStyleAccess: true
+
 kafka:
   service: kafka-cluster-kafka-bootstrap:9092

@@ -37,6 +37,13 @@ ceph:
   file-storage-secret-key: file-secret-key
   file-storage-bucket: file-bucket
 
+s3:
+  config:
+    client:
+      protocol: http
+    options:
+      pathStyleAccess: true
+
 keycloak:
   url: http://localhost:8200/auth
   citizen:
