@@ -22,6 +22,7 @@ readinessPath: "/actuator/health/readiness"
 livenessPath: "/actuator/health/liveness"
 officerConfigMountPath: "/app/config/registry-regulation/officer-roles"
 citizenConfigMountPath: "/app/config/registry-regulation/citizen-roles"
+trembitaConfigMountPath: "/app/config/registry-regulation/trembita-configuration"
 officerConfigMapName: officer-roles
 citizenConfigMapName: citizen-roles
 trembitaConfConfigmapName: trembita-configuration
