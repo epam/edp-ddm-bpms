@@ -22,18 +22,21 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.epam.digital.data.platform.bpm.history.base.dto.HistoryProcessInstanceDto;
 import com.epam.digital.data.platform.bpm.history.base.dto.HistoryTaskDto;
 import com.epam.digital.data.platform.bpm.history.base.mapper.HistoryMapper;
 import com.epam.digital.data.platform.bpm.history.base.publisher.ProcessHistoryEventPublisher;
 import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
+import com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessExcerptIdVariable;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
@@ -65,6 +68,8 @@ class ProcessHistoryEventHandlerTest {
   @Spy
   private HistoryMapper historyMapper = Mappers.getMapper(HistoryMapper.class);
   @Mock
+  private CamundaImpersonationFactory camundaImpersonationFactory;
+  @Mock
   private CamundaImpersonation camundaImpersonation;
   @Mock
   private RepositoryService repositoryService;
@@ -76,11 +81,13 @@ class ProcessHistoryEventHandlerTest {
 
   @BeforeEach
   void setUp() {
-    ReflectionTestUtils.setField(processHistoryEventHandler, "camundaAdminImpersonation",
-        camundaImpersonation);
+    ReflectionTestUtils.setField(processHistoryEventHandler, "camundaImpersonationFactory",
+        camundaImpersonationFactory);
     ReflectionTestUtils.setField(processHistoryEventHandler, "repositoryService",
         repositoryService);
     ReflectionTestUtils.setField(processHistoryEventHandler, "historyMapper", historyMapper);
+    lenient().when(camundaImpersonationFactory.getCamundaImpersonation())
+        .thenReturn(Optional.of(camundaImpersonation));
     lenient().doAnswer(invocation -> {
       Supplier<?> supplier = invocation.getArgument(0);
       return supplier.get();
@@ -285,6 +292,40 @@ class ProcessHistoryEventHandlerTest {
         .hasFieldOrPropertyWithValue("processDefinitionId", "processDefinitionId")
         .hasFieldOrPropertyWithValue("processDefinitionKey", "processDefinitionKey")
         .hasFieldOrPropertyWithValue("processDefinitionName", "processDefinitionName")
+        .hasFieldOrPropertyWithValue("rootProcessInstanceId", "rootProcessInstanceId")
+        .hasFieldOrPropertyWithValue("startTime", null)
+        .hasFieldOrPropertyWithValue("endTime", LocalDateTime.of(2021, 12, 10, 18, 22))
+        .hasFieldOrPropertyWithValue("assignee", "assignee");
+  }
+
+  @Test
+  void handleTaskEvent_completeWithNoCamundaImpersonation() {
+    when(camundaImpersonationFactory.getCamundaImpersonation()).thenReturn(Optional.empty());
+
+    var taskEvent = new HistoricTaskInstanceEventEntity();
+    taskEvent.setEventType(HistoryEventTypes.TASK_INSTANCE_COMPLETE.getEventName());
+    taskEvent.setActivityInstanceId("activityInstanceId");
+    taskEvent.setTaskDefinitionKey("taskDefinitionKey");
+    taskEvent.setName("taskDefinitionName");
+    taskEvent.setProcessInstanceId("processInstanceId");
+    taskEvent.setProcessDefinitionId("processDefinitionId");
+    taskEvent.setProcessDefinitionKey("processDefinitionKey");
+    taskEvent.setRootProcessInstanceId("rootProcessInstanceId");
+    taskEvent.setEndTime(
+        Date.from(LocalDateTime.of(2021, 12, 10, 18, 22).toInstant(ZoneOffset.UTC)));
+    taskEvent.setAssignee("assignee");
+
+    processHistoryEventHandler.handleEvent(taskEvent);
+    verify(publisher).patch(historyTaskDtoArgumentCaptor.capture());
+    var value = historyTaskDtoArgumentCaptor.getValue();
+    assertThat(value)
+        .hasFieldOrPropertyWithValue("activityInstanceId", "activityInstanceId")
+        .hasFieldOrPropertyWithValue("taskDefinitionKey", "taskDefinitionKey")
+        .hasFieldOrPropertyWithValue("taskDefinitionName", "taskDefinitionName")
+        .hasFieldOrPropertyWithValue("processInstanceId", "processInstanceId")
+        .hasFieldOrPropertyWithValue("processDefinitionId", "processDefinitionId")
+        .hasFieldOrPropertyWithValue("processDefinitionKey", "processDefinitionKey")
+        .hasFieldOrPropertyWithValue("processDefinitionName", null)
         .hasFieldOrPropertyWithValue("rootProcessInstanceId", "rootProcessInstanceId")
         .hasFieldOrPropertyWithValue("startTime", null)
         .hasFieldOrPropertyWithValue("endTime", LocalDateTime.of(2021, 12, 10, 18, 22))
