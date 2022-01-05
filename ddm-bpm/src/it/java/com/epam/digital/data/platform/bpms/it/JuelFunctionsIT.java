@@ -72,9 +72,11 @@ public class JuelFunctionsIT extends BaseIT {
 
     var processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
 
-    formDataStorageService.putFormData(taskDefinitionKey, processInstance.getId(), FormDataDto.builder().accessToken(validAccessToken).build());
+    formDataStorageService.putFormData(taskDefinitionKey, processInstance.getId(),
+        FormDataDto.builder().accessToken(validAccessToken).build());
 
-    String taskId = taskService.createTaskQuery().taskDefinitionKey(taskDefinitionKey).singleResult().getId();
+    String taskId = taskService.createTaskQuery().taskDefinitionKey(taskDefinitionKey)
+        .singleResult().getId();
     taskService.complete(taskId);
 
     BpmnAwareTests.assertThat(processInstance).isEnded();
@@ -93,8 +95,10 @@ public class JuelFunctionsIT extends BaseIT {
 
     var processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey, vars);
 
-    formDataStorageService.putFormData(taskDefinitionKey, processInstance.getId(), FormDataDto.builder().data(formData).build());
-    formDataStorageService.putFormData(startFormCephKey, FormDataDto.builder().data(formData).build());
+    formDataStorageService.putFormData(taskDefinitionKey, processInstance.getId(),
+        FormDataDto.builder().data(formData).build());
+    formDataStorageService.putFormData(startFormCephKey,
+        FormDataDto.builder().data(formData).build());
 
     String taskId = taskService.createTaskQuery().taskDefinitionKey(taskDefinitionKey)
         .singleResult().getId();
@@ -117,10 +121,13 @@ public class JuelFunctionsIT extends BaseIT {
 
     var processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey, vars);
 
-    formDataStorageService.putFormData(taskDefinitionKey, processInstance.getId(), FormDataDto.builder().data(data).signature(signature).build());
-    formDataStorageService.putFormData(startFormCephKey, FormDataDto.builder().data(data).signature(signature).build());
+    formDataStorageService.putFormData(taskDefinitionKey, processInstance.getId(),
+        FormDataDto.builder().data(data).signature(signature).build());
+    formDataStorageService.putFormData(startFormCephKey,
+        FormDataDto.builder().data(data).signature(signature).build());
 
-    String taskId = taskService.createTaskQuery().taskDefinitionKey(taskDefinitionKey).singleResult().getId();
+    String taskId = taskService.createTaskQuery().taskDefinitionKey(taskDefinitionKey)
+        .singleResult().getId();
     taskService.complete(taskId);
 
     BpmnAwareTests.assertThat(processInstance).isEnded();
@@ -135,7 +142,8 @@ public class JuelFunctionsIT extends BaseIT {
             .withRequestBody(equalTo("grant_type=client_credentials"))
             .willReturn(aResponse().withStatus(200)
                 .withHeader("Content-type", "application/json")
-                .withBody(convertJsonToString("/json/keycloak/keycloakSystemUserConnectResponse.json")))));
+                .withBody(convertJsonToString(
+                    "/json/keycloak/keycloakSystemUserConnectResponse.json")))));
 
     var processInstance = runtimeService.startProcessInstanceByKey("test_system_user", Map.of());
 

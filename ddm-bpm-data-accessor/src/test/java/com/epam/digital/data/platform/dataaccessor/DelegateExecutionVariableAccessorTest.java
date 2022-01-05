@@ -21,6 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -66,7 +67,8 @@ class DelegateExecutionVariableAccessorTest {
   void setVariableTransient() {
     delegateExecutionVariableAccessor.setVariableTransient(VARIABLE_NAME, VARIABLE_VALUE);
 
-    verify(delegateExecution).setVariableLocalTransient(VARIABLE_NAME, VARIABLE_VALUE);
+    verify(delegateExecution).setVariableLocal(VARIABLE_NAME,
+        Variables.untypedValue(VARIABLE_VALUE, true));
   }
 
   @Test

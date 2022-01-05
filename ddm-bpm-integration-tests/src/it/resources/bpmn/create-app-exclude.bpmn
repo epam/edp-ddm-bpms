@@ -180,7 +180,7 @@
         }
 
         execution.removeVariable('addApplicationFormPayload')
-        execution.setVariableLocalTransient('addApplicationFormPayload', S(cephData, 'application/json'))</bpmn:script>
+        set_transient_variable('addApplicationFormPayload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:userTask id="addApplicationFormActivity" name="Внести заяву" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="shared-add-application" camunda:assignee="${initiator}">
       <bpmn:extensionElements>
@@ -274,7 +274,7 @@
         cephData['initiated'] = initiated
 
         execution.removeVariable('addDecisionExcludeFormData')
-        execution.setVariableLocalTransient('addDecisionExcludeFormData', S(cephData, 'application/json'))
+        set_transient_variable('addDecisionExcludeFormData', S(cephData, 'application/json'))
 
         execution.setVariable('solutionTypeId', solutionResponseObj.prop('solutionTypeId').value())</bpmn:script>
     </bpmn:scriptTask>
@@ -319,7 +319,7 @@
         cephData['solutionName'] = solutionName
 
         execution.removeVariable('addDecisionDenyFormData')
-        execution.setVariableLocalTransient('addDecisionDenyFormData', S(cephData, 'application/json'))
+        set_transient_variable('addDecisionDenyFormData', S(cephData, 'application/json'))
 
         execution.setVariable('solutionTypeId', solutionResponseObj.prop('solutionTypeId').value())</bpmn:script>
     </bpmn:scriptTask>
@@ -401,7 +401,7 @@
         )
 
         execution.removeVariable('signAppDenyFormData')
-        execution.setVariableLocalTransient('signAppDenyFormData', S(cephData, 'application/json'))</bpmn:script>
+        set_transient_variable('signAppDenyFormData', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:scriptTask id="createSignAppExcludeFormDataPrepoulationActivity" name="Підготовка даних документа для показу" scriptFormat="groovy">
       <bpmn:incoming>Flow_0s0wsvr</bpmn:incoming>
@@ -418,7 +418,7 @@
         })
 
         execution.removeVariable('signAppExcludeFormData')
-        execution.setVariableLocalTransient('signAppExcludeFormData', S(cephData, 'application/json'))</bpmn:script>
+        set_transient_variable('signAppExcludeFormData', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:userTask id="signAppDenyFormActivity" name="Підписати КЕП" camunda:modelerTemplate="officerSignTaskTemplate" camunda:formKey="create-app-exclude-bp-sign-app-deny" camunda:assignee="${initiator}">
       <bpmn:extensionElements>
@@ -472,7 +472,7 @@
 
         var dataPayload = S(requestMap, 'application/json')
         execution.removeVariable('dataPayload')
-        execution.setVariableLocalTransient('dataPayload', dataPayload)</bpmn:script>
+        set_transient_variable('dataPayload', dataPayload)</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataStoreReference id="DataStoreReference_0daeyy4" name="Дата Фабрика" />
     <bpmn:serviceTask id="searchApplicationTypeIdForExclusionActivity" name="Отримання унікального ідентификатору типу заяви з дата фабрики" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
@@ -543,7 +543,7 @@
 
         var dataPayload = S(requestMap, 'application/json')
         execution.removeVariable('dataPayload')
-        execution.setVariableLocalTransient('dataPayload', dataPayload)</bpmn:script>
+        set_transient_variable('dataPayload', dataPayload)</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:callActivity id="signFormDataForExclusionWithDsoActivity" name="Підписати дані системним ключем" calledElement="system-signature-bp">
       <bpmn:extensionElements>
@@ -639,7 +639,7 @@
         }
 
         execution.removeVariable('addLetterDataFormDataForExclusion')
-        execution.setVariableLocalTransient('addLetterDataFormDataForExclusion', S(cephData, 'application/json'))</bpmn:script>
+        set_transient_variable('addLetterDataFormDataForExclusion', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:scriptTask id="buildPrepopulationForAddLetterDataFormForDenyActivity" name="Підготовка даних документа для показу" scriptFormat="groovy">
       <bpmn:incoming>Flow_06wtttm</bpmn:incoming>
@@ -651,7 +651,7 @@
         }
 
         execution.removeVariable('addLetterDataFormDataForDeny')
-        execution.setVariableLocalTransient('addLetterDataFormDataForDeny', S(cephData, 'application/json'))</bpmn:script>
+        set_transient_variable('addLetterDataFormDataForDeny', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataStoreReference id="DataStoreReference_1qsgusj" name="Дата Фабрика" />
     <bpmn:dataObjectReference id="DataObjectReference_0334p0g" dataObjectRef="DataObject_0wgzepu" />

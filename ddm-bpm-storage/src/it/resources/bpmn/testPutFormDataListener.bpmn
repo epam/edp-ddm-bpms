@@ -9,9 +9,8 @@
       <bpmn:incoming>Flow_0j0y1n8</bpmn:incoming>
       <bpmn:outgoing>Flow_1btky6z</bpmn:outgoing>
       <bpmn:script>def formData = ['field1':'value1','field2':'value2']
-
-        execution.removeVariable('formData')
-        execution.setVariableLocalTransient('formData', S(formData, 'application/json'))</bpmn:script>
+execution.removeVariable('formData')
+execution.setVariable('formData', S(formData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:sequenceFlow id="Flow_1btky6z" sourceRef="Activity_0x4yb3z" targetRef="user_task" />
     <bpmn:userTask id="user_task" name="User task">

@@ -39,6 +39,8 @@ camunda:
             retention-policy-in-days: 7
 
 spring:
+  main:
+    allow-bean-definition-overriding: true
   jersey:
     application-path: api
   application:

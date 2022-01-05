@@ -33,13 +33,13 @@
       <bpmn:script>def subjectType = submission('start_event').formData.prop('subjectType').value()
 
         if (subjectType.equals('ENTREPRENEUR')) {
-        execution.setVariableLocalTransient('subjectCode', submission('start_event').formData.prop('rnokppCode').value())
+        set_transient_variable('subjectCode', submission('start_event').formData.prop('rnokppCode').value())
         } else if (subjectType.equals('LEGAL')) {
-        execution.setVariableLocalTransient('subjectCode', submission('start_event').formData.prop('edrpou').value())
+        set_transient_variable('subjectCode', submission('start_event').formData.prop('edrpou').value())
         }
 		
-        execution.setVariableLocalTransient('subjectType', subjectType)
-		execution.setVariableLocalTransient('absentEdrFlag', submission('start_event').formData.prop('absentEdrFlag').value())</bpmn:script>
+        set_transient_variable('subjectType', subjectType)
+		set_transient_variable('absentEdrFlag', submission('start_event').formData.prop('absentEdrFlag').value())</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="Activity_10m5p9w" name="Пошук даних про суб&#39;єкт" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
       <bpmn:extensionElements>
@@ -81,7 +81,7 @@
 def absentEdrFlagEdrNotExist = absentEdrFlag.value &amp;&amp; responseEdr.responseBody.elements().isEmpty()
 def notAbsentEdrFlagEdrExist = !absentEdrFlag.value &amp;&amp; !responseEdr.responseBody.elements().isEmpty()
 
-execution.setVariableLocalTransient('absentEdrFlagEdrNotExist', absentEdrFlagEdrNotExist)
+set_transient_variable('absentEdrFlagEdrNotExist', absentEdrFlagEdrNotExist)
 
 return absentEdrFlagEdrExist || absentEdrFlagEdrNotExist || notAbsentEdrFlagEdrExist</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
@@ -134,7 +134,7 @@ return absentEdrFlagEdrExist || absentEdrFlagEdrNotExist || notAbsentEdrFlagEdrE
       <bpmn:script>def signedFormData = submission('sign_subject_officer_create_subject_task').formData
 
         execution.removeVariable('signedFormData')
-        execution.setVariableLocalTransient('signedFormData', signedFormData)
+        set_transient_variable('signedFormData', signedFormData)
 
         def subject = [:]
 
@@ -146,7 +146,7 @@ return absentEdrFlagEdrExist || absentEdrFlagEdrNotExist || notAbsentEdrFlagEdrE
 
         def payload = S(subject, 'application/json')
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', payload)</bpmn:script>
+        set_transient_variable('payload', payload)</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:exclusiveGateway id="Gateway_09k16ro">
       <bpmn:incoming>Flow_1opp6ie</bpmn:incoming>
@@ -181,7 +181,7 @@ return absentEdrFlagEdrExist || absentEdrFlagEdrNotExist || notAbsentEdrFlagEdrE
 		cephData['absentEdrFlag'] = absentEdrFlagEdrNotExist
 		
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+        set_transient_variable('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:exclusiveGateway id="Gateway_1gu6u05" name="absentEdrFlag = false, та немає в ЄДР">
       <bpmn:incoming>Flow_0rbgsm1</bpmn:incoming>

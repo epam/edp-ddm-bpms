@@ -44,7 +44,7 @@ var edrpou = labResponse.responseBody.prop('edrpou').value()
 var cephData = ['edrpou':edrpou,'name':name]
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+set_transient_variable('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:sequenceFlow id="Flow_0jkcssd" sourceRef="extractAddPersonnelFormPrepopulationActivity" targetRef="addPersonnelFormActivity" />
     <bpmn:sequenceFlow id="Flow_09vxpfx" sourceRef="createStaffInDataFactoryActivity" targetRef="defineBusinessProcessStatusActivity" />
@@ -168,7 +168,7 @@ execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))<
         }
 
         execution.removeVariable('dataPayload')
-        execution.setVariableLocalTransient('dataPayload', S(personnelGrid.toString()))</bpmn:script>
+        set_transient_variable('dataPayload', S(personnelGrid.toString()))</bpmn:script>
     </bpmn:scriptTask>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">

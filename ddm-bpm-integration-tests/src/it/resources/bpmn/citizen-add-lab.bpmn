@@ -158,7 +158,7 @@
         cephData['edrpou'] = initiator().edrpou
 
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+        set_transient_variable('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:sequenceFlow id="Flow_0x2gh5o" sourceRef="Activity_18adkt4" targetRef="Activity_1mkxm6q" />
     <bpmn:serviceTask id="Activity_18adkt4" name="Пошук суб&#39;єкту в датафабриці" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
@@ -270,7 +270,7 @@
         signedFormData.prop('subjectId', subjectId)
 
         execution.removeVariable('dataPayload')
-        execution.setVariableLocalTransient('dataPayload', signedFormData)</bpmn:script>
+        set_transient_variable('dataPayload', signedFormData)</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:callActivity id="Activity_1lsh3ew" name="Підписати дані системним ключем" calledElement="system-signature-bp">
       <bpmn:extensionElements>

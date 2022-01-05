@@ -61,7 +61,7 @@
         }
 
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+        set_transient_variable('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataStoreReference id="DataStoreReference_1y6znyo" name="Дата Фабрика" />
     <bpmn:scriptTask id="extractResearchesIdsFromStaffActivity" name="Підготовка данних для пошуку досліджень" scriptFormat="groovy">
@@ -71,7 +71,7 @@
         .map(objId -&gt; objId.value())
         .collect()
 
-        execution.setVariableLocalTransient("researchIds", researchesIds)</bpmn:script>
+        set_transient_variable("researchIds", researchesIds)</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="Activity_11nqllh" name="Пошук даних про співробітника" camunda:modelerTemplate="dataFactoryConnectorReadDelegate" camunda:delegateExpression="${dataFactoryConnectorReadDelegate}">
       <bpmn:extensionElements>

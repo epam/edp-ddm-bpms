@@ -21,7 +21,7 @@
   <parent>
     <artifactId>ddm-bpm-parent</artifactId>
     <groupId>com.epam.digital.data.platform</groupId>
-    <version>1.5.6-SNAPSHOT</version>
+    <version>1.5.7-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 

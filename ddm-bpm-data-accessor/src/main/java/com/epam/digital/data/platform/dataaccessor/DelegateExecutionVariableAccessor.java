@@ -19,7 +19,7 @@ package com.epam.digital.data.platform.dataaccessor;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.variable.Variables;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
@@ -52,7 +52,7 @@ public class DelegateExecutionVariableAccessor implements VariableAccessor {
 
   @Override
   public void setVariableTransient(@NonNull String name, @Nullable Object value) {
-    ((AbstractVariableScope) execution).setVariableLocalTransient(name, value);
+    execution.setVariableLocal(name, Variables.untypedValue(value, true));
   }
 
   @Override

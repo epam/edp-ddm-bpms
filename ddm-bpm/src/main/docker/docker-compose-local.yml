@@ -10,11 +10,3 @@ services:
       POSTGRES_DB: camunda
       POSTGRES_USER: bpms
       POSTGRES_PASSWORD: password
-
-  mock-server:
-    image: low-code/mock-server:0.0.1-SNAPSHOT
-    container_name: mock-server
-    environment:
-      SERVER_PORT: 8877
-    ports:
-      - 8877:8877

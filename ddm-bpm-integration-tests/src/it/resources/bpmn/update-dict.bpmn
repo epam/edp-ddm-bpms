@@ -95,7 +95,7 @@
         signedFormData.prop('factorType', 'Хімічний: довільні')
 
         execution.removeVariable('dataPayload')
-        execution.setVariableLocalTransient('dataPayload', signedFormData)</bpmn:script>
+        set_transient_variable('dataPayload', signedFormData)</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:callActivity id="Activity_1n5e58b" name="Підписати дані системним ключем" calledElement="system-signature-bp">
       <bpmn:extensionElements>

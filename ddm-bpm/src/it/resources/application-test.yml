@@ -30,13 +30,7 @@ dso:
   url: http://localhost:8081
 
 ceph:
-  http-endpoint: http://localhost:8100
-  access-key: access-key
-  secret-key: secret-key
   bucket: bucket
-  file-storage-access-key: file-access-key
-  file-storage-secret-key: file-secret-key
-  file-storage-bucket: file-bucket
 
 user-settings-service-api:
   url: http://localhost:8878/user-settings-mock-server

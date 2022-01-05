@@ -19,8 +19,8 @@ package com.epam.digital.data.platform.bpms.engine.config;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.compress.utils.Lists;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.junit.jupiter.api.Test;
@@ -45,7 +45,7 @@ class CamundaEngineSystemVariablesSupportListenerPluginTest {
 
     camundaSystemVariablesSupportListenerPlugin.preInit(processEngineConfiguration);
 
-    List<BpmnParseListener> listeners = Lists.newArrayList();
+    List<BpmnParseListener> listeners = new ArrayList<>();
     listeners.add(camundaSystemVariablesSupportListener);
     verify(processEngineConfiguration).setCustomPreBPMNParseListeners(listeners);
   }

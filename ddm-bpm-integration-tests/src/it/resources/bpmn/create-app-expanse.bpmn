@@ -223,7 +223,7 @@
         cephData[it] = labResponse.responseBody.prop(it).stringValue()
         }
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))
+        set_transient_variable('payload', S(cephData, 'application/json'))
 
 execution.setVariable("fullName", initiator().fullName)</bpmn:script>
     </bpmn:scriptTask>
@@ -273,7 +273,7 @@ execution.setVariable("fullName", initiator().fullName)</bpmn:script>
         }
 
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+        set_transient_variable('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:userTask id="Activity_shared-add-factors" name="Внести фактори" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="shared-add-factors" camunda:assignee="${initiator}">
       <bpmn:extensionElements>
@@ -344,7 +344,7 @@ execution.setVariable("fullName", initiator().fullName)</bpmn:script>
         }
 
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+        set_transient_variable('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:userTask id="Activity_shared-check-complience" name="Перевірити на відповідність" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="shared-check-complience" camunda:assignee="${initiator}">
       <bpmn:extensionElements>
@@ -402,7 +402,7 @@ execution.setVariable("fullName", initiator().fullName)</bpmn:script>
         cephData['solutionName'] = solution.prop('name').stringValue()
 
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))
+        set_transient_variable('payload', S(cephData, 'application/json'))
 
         execution.setVariable('solutionTypeId', solution.prop('solutionTypeId').stringValue())</bpmn:script>
     </bpmn:scriptTask>
@@ -418,7 +418,7 @@ execution.setVariable("fullName", initiator().fullName)</bpmn:script>
         cephData['solutionName'] = solution.prop('name').stringValue()
 
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))
+        set_transient_variable('payload', S(cephData, 'application/json'))
 
         execution.setVariable('solutionTypeId', solution.prop('solutionTypeId').stringValue())</bpmn:script>
     </bpmn:scriptTask>
@@ -495,7 +495,7 @@ execution.setVariable("fullName", initiator().fullName)</bpmn:script>
         }
 
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+        set_transient_variable('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:scriptTask id="Activity_0xp7isz" name="Підготовка даних документа для показу" scriptFormat="groovy">
       <bpmn:incoming>Flow_1qtm8ta</bpmn:incoming>
@@ -506,7 +506,7 @@ execution.setVariable("fullName", initiator().fullName)</bpmn:script>
         }
 
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+        set_transient_variable('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:userTask id="Activity_shared-add-letter-data" name="Внести дані про отримання листа з рішенням (Дата, ПІБ, №)" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="shared-add-letter-data" camunda:assignee="${initiator}">
       <bpmn:extensionElements>
@@ -550,7 +550,7 @@ execution.setVariable("fullName", initiator().fullName)</bpmn:script>
         ['receivedBy', 'certifiedBy', 'notes'].each { cephData[it] = submission('Activity_shared-add-letter-data').formData.prop(it).stringValue() }
 
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+        set_transient_variable('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:exclusiveGateway id="Gateway_083f29d">
       <bpmn:incoming>Flow_0s6qatb</bpmn:incoming>
@@ -600,7 +600,7 @@ execution.setVariable("fullName", initiator().fullName)</bpmn:script>
         }
 
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+        set_transient_variable('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:exclusiveGateway id="Gateway_19mmoz0">
       <bpmn:incoming>Flow_1qplogf</bpmn:incoming>
@@ -639,7 +639,7 @@ execution.setVariable("fullName", initiator().fullName)</bpmn:script>
 
         var payload = S(requestMap, 'application/json')
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', payload)</bpmn:script>
+        set_transient_variable('payload', payload)</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="Activity_0vb7epo" name="Отримання унікального ідентификатору типу заяви з дата фабрики" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
       <bpmn:extensionElements>
@@ -713,7 +713,7 @@ execution.setVariable("fullName", initiator().fullName)</bpmn:script>
 
         var payload = S(requestMap, 'application/json')
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', payload)</bpmn:script>
+        set_transient_variable('payload', payload)</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:callActivity id="Activity_0cfy5es" name="Підписати дані системним ключем" calledElement="system-signature-bp">
       <bpmn:extensionElements>

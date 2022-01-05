@@ -109,7 +109,7 @@
         cephData['e-mail'] = settingsResponse.responseBody.prop('e-mail').value()
 
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))
+        set_transient_variable('payload', S(cephData, 'application/json'))
 
         if(subjectResponse.responseBody.elements().size() != 0) {
         var subjectId = subjectResponse.responseBody.elements().get(0).prop('subjectId').value()
@@ -221,7 +221,7 @@
 
         def payload = S(subject, 'application/json')
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', payload)</bpmn:script>
+        set_transient_variable('payload', payload)</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:sequenceFlow id="Flow_0p782yc" sourceRef="Activity_1c2reut" targetRef="Activity_11onhci" />
     <bpmn:callActivity id="Activity_1c2reut" name="Підписати дані системним ключем" calledElement="system-signature-bp">
@@ -272,7 +272,7 @@
 
         def settingsPayload = S(settings, 'application/json')
         execution.removeVariable('settingsPayload')
-        execution.setVariableLocalTransient('settingsPayload', settingsPayload)</bpmn:script>
+        set_transient_variable('settingsPayload', settingsPayload)</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataStoreReference id="DataStoreReference_0t5x678" name="Дата фабрика" />
     <bpmn:serviceTask id="Activity_0cgwivx" name="Пошук суб&#39;єкту в датафабриці" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
@@ -308,7 +308,7 @@
 
         def payload = S(subjectProfile, 'application/json')
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', payload)</bpmn:script>
+        set_transient_variable('payload', payload)</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:boundaryEvent id="Event_1wkj8hv" attachedToRef="Activity_0ow0pr7">
       <bpmn:outgoing>Flow_0inppnx</bpmn:outgoing>

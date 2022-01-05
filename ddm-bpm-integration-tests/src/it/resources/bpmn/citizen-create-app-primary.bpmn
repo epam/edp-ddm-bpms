@@ -229,7 +229,7 @@ cephData['createdDate'] = createdDate
 execution.setVariable('officerAssignee', officerAssignee.prop('userName').value())
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+set_transient_variable('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:userTask id="Activity_shared-dispatch-task" name="Призначення виконавця задачі &#34;Створити заяву&#34;" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="shared-dispatch-task" camunda:assignee="" camunda:candidateGroups="head-officer">
       <bpmn:extensionElements>
@@ -355,7 +355,7 @@ cephData['registrationNo'] = regNumber
 
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+set_transient_variable('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:userTask id="Activity_citizen-shared-headofficer-check-complience" name="Перевірка документів на відповідність" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="citizen-shared-headofficer-check-complience" camunda:assignee="" camunda:candidateGroups="head-officer">
       <bpmn:extensionElements>
@@ -505,7 +505,7 @@ cephData['subjectCode'] = labResponse.responseBody.prop('edrpou').stringValue()
 cephData['accreditationFlag'] = labResponse.responseBody.hasProp('accreditationFlag') ? labResponse.responseBody.prop('accreditationFlag').value() : false
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))
+set_transient_variable('payload', S(cephData, 'application/json'))
 
 execution.setVariable('fullName', initiator().fullName)</bpmn:script>
     </bpmn:scriptTask>
@@ -595,7 +595,7 @@ def solution = solutionResponse.responseBody.elements()[0]
 cephData['solutionName'] = solution.prop('name').stringValue()
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))
+set_transient_variable('payload', S(cephData, 'application/json'))
 
 execution.setVariable('solutionTypeId', solution.prop('solutionTypeId').stringValue())</bpmn:script>
     </bpmn:scriptTask>
@@ -649,7 +649,7 @@ def solution = solutionResponse.responseBody.elements()[0]
 cephData['solutionName'] = solution.prop('name').stringValue()
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))
+set_transient_variable('payload', S(cephData, 'application/json'))
 
 execution.setVariable('solutionTypeId', solution.prop('solutionTypeId').stringValue())</bpmn:script>
     </bpmn:scriptTask>
@@ -712,7 +712,7 @@ if (headOfficerCheckFlag) {
 cephData[it] = submission('Activity_shared-add-decision-include').formData.prop(it).stringValue() }
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+set_transient_variable('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:exclusiveGateway id="Gateway_0iwxwo7">
       <bpmn:incoming>Flow_1lshq15</bpmn:incoming>
@@ -772,7 +772,7 @@ requestMap['createdDate'] = submission('Activity_citizen-shared-add-application'
 
 var payload = S(requestMap, 'application/json')
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', payload)</bpmn:script>
+set_transient_variable('payload', payload)</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="Activity_1odu57w" name="Отримання унікального ідентификатору типу заяви з дата фабрики" camunda:modelerTemplate="dataFactoryConnectorSearchDelegate" camunda:delegateExpression="${dataFactoryConnectorSearchDelegate}">
       <bpmn:extensionElements>
@@ -869,7 +869,7 @@ cephData[it] = submission('Activity_shared-add-decision-deny').formData.prop(it)
 }
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+set_transient_variable('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:exclusiveGateway id="Gateway_06g14p1">
       <bpmn:incoming>Flow_1png13n</bpmn:incoming>
@@ -959,7 +959,7 @@ requestMap['createdDate'] = submission('Activity_citizen-shared-add-application'
 var payload = S(requestMap, 'application/json')
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', payload)</bpmn:script>
+set_transient_variable('payload', payload)</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:callActivity id="Activity_0rl0sj1" name="Підписати дані системним ключем" calledElement="system-signature-bp">
       <bpmn:extensionElements>
@@ -1013,9 +1013,9 @@ execution.setVariableLocalTransient('payload', payload)</bpmn:script>
       <bpmn:script>def subjectType = submission('start_event').formData.prop('subjectType').value()
 
         if (subjectType.equals('ENTREPRENEUR')) {
-        execution.setVariableLocalTransient('subjectCode', submission('start_event').formData.prop('rnokppCode').value())
+        set_transient_variable('subjectCode', submission('start_event').formData.prop('rnokppCode').value())
         } else if (subjectType.equals('LEGAL')) {
-        execution.setVariableLocalTransient('subjectCode', submission('start_event').formData.prop('edrpou').value())
+        set_transient_variable('subjectCode', submission('start_event').formData.prop('edrpou').value())
         }</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:association id="Association_07vsv6f" sourceRef="start_event" targetRef="TextAnnotation_020yojw" />

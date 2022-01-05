@@ -80,7 +80,7 @@
         cephData[it] = labResponse.responseBody.prop(it).stringValue()
         }
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+        set_transient_variable('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:userTask id="addCitizenPersonnelFormActivity" name="Додати дані про кадри" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="citizen-add-personnel-bp-add-personnel" camunda:assignee="${initiator}">
       <bpmn:extensionElements>
@@ -169,7 +169,7 @@ def laboratoryId = submission('start_event').formData.prop('laboratory').prop('l
         }
 
         execution.removeVariable('dataPayload')
-        execution.setVariableLocalTransient('dataPayload', S(personnelGrid.toString()))</bpmn:script>
+        set_transient_variable('dataPayload', S(personnelGrid.toString()))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:userTask id="signCitizenPersonnelFormActivity" name="Підписати дані КЕП" camunda:modelerTemplate="citizenSignTaskTemplate" camunda:formKey="add-personnel-bp-sign-personnel" camunda:assignee="${initiator}">
       <bpmn:extensionElements>

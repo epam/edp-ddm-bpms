@@ -74,7 +74,7 @@
         }
 
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+        set_transient_variable('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataStoreReference id="DataStoreReference_1y6znyo" name="Дата Фабрика" />
     <bpmn:scriptTask id="extractResearchesIdsFromStaffActivity" name="Підготовка данних для пошуку досліджень" scriptFormat="groovy">
@@ -84,7 +84,7 @@
         .map(objId -&gt; objId.value())
         .collect()
 
-        execution.setVariableLocalTransient("researchIds", researchesIds)</bpmn:script>
+        set_transient_variable("researchIds", researchesIds)</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="Activity_11nqllh" name="Пошук даних про співробітника" camunda:modelerTemplate="dataFactoryConnectorReadDelegate" camunda:delegateExpression="${dataFactoryConnectorReadDelegate}">
       <bpmn:extensionElements>
@@ -166,7 +166,7 @@
       <bpmn:script>def signedFormData = submission('Activity_update-personnel-bp-sign-personnel').formData
 
         var staffId = signedFormData.prop('staffId').stringValue()
-        execution.setVariableLocalTransient('staffId', staffId)
+        set_transient_variable('staffId', staffId)
 
         signedFormData.prop('staffStatusId', signedFormData.prop('staffStatus').prop('staffStatusId').value())
         signedFormData.deleteProp('staffStatus')
@@ -203,7 +203,7 @@
 		}
 
         execution.removeVariable('dataPayload')
-        execution.setVariableLocalTransient('dataPayload', signedFormData)</bpmn:script>
+        set_transient_variable('dataPayload', signedFormData)</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:callActivity id="Activity_06u93yz" name="Підписати дані системним ключем" calledElement="system-signature-bp">
       <bpmn:extensionElements>

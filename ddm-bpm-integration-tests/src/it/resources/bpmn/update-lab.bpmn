@@ -65,7 +65,7 @@
         cephData['kopfg'] = slurper.parseText(kopfgResponse.responseBody.toString())
 
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))
+        set_transient_variable('payload', S(cephData, 'application/json'))
 
         execution.setVariable('laboratoryId', labResponse.responseBody.prop('laboratoryId').value())</bpmn:script>
     </bpmn:scriptTask>
@@ -182,12 +182,12 @@
 
         execution.removeVariable('name')
         execution.removeVariable('edrpou')
-        execution.setVariableLocalTransient('name', name)
-        execution.setVariableLocalTransient('edrpou', edrpou)
+        set_transient_variable('name', name)
+        set_transient_variable('edrpou', edrpou)
 
         var oldName = submission('viewLabDataFormActivity').formData.prop('name').stringValue()
         execution.removeVariable('oldName')
-        execution.setVariableLocalTransient('oldName', oldName)</bpmn:script>
+        set_transient_variable('oldName', oldName)</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:exclusiveGateway id="Gateway_038bgls" name="Назву лабораторії змінено?">
       <bpmn:incoming>Flow_0hz7hdv</bpmn:incoming>
@@ -272,7 +272,7 @@
         }
 
         execution.removeVariable('dataPayload')
-        execution.setVariableLocalTransient('dataPayload', signedFormData)</bpmn:script>
+        set_transient_variable('dataPayload', signedFormData)</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataObjectReference id="DataObjectReference_1burbk6" dataObjectRef="DataObject_12xnr2q" />
     <bpmn:dataObject id="DataObject_12xnr2q" />
