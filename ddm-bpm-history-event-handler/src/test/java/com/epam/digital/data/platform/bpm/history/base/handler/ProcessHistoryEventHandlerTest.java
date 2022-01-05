@@ -24,8 +24,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.epam.digital.data.platform.bpm.history.base.dto.HistoryProcessInstanceDto;
-import com.epam.digital.data.platform.bpm.history.base.dto.HistoryTaskDto;
+import com.epam.digital.data.platform.bphistory.model.HistoryProcess;
+import com.epam.digital.data.platform.bphistory.model.HistoryTask;
 import com.epam.digital.data.platform.bpm.history.base.mapper.HistoryMapper;
 import com.epam.digital.data.platform.bpm.history.base.publisher.ProcessHistoryEventPublisher;
 import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
@@ -75,9 +75,9 @@ class ProcessHistoryEventHandlerTest {
   private RepositoryService repositoryService;
 
   @Captor
-  private ArgumentCaptor<HistoryProcessInstanceDto> historyProcessInstanceDtoArgumentCaptor;
+  private ArgumentCaptor<HistoryProcess> historyProcessArgumentCaptor;
   @Captor
-  private ArgumentCaptor<HistoryTaskDto> historyTaskDtoArgumentCaptor;
+  private ArgumentCaptor<HistoryTask> historyTaskArgumentCaptor;
 
   @BeforeEach
   void setUp() {
@@ -126,9 +126,9 @@ class ProcessHistoryEventHandlerTest {
 
     processHistoryEventHandler.handleEvent(event);
 
-    verify(publisher).put(historyProcessInstanceDtoArgumentCaptor.capture());
+    verify(publisher).put(historyProcessArgumentCaptor.capture());
 
-    var value = historyProcessInstanceDtoArgumentCaptor.getValue();
+    var value = historyProcessArgumentCaptor.getValue();
     assertThat(value)
         .hasFieldOrPropertyWithValue("processInstanceId", "processInstanceId")
         .hasFieldOrPropertyWithValue("superProcessInstanceId", "superProcessInstanceId")
@@ -157,9 +157,9 @@ class ProcessHistoryEventHandlerTest {
 
     processHistoryEventHandler.handleEvent(event);
 
-    verify(publisher).patch(historyProcessInstanceDtoArgumentCaptor.capture());
+    verify(publisher).patch(historyProcessArgumentCaptor.capture());
 
-    var value = historyProcessInstanceDtoArgumentCaptor.getValue();
+    var value = historyProcessArgumentCaptor.getValue();
     assertThat(value)
         .hasFieldOrPropertyWithValue("processInstanceId", "processInstanceId")
         .hasFieldOrPropertyWithValue("superProcessInstanceId", "superProcessInstanceId")
@@ -180,9 +180,9 @@ class ProcessHistoryEventHandlerTest {
 
     processHistoryEventHandler.handleEvent(nonSystemVarEvent);
 
-    verify(publisher, never()).put(any(HistoryProcessInstanceDto.class));
-    verify(publisher, never()).patch(any(HistoryProcessInstanceDto.class));
-    verify(publisher, never()).put(any(HistoryTaskDto.class));
+    verify(publisher, never()).put(any(HistoryProcess.class));
+    verify(publisher, never()).patch(any(HistoryProcess.class));
+    verify(publisher, never()).put(any(HistoryTask.class));
   }
 
   @Test
@@ -196,9 +196,9 @@ class ProcessHistoryEventHandlerTest {
 
     processHistoryEventHandler.handleEvent(processCompletionResult);
 
-    verify(publisher, never()).put(any(HistoryProcessInstanceDto.class));
-    verify(publisher, never()).patch(any(HistoryProcessInstanceDto.class));
-    verify(publisher, never()).put(any(HistoryTaskDto.class));
+    verify(publisher, never()).put(any(HistoryProcess.class));
+    verify(publisher, never()).patch(any(HistoryProcess.class));
+    verify(publisher, never()).put(any(HistoryTask.class));
   }
 
   @Test
@@ -211,8 +211,8 @@ class ProcessHistoryEventHandlerTest {
     processCompletionResult.setEventType(HistoryEventTypes.VARIABLE_INSTANCE_CREATE.getEventName());
 
     processHistoryEventHandler.handleEvent(processCompletionResult);
-    verify(publisher).patch(historyProcessInstanceDtoArgumentCaptor.capture());
-    var processCompletionValue = historyProcessInstanceDtoArgumentCaptor.getValue();
+    verify(publisher).patch(historyProcessArgumentCaptor.capture());
+    var processCompletionValue = historyProcessArgumentCaptor.getValue();
     assertThat(processCompletionValue)
         .hasFieldOrPropertyWithValue("processInstanceId", "processInstanceId")
         .hasFieldOrPropertyWithValue("completionResult", "process completed for a reason");
@@ -227,8 +227,8 @@ class ProcessHistoryEventHandlerTest {
     excerptId.setEventType(HistoryEventTypes.VARIABLE_INSTANCE_CREATE.getEventName());
 
     processHistoryEventHandler.handleEvent(excerptId);
-    verify(publisher).patch(historyProcessInstanceDtoArgumentCaptor.capture());
-    var excerptValue = historyProcessInstanceDtoArgumentCaptor.getValue();
+    verify(publisher).patch(historyProcessArgumentCaptor.capture());
+    var excerptValue = historyProcessArgumentCaptor.getValue();
     assertThat(excerptValue)
         .hasFieldOrPropertyWithValue("processInstanceId", "processInstanceId")
         .hasFieldOrPropertyWithValue("excerptId", "excerpt");
@@ -250,8 +250,8 @@ class ProcessHistoryEventHandlerTest {
     taskEvent.setAssignee("assignee");
 
     processHistoryEventHandler.handleEvent(taskEvent);
-    verify(publisher).put(historyTaskDtoArgumentCaptor.capture());
-    var value = historyTaskDtoArgumentCaptor.getValue();
+    verify(publisher).put(historyTaskArgumentCaptor.capture());
+    var value = historyTaskArgumentCaptor.getValue();
     assertThat(value)
         .hasFieldOrPropertyWithValue("activityInstanceId", "activityInstanceId")
         .hasFieldOrPropertyWithValue("taskDefinitionKey", "taskDefinitionKey")
@@ -282,8 +282,8 @@ class ProcessHistoryEventHandlerTest {
     taskEvent.setAssignee("assignee");
 
     processHistoryEventHandler.handleEvent(taskEvent);
-    verify(publisher).patch(historyTaskDtoArgumentCaptor.capture());
-    var value = historyTaskDtoArgumentCaptor.getValue();
+    verify(publisher).patch(historyTaskArgumentCaptor.capture());
+    var value = historyTaskArgumentCaptor.getValue();
     assertThat(value)
         .hasFieldOrPropertyWithValue("activityInstanceId", "activityInstanceId")
         .hasFieldOrPropertyWithValue("taskDefinitionKey", "taskDefinitionKey")
@@ -316,8 +316,8 @@ class ProcessHistoryEventHandlerTest {
     taskEvent.setAssignee("assignee");
 
     processHistoryEventHandler.handleEvent(taskEvent);
-    verify(publisher).patch(historyTaskDtoArgumentCaptor.capture());
-    var value = historyTaskDtoArgumentCaptor.getValue();
+    verify(publisher).patch(historyTaskArgumentCaptor.capture());
+    var value = historyTaskArgumentCaptor.getValue();
     assertThat(value)
         .hasFieldOrPropertyWithValue("activityInstanceId", "activityInstanceId")
         .hasFieldOrPropertyWithValue("taskDefinitionKey", "taskDefinitionKey")

@@ -16,8 +16,8 @@
 
 package com.epam.digital.data.platform.bpm.history.it.kafka;
 
-import com.epam.digital.data.platform.bpm.history.base.dto.HistoryProcessInstanceDto;
-import com.epam.digital.data.platform.bpm.history.base.dto.HistoryTaskDto;
+import com.epam.digital.data.platform.bphistory.model.HistoryProcess;
+import com.epam.digital.data.platform.bphistory.model.HistoryTask;
 import com.epam.digital.data.platform.bpm.history.it.storage.TestHistoryEventStorage;
 import com.epam.digital.data.platform.bpm.history.kafka.StartupHistoryProcessKafkaTopicCreator;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -77,7 +77,7 @@ public class KafkaConsumer {
 
   @SneakyThrows
   public void consumeHistoryProcessInstanceDto(ConsumerRecord<String, String> consumerRecord) {
-    var value = objectMapper.readValue(consumerRecord.value(), HistoryProcessInstanceDto.class);
+    var value = objectMapper.readValue(consumerRecord.value(), HistoryProcess.class);
     log.info("bpm-history-process event - {}", value);
 
     if (Objects.isNull(storage.getHistoryProcessInstanceDto(value.getProcessInstanceId()))) {
@@ -89,7 +89,7 @@ public class KafkaConsumer {
 
   @SneakyThrows
   public void consumeHistoryTaskDto(ConsumerRecord<String, String> consumerRecord) {
-    var value = objectMapper.readValue(consumerRecord.value(), HistoryTaskDto.class);
+    var value = objectMapper.readValue(consumerRecord.value(), HistoryTask.class);
 
     log.info("bpm-history-task event - {}", value);
 
