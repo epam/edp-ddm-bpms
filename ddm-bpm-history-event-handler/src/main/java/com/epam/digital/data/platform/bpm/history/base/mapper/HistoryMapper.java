@@ -16,8 +16,8 @@
 
 package com.epam.digital.data.platform.bpm.history.base.mapper;
 
-import com.epam.digital.data.platform.bpm.history.base.dto.HistoryProcessInstanceDto;
-import com.epam.digital.data.platform.bpm.history.base.dto.HistoryTaskDto;
+import com.epam.digital.data.platform.bphistory.model.HistoryProcess;
+import com.epam.digital.data.platform.bphistory.model.HistoryTask;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessExcerptIdVariable;
 import java.time.LocalDateTime;
@@ -35,9 +35,9 @@ import org.mapstruct.ReportingPolicy;
 /**
  * Mapper that maps Camunda history events to custom dtos
  *
- * @see HistoryMapper#toHistoryProcessInstanceDto(HistoricProcessInstanceEventEntity)
- * @see HistoryMapper#toHistoryProcessInstanceDto(HistoricVariableUpdateEventEntity)
- * @see HistoryMapper#toHistoryTaskDto(HistoricTaskInstanceEventEntity)
+ * @see HistoryMapper#toHistoryProcess(HistoricProcessInstanceEventEntity)
+ * @see HistoryMapper#toHistoryProcess(HistoricVariableUpdateEventEntity)
+ * @see HistoryMapper#toHistoryTask(HistoricTaskInstanceEventEntity)
  */
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface HistoryMapper {
@@ -51,21 +51,21 @@ public interface HistoryMapper {
   }
 
   /**
-   * Map camunda {@link HistoricProcessInstanceEventEntity} to {@link HistoryProcessInstanceDto}
+   * Map camunda {@link HistoricProcessInstanceEventEntity} to {@link HistoryProcess}
    */
   @Mapping(target = "startTime", qualifiedByName = "toLocalDateTime")
   @Mapping(target = "endTime", qualifiedByName = "toLocalDateTime")
-  HistoryProcessInstanceDto toHistoryProcessInstanceDto(HistoricProcessInstanceEventEntity entity);
+  HistoryProcess toHistoryProcess(HistoricProcessInstanceEventEntity entity);
 
   /**
-   * Map camunda {@link HistoricVariableUpdateEventEntity} to {@link HistoryProcessInstanceDto}
+   * Map camunda {@link HistoricVariableUpdateEventEntity} to {@link HistoryProcess}
    */
   @Mapping(target = "processDefinitionId", ignore = true)
   @Mapping(target = "processDefinitionKey", ignore = true)
   @Mapping(target = "processDefinitionName", ignore = true)
   @Mapping(target = "completionResult", source = "entity", qualifiedByName = "toCompletionResult")
   @Mapping(target = "excerptId", source = "entity", qualifiedByName = "toExcerptId")
-  HistoryProcessInstanceDto toHistoryProcessInstanceDto(HistoricVariableUpdateEventEntity entity);
+  HistoryProcess toHistoryProcess(HistoricVariableUpdateEventEntity entity);
 
   @Named("toCompletionResult")
   default String toCompletionResult(HistoricVariableUpdateEventEntity entity) {
@@ -85,10 +85,10 @@ public interface HistoryMapper {
   }
 
   /**
-   * Map camunda {@link HistoricTaskInstanceEventEntity} to {@link HistoryTaskDto}
+   * Map camunda {@link HistoricTaskInstanceEventEntity} to {@link HistoryTask}
    */
   @Mapping(target = "taskDefinitionName", source = "name")
   @Mapping(target = "startTime", qualifiedByName = "toLocalDateTime")
   @Mapping(target = "endTime", qualifiedByName = "toLocalDateTime")
-  HistoryTaskDto toHistoryTaskDto(HistoricTaskInstanceEventEntity entity);
+  HistoryTask toHistoryTask(HistoricTaskInstanceEventEntity entity);
 }
