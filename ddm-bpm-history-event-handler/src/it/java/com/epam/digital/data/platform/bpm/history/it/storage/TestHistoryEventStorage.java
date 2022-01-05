@@ -16,9 +16,8 @@
 
 package com.epam.digital.data.platform.bpm.history.it.storage;
 
-import com.epam.digital.data.platform.bpm.history.base.dto.HistoryProcessInstanceDto;
-import com.epam.digital.data.platform.bpm.history.base.dto.HistoryTaskDto;
-import com.epam.digital.data.platform.bpm.history.base.publisher.ProcessHistoryEventPublisher;
+import com.epam.digital.data.platform.bphistory.model.HistoryProcess;
+import com.epam.digital.data.platform.bphistory.model.HistoryTask;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -27,59 +26,73 @@ import lombok.Getter;
 @Getter
 public class TestHistoryEventStorage {
 
-  private final Map<String, HistoryProcessInstanceDto> processInstanceDtoMap = new HashMap<>();
-  private final Map<String, HistoryTaskDto> historyTaskDtoMap = new HashMap<>();
+  private final Map<String, HistoryProcess> processInstanceDtoMap = new HashMap<>();
+  private final Map<String, HistoryTask> historyTaskDtoMap = new HashMap<>();
 
-  public void put(HistoryProcessInstanceDto dto) {
+  public void put(HistoryProcess dto) {
     processInstanceDtoMap.put(dto.getProcessInstanceId(), dto);
   }
 
-  public void patch(HistoryProcessInstanceDto dto) {
+  public void patch(HistoryProcess dto) {
     var existedDto = processInstanceDtoMap.get(dto.getProcessInstanceId());
 
-    var newDto = new HistoryProcessInstanceDto(existedDto.getProcessInstanceId(),
-        getOrElse(dto.getSuperProcessInstanceId(), existedDto.getSuperProcessInstanceId()),
-        getOrElse(dto.getProcessDefinitionId(), existedDto.getProcessDefinitionId()),
-        getOrElse(dto.getProcessDefinitionKey(), existedDto.getProcessDefinitionKey()),
-        getOrElse(dto.getProcessDefinitionName(), existedDto.getProcessDefinitionName()),
-        getOrElse(dto.getBusinessKey(), existedDto.getBusinessKey()),
-        getOrElse(dto.getStartTime(), existedDto.getStartTime()),
-        getOrElse(dto.getEndTime(), existedDto.getEndTime()),
-        getOrElse(dto.getStartUserId(), existedDto.getStartUserId()),
-        getOrElse(dto.getState(), existedDto.getState()),
-        getOrElse(dto.getExcerptId(), existedDto.getExcerptId()),
+    var newDto = new HistoryProcess();
+    newDto.setProcessInstanceId(existedDto.getProcessInstanceId());
+    newDto.setSuperProcessInstanceId(
+        getOrElse(dto.getSuperProcessInstanceId(), existedDto.getSuperProcessInstanceId()));
+    newDto.setProcessDefinitionId(
+        getOrElse(dto.getProcessDefinitionId(), existedDto.getProcessDefinitionId()));
+    newDto.setProcessDefinitionKey(
+        getOrElse(dto.getProcessDefinitionKey(), existedDto.getProcessDefinitionKey()));
+    newDto.setProcessDefinitionName(
+        getOrElse(dto.getProcessDefinitionName(), existedDto.getProcessDefinitionName()));
+    newDto.setBusinessKey(getOrElse(dto.getBusinessKey(), existedDto.getBusinessKey()));
+    newDto.setStartTime(getOrElse(dto.getStartTime(), existedDto.getStartTime()));
+    newDto.setEndTime(getOrElse(dto.getEndTime(), existedDto.getEndTime()));
+    newDto.setStartUserId(getOrElse(dto.getStartUserId(), existedDto.getStartUserId()));
+    newDto.setState(getOrElse(dto.getState(), existedDto.getState()));
+    newDto.setExcerptId(getOrElse(dto.getExcerptId(), existedDto.getExcerptId()));
+    newDto.setCompletionResult(
         getOrElse(dto.getCompletionResult(), existedDto.getCompletionResult()));
 
     processInstanceDtoMap.put(newDto.getProcessInstanceId(), newDto);
   }
 
-  public void put(HistoryTaskDto dto) {
+  public void put(HistoryTask dto) {
     historyTaskDtoMap.put(dto.getActivityInstanceId(), dto);
   }
 
-  public void patch(HistoryTaskDto dto) {
+  public void patch(HistoryTask dto) {
     var existedDto = historyTaskDtoMap.get(dto.getActivityInstanceId());
 
-    var newDto = new HistoryTaskDto(existedDto.getActivityInstanceId(),
-        getOrElse(dto.getTaskDefinitionKey(), existedDto.getTaskDefinitionKey()),
-        getOrElse(dto.getTaskDefinitionName(), existedDto.getTaskDefinitionName()),
-        getOrElse(dto.getProcessInstanceId(), existedDto.getProcessInstanceId()),
-        getOrElse(dto.getProcessDefinitionId(), existedDto.getProcessDefinitionId()),
-        getOrElse(dto.getProcessDefinitionKey(), existedDto.getProcessDefinitionKey()),
-        getOrElse(dto.getProcessDefinitionName(), existedDto.getProcessDefinitionName()),
-        getOrElse(dto.getRootProcessInstanceId(), existedDto.getRootProcessInstanceId()),
-        getOrElse(dto.getStartTime(), existedDto.getStartTime()),
-        getOrElse(dto.getEndTime(), existedDto.getEndTime()),
-        getOrElse(dto.getAssignee(), existedDto.getAssignee()));
+    var newDto = new HistoryTask();
+    newDto.setActivityInstanceId(existedDto.getActivityInstanceId());
+    newDto.setTaskDefinitionKey(
+        getOrElse(dto.getTaskDefinitionKey(), existedDto.getTaskDefinitionKey()));
+    newDto.setTaskDefinitionName(
+        getOrElse(dto.getTaskDefinitionName(), existedDto.getTaskDefinitionName()));
+    newDto.setProcessInstanceId(
+        getOrElse(dto.getProcessInstanceId(), existedDto.getProcessInstanceId()));
+    newDto.setProcessDefinitionId(
+        getOrElse(dto.getProcessDefinitionId(), existedDto.getProcessDefinitionId()));
+    newDto.setProcessDefinitionKey(
+        getOrElse(dto.getProcessDefinitionKey(), existedDto.getProcessDefinitionKey()));
+    newDto.setProcessDefinitionName(
+        getOrElse(dto.getProcessDefinitionName(), existedDto.getProcessDefinitionName()));
+    newDto.setRootProcessInstanceId(
+        getOrElse(dto.getRootProcessInstanceId(), existedDto.getRootProcessInstanceId()));
+    newDto.setStartTime(getOrElse(dto.getStartTime(), existedDto.getStartTime()));
+    newDto.setEndTime(getOrElse(dto.getEndTime(), existedDto.getEndTime()));
+    newDto.setAssignee(getOrElse(dto.getAssignee(), existedDto.getAssignee()));
 
     historyTaskDtoMap.put(newDto.getActivityInstanceId(), newDto);
   }
 
-  public HistoryProcessInstanceDto getHistoryProcessInstanceDto(String id) {
+  public HistoryProcess getHistoryProcessInstanceDto(String id) {
     return processInstanceDtoMap.get(id);
   }
 
-  public HistoryTaskDto getHistoryTaskDto(String id) {
+  public HistoryTask getHistoryTaskDto(String id) {
     return historyTaskDtoMap.get(id);
   }
 

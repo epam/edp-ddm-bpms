@@ -16,8 +16,8 @@
 
 package com.epam.digital.data.platform.bpm.history.kafka;
 
-import com.epam.digital.data.platform.bpm.history.base.dto.HistoryProcessInstanceDto;
-import com.epam.digital.data.platform.bpm.history.base.dto.HistoryTaskDto;
+import com.epam.digital.data.platform.bphistory.model.HistoryProcess;
+import com.epam.digital.data.platform.bphistory.model.HistoryTask;
 import com.epam.digital.data.platform.bpm.history.base.publisher.ProcessHistoryEventPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,31 +34,31 @@ public class ProcessHistoryEventKafkaPublisher implements ProcessHistoryEventPub
   private final KafkaProperties kafkaProperties;
 
   @Override
-  public void put(HistoryProcessInstanceDto dto) {
+  public void put(HistoryProcess dto) {
     sendHistoryProcessInstanceDto(dto);
   }
 
   @Override
-  public void patch(HistoryProcessInstanceDto dto) {
+  public void patch(HistoryProcess dto) {
     sendHistoryProcessInstanceDto(dto);
   }
 
   @Override
-  public void put(HistoryTaskDto dto) {
+  public void put(HistoryTask dto) {
     sendHistoryTaskDto(dto);
   }
 
   @Override
-  public void patch(HistoryTaskDto dto) {
+  public void patch(HistoryTask dto) {
     sendHistoryTaskDto(dto);
   }
 
-  private void sendHistoryProcessInstanceDto(HistoryProcessInstanceDto dto) {
+  private void sendHistoryProcessInstanceDto(HistoryProcess dto) {
     var topicName = kafkaProperties.getTopics().getHistoryProcessInstanceTopic().getName();
     send(topicName, dto);
   }
 
-  private void sendHistoryTaskDto(HistoryTaskDto dto) {
+  private void sendHistoryTaskDto(HistoryTask dto) {
     var topicName = kafkaProperties.getTopics().getHistoryTaskTopic().getName();
     send(topicName, dto);
   }

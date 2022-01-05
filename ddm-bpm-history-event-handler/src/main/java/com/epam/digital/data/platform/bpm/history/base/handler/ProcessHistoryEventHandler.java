@@ -16,7 +16,7 @@
 
 package com.epam.digital.data.platform.bpm.history.base.handler;
 
-import com.epam.digital.data.platform.bpm.history.base.dto.HistoryProcessInstanceDto;
+import com.epam.digital.data.platform.bphistory.model.HistoryProcess;
 import com.epam.digital.data.platform.bpm.history.base.mapper.HistoryMapper;
 import com.epam.digital.data.platform.bpm.history.base.publisher.ProcessHistoryEventPublisher;
 import com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory;
@@ -94,7 +94,7 @@ public class ProcessHistoryEventHandler implements HistoryEventHandler {
   protected void handleProcessInstanceEvent(
       HistoricProcessInstanceEventEntity processInstanceEvent) {
     fillHistoryEventWithProcessDefinitionName(processInstanceEvent);
-    var historyDto = historyMapper.toHistoryProcessInstanceDto(processInstanceEvent);
+    var historyDto = historyMapper.toHistoryProcess(processInstanceEvent);
 
     if (processInstanceEvent.isEventOfType(HistoryEventTypes.PROCESS_INSTANCE_START)) {
       publisher.put(historyDto);
@@ -104,10 +104,10 @@ public class ProcessHistoryEventHandler implements HistoryEventHandler {
   }
 
   /**
-   * Updates {@link HistoryProcessInstanceDto#getCompletionResult() completion result} of the
+   * Updates {@link HistoryProcess#getCompletionResult() completion result} of the
    * historic process instance in case of facing event of updating {@link
    * ProcessCompletionResultVariable#SYS_VAR_PROCESS_COMPLETION_RESULT} or {@link
-   * HistoryProcessInstanceDto#getExcerptId() excerpt id} in case of updating {@link
+   * HistoryProcess#getExcerptId() excerpt id} in case of updating {@link
    * ProcessExcerptIdVariable#SYS_VAR_PROCESS_EXCERPT_ID}
    * <p>
    * Delete variable events are ignored because system variables mustn't be deleted from process
@@ -121,7 +121,7 @@ public class ProcessHistoryEventHandler implements HistoryEventHandler {
         || variableUpdateEvent.isEventOfType(HistoryEventTypes.VARIABLE_INSTANCE_DELETE)) {
       return;
     }
-    publisher.patch(historyMapper.toHistoryProcessInstanceDto(variableUpdateEvent));
+    publisher.patch(historyMapper.toHistoryProcess(variableUpdateEvent));
   }
 
   /**
@@ -131,7 +131,7 @@ public class ProcessHistoryEventHandler implements HistoryEventHandler {
    */
   protected void handleHistoricTaskEvent(HistoricTaskInstanceEventEntity taskInstanceEvent) {
     fillHistoryEventWithProcessDefinitionName(taskInstanceEvent);
-    var historyDto = historyMapper.toHistoryTaskDto(taskInstanceEvent);
+    var historyDto = historyMapper.toHistoryTask(taskInstanceEvent);
 
     if (taskInstanceEvent.isEventOfType(HistoryEventTypes.TASK_INSTANCE_CREATE)) {
       publisher.put(historyDto);

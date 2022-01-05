@@ -73,6 +73,11 @@
       <groupId>org.mapstruct</groupId>
       <artifactId>mapstruct</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.epam.digital.data.platform</groupId>
+      <artifactId>process-history-model</artifactId>
+      <version>${process-history-model.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>

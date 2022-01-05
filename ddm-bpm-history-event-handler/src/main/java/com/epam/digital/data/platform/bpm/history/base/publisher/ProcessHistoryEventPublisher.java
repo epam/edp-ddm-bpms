@@ -16,8 +16,8 @@
 
 package com.epam.digital.data.platform.bpm.history.base.publisher;
 
-import com.epam.digital.data.platform.bpm.history.base.dto.HistoryProcessInstanceDto;
-import com.epam.digital.data.platform.bpm.history.base.dto.HistoryTaskDto;
+import com.epam.digital.data.platform.bphistory.model.HistoryProcess;
+import com.epam.digital.data.platform.bphistory.model.HistoryTask;
 
 /**
  * Publisher that is used to publish messages to a message broker
@@ -25,30 +25,30 @@ import com.epam.digital.data.platform.bpm.history.base.dto.HistoryTaskDto;
 public interface ProcessHistoryEventPublisher {
 
   /**
-   * Publish put (create or update) request of the {@link HistoryProcessInstanceDto}
+   * Publish put (create or update) request of the {@link HistoryProcess}
    *
    * @param dto the dto to be published
    */
-  void put(HistoryProcessInstanceDto dto);
+  void put(HistoryProcess dto);
 
   /**
-   * Publish patch (partial update) request of the {@link HistoryProcessInstanceDto}
+   * Publish patch (partial update) request of the {@link HistoryProcess}
    *
    * @param dto the dto to be published
    */
-  void patch(HistoryProcessInstanceDto dto);
+  void patch(HistoryProcess dto);
 
   /**
-   * Publish put (create or update) request of the {@link HistoryTaskDto}
+   * Publish put (create or update) request of the {@link HistoryTask}
    *
    * @param dto the dto to be published
    */
-  void put(HistoryTaskDto dto);
+  void put(HistoryTask dto);
 
   /**
-   * Publish patch (partial update) request of the {@link HistoryTaskDto}
+   * Publish patch (partial update) request of the {@link HistoryTask}
    *
    * @param dto the dto to be published
    */
-  void patch(HistoryTaskDto dto);
+  void patch(HistoryTask dto);
 }
