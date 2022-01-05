@@ -17,14 +17,13 @@
 package com.epam.digital.data.platform.bpm.history.base.handler;
 
 import com.epam.digital.data.platform.bpm.history.base.dto.HistoryProcessInstanceDto;
-import com.epam.digital.data.platform.bpm.history.base.publisher.ProcessHistoryEventPublisher;
 import com.epam.digital.data.platform.bpm.history.base.mapper.HistoryMapper;
-import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
+import com.epam.digital.data.platform.bpm.history.base.publisher.ProcessHistoryEventPublisher;
+import com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessExcerptIdVariable;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
@@ -51,8 +50,8 @@ public class ProcessHistoryEventHandler implements HistoryEventHandler {
   @Lazy
   @Autowired
   private RepositoryService repositoryService;
-  @Resource(name = "camundaAdminImpersonation")
-  private CamundaImpersonation camundaAdminImpersonation;
+  @Autowired
+  private CamundaImpersonationFactory camundaImpersonationFactory;
 
   /**
    * Handle list of fired {@link HistoryEvent}
@@ -147,7 +146,13 @@ public class ProcessHistoryEventHandler implements HistoryEventHandler {
   }
 
   private void fillHistoryEventWithProcessDefinitionName(HistoryEvent event) {
-    var processDefinitionName = camundaAdminImpersonation.execute(() ->
+    var camundaAdminImpersonation = camundaImpersonationFactory.getCamundaImpersonation();
+
+    if (camundaAdminImpersonation.isEmpty()) {
+      return;
+    }
+
+    var processDefinitionName = camundaAdminImpersonation.get().execute(() ->
         repositoryService.getProcessDefinition(event.getProcessDefinitionId()).getName());
 
     event.setProcessDefinitionName(processDefinitionName);

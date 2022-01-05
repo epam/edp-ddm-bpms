@@ -18,9 +18,12 @@ package com.epam.digital.data.platform.bpm.history.it;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
+import com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory;
+import java.util.Optional;
 import java.util.function.Supplier;
 import org.springframework.beans.factory.config.CustomScopeConfigurer;
 import org.springframework.context.annotation.Bean;
@@ -41,7 +44,9 @@ public class BaseTestConfig {
   }
 
   @Bean("camundaAdminImpersonation")
-  public CamundaImpersonation camundaImpersonation() {
+  public CamundaImpersonationFactory camundaImpersonationFactory() {
+    var factory = mock(CamundaImpersonationFactory.class);
+
     var impersonation = mock(CamundaImpersonation.class);
 
     doAnswer(invocation -> {
@@ -49,6 +54,8 @@ public class BaseTestConfig {
       return supplier.get();
     }).when(impersonation).execute(any());
 
-    return impersonation;
+    doReturn(Optional.of(impersonation)).when(factory).getCamundaImpersonation();
+
+    return factory;
   }
 }
