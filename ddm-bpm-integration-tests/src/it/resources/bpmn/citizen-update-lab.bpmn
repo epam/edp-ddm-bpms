@@ -129,7 +129,7 @@ if(labResponse.responseBody.hasProp('accreditationFile') &amp;&amp; !labResponse
 }
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))
+set_transient_variable('payload', S(cephData, 'application/json'))
 
 execution.setVariable('laboratoryId', labResponse.responseBody.prop('laboratoryId').value())</bpmn:script>
     </bpmn:scriptTask>
@@ -246,12 +246,12 @@ execution.setVariable('laboratoryId', labResponse.responseBody.prop('laboratoryI
 
         execution.removeVariable('name')
         execution.removeVariable('edrpou')
-        execution.setVariableLocalTransient('name', name)
-        execution.setVariableLocalTransient('edrpou', edrpou)
+        set_transient_variable('name', name)
+        set_transient_variable('edrpou', edrpou)
 
         var oldName = submission('viewLabDataCitizenActivity').formData.prop('name').stringValue()
         execution.removeVariable('oldName')
-        execution.setVariableLocalTransient('oldName', oldName)</bpmn:script>
+        set_transient_variable('oldName', oldName)</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:exclusiveGateway id="Gateway_038bgls" name="Назву лабораторії змінено?">
       <bpmn:incoming>Flow_0hz7hdv</bpmn:incoming>
@@ -466,7 +466,7 @@ if(signedFormData.hasProp('accreditationFile') &amp;&amp; !signedFormData.prop('
 
 
         execution.removeVariable('dataPayload')
-        execution.setVariableLocalTransient('dataPayload', signedFormData)</bpmn:script>
+        set_transient_variable('dataPayload', signedFormData)</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:callActivity id="Activity_0i7keo5" name="Підписати дані системним ключем" calledElement="system-signature-bp">
       <bpmn:extensionElements>

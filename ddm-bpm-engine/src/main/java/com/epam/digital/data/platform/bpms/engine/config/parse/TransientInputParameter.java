@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.core.variable.mapping.InputParameter;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
@@ -44,7 +45,7 @@ public class TransientInputParameter extends InputParameter {
     if (!(value instanceof TypedValue) || !((TypedValue) value).isTransient()) {
       innerScope.setVariableLocal(name, value);
     } else {
-      innerScope.setVariableLocalTransient(name, value);
+      innerScope.setVariableLocal(name, Variables.untypedValue(value, true));
     }
   }
 }

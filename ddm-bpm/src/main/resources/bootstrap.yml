@@ -1,14 +1,4 @@
 spring:
-  profiles: local, test
-  cloud:
-    kubernetes:
-      config:
-        enabled: false
-logging:
-  config: classpath:log4j2-local-console.xml
-
----
-spring:
   application:
     name: ddm-bpm
   cloud:
@@ -29,3 +19,14 @@ spring:
           - /app/secrets
 logging:
   config: classpath:log4j2-json-console.xml # stdout log streaming for fluentd
+
+---
+spring:
+  cloud:
+    kubernetes:
+      config:
+        enabled: false
+  profiles:
+    active: test, local
+logging:
+  config: classpath:log4j2-local-console.xml

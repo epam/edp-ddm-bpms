@@ -125,7 +125,7 @@ cephData['kopfg'] = slurper.parseText(kopfgResponse.responseBody.toString())
 cephData['premisesFile'] = [slurper.parseText(labResponse.responseBody.prop('premisesFile').toString())]
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))
+set_transient_variable('payload', S(cephData, 'application/json'))
 
 execution.setVariable('laboratoryId', labResponse.responseBody.prop('laboratoryId').value())</bpmn:script>
     </bpmn:scriptTask>

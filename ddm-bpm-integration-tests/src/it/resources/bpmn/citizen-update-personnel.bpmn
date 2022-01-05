@@ -119,7 +119,7 @@
       <bpmn:script>def signedFormData = submission('signUpdatedCitizenPersonnelFormActivity').formData
 
 var staffId = signedFormData.prop('staffId').stringValue()
-execution.setVariableLocalTransient('staffId', staffId)
+set_transient_variable('staffId', staffId)
 
 signedFormData.prop('staffStatusId', signedFormData.prop('staffStatus').prop('staffStatusId').value())
 signedFormData.deleteProp('staffStatus')
@@ -165,7 +165,7 @@ if (signedFormData.hasProp('hireStaffFile') &amp;&amp; !signedFormData.prop('hir
 }
 
 execution.removeVariable('dataPayload')
-execution.setVariableLocalTransient('dataPayload', signedFormData)</bpmn:script>
+set_transient_variable('dataPayload', signedFormData)</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:callActivity id="systemSignatureActivity" name="Підписати дані системним ключем" calledElement="system-signature-bp">
       <bpmn:extensionElements>
@@ -238,7 +238,7 @@ staffResponseBody.fieldNames().each {
 }
 
 execution.removeVariable('payload')
-execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))</bpmn:script>
+set_transient_variable('payload', S(cephData, 'application/json'))</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="batchReadResearchFromDataFactoryActivity" name="Отриммання об&#39;єкта досліджень" camunda:modelerTemplate="dataFactoryConnectorBatchReadDelegate" camunda:delegateExpression="${dataFactoryConnectorBatchReadDelegate}">
       <bpmn:extensionElements>
@@ -259,7 +259,7 @@ execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))<
         .map(objId -&gt; objId.value())
         .collect()
 
-        execution.setVariableLocalTransient("researchIds", researchesIds)</bpmn:script>
+        set_transient_variable("researchIds", researchesIds)</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="readStaffStatusFromDataFactoryActivity" name="Отримання об&#39;єкта статуса" camunda:modelerTemplate="dataFactoryConnectorReadDelegate" camunda:delegateExpression="${dataFactoryConnectorReadDelegate}">
       <bpmn:extensionElements>
