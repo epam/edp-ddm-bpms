@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import com.epam.digital.data.platform.dataaccessor.config.DataAccessorTestConfiguration;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -75,8 +76,8 @@ class SystemVariableBeanPostProcessorIT {
 
     clearInvocations(delegateExecution);
     validTransientVariable.on(delegateExecution).set(VARIABLE_VALUE);
-    verify(delegateExecution).setVariableLocalTransient(VALID_TRANSIENT_VARIABLE_NAME,
-        VARIABLE_VALUE);
+    verify(delegateExecution).setVariableLocal(VALID_TRANSIENT_VARIABLE_NAME,
+        Variables.untypedValue(VARIABLE_VALUE, true));
 
     clearInvocations(delegateExecution);
     validVariable.on(delegateExecution).setLocal(VARIABLE_VALUE);
@@ -84,8 +85,8 @@ class SystemVariableBeanPostProcessorIT {
 
     clearInvocations(delegateExecution);
     validTransientVariable.on(delegateExecution).setLocal(VARIABLE_VALUE);
-    verify(delegateExecution).setVariableLocalTransient(VALID_TRANSIENT_VARIABLE_NAME,
-        VARIABLE_VALUE);
+    verify(delegateExecution).setVariableLocal(VALID_TRANSIENT_VARIABLE_NAME,
+        Variables.untypedValue(VARIABLE_VALUE, true));
 
     clearInvocations(delegateExecution);
     validTransientVariable.on(delegateExecution).remove();

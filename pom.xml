@@ -7,12 +7,12 @@
   <parent>
     <groupId>com.epam.digital.data.platform</groupId>
     <artifactId>low-code-platform-parent</artifactId>
-    <version>1.2.0</version>
+    <version>1.5.1-SNAPSHOT</version>
     <relativePath/>
   </parent>
 
   <artifactId>ddm-bpm-parent</artifactId>
-  <version>1.5.6-SNAPSHOT</version>
+  <version>1.5.7-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -32,18 +32,18 @@
 
   <properties>
     <groovy.version>3.0.6</groovy.version>
-    <ddm-starter-actuator.version>1.4.0</ddm-starter-actuator.version>
-    <ddm-starter-error-handler.version>1.4.0</ddm-starter-error-handler.version>
+    <ddm-starter-actuator.version>1.5.1-SNAPSHOT</ddm-starter-actuator.version>
+    <ddm-starter-error-handler.version>1.5.1-SNAPSHOT</ddm-starter-error-handler.version>
     <ddm-starter-juel-function.version>1.5.4-SNAPSHOT</ddm-starter-juel-function.version>
-    <ddm-starter-localization.version>1.2.0</ddm-starter-localization.version>
-    <ddm-starter-logging.version>1.5.1-SNAPSHOT</ddm-starter-logging.version>
-    <ddm-starter-security.version>1.5.0-SNAPSHOT</ddm-starter-security.version>
-    <ddm-starter-trembita-integration.version>1.5.4-SNAPSHOT</ddm-starter-trembita-integration.version>
+    <ddm-starter-localization.version>1.5.1-SNAPSHOT</ddm-starter-localization.version>
+    <ddm-starter-logging.version>1.5.2-SNAPSHOT</ddm-starter-logging.version>
+    <ddm-starter-security.version>1.5.1-SNAPSHOT</ddm-starter-security.version>
+    <ddm-starter-trembita-integration.version>1.5.3-SNAPSHOT</ddm-starter-trembita-integration.version>
     <excerpt-model.version>1.4.0</excerpt-model.version>
     <p6spy-spring-boot-starter.version>1.7.1</p6spy-spring-boot-starter.version>
     <dso.version>1.4.5</dso.version>
-    <log4j.version>2.16.0</log4j.version>
-    <process-history-model.version>1.5.1-SNAPSHOT</process-history-model.version>
+    <log4j.version>2.17.0</log4j.version>
+    <process-history-model.version>1.5.0-SNAPSHOT</process-history-model.version>
 
     <deployable.module>ddm-bpm</deployable.module>
 
@@ -71,7 +71,13 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
+      <version>2.3.9.RELEASE</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>3.16.1</version>
     </dependency>
     <dependency>
       <groupId>com.epam.digital.data.platform</groupId>

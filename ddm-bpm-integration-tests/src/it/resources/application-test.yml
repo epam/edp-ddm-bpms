@@ -20,6 +20,9 @@ camunda:
   admin-user-id: camunda
   admin-group-id: camunda-admin
   bpm:
+    history-publisher:
+      kafka:
+        bootstrap: localhost:9092
     generic-properties:
       properties:
         enableHistoricInstancePermissions: true

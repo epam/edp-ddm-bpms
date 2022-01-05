@@ -42,11 +42,12 @@ public class TestCephConfig {
 
   @Bean
   @Primary
-  public TestCephServiceImpl cephService() {
+  public CephService cephService() {
     return new TestCephServiceImpl(cephBucketName, objectMapper);
   }
 
   @Bean
+  @Primary
   public FormDataRepository formDataRepository(CephService cephService) {
     return CephFormDataRepository.builder()
         .cephBucketName(cephBucketName)
@@ -56,6 +57,7 @@ public class TestCephConfig {
   }
 
   @Bean
+  @Primary
   public FormDataFileRepository formDataFileRepository(CephService cephService) {
     return CephFormDataFileRepository.builder()
         .cephBucketName(cephBucketName)
@@ -64,6 +66,7 @@ public class TestCephConfig {
   }
 
   @Bean
+  @Primary
   public FormDataStorageService formDataStorageService(FormDataRepository formDataRepository) {
     return FormDataStorageService.builder()
         .keyProvider(new FormDataKeyProviderImpl())
@@ -72,6 +75,7 @@ public class TestCephConfig {
   }
 
   @Bean
+  @Primary
   public FormDataFileStorageService formDataFileStorageService(
       FormDataFileRepository formDataFileRepository) {
     return FormDataFileStorageService.builder()

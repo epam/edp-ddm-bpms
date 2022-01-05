@@ -238,7 +238,7 @@
         cephData['laboratoryName'] = submission('searchLabFormActivity').formData.prop('laboratory').prop('name').value()
 
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', S(cephData, 'application/json'))
+        set_transient_variable('payload', S(cephData, 'application/json'))
 
         execution.setVariable('solutionDate', lastSolutionResponse.responseBody.elements()[0].prop('solutionDate').value())</bpmn:script>
     </bpmn:scriptTask>
@@ -273,10 +273,10 @@
 
         def payload = S(excerpt, 'application/json')
         execution.removeVariable('payload')
-        execution.setVariableLocalTransient('payload', payload)
+        set_transient_variable('payload', payload)
 
         execution.removeVariable('excerpt')
-        execution.setVariableLocalTransient('excerpt', excerpt)</bpmn:script>
+        set_transient_variable('excerpt', excerpt)</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:callActivity id="Activity_0ysz8c1" name="Підписати дані системним ключем" calledElement="system-signature-bp">
       <bpmn:extensionElements>

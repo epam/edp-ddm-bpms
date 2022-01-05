@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.epam.digital.data.platform</groupId>
     <artifactId>ddm-bpm-parent</artifactId>
-    <version>1.5.6-SNAPSHOT</version>
+    <version>1.5.7-SNAPSHOT</version>
   </parent>
 
   <artifactId>ddm-bpm</artifactId>
@@ -96,7 +96,7 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.cloud</groupId>
-      <artifactId>spring-cloud-starter-zipkin</artifactId>
+      <artifactId>spring-cloud-sleuth-zipkin</artifactId>
     </dependency>
     <dependency>
       <groupId>io.opentracing.brave</groupId>
@@ -125,8 +125,14 @@
     </dependency>
 
     <dependency>
-      <artifactId>spring-cloud-starter-kubernetes-config</artifactId>
       <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-kubernetes-client-config</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -339,17 +345,11 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <version>2.22.2</version>
-            <configuration>
-              <argLine>@{argLine} -Dspring.profiles.active=local</argLine>
-            </configuration>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <version>2.22.2</version>
-            <configuration>
-              <argLine>@{argLine} -Dspring.profiles.active=local</argLine>
-            </configuration>
           </plugin>
         </plugins>
       </build>
