@@ -16,10 +16,45 @@
 
 package com.epam.digital.data.platform.bpm.history;
 
+import com.epam.digital.data.platform.bpm.history.base.handler.LevelBasedHistoryEventHandlerWrapper;
+import com.epam.digital.data.platform.bpm.history.base.level.TypeBasedHistoryLevelEnum;
+import com.epam.digital.data.platform.bpm.history.base.plugin.ProcessHistoryEventHandlerPlugin;
+import java.util.List;
+import org.camunda.bpm.engine.impl.history.handler.CompositeHistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.handler.DbHistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
+/**
+ * Autoconfiguration class that creates a composite history event handler (with default history
+ * event handler and scanned custom {@link HistoryEventHandler HistoryEventHandlers}) and register
+ * it in Camunda context using {@link ProcessHistoryEventHandlerPlugin}
+ */
 @Configuration
 @ComponentScan
 public class DdmBpmHistoryAutoConfiguration {
+
+  @Bean
+  public ProcessHistoryEventHandlerPlugin processHistoryEventHandlerPlugin(
+      HistoryEventHandler handler) {
+    return new ProcessHistoryEventHandlerPlugin(handler);
+  }
+
+  @Bean
+  @Primary
+  public HistoryEventHandler historyEventHandler(List<HistoryEventHandler> historyEventHandlers) {
+    return new CompositeHistoryEventHandler(historyEventHandlers);
+  }
+
+  @Bean
+  public LevelBasedHistoryEventHandlerWrapper levelBasedHistoryEventHandlerWrapper(
+      @Value("${camunda.bpm.history.level:FULL}") String historyLevel) {
+    var level = TypeBasedHistoryLevelEnum.fromName(historyLevel);
+
+    return new LevelBasedHistoryEventHandlerWrapper(level, new DbHistoryEventHandler());
+  }
 }

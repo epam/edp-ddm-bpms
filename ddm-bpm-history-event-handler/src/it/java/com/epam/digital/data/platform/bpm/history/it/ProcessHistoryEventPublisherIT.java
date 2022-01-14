@@ -22,6 +22,7 @@ import com.epam.digital.data.platform.bpm.history.it.kafka.KafkaConsumer;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -47,6 +48,8 @@ class ProcessHistoryEventPublisherIT {
   private TaskService taskService;
   @Inject
   private IdentityService identityService;
+  @Inject
+  private HistoryService historyService;
 
   @Inject
   private KafkaConsumer kafkaConsumer;
@@ -104,5 +107,8 @@ class ProcessHistoryEventPublisherIT {
         .hasFieldOrProperty("startTime")
         .hasFieldOrProperty("endTime")
         .hasFieldOrPropertyWithValue("assignee", "testUser");
+
+    assertThat(historyService.createHistoricProcessInstanceQuery().list()).isEmpty();
+    assertThat(historyService.createHistoricTaskInstanceQuery().list()).isEmpty();
   }
 }
