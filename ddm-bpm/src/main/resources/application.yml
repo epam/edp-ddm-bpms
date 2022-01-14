@@ -8,6 +8,8 @@ camunda:
   admin-user-id: camunda
   admin-group-id: camunda-admin
   bpm:
+    history:
+      level: AUDIT
     generic-properties:
       properties:
         enable-historic-instance-permissions: true

@@ -58,11 +58,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-class ProcessHistoryEventHandlerTest {
+class ProcessPublisherHistoryEventHandlerTest {
 
   @Spy
   @InjectMocks
-  private ProcessHistoryEventHandler processHistoryEventHandler;
+  private ProcessPublisherHistoryEventHandler processPublisherHistoryEventHandler;
   @Mock
   private ProcessHistoryEventPublisher publisher;
   @Spy
@@ -81,11 +81,11 @@ class ProcessHistoryEventHandlerTest {
 
   @BeforeEach
   void setUp() {
-    ReflectionTestUtils.setField(processHistoryEventHandler, "camundaImpersonationFactory",
+    ReflectionTestUtils.setField(processPublisherHistoryEventHandler, "camundaImpersonationFactory",
         camundaImpersonationFactory);
-    ReflectionTestUtils.setField(processHistoryEventHandler, "repositoryService",
+    ReflectionTestUtils.setField(processPublisherHistoryEventHandler, "repositoryService",
         repositoryService);
-    ReflectionTestUtils.setField(processHistoryEventHandler, "historyMapper", historyMapper);
+    ReflectionTestUtils.setField(processPublisherHistoryEventHandler, "historyMapper", historyMapper);
     lenient().when(camundaImpersonationFactory.getCamundaImpersonation())
         .thenReturn(Optional.of(camundaImpersonation));
     lenient().doAnswer(invocation -> {
@@ -101,14 +101,14 @@ class ProcessHistoryEventHandlerTest {
 
   @Test
   void handleEvents() {
-    processHistoryEventHandler.handleEvents(null);
-    verify(processHistoryEventHandler, never()).handleEvent(any());
+    processPublisherHistoryEventHandler.handleEvents(null);
+    verify(processPublisherHistoryEventHandler, never()).handleEvent(any());
 
     var event1 = mock(HistoryEvent.class);
     var event2 = mock(HistoryEvent.class);
-    processHistoryEventHandler.handleEvents(List.of(event1, event2));
-    verify(processHistoryEventHandler).handleEvent(event1);
-    verify(processHistoryEventHandler).handleEvent(event2);
+    processPublisherHistoryEventHandler.handleEvents(List.of(event1, event2));
+    verify(processPublisherHistoryEventHandler).handleEvent(event1);
+    verify(processPublisherHistoryEventHandler).handleEvent(event2);
   }
 
   @Test
@@ -124,7 +124,7 @@ class ProcessHistoryEventHandlerTest {
     event.setStartUserId("startUserId");
     event.setState("state");
 
-    processHistoryEventHandler.handleEvent(event);
+    processPublisherHistoryEventHandler.handleEvent(event);
 
     verify(publisher).put(historyProcessArgumentCaptor.capture());
 
@@ -155,7 +155,7 @@ class ProcessHistoryEventHandlerTest {
     event.setStartUserId("startUserId");
     event.setState("state");
 
-    processHistoryEventHandler.handleEvent(event);
+    processPublisherHistoryEventHandler.handleEvent(event);
 
     verify(publisher).patch(historyProcessArgumentCaptor.capture());
 
@@ -178,7 +178,7 @@ class ProcessHistoryEventHandlerTest {
     var nonSystemVarEvent = new HistoricVariableUpdateEventEntity();
     nonSystemVarEvent.setVariableName("nonSystemName");
 
-    processHistoryEventHandler.handleEvent(nonSystemVarEvent);
+    processPublisherHistoryEventHandler.handleEvent(nonSystemVarEvent);
 
     verify(publisher, never()).put(any(HistoryProcess.class));
     verify(publisher, never()).patch(any(HistoryProcess.class));
@@ -194,7 +194,7 @@ class ProcessHistoryEventHandlerTest {
     processCompletionResult.setTextValue("process completed for a reason");
     processCompletionResult.setEventType(HistoryEventTypes.VARIABLE_INSTANCE_DELETE.getEventName());
 
-    processHistoryEventHandler.handleEvent(processCompletionResult);
+    processPublisherHistoryEventHandler.handleEvent(processCompletionResult);
 
     verify(publisher, never()).put(any(HistoryProcess.class));
     verify(publisher, never()).patch(any(HistoryProcess.class));
@@ -210,7 +210,7 @@ class ProcessHistoryEventHandlerTest {
     processCompletionResult.setTextValue("process completed for a reason");
     processCompletionResult.setEventType(HistoryEventTypes.VARIABLE_INSTANCE_CREATE.getEventName());
 
-    processHistoryEventHandler.handleEvent(processCompletionResult);
+    processPublisherHistoryEventHandler.handleEvent(processCompletionResult);
     verify(publisher).patch(historyProcessArgumentCaptor.capture());
     var processCompletionValue = historyProcessArgumentCaptor.getValue();
     assertThat(processCompletionValue)
@@ -226,7 +226,7 @@ class ProcessHistoryEventHandlerTest {
     excerptId.setTextValue("excerpt");
     excerptId.setEventType(HistoryEventTypes.VARIABLE_INSTANCE_CREATE.getEventName());
 
-    processHistoryEventHandler.handleEvent(excerptId);
+    processPublisherHistoryEventHandler.handleEvent(excerptId);
     verify(publisher).patch(historyProcessArgumentCaptor.capture());
     var excerptValue = historyProcessArgumentCaptor.getValue();
     assertThat(excerptValue)
@@ -249,7 +249,7 @@ class ProcessHistoryEventHandlerTest {
         Date.from(LocalDateTime.of(2021, 12, 10, 18, 18).toInstant(ZoneOffset.UTC)));
     taskEvent.setAssignee("assignee");
 
-    processHistoryEventHandler.handleEvent(taskEvent);
+    processPublisherHistoryEventHandler.handleEvent(taskEvent);
     verify(publisher).put(historyTaskArgumentCaptor.capture());
     var value = historyTaskArgumentCaptor.getValue();
     assertThat(value)
@@ -281,7 +281,7 @@ class ProcessHistoryEventHandlerTest {
         Date.from(LocalDateTime.of(2021, 12, 10, 18, 22).toInstant(ZoneOffset.UTC)));
     taskEvent.setAssignee("assignee");
 
-    processHistoryEventHandler.handleEvent(taskEvent);
+    processPublisherHistoryEventHandler.handleEvent(taskEvent);
     verify(publisher).patch(historyTaskArgumentCaptor.capture());
     var value = historyTaskArgumentCaptor.getValue();
     assertThat(value)
@@ -315,7 +315,7 @@ class ProcessHistoryEventHandlerTest {
         Date.from(LocalDateTime.of(2021, 12, 10, 18, 22).toInstant(ZoneOffset.UTC)));
     taskEvent.setAssignee("assignee");
 
-    processHistoryEventHandler.handleEvent(taskEvent);
+    processPublisherHistoryEventHandler.handleEvent(taskEvent);
     verify(publisher).patch(historyTaskArgumentCaptor.capture());
     var value = historyTaskArgumentCaptor.getValue();
     assertThat(value)

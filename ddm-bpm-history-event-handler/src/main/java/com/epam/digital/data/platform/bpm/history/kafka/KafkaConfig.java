@@ -16,7 +16,7 @@
 
 package com.epam.digital.data.platform.bpm.history.kafka;
 
-import com.epam.digital.data.platform.bpm.history.base.handler.ProcessHistoryEventHandler;
+import com.epam.digital.data.platform.bpm.history.base.handler.ProcessPublisherHistoryEventHandler;
 import com.epam.digital.data.platform.bpm.history.base.publisher.ProcessHistoryEventPublisher;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +38,7 @@ import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
 /**
- * Class that configures an instance of {@link ProcessHistoryEventHandler} that is used {@link
+ * Class that configures an instance of {@link ProcessPublisherHistoryEventHandler} that is used {@link
  * ProcessHistoryEventKafkaPublisher Kafka implementation} of the {@link
  * ProcessHistoryEventPublisher}
  */
@@ -96,8 +96,8 @@ public class KafkaConfig {
 
   @Bean
   @Qualifier("kafkaProcessHistoryHandler")
-  public ProcessHistoryEventHandler kafkaHandler(
+  public ProcessPublisherHistoryEventHandler kafkaHandler(
       @Qualifier("kafkaPublisher") ProcessHistoryEventPublisher publisher) {
-    return new ProcessHistoryEventHandler(publisher);
+    return new ProcessPublisherHistoryEventHandler(publisher);
   }
 }

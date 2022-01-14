@@ -1,6 +1,7 @@
 camunda:
   bpm:
-    history-level: AUDIT
+    history:
+      level: NONE
     history-publisher:
       kafka:
         enabled: true
