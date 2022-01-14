@@ -41,7 +41,7 @@ import org.springframework.context.annotation.Lazy;
  * using {@link ProcessHistoryEventPublisher}
  */
 @RequiredArgsConstructor
-public class ProcessHistoryEventHandler implements HistoryEventHandler {
+public class ProcessPublisherHistoryEventHandler implements HistoryEventHandler {
 
   private final ProcessHistoryEventPublisher publisher;
 
@@ -57,7 +57,7 @@ public class ProcessHistoryEventHandler implements HistoryEventHandler {
    * Handle list of fired {@link HistoryEvent}
    *
    * @param historyEvents the {@link HistoryEvent} list that is about to be fired
-   * @see ProcessHistoryEventHandler#handleEvent(HistoryEvent)
+   * @see ProcessPublisherHistoryEventHandler#handleEvent(HistoryEvent)
    */
   @Override
   public void handleEvents(List<HistoryEvent> historyEvents) {
@@ -70,9 +70,9 @@ public class ProcessHistoryEventHandler implements HistoryEventHandler {
    * Handle fired {@link HistoryEvent}
    *
    * @param historyEvent the {@link HistoryEvent} that is about to be fired
-   * @see ProcessHistoryEventHandler#handleProcessInstanceEvent(HistoricProcessInstanceEventEntity)
-   * @see ProcessHistoryEventHandler#handleVariableUpdateEvent(HistoricVariableUpdateEventEntity)
-   * @see ProcessHistoryEventHandler#handleHistoricTaskEvent(HistoricTaskInstanceEventEntity)
+   * @see ProcessPublisherHistoryEventHandler#handleProcessInstanceEvent(HistoricProcessInstanceEventEntity)
+   * @see ProcessPublisherHistoryEventHandler#handleVariableUpdateEvent(HistoricVariableUpdateEventEntity)
+   * @see ProcessPublisherHistoryEventHandler#handleHistoricTaskEvent(HistoricTaskInstanceEventEntity)
    */
   @Override
   public void handleEvent(HistoryEvent historyEvent) {
