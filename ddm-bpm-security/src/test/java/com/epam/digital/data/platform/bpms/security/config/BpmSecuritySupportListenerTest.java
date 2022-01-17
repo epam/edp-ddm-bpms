@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,6 +52,8 @@ public class BpmSecuritySupportListenerTest {
   private CompleterTaskEventListener completerTaskEventListener;
   @Mock
   private TaskDefinition taskDefinition;
+  @Mock
+  private ProcessDefinitionImpl processDefinition;
 
   private BpmSecuritySupportListener bpmSupportListener;
 
@@ -74,10 +77,10 @@ public class BpmSecuritySupportListenerTest {
 
   @Test
   public void shouldAddStartEventListeners() {
-    bpmSupportListener.parseStartEvent(null, null, activity);
+    bpmSupportListener.parseStartEvent(null, processDefinition, activity);
 
     ArgumentCaptor<ExecutionListener> captor = ArgumentCaptor.forClass(ExecutionListener.class);
     verify(activity, times(2))
-        .addListener(eq(ExecutionListener.EVENTNAME_START), captor.capture());
+        .addBuiltInListener(eq(ExecutionListener.EVENTNAME_START), captor.capture());
   }
 }

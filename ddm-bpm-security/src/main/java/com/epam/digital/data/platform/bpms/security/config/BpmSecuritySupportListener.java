@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.springframework.stereotype.Component;
@@ -44,10 +45,12 @@ public class BpmSecuritySupportListener extends AbstractBpmnParseListener {
   @Override
   public void parseStartEvent(Element startEventElement, ScopeImpl scope,
       ActivityImpl startEventActivity) {
-    startEventActivity.addListener(ExecutionListener.EVENTNAME_START,
-        authorizationStartEventListener);
-    startEventActivity.addListener(ExecutionListener.EVENTNAME_START,
-        initiatorTokenStartEventListener);
+    if (scope instanceof ProcessDefinitionImpl) {
+      startEventActivity.addBuiltInListener(ExecutionListener.EVENTNAME_START,
+          authorizationStartEventListener);
+      startEventActivity.addBuiltInListener(ExecutionListener.EVENTNAME_START,
+          initiatorTokenStartEventListener);
+    }
   }
 
   @Override
