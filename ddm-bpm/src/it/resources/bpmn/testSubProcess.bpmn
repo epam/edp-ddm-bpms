@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_17u153q" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.11.1">
+  <bpmn:process id="testSubProcessKey" name="Test sub process" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="start" camunda:initiator="initiator">
+      <bpmn:outgoing>Flow_0p03v6e</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0p03v6e" sourceRef="StartEvent_1" targetRef="rootUserTaskProcessActivity" />
+    <bpmn:userTask id="rootUserTaskProcessActivity" name="User task" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="first-user-form" camunda:assignee="${initiator}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="userTaskInputFormDataPrepopulate" />
+        </camunda:inputOutput>
+        <camunda:properties>
+          <camunda:property name="formVariables" value="" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0p03v6e</bpmn:incoming>
+      <bpmn:outgoing>Flow_0h5k05o</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:subProcess id="Activity_19i9vz4">
+      <bpmn:incoming>Flow_0h5k05o</bpmn:incoming>
+      <bpmn:outgoing>Flow_0gk7gob</bpmn:outgoing>
+      <bpmn:startEvent id="Event_1m9feli" name="st">
+        <bpmn:outgoing>Flow_1yki07a</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:userTask id="subProcessUserTaskActivity" name="Sub Process task" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="second-user-form" camunda:assignee="${initiator}">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="userTaskInputFormDataPrepopulate" />
+          </camunda:inputOutput>
+          <camunda:properties>
+            <camunda:property name="formVariables" value="" />
+          </camunda:properties>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_1yki07a</bpmn:incoming>
+        <bpmn:outgoing>Flow_0ci9dj4</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:sequenceFlow id="Flow_1yki07a" sourceRef="Event_1m9feli" targetRef="subProcessUserTaskActivity" />
+      <bpmn:endEvent id="Event_1dcp6cl" name="fin">
+        <bpmn:incoming>Flow_0ci9dj4</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_0ci9dj4" sourceRef="subProcessUserTaskActivity" targetRef="Event_1dcp6cl" />
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_0h5k05o" sourceRef="rootUserTaskProcessActivity" targetRef="Activity_19i9vz4" />
+    <bpmn:sequenceFlow id="Flow_0gk7gob" sourceRef="Activity_19i9vz4" targetRef="Event_07xyhj1" />
+    <bpmn:endEvent id="Event_07xyhj1" name="end">
+      <bpmn:incoming>Flow_0gk7gob</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testSubProcessKey">
+      <bpmndi:BPMNEdge id="Flow_0gk7gob_di" bpmnElement="Flow_0gk7gob">
+        <di:waypoint x="710" y="177" />
+        <di:waypoint x="762" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0h5k05o_di" bpmnElement="Flow_0h5k05o">
+        <di:waypoint x="340" y="177" />
+        <di:waypoint x="390" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0p03v6e_di" bpmnElement="Flow_0p03v6e">
+        <di:waypoint x="188" y="177" />
+        <di:waypoint x="240" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_045rvoe_di" bpmnElement="rootUserTaskProcessActivity">
+        <dc:Bounds x="240" y="137" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="159" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="159" y="202" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_07xyhj1_di" bpmnElement="Event_07xyhj1">
+        <dc:Bounds x="762" y="159" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="771" y="202" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_19i9vz4_di" bpmnElement="Activity_19i9vz4" isExpanded="true">
+        <dc:Bounds x="390" y="77" width="320" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0ci9dj4_di" bpmnElement="Flow_0ci9dj4">
+        <di:waypoint x="600" y="177" />
+        <di:waypoint x="632" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1yki07a_di" bpmnElement="Flow_1yki07a">
+        <di:waypoint x="466" y="177" />
+        <di:waypoint x="500" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1m9feli_di" bpmnElement="Event_1m9feli">
+        <dc:Bounds x="430" y="159" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="443" y="202" width="10" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_089yit5_di" bpmnElement="subProcessUserTaskActivity">
+        <dc:Bounds x="500" y="137" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1dcp6cl_di" bpmnElement="Event_1dcp6cl">
+        <dc:Bounds x="632" y="159" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="644" y="202" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.springframework.stereotype.Component;
@@ -50,7 +51,9 @@ public class StorageBpmnParseListener extends AbstractBpmnParseListener {
 
   @Override
   public void parseEndEvent(Element endEventElement, ScopeImpl scope, ActivityImpl endActivity) {
-    endActivity.addListener(ExecutionListener.EVENTNAME_END, fileCleanerEndEventListener);
-    endActivity.addListener(ExecutionListener.EVENTNAME_END, formDataCleanerEndEventListener);
+    if (scope instanceof ProcessDefinitionImpl) {
+      endActivity.addBuiltInListener(ExecutionListener.EVENTNAME_END, fileCleanerEndEventListener);
+      endActivity.addBuiltInListener(ExecutionListener.EVENTNAME_END, formDataCleanerEndEventListener);
+    }
   }
 }

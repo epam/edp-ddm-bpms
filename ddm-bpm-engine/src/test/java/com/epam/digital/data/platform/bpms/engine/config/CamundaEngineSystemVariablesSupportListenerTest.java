@@ -31,6 +31,7 @@ import org.assertj.core.util.Maps;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -50,6 +51,8 @@ class CamundaEngineSystemVariablesSupportListenerTest {
   private VariableAccessorFactory variableAccessorFactory;
   @Mock
   private ProcessStartTimeVariable processStartTimeVariable;
+  @Mock
+  private ProcessDefinitionImpl processDefinition;
 
   @Captor
   private ArgumentCaptor<ExecutionListener> executionListenerArgumentCaptor;
@@ -69,9 +72,9 @@ class CamundaEngineSystemVariablesSupportListenerTest {
     when(processStartTimeVariable.on(delegateExecution)).thenReturn(startTimeAccessor);
 
     var activity = mock(ActivityImpl.class);
-    camundaSystemVariablesSupportListener.parseStartEvent(null, null, activity);
+    camundaSystemVariablesSupportListener.parseStartEvent(null, processDefinition, activity);
 
-    verify(activity).addListener(eq(ExecutionListener.EVENTNAME_START),
+    verify(activity).addBuiltInListener(eq(ExecutionListener.EVENTNAME_START),
         executionListenerArgumentCaptor.capture());
     var executionListener = executionListenerArgumentCaptor.getValue();
     assertThat(executionListener).isNotNull();
