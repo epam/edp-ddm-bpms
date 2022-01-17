@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.springframework.stereotype.Component;
@@ -44,12 +45,14 @@ public class CamundaEngineSystemVariablesSupportListener extends AbstractBpmnPar
   @Override
   public void parseStartEvent(Element startEventElement, ScopeImpl scope,
       ActivityImpl startEventActivity) {
-    startEventActivity.addListener(ExecutionListener.EVENTNAME_START,
-        (ExecutionListener) execution -> {
-          var variableAccessor = variableAccessorFactory.from(execution);
-          systemProperties.getSystemVariables().forEach(variableAccessor::setVariable);
+    if (scope instanceof ProcessDefinitionImpl) {
+      startEventActivity.addBuiltInListener(ExecutionListener.EVENTNAME_START,
+          (ExecutionListener) execution -> {
+            var variableAccessor = variableAccessorFactory.from(execution);
+            systemProperties.getSystemVariables().forEach(variableAccessor::setVariable);
 
-          processStartTimeVariable.on(execution).set(LocalDateTime.now(ZoneOffset.UTC));
-        });
+            processStartTimeVariable.on(execution).set(LocalDateTime.now(ZoneOffset.UTC));
+          });
+    }
   }
 }
