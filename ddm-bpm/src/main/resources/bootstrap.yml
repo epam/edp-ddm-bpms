@@ -22,11 +22,12 @@ logging:
 
 ---
 spring:
+  config:
+    activate:
+      on-profile: test, local
   cloud:
     kubernetes:
       config:
         enabled: false
-  profiles:
-    active: test, local
 logging:
   config: classpath:log4j2-local-console.xml
