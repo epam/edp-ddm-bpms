@@ -34,7 +34,7 @@
     <groovy.version>3.0.6</groovy.version>
     <ddm-starter-actuator.version>1.5.1-SNAPSHOT</ddm-starter-actuator.version>
     <ddm-starter-error-handler.version>1.5.1-SNAPSHOT</ddm-starter-error-handler.version>
-    <ddm-starter-juel-function.version>1.5.4-SNAPSHOT</ddm-starter-juel-function.version>
+    <ddm-starter-juel-function.version>1.5.5-SNAPSHOT</ddm-starter-juel-function.version>
     <ddm-starter-localization.version>1.5.1-SNAPSHOT</ddm-starter-localization.version>
     <ddm-starter-logging.version>1.5.2-SNAPSHOT</ddm-starter-logging.version>
     <ddm-starter-security.version>1.5.1-SNAPSHOT</ddm-starter-security.version>
