@@ -22,6 +22,7 @@ import com.epam.digital.data.platform.starter.security.SystemRole;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.ByteStreams;
+import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import java.io.IOException;
 import java.util.stream.Stream;
 import javax.inject.Inject;
@@ -53,6 +54,7 @@ import org.springframework.util.CollectionUtils;
 @ActiveProfiles("test")
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@AutoConfigureEmbeddedDatabase(provider = AutoConfigureEmbeddedDatabase.DatabaseProvider.ZONKY)
 public abstract class BaseIT {
 
   protected final String TOKEN_HEADER = "x-access-token";

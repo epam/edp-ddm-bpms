@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.epam.digital.data.platform.bpms.engine.it;
+package com.epam.digital.data.platform.bpms.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.epam.digital.data.platform.bpms.engine.manager.DdmAuthorizationManager;
-import com.epam.digital.data.platform.bpms.engine.manager.factory.DdmAuthorizationManagerFactory;
+import com.epam.digital.data.platform.bpms.security.manager.DdmAuthorizationManager;
+import com.epam.digital.data.platform.bpms.security.manager.factory.DdmAuthorizationManagerFactory;
 import java.util.List;
 import javax.inject.Inject;
 import org.camunda.bpm.engine.impl.context.Context;

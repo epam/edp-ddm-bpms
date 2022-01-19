@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.epam.digital.data.platform.bpms.engine.manager.factory;
+package com.epam.digital.data.platform.bpms.security.manager.factory;
 
-import com.epam.digital.data.platform.bpms.engine.config.CamundaRegistryRoles;
-import com.epam.digital.data.platform.bpms.engine.manager.DdmAuthorizationManager;
+import com.epam.digital.data.platform.bpms.security.config.CamundaRegistryRoles;
+import com.epam.digital.data.platform.bpms.security.manager.DdmAuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;

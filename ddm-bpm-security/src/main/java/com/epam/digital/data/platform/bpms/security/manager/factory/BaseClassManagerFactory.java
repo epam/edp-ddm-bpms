@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.epam.digital.data.platform.bpms.engine.manager.factory;
+package com.epam.digital.data.platform.bpms.security.manager.factory;
 
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
