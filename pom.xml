@@ -43,7 +43,7 @@
     <p6spy-spring-boot-starter.version>1.7.1</p6spy-spring-boot-starter.version>
     <dso.version>1.4.5</dso.version>
     <log4j.version>2.17.0</log4j.version>
-    <process-history-model.version>1.5.0-SNAPSHOT</process-history-model.version>
+    <process-history-model.version>1.5.1-SNAPSHOT</process-history-model.version>
 
     <deployable.module>ddm-bpm</deployable.module>
 
