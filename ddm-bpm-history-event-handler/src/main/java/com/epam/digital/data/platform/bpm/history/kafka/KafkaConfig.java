@@ -20,6 +20,8 @@ import com.epam.digital.data.platform.bpm.history.base.handler.ProcessHistoryEve
 import com.epam.digital.data.platform.bpm.history.base.publisher.ProcessHistoryEventPublisher;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
+
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -70,7 +72,11 @@ public class KafkaConfig {
   }
 
   @Bean
-  public AdminClient kafkaAdminClient() {
+  public Supplier<AdminClient> adminClientFactory() {
+    return this::kafkaAdminClient;
+  }
+
+  private AdminClient kafkaAdminClient() {
     Map<String, Object> props = new HashMap<>();
     props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrap());
     return AdminClient.create(props);
@@ -78,8 +84,8 @@ public class KafkaConfig {
 
   @Bean
   public StartupHistoryProcessKafkaTopicCreator startupHistoryProcessKafkaTopicCreator(
-      AdminClient adminClient) {
-    return new StartupHistoryProcessKafkaTopicCreator(adminClient, kafkaProperties);
+      Supplier<AdminClient> adminClientFactory) {
+    return new StartupHistoryProcessKafkaTopicCreator(adminClientFactory, kafkaProperties);
   }
 
   @Bean
