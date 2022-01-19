@@ -1,11 +1,6 @@
 spring:
   jersey:
     application-path: api
-  datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
-    username: bpms
-    password: password
 
 camunda:
   admin-user-id: camunda
@@ -19,3 +14,15 @@ camunda:
     admin-user:
       id: ${camunda.admin-user-id}
       password: camunda
+
+registry-regulation:
+  officer:
+    roles:
+      - name: officer
+        description: 'Officer role'
+      - name: head-officer
+        description: 'Head officer role'
+      - name: task-dispatcher
+        description: 'Task dispatcher role'
+  citizen:
+    roles: [ ]

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.epam.digital.data.platform.bpms.engine.manager;
+package com.epam.digital.data.platform.bpms.security.manager;
 
 import java.util.Set;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;

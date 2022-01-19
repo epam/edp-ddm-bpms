@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.epam.digital.data.platform.bpms.engine.config;
+package com.epam.digital.data.platform.bpms.security.config;
 
 import com.epam.digital.data.platform.starter.security.SystemRole;
 import com.epam.digital.data.platform.starter.security.dto.enums.KeycloakPlatformRole;
