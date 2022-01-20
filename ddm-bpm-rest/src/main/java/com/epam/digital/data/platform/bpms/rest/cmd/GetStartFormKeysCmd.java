@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.epam.digital.data.platform.bpms.engine.cmd;
+package com.epam.digital.data.platform.bpms.rest.cmd;
 
 import java.util.Collections;
 import java.util.Map;
