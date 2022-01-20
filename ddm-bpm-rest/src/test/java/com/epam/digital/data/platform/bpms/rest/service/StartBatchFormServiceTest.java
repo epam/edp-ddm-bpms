@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.epam.digital.data.platform.bpms.engine.service;
+package com.epam.digital.data.platform.bpms.rest.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import com.epam.digital.data.platform.bpms.engine.cmd.GetStartFormKeysCmd;
+import com.epam.digital.data.platform.bpms.rest.cmd.GetStartFormKeysCmd;
 import java.util.Map;
 import java.util.Set;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -33,7 +33,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class StartBatchFormServiceTest {
 
   @InjectMocks
-  private BatchFormServiceImpl batchFormService;
+  private BatchFormService batchFormService;
   @Mock
   private CommandExecutor commandExecutor;
 

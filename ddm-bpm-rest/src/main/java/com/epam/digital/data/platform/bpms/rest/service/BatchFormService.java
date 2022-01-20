@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package com.epam.digital.data.platform.bpms.engine.service;
+package com.epam.digital.data.platform.bpms.rest.service;
 
+import com.epam.digital.data.platform.bpms.rest.cmd.GetStartFormKeysCmd;
 import java.util.Map;
 import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.impl.ServiceImpl;
+import org.springframework.stereotype.Component;
 
 /**
  * The service for managing form keys.
  */
-public interface BatchFormService {
+@Slf4j
+@Component
+public class BatchFormService extends ServiceImpl {
 
   /**
    * Get start form keys by provided process definition ids.
@@ -30,6 +36,10 @@ public interface BatchFormService {
    * @param processDefinitionIds specified process definition ids.
    * @return grouped start form keys by process definition ids.
    */
-  Map<String, String> getStartFormKeys(Set<String> processDefinitionIds);
-
+  public Map<String, String> getStartFormKeys(Set<String> processDefinitionIds) {
+    log.info("Getting start form map for process definitions - {}", processDefinitionIds);
+    var result = commandExecutor.execute(new GetStartFormKeysCmd(processDefinitionIds));
+    log.info("Found {} start forms", result.size());
+    return result;
+  }
 }

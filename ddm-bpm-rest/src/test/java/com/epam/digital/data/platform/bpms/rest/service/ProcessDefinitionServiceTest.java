@@ -22,7 +22,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.epam.digital.data.platform.bpms.api.dto.DdmProcessDefinitionDto;
-import com.epam.digital.data.platform.bpms.engine.service.BatchFormService;
 import com.epam.digital.data.platform.bpms.rest.mapper.ProcessDefinitionMapper;
 import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessDefinitionRepositoryService;
 import java.util.List;
