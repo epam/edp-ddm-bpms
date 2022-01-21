@@ -1,7 +1,6 @@
 camunda:
   bpm:
-    history:
-      level: NONE
+    database-history-level: NONE
     history-publisher:
       kafka:
         enabled: true
