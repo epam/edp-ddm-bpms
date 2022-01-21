@@ -52,7 +52,7 @@ public class DdmBpmHistoryAutoConfiguration {
 
   @Bean
   public LevelBasedHistoryEventHandlerWrapper levelBasedHistoryEventHandlerWrapper(
-      @Value("${camunda.bpm.history.level:FULL}") String historyLevel) {
+      @Value("${camunda.bpm.database-history-level:FULL}") String historyLevel) {
     var level = TypeBasedHistoryLevelEnum.fromName(historyLevel);
 
     return new LevelBasedHistoryEventHandlerWrapper(level, new DbHistoryEventHandler());
