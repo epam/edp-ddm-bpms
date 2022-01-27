@@ -18,10 +18,13 @@ package com.epam.digital.data.platform.bpms.extension.config;
 
 import com.epam.digital.data.platform.bpms.extension.service.KeycloakClientService;
 import com.epam.digital.data.platform.bpms.extension.service.KeycloakClientServiceImpl;
-import org.keycloak.OAuth2Constants;
-import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.KeycloakBuilder;
+import com.epam.digital.data.platform.integration.idm.client.KeycloakAdminClient;
+import com.epam.digital.data.platform.integration.idm.dto.KeycloakClientProperties;
+import com.epam.digital.data.platform.integration.idm.factory.IdmClientFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,49 +38,42 @@ public class KeycloakClientConfig {
 
   @Value("${keycloak.url}")
   private String serverUrl;
-  @Value("${keycloak.citizen.realm}")
-  private String citizenRealm;
-  @Value("${keycloak.citizen.client-id}")
-  private String citizenClientId;
-  @Value("${keycloak.citizen.client-secret}")
-  private String citizenClientSecret;
-  @Value("${keycloak.officer.realm}")
-  private String officerRealm;
-  @Value("${keycloak.officer.client-id}")
-  private String officerClientId;
-  @Value("${keycloak.officer.client-secret}")
-  private String officerClientSecret;
 
-
-  @Bean("citizen-keycloak-client")
-  public Keycloak citizenKeycloak() {
-    return KeycloakBuilder.builder()
-        .serverUrl(serverUrl)
-        .realm(citizenRealm)
-        .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-        .clientId(citizenClientId)
-        .clientSecret(citizenClientSecret)
-        .build();
+  @Bean
+  public IdmClientFactory idmClientFactory() {
+    return new IdmClientFactory();
   }
 
-  @Bean("officer-keycloak-client")
-  public Keycloak officerKeycloak() {
-    return KeycloakBuilder.builder()
-        .serverUrl(serverUrl)
-        .realm(officerRealm)
-        .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-        .clientId(officerClientId)
-        .clientSecret(officerClientSecret)
-        .build();
+  @Bean
+  @ConditionalOnProperty(prefix = "keycloak.officer", value = "realm")
+  @ConfigurationProperties(prefix = "keycloak.officer")
+  public KeycloakClientProperties officerRealmProperties() {
+    return new KeycloakClientProperties();
   }
 
-  @Bean("citizen-keycloak-service")
-  public KeycloakClientService citizenKeycloakService() {
-    return new KeycloakClientServiceImpl(citizenRealm, citizenKeycloak());
+  @Bean
+  @ConditionalOnProperty(prefix = "keycloak.citizen", name = "realm")
+  @ConfigurationProperties(prefix = "keycloak.citizen")
+  public KeycloakClientProperties citizenRealmProperties() {
+    return new KeycloakClientProperties();
   }
 
-  @Bean("officer-keycloak-service")
-  public KeycloakClientService officerKeycloakService() {
-    return new KeycloakClientServiceImpl(officerRealm, officerKeycloak());
+  @Bean("officer-keycloak-admin-client")
+  @ConditionalOnBean(name = "officerRealmProperties")
+  public KeycloakAdminClient officerKeycloakAdminClient(IdmClientFactory idmClientFactory,
+      KeycloakClientProperties officerRealmProperties) {
+    return idmClientFactory.keycloakAdminClient(serverUrl, officerRealmProperties);
+  }
+
+  @Bean("citizen-keycloak-admin-client")
+  @ConditionalOnBean(name = "citizenRealmProperties")
+  public KeycloakAdminClient citizenKeycloakAdminClient(IdmClientFactory idmClientFactory,
+      KeycloakClientProperties citizenRealmProperties) {
+    return idmClientFactory.keycloakAdminClient(serverUrl, citizenRealmProperties);
+  }
+
+  @Bean
+  public KeycloakClientService keycloakClientService() {
+    return new KeycloakClientServiceImpl();
   }
 }

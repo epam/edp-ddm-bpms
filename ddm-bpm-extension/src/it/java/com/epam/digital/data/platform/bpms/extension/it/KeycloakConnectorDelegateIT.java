@@ -31,7 +31,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 
-import com.epam.digital.data.platform.bpms.extension.exception.KeycloakException;
+import com.epam.digital.data.platform.integration.idm.exception.KeycloakException;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.junit.Test;
@@ -103,7 +103,7 @@ public class KeycloakConnectorDelegateIT extends BaseIT {
         .startProcessInstanceByKey("testAddRoleKeycloak_key"));
 
     assertThat(ex).isNotNull();
-    assertThat(ex.getMessage()).isEqualTo("Found 0 users with name testuser in realm citizen-realm, but expect one");
+    assertThat(ex.getMessage()).isEqualTo("Found 0 users with name testuser, but expect one");
   }
 
   @Test

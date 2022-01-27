@@ -20,6 +20,7 @@ import com.epam.digital.data.platform.bpms.extension.delegate.dto.KeycloakUserDt
 import com.epam.digital.data.platform.bpms.extension.service.KeycloakClientService;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
+import com.epam.digital.data.platform.integration.idm.client.KeycloakAdminClient;
 import java.util.List;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -43,16 +44,17 @@ public class KeycloakGetOfficerUsersConnectorDelegate extends BaseKeycloakOffice
   private NamedVariableAccessor<List<KeycloakUserDto>> usersByRoleVariable;
 
   public KeycloakGetOfficerUsersConnectorDelegate(
-      @Qualifier("officer-keycloak-service") KeycloakClientService keycloakClientService) {
-    super(keycloakClientService);
+      @Qualifier("officer-keycloak-admin-client") KeycloakAdminClient keycloakAdminClient,
+      KeycloakClientService keycloakClientService) {
+    super(keycloakAdminClient, keycloakClientService);
   }
 
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
     var role = roleNameVariable.from(execution).getOrDefault(DEFAULT_ROLE);
 
-    var realmResource = keycloakClientService.getRealmResource();
-    var roleUserMembers = keycloakClientService.getRoleUserMembers(realmResource, role);
+    var roleUserMembers = keycloakClientService.getRoleUserMembers(officerKeycloakAdminClient,
+        role);
 
     usersByRoleVariable.on(execution).set(roleUserMembers);
   }
