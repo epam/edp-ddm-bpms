@@ -19,6 +19,7 @@ package com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloa
 import com.epam.digital.data.platform.bpms.extension.service.KeycloakClientService;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
+import com.epam.digital.data.platform.integration.idm.client.KeycloakAdminClient;
 import com.epam.digital.data.platform.starter.security.dto.enums.KeycloakPlatformRole;
 import java.util.List;
 import java.util.function.Predicate;
@@ -44,14 +45,14 @@ public class KeycloakGetCitizenRolesConnectorDelegate extends BaseKeycloakCitize
   private NamedVariableAccessor<List<String>> rolesVariable;
 
   public KeycloakGetCitizenRolesConnectorDelegate(
-      @Qualifier("citizen-keycloak-service") KeycloakClientService keycloakClientService) {
-    super(keycloakClientService);
+      @Qualifier("citizen-keycloak-admin-client")KeycloakAdminClient citizenKeycloakAdminClient,
+      KeycloakClientService keycloakClientService) {
+    super(citizenKeycloakAdminClient, keycloakClientService);
   }
 
   @Override
   public void executeInternal(DelegateExecution execution) {
-    var realmResource = keycloakClientService.getRealmResource();
-    var keycloakRoles = keycloakClientService.getKeycloakRoles(realmResource);
+    var keycloakRoles = keycloakClientService.getKeycloakRoles(citizenKeycloakAdminClient);
     log.debug("Start filtering keycloak roles {}", keycloakRoles);
     var regulationsRoles = keycloakRoles.stream()
         .map(RoleRepresentation::getName)

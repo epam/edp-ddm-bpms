@@ -18,10 +18,12 @@ package com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloa
 
 import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.bpms.extension.service.KeycloakClientService;
+import com.epam.digital.data.platform.integration.idm.client.KeycloakAdminClient;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public abstract class BaseKeycloakOfficerConnectorDelegate extends BaseJavaDelegate {
 
+  protected final KeycloakAdminClient officerKeycloakAdminClient;
   protected final KeycloakClientService keycloakClientService;
 }
