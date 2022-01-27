@@ -16,7 +16,7 @@
 
 package com.epam.digital.data.platform.bpms.rest.exception.mapper;
 
-import com.epam.digital.data.platform.bpms.extension.exception.KeycloakException;
+import com.epam.digital.data.platform.integration.idm.exception.KeycloakException;
 import com.epam.digital.data.platform.starter.errorhandling.BaseRestExceptionHandler;
 import com.epam.digital.data.platform.starter.errorhandling.dto.SystemErrorDto;
 import javax.ws.rs.core.MediaType;

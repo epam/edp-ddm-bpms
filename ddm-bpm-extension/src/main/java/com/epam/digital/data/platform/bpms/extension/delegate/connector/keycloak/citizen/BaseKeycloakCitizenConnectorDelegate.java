@@ -18,10 +18,19 @@ package com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloa
 
 import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.bpms.extension.service.KeycloakClientService;
+import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
+import com.epam.digital.data.platform.integration.idm.client.KeycloakAdminClient;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public abstract class BaseKeycloakCitizenConnectorDelegate extends BaseJavaDelegate {
 
+  protected final KeycloakAdminClient citizenKeycloakAdminClient;
   protected final KeycloakClientService keycloakClientService;
+
+  @SystemVariable(name = "user_name")
+  protected NamedVariableAccessor<String> userNameVariable;
+  @SystemVariable(name = "role")
+  protected NamedVariableAccessor<String> roleVariable;
 }
