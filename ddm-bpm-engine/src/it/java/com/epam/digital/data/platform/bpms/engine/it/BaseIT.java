@@ -18,6 +18,7 @@ package com.epam.digital.data.platform.bpms.engine.it;
 
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import javax.inject.Inject;
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,4 +37,6 @@ public abstract class BaseIT {
   protected RuntimeService runtimeService;
   @Inject
   protected TaskService taskService;
+  @Inject
+  protected HistoryService historyService;
 }

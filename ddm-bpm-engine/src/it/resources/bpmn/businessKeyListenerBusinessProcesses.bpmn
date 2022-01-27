@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_12mlj7s" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:collaboration id="Collaboration_07cikzn">
+    <bpmn:participant id="Participant_0dpp6qj" name="No extension attributes" processRef="businessKeyTestProcess_noExtensionAttributes" />
+    <bpmn:participant id="Participant_1j405rn" name="Several extension attributes" processRef="businessKeyTestProcess_severalExtensionAttributes" />
+    <bpmn:participant id="Participant_1gfvkrc" name="Invalid expression" processRef="businessKeyTestProcess_invalidExpression" />
+    <bpmn:participant id="Participant_0pqt7mf" name="Long expression" processRef="businessKeyTestProcess_longExpressionResult" />
+    <bpmn:participant id="Participant_0crnmne" name="Valid expression" processRef="businessKeyTestProcess_validExpression" />
+  </bpmn:collaboration>
+  <bpmn:process id="businessKeyTestProcess_noExtensionAttributes" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="start">
+      <bpmn:outgoing>Flow_0pj4vat</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_1waxv49" name="end">
+      <bpmn:incoming>Flow_0pj4vat</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0pj4vat" sourceRef="StartEvent_1" targetRef="Event_1waxv49" />
+  </bpmn:process>
+  <bpmn:process id="businessKeyTestProcess_severalExtensionAttributes" isExecutable="true">
+    <bpmn:startEvent id="Event_0njr1jm" name="start">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="businessKeyExpression" value="${&#34;&#34;}" />
+          <camunda:property name="businessKeyExpression" value="${&#34;&#34;}" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_1s8xzsc</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_1pv1shr" name="end">
+      <bpmn:incoming>Flow_1s8xzsc</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1s8xzsc" sourceRef="Event_0njr1jm" targetRef="Event_1pv1shr" />
+  </bpmn:process>
+  <bpmn:process id="businessKeyTestProcess_invalidExpression" isExecutable="true">
+    <bpmn:startEvent id="Event_0bql7hu" name="start">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="businessKeyExpression" value="${sdasdassds}" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_0efjomo</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_1d9kjwe" name="end">
+      <bpmn:incoming>Flow_0efjomo</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0efjomo" sourceRef="Event_0bql7hu" targetRef="Event_1d9kjwe" />
+  </bpmn:process>
+  <bpmn:process id="businessKeyTestProcess_longExpressionResult" isExecutable="true">
+    <bpmn:startEvent id="Event_0lf5fsr" name="start">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="businessKeyExpression" value="${&#34;a&#34;.repeat(256)}" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_0dprnfz</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_0jamcjm" name="end">
+      <bpmn:incoming>Flow_0dprnfz</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0dprnfz" sourceRef="Event_0lf5fsr" targetRef="Event_0jamcjm" />
+  </bpmn:process>
+  <bpmn:process id="businessKeyTestProcess_validExpression" isExecutable="true">
+    <bpmn:startEvent id="Event_0gcn7ck" name="start">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="businessKeyExpression" value="${&#34;businessKey&#34;}" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_0dn1ku2</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_1j2kj8v" name="end">
+      <bpmn:incoming>Flow_0dn1ku2</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0dn1ku2" sourceRef="Event_0gcn7ck" targetRef="Event_1j2kj8v" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_07cikzn">
+      <bpmndi:BPMNShape id="Participant_0dpp6qj_di" bpmnElement="Participant_0dpp6qj" isHorizontal="true">
+        <dc:Bounds x="129" y="80" width="301" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0pj4vat_di" bpmnElement="Flow_0pj4vat">
+        <di:waypoint x="215" y="127" />
+        <di:waypoint x="272" y="127" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="109" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="152" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1waxv49_di" bpmnElement="Event_1waxv49">
+        <dc:Bounds x="272" y="109" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="281" y="152" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_1j405rn_di" bpmnElement="Participant_1j405rn" isHorizontal="true">
+        <dc:Bounds x="129" y="180" width="301" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1s8xzsc_di" bpmnElement="Flow_1s8xzsc">
+        <di:waypoint x="215" y="227" />
+        <di:waypoint x="272" y="227" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0njr1jm_di" bpmnElement="Event_0njr1jm">
+        <dc:Bounds x="179" y="209" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="252" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1pv1shr_di" bpmnElement="Event_1pv1shr">
+        <dc:Bounds x="272" y="209" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="281" y="252" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_1gfvkrc_di" bpmnElement="Participant_1gfvkrc" isHorizontal="true">
+        <dc:Bounds x="129" y="280" width="301" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0efjomo_di" bpmnElement="Flow_0efjomo">
+        <di:waypoint x="215" y="327" />
+        <di:waypoint x="272" y="327" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0bql7hu_di" bpmnElement="Event_0bql7hu">
+        <dc:Bounds x="179" y="309" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="352" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1d9kjwe_di" bpmnElement="Event_1d9kjwe">
+        <dc:Bounds x="272" y="309" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="281" y="352" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_0pqt7mf_di" bpmnElement="Participant_0pqt7mf" isHorizontal="true">
+        <dc:Bounds x="129" y="380" width="301" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0dprnfz_di" bpmnElement="Flow_0dprnfz">
+        <di:waypoint x="215" y="427" />
+        <di:waypoint x="272" y="427" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0lf5fsr_di" bpmnElement="Event_0lf5fsr">
+        <dc:Bounds x="179" y="409" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="452" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0jamcjm_di" bpmnElement="Event_0jamcjm">
+        <dc:Bounds x="272" y="409" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="281" y="452" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_0crnmne_di" bpmnElement="Participant_0crnmne" isHorizontal="true">
+        <dc:Bounds x="129" y="480" width="301" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0dn1ku2_di" bpmnElement="Flow_0dn1ku2">
+        <di:waypoint x="215" y="527" />
+        <di:waypoint x="272" y="527" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0gcn7ck_di" bpmnElement="Event_0gcn7ck">
+        <dc:Bounds x="179" y="509" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="552" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1j2kj8v_di" bpmnElement="Event_1j2kj8v">
+        <dc:Bounds x="272" y="509" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="281" y="552" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
