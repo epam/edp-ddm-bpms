@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,6 +42,9 @@ import org.springframework.stereotype.Component;
 public class UserDataValidationErrorDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "userDataValidationErrorDelegate";
+  public static final String VALIDATION_ERROR_MSG_PATTERN =
+      "Business validation failure occurred during process execution: "
+          + "process definition key %s, process instance id %s, activity id %s";
 
   private final ObjectMapper objectMapper;
 
@@ -54,7 +58,7 @@ public class UserDataValidationErrorDelegate extends BaseJavaDelegate {
         .map(this::readValidationErrorValue)
         .collect(Collectors.toList());
 
-    throw new ValidationException(createUserDataValidationErrorDto(validationErrorDtos));
+    throw new ValidationException(createUserDataValidationErrorDto(validationErrorDtos, execution));
   }
 
   private ErrorDetailDto readValidationErrorValue(String value) {
@@ -66,12 +70,18 @@ public class UserDataValidationErrorDelegate extends BaseJavaDelegate {
   }
 
   private ValidationErrorDto createUserDataValidationErrorDto(
-      List<ErrorDetailDto> validationErrorDtos) {
+      List<ErrorDetailDto> validationErrorDtos, DelegateExecution execution) {
     return ValidationErrorDto.builder()
         .code("VALIDATION_ERROR")
-        .message("Validation error")
+        .message(buildValidationErrorMsg(execution))
         .details(new ErrorsListDto(validationErrorDtos))
         .build();
+  }
+
+  private String buildValidationErrorMsg(DelegateExecution execution) {
+    return String.format(VALIDATION_ERROR_MSG_PATTERN,
+        ((ExecutionEntity) execution).getProcessDefinition().getKey(),
+        execution.getProcessInstanceId(), execution.getCurrentActivityId());
   }
 
   @Override

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1k6zqyr" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1k6zqyr" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.11.1">
   <bpmn:process id="Process_0plk85h" isExecutable="true">
     <bpmn:startEvent id="StartEvent_1" name="start">
       <bpmn:outgoing>Flow_0s3iljg</bpmn:outgoing>
@@ -8,8 +8,8 @@
     <bpmn:endEvent id="Event_17hd48v" name="end">
       <bpmn:incoming>Flow_133ycqg</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_133ycqg" sourceRef="Activity_1h4lusc" targetRef="Event_17hd48v" />
-    <bpmn:serviceTask id="Activity_1h4lusc" name="Business Validation Error Delegate" camunda:delegateExpression="#{userDataValidationErrorDelegate}">
+    <bpmn:sequenceFlow id="Flow_133ycqg" sourceRef="well-readable-activity-id" targetRef="Event_17hd48v" />
+    <bpmn:serviceTask id="well-readable-activity-id" name="Business Validation Error Delegate" camunda:delegateExpression="#{userDataValidationErrorDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="validationErrors">
@@ -24,7 +24,7 @@
       <bpmn:incoming>Flow_0p5pqek</bpmn:incoming>
       <bpmn:outgoing>Flow_133ycqg</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_0p5pqek" sourceRef="Activity_1pov4gh" targetRef="Activity_1h4lusc" />
+    <bpmn:sequenceFlow id="Flow_0p5pqek" sourceRef="Activity_1pov4gh" targetRef="well-readable-activity-id" />
     <bpmn:userTask id="Activity_1pov4gh" name="User Task">
       <bpmn:incoming>Flow_0s3iljg</bpmn:incoming>
       <bpmn:outgoing>Flow_0p5pqek</bpmn:outgoing>
@@ -56,7 +56,7 @@
           <dc:Bounds x="531" y="142" width="19" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0evwb9z_di" bpmnElement="Activity_1h4lusc">
+      <bpmndi:BPMNShape id="Activity_0evwb9z_di" bpmnElement="well-readable-activity-id">
         <dc:Bounds x="370" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_04lsw2b_di" bpmnElement="Activity_1pov4gh">

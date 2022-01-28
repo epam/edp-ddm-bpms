@@ -19,6 +19,7 @@ package com.epam.digital.data.platform.bpms.extension.it;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 
+import com.epam.digital.data.platform.bpms.extension.delegate.UserDataValidationErrorDelegate;
 import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import java.util.HashMap;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -30,14 +31,19 @@ public class UserDataValidationErrorDelegateIT extends BaseIT {
   @Test
   @Deployment(resources = {"bpmn/delegate/testBusinessValidationErrorDelegate.bpmn"})
   public void shouldThrowUserDataValidationException() {
+    var pdKey = "Process_0plk85h";
     ProcessInstance process = runtimeService
-        .startProcessInstanceByKey("Process_0plk85h", "1", new HashMap<>());
+        .startProcessInstanceByKey(pdKey, "1", new HashMap<>());
 
     var tasks = engine.getTaskService().createTaskQuery().processInstanceId(process.getId()).list();
     var taskId = tasks.get(0).getId();
     var ex = assertThrows(ValidationException.class, () -> taskService.complete(taskId));
 
+    var expectedExceptionMsg = String.format(
+        UserDataValidationErrorDelegate.VALIDATION_ERROR_MSG_PATTERN, pdKey, process.getId(),
+        "well-readable-activity-id");
     assertThat(ex).isNotNull();
+    assertThat(ex.getMessage()).isEqualTo(expectedExceptionMsg);
     assertThat(ex.getDetails()).isNotNull();
     assertThat(ex.getDetails().getErrors()).isNotEmpty();
     var validationErrors = ex.getDetails().getErrors();

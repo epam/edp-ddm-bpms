@@ -27,7 +27,8 @@ import com.epam.digital.data.platform.starter.errorhandling.exception.Validation
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Optional;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,12 +45,14 @@ public class UserDataValidationErrorDelegateTest {
   private UserDataValidationErrorDelegate delegate;
   @Spy
   private ObjectMapper objectMapper = new ObjectMapper();
-  @Mock
-  private DelegateExecution delegateExecution;
+  @Spy
+  private ExecutionEntity delegateExecution = new ExecutionEntity();
   @Mock
   private NamedVariableAccessor<List<String>> validationErrorsVariableAccessor;
   @Mock
   private NamedVariableReadAccessor<List<String>> validationErrorsVariableReadAccessor;
+  @Mock
+  private ProcessDefinitionEntity processDefinition;
 
   @Before
   public void init() {
@@ -63,6 +66,8 @@ public class UserDataValidationErrorDelegateTest {
   @Test
   public void testNoMessagesFromUser() {
     when(validationErrorsVariableReadAccessor.getOptional()).thenReturn(Optional.empty());
+    when(delegateExecution.getProcessDefinition()).thenReturn(processDefinition);
+    when(processDefinition.getKey()).thenReturn("testKey");
 
     var exception = assertThrows(ValidationException.class,
         () -> delegate.execute(delegateExecution));
