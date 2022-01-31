@@ -26,8 +26,6 @@ import java.util.stream.Collectors;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricTaskInstanceDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
-import org.mapstruct.Context;
-import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -38,12 +36,22 @@ import org.mapstruct.ReportingPolicy;
 public interface TaskMapper {
 
   @Mapping(target = "created", qualifiedByName = "toLocalDateTime")
-  @Mapping(target = "processDefinitionName", expression = "java(processDefinitionNames.get(dto.getProcessDefinitionId()))")
+  @Mapping(target = "processDefinitionName", source = "processDefinitionName")
+  @Mapping(target = "businessKey", source = "businessKey")
   @Named("toUserTaskDto")
-  DdmTaskDto toDdmTaskDto(TaskDto dto, @Context Map<String, String> processDefinitionNames);
+  DdmTaskDto toDdmTaskDto(TaskDto dto, String processDefinitionName, String businessKey);
 
-  @IterableMapping(qualifiedByName = "toUserTaskDto")
-  List<DdmTaskDto> toDdmTaskDtos(List<TaskDto> dtos, @Context Map<String, String> processDefinitionNames);
+  default List<DdmTaskDto> toDdmTaskDtos(List<TaskDto> dtos,
+      Map<String, String> processDefinitionNames,
+      Map<String, String> processBusinessKeys) {
+    return dtos.stream()
+        .map(dto -> {
+          var processDefinitionName = processDefinitionNames.get(dto.getProcessDefinitionId());
+          var businessKey = processBusinessKeys.get(dto.getProcessInstanceId());
+
+          return toDdmTaskDto(dto, processDefinitionName, businessKey);
+        }).collect(Collectors.toList());
+  }
 
   @Mapping(target = "created", qualifiedByName = "toLocalDateTime")
   DdmSignableTaskDto toSignableUserTaskDto(TaskDto taskDto);
