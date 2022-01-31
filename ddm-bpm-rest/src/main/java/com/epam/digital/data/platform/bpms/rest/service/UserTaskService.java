@@ -40,6 +40,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
@@ -90,7 +92,11 @@ public class UserTaskService {
     var processDefinitionNames = getProcessDefinitionNames(taskDtos);
     log.trace("Found process definition names - {}", processDefinitionNames.values());
 
-    var result = taskMapper.toDdmTaskDtos(taskDtos, processDefinitionNames);
+    var processBusinessKeys = getProcessBusinessKeys(taskDtos);
+    log.trace("Found {} process business keys", processBusinessKeys.size());
+
+    var result = taskMapper.toDdmTaskDtos(taskDtos, processDefinitionNames,
+        processBusinessKeys);
     log.trace("Found user task list - {}", result);
 
     log.info("Found {} user tasks", result.size());
@@ -209,6 +215,22 @@ public class UserTaskService {
         .toArray(String[]::new);
     return camundaAdminImpersonation.execute(
         () -> processDefinitionRepositoryService.getProcessDefinitionsNames(processDefinitionIds));
+  }
+
+  private Map<String, String> getProcessBusinessKeys(List<TaskDto> taskDtos) {
+    var processInstanceIds = taskDtos.stream()
+        .map(TaskDto::getProcessInstanceId)
+        .collect(Collectors.toSet());
+    var processInstanceQueryDto = new ProcessInstanceQueryDto();
+    processInstanceQueryDto.setProcessInstanceIds(processInstanceIds);
+
+    var processInstances = camundaAdminImpersonation.execute(
+        () -> processInstanceRuntimeService.getProcessInstanceDtos(processInstanceQueryDto,
+            PaginationQueryDto.builder().build()));
+
+    return processInstances.stream()
+        .filter(processInstanceDto -> Objects.nonNull(processInstanceDto.getBusinessKey()))
+        .collect(Collectors.toMap(ProcessInstanceDto::getId, ProcessInstanceDto::getBusinessKey));
   }
 
   private Map<String, Object> getTaskFormVariables(String taskId, String formVariables) {

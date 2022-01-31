@@ -40,4 +40,5 @@ public class DdmTaskDto {
   private String processDefinitionId;
   private String formKey;
   private boolean suspended;
+  private String businessKey;
 }

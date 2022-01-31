@@ -20,6 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.variable.Variables.stringValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -47,6 +49,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
@@ -178,6 +182,7 @@ class UserTaskServiceTest {
 
     var task = new TaskEntity();
     task.setId("id");
+    task.setProcessInstanceId("processInstanceId");
     task.setProcessDefinitionId("processDefinitionId");
     var taskDto = TaskDto.fromEntity(task);
     when(taskRuntimeService.getTasksByParams(queryDto, paginationQueryDto))
@@ -186,18 +191,30 @@ class UserTaskServiceTest {
     when(processDefinitionRepositoryService.getProcessDefinitionsNames("processDefinitionId"))
         .thenReturn(Map.of("processDefinitionId", "processDefinitionName"));
 
+    var processInstanceQueryDto = new ProcessInstanceQueryDto();
+    processInstanceQueryDto.setProcessInstanceIds(Set.of("processInstanceId"));
+    var processInstance = new ExecutionEntity();
+    processInstance.setId("processInstanceId");
+    processInstance.setBusinessKey("businessKey");
+    when(processInstanceRuntimeService.getProcessInstanceDtos(refEq(processInstanceQueryDto),
+        eq(PaginationQueryDto.builder().build())))
+        .thenReturn(List.of(ProcessInstanceDto.fromProcessInstance(processInstance)));
+
     var result = service.getTasksByParams(queryDto, paginationQueryDto);
 
     assertThat(result).hasSize(1).element(0)
         .hasFieldOrPropertyWithValue("id", "id")
         .hasFieldOrPropertyWithValue("processDefinitionId", "processDefinitionId")
-        .hasFieldOrPropertyWithValue("processDefinitionName", "processDefinitionName");
+        .hasFieldOrPropertyWithValue("processDefinitionName", "processDefinitionName")
+        .hasFieldOrPropertyWithValue("businessKey", "businessKey");
 
     assertThat(service.getTasksByParams(queryDto, paginationQueryDto)).isEmpty();
 
     verify(taskRuntimeService, times(2)).getTasksByParams(queryDto, paginationQueryDto);
-    verify(camundaAdminImpersonation).execute(any());
+    verify(camundaAdminImpersonation, times(2)).execute(any());
     verify(processDefinitionRepositoryService).getProcessDefinitionsNames("processDefinitionId");
+    verify(processInstanceRuntimeService).getProcessInstanceDtos(refEq(processInstanceQueryDto),
+        eq(PaginationQueryDto.builder().build()));
   }
 
   @Test

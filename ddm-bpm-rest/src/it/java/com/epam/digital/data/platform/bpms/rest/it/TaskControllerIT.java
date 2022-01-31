@@ -33,8 +33,8 @@ class TaskControllerIT extends BaseIT {
   @Test
   @Deployment(resources = "bpmn/testGetExtendedTasks.bpmn")
   void shouldGetTaskWithProcessDefinitionName() throws Exception {
-    var startResult = postForObject("api/process-definition/key/testGetExtendedTasks_key/start", "",
-        Map.class);
+    var startResult = postForObject("api/process-definition/key/testGetExtendedTasks_key/start",
+        "{\"businessKey\":\"businessKey\"}", Map.class);
     var processId = (String) startResult.get("id");
 
     var result = postForObject("api/extended/task",
@@ -45,6 +45,7 @@ class TaskControllerIT extends BaseIT {
     assertThat(result[0].getAssignee()).isEqualTo("testuser");
     assertThat(result[0].getProcessDefinitionName()).isNotNull();
     assertThat(result[0].getProcessDefinitionName()).isEqualTo("Test Name");
+    assertThat(result[0].getBusinessKey()).isEqualTo("businessKey");
   }
 
   @Test

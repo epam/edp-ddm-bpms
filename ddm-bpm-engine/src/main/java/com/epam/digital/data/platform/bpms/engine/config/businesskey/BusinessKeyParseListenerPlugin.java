@@ -43,7 +43,7 @@ public class BusinessKeyParseListenerPlugin extends AbstractProcessEnginePlugin 
       BpmnParseListener parseListener) {
     final var customPreBPMNParseListeners = Lists.newArrayList(parseListener);
 
-    if (!Objects.isNull(processEngineConfiguration.getCustomPreBPMNParseListeners())) {
+    if (Objects.nonNull(processEngineConfiguration.getCustomPreBPMNParseListeners())) {
       customPreBPMNParseListeners.addAll(
           processEngineConfiguration.getCustomPreBPMNParseListeners());
     }
