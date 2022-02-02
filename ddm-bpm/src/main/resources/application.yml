@@ -116,3 +116,6 @@ decorator:
       enabled: false
     p6spy:
       enable-logging: false
+
+# Reducing logging level of TraceListenerStrategy because of "TODO" logs
+logging.level.org.springframework.cloud.sleuth.instrument.jdbc.TraceListenerStrategy: WARN

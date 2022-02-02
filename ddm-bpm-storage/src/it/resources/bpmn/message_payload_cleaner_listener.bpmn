@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0nw52t9" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:process id="messagePayloadCleanerListenerKey" isExecutable="true">
+    <bpmn:sequenceFlow id="Flow_07c76a9" sourceRef="StartEvent_1" targetRef="messagePayloadCleanerListenerId" />
+    <bpmn:endEvent id="Event_0x5zhlg" name="end">
+      <bpmn:incoming>Flow_1l2ybvo</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1l2ybvo" sourceRef="messagePayloadCleanerListenerId" targetRef="Event_0x5zhlg" />
+    <bpmn:userTask id="messagePayloadCleanerListenerId" name="Waiting task for message payload cleaner listener" camunda:assignee="${initiator}">
+      <bpmn:incoming>Flow_07c76a9</bpmn:incoming>
+      <bpmn:outgoing>Flow_1l2ybvo</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:startEvent id="StartEvent_1" name="start" camunda:initiator="initiator">
+      <bpmn:outgoing>Flow_07c76a9</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1mcsiru" messageRef="Message_1qf0eyz" />
+    </bpmn:startEvent>
+  </bpmn:process>
+  <bpmn:message id="Message_1qf0eyz" name="messagePayloadCleanerListenerMessage" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="messagePayloadCleanerListenerKey">
+      <bpmndi:BPMNEdge id="Flow_1l2ybvo_di" bpmnElement="Flow_1l2ybvo">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="412" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07c76a9_di" bpmnElement="Flow_07c76a9">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0x5zhlg_di" bpmnElement="Event_0x5zhlg">
+        <dc:Bounds x="412" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="421" y="142" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_03cavin_di" bpmnElement="messagePayloadCleanerListenerId">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0htkdcf_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="142" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

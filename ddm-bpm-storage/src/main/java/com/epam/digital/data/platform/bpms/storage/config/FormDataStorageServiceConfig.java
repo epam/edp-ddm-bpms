@@ -6,6 +6,7 @@ import com.epam.digital.data.platform.storage.base.config.CephStorageConfigurati
 import com.epam.digital.data.platform.storage.base.factory.StorageServiceFactory;
 import com.epam.digital.data.platform.storage.file.service.FormDataFileStorageService;
 import com.epam.digital.data.platform.storage.form.service.FormDataStorageService;
+import com.epam.digital.data.platform.storage.message.service.MessagePayloadStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -30,7 +31,8 @@ public class FormDataStorageServiceConfig {
   }
 
   @Bean
-  public StorageServiceFactory storageServiceFactory(ObjectMapper objectMapper, CephS3Factory cephS3Factory) {
+  public StorageServiceFactory storageServiceFactory(ObjectMapper objectMapper,
+      CephS3Factory cephS3Factory) {
     return new StorageServiceFactory(objectMapper, cephS3Factory);
   }
 
@@ -47,6 +49,14 @@ public class FormDataStorageServiceConfig {
       StorageServiceFactory storageServiceFactory,
       CephStorageConfiguration fileDataCephStorageConfiguration) {
     return storageServiceFactory.fromDataFileStorageService(fileDataCephStorageConfiguration);
+  }
+
+  @Bean
+  @ConditionalOnProperty(prefix = "storage.form-data", name = "type", havingValue = "ceph")
+  public MessagePayloadStorageService messagePayloadStorageService(
+      StorageServiceFactory storageServiceFactory,
+      CephStorageConfiguration formDataCephStorageConfiguration) {
+    return storageServiceFactory.messagePayloadStorageService(formDataCephStorageConfiguration);
   }
 
   @Bean

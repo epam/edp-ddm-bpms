@@ -25,10 +25,12 @@ import com.epam.digital.data.platform.dataaccessor.initiator.BaseInitiatorVariab
 import com.epam.digital.data.platform.dataaccessor.initiator.InitiatorVariablesAccessor;
 import com.epam.digital.data.platform.dataaccessor.named.BaseNamedVariableAccessorFactory;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessorFactory;
+import com.epam.digital.data.platform.dataaccessor.sysvar.CallerProcessInstanceIdVariable;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessExcerptIdVariable;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessStartTimeVariable;
 import com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable;
+import com.epam.digital.data.platform.dataaccessor.sysvar.StartMessagePayloadStorageKeyVariable;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -74,6 +76,20 @@ public class VariableAccessorAutoConfiguration {
   public StartFormCephKeyVariable startFormCephKeyVariable(
       VariableAccessorFactory variableAccessorFactory) {
     return new StartFormCephKeyVariable(variableAccessorFactory);
+  }
+
+  @Bean
+  @ConditionalOnMissingBean(StartMessagePayloadStorageKeyVariable.class)
+  public StartMessagePayloadStorageKeyVariable startMessagePayloadStorageKey(
+      VariableAccessorFactory variableAccessorFactory) {
+    return new StartMessagePayloadStorageKeyVariable(variableAccessorFactory);
+  }
+
+  @Bean
+  @ConditionalOnMissingBean(CallerProcessInstanceIdVariable.class)
+  public CallerProcessInstanceIdVariable callerProcessInstanceIdVariable(
+      VariableAccessorFactory variableAccessorFactory) {
+    return new CallerProcessInstanceIdVariable(variableAccessorFactory);
   }
 
   @Bean
