@@ -25,6 +25,10 @@ import com.epam.digital.data.platform.storage.form.repository.CephFormDataReposi
 import com.epam.digital.data.platform.storage.form.repository.FormDataRepository;
 import com.epam.digital.data.platform.storage.form.service.FormDataKeyProviderImpl;
 import com.epam.digital.data.platform.storage.form.service.FormDataStorageService;
+import com.epam.digital.data.platform.storage.message.repository.CephMessagePayloadRepository;
+import com.epam.digital.data.platform.storage.message.repository.MessagePayloadRepository;
+import com.epam.digital.data.platform.storage.message.service.MessagePayloadKeyProviderImpl;
+import com.epam.digital.data.platform.storage.message.service.MessagePayloadStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,6 +71,16 @@ public class TestCephConfig {
 
   @Bean
   @Primary
+  public MessagePayloadRepository messagePayloadRepository(CephService cephService) {
+    return CephMessagePayloadRepository.builder()
+        .cephBucketName(cephBucketName)
+        .objectMapper(objectMapper)
+        .cephService(cephService)
+        .build();
+  }
+
+  @Bean
+  @Primary
   public FormDataStorageService formDataStorageService(FormDataRepository formDataRepository) {
     return FormDataStorageService.builder()
         .keyProvider(new FormDataKeyProviderImpl())
@@ -81,6 +95,16 @@ public class TestCephConfig {
     return FormDataFileStorageService.builder()
         .keyProvider(new FormDataFileKeyProviderImpl())
         .repository(formDataFileRepository)
+        .build();
+  }
+
+  @Bean
+  @Primary
+  public MessagePayloadStorageService messagePayloadStorageService(
+      MessagePayloadRepository messagePayloadRepository) {
+    return MessagePayloadStorageService.builder()
+        .keyProvider(new MessagePayloadKeyProviderImpl())
+        .repository(messagePayloadRepository)
         .build();
   }
 }
