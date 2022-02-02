@@ -18,6 +18,7 @@ package com.epam.digital.data.platform.bpms.storage.config;
 
 import com.epam.digital.data.platform.bpms.storage.listener.FileCleanerEndEventListener;
 import com.epam.digital.data.platform.bpms.storage.listener.FormDataCleanerEndEventListener;
+import com.epam.digital.data.platform.bpms.storage.listener.MessagePayloadCleanerEndEventListener;
 import com.epam.digital.data.platform.bpms.storage.listener.PutFormDataToStorageTaskListener;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
@@ -41,6 +42,7 @@ public class StorageBpmnParseListener extends AbstractBpmnParseListener {
   private final PutFormDataToStorageTaskListener putFormDataToStorageTaskListener;
   private final FileCleanerEndEventListener fileCleanerEndEventListener;
   private final FormDataCleanerEndEventListener formDataCleanerEndEventListener;
+  private final MessagePayloadCleanerEndEventListener messagePayloadCleanerEndEventListener;
 
   @Override
   public void parseUserTask(Element userTaskElement, ScopeImpl scope, ActivityImpl activity) {
@@ -53,7 +55,10 @@ public class StorageBpmnParseListener extends AbstractBpmnParseListener {
   public void parseEndEvent(Element endEventElement, ScopeImpl scope, ActivityImpl endActivity) {
     if (scope instanceof ProcessDefinitionImpl) {
       endActivity.addBuiltInListener(ExecutionListener.EVENTNAME_END, fileCleanerEndEventListener);
-      endActivity.addBuiltInListener(ExecutionListener.EVENTNAME_END, formDataCleanerEndEventListener);
+      endActivity.addBuiltInListener(ExecutionListener.EVENTNAME_END,
+          formDataCleanerEndEventListener);
+      endActivity.addBuiltInListener(ExecutionListener.EVENTNAME_END,
+          messagePayloadCleanerEndEventListener);
     }
   }
 }

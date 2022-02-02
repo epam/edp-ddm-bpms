@@ -3,6 +3,7 @@ package com.epam.digital.data.platform.bpms.storage;
 import com.epam.digital.data.platform.bpms.storage.config.TestCephServiceImpl;
 import com.epam.digital.data.platform.storage.file.service.FormDataFileStorageService;
 import com.epam.digital.data.platform.storage.form.service.FormDataStorageService;
+import com.epam.digital.data.platform.storage.message.service.MessagePayloadStorageService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +29,8 @@ public abstract class BaseIT {
   protected FormDataStorageService formDataStorageService;
   @Autowired
   protected FormDataFileStorageService formDataFileStorageService;
+  @Autowired
+  protected MessagePayloadStorageService messagePayloadStorageService;
 
   @BeforeEach
   void setup() {
