@@ -40,6 +40,8 @@ import org.springframework.stereotype.Component;
  *       num-partitions: 1
  *       replication-factor: 1
  *       retention-policy-in-days: 7
+ *   ssl:
+ *     enabled: false
  * </pre>
  */
 @Data
@@ -51,6 +53,7 @@ public class KafkaProperties {
   private String bootstrap;
 
   private TopicsProperty topics;
+  private SslProperties ssl;
 
   @Data
   public static class TopicsProperty {
@@ -66,5 +69,14 @@ public class KafkaProperties {
     private Integer numPartitions;
     private Short replicationFactor;
     private Integer retentionPolicyInDays;
+  }
+
+  @Data
+  public static class SslProperties {
+
+    private boolean enabled;
+    private String keystoreKey;
+    private String keystoreCertificate;
+    private String truststoreCertificate;
   }
 }
