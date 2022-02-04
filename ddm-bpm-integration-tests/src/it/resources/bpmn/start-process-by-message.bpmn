@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0bdi3zy" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:message id="Message_03lyfii" name="startProcessRecieveMessageTest" />
+  <bpmn:collaboration id="Collaboration_1j4x0dh">
+    <bpmn:participant id="Participant_135tmd3" name="Send message" processRef="processThatStartsAnotherProcessByMessage" />
+    <bpmn:participant id="Participant_1pbvb45" name="Recieve Message" processRef="processThatIsStartedByAnotherProcessByMessage" />
+  </bpmn:collaboration>
+  <bpmn:process id="processThatStartsAnotherProcessByMessage" isExecutable="true">
+    <bpmn:sequenceFlow id="Flow_0jdmtmk" sourceRef="startEvent1" targetRef="user_form_1" />
+    <bpmn:startEvent id="startEvent1" name="start" camunda:initiator="initiator">
+      <bpmn:outgoing>Flow_0jdmtmk</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_08b9jtq" sourceRef="user_form_1" targetRef="Activity_1n172br" />
+    <bpmn:endEvent id="Event_0nw5sd2" name="end">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="messagePayload">${messagePayload}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0kmyyqo</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1tk54wt" messageRef="Message_03lyfii" camunda:delegateExpression="${startProcessByMessageDelegate}" />
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0kmyyqo" sourceRef="Activity_1n172br" targetRef="Event_0nw5sd2" />
+    <bpmn:userTask id="user_form_1" name="user-form-1" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="user-form-1" camunda:assignee="${initiator}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="userTaskInputFormDataPrepopulate" />
+        </camunda:inputOutput>
+        <camunda:properties>
+          <camunda:property name="formVariables" value="" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0jdmtmk</bpmn:incoming>
+      <bpmn:outgoing>Flow_08b9jtq</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:scriptTask id="Activity_1n172br" name="user-form to map" scriptFormat="groovy">
+      <bpmn:incoming>Flow_08b9jtq</bpmn:incoming>
+      <bpmn:outgoing>Flow_0kmyyqo</bpmn:outgoing>
+      <bpmn:script>var messagePayload = [:]
+
+        var submission = submission('user_form_1').formData
+
+        submission.fieldNames().each {
+        messagePayload[it] = submission.prop(it).value()
+        }
+
+        set_transient_variable('messagePayload', messagePayload)</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmn:process id="processThatIsStartedByAnotherProcessByMessage" name="" isExecutable="true" camunda:isStartableInTasklist="false">
+    <bpmn:startEvent id="startEvent2" name="start">
+      <bpmn:outgoing>Flow_0i5aupu</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0qm94wj" messageRef="Message_03lyfii" />
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_19g2qys" name="end">
+      <bpmn:incoming>Flow_1otvu4u</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0i5aupu" sourceRef="startEvent2" targetRef="Activity_1b7cq5w" />
+    <bpmn:sequenceFlow id="Flow_1otvu4u" sourceRef="user_form_2" targetRef="Event_19g2qys" />
+    <bpmn:userTask id="user_form_2" name="user-form-2" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="user-form-2" camunda:assignee="" camunda:candidateUsers="second_enterprise_user" camunda:candidateGroups="">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="userTaskInputFormDataPrepopulate">${payload}</camunda:inputParameter>
+        </camunda:inputOutput>
+        <camunda:properties>
+          <camunda:property name="formVariables" value="" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0u1xqud</bpmn:incoming>
+      <bpmn:outgoing>Flow_1otvu4u</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0u1xqud" sourceRef="Activity_1b7cq5w" targetRef="user_form_2" />
+    <bpmn:scriptTask id="Activity_1b7cq5w" name="message-payload to form" scriptFormat="groovy">
+      <bpmn:incoming>Flow_0i5aupu</bpmn:incoming>
+      <bpmn:outgoing>Flow_0u1xqud</bpmn:outgoing>
+      <bpmn:script>var cephData = [:]
+
+        cephData['callerProcess'] = process_caller().id
+
+        message_payload('startEvent2').data.keySet().each {
+        cephData[it] = message_payload('startEvent2').data.get(it)
+        }
+
+        set_transient_variable('payload', S(cephData, 'application/json'))</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1j4x0dh">
+      <bpmndi:BPMNShape id="Participant_135tmd3_di" bpmnElement="Participant_135tmd3" isHorizontal="true">
+        <dc:Bounds x="160" y="50" width="560" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0jdmtmk_di" bpmnElement="Flow_0jdmtmk">
+        <di:waypoint x="248" y="97" />
+        <di:waypoint x="280" y="97" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_08b9jtq_di" bpmnElement="Flow_08b9jtq">
+        <di:waypoint x="380" y="97" />
+        <di:waypoint x="420" y="97" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kmyyqo_di" bpmnElement="Flow_0kmyyqo">
+        <di:waypoint x="520" y="97" />
+        <di:waypoint x="562" y="97" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="startEvent1">
+        <dc:Bounds x="212" y="79" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="219" y="122" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0h1bwz1_di" bpmnElement="Event_0nw5sd2">
+        <dc:Bounds x="562" y="79" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="570" y="122" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1mmu6o4_di" bpmnElement="user_form_1">
+        <dc:Bounds x="280" y="57" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ijvdai_di" bpmnElement="Activity_1n172br">
+        <dc:Bounds x="420" y="57" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_1pbvb45_di" bpmnElement="Participant_1pbvb45" isHorizontal="true">
+        <dc:Bounds x="160" y="150" width="560" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0i5aupu_di" bpmnElement="Flow_0i5aupu">
+        <di:waypoint x="248" y="210" />
+        <di:waypoint x="280" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1otvu4u_di" bpmnElement="Flow_1otvu4u">
+        <di:waypoint x="520" y="210" />
+        <di:waypoint x="562" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0u1xqud_di" bpmnElement="Flow_0u1xqud">
+        <di:waypoint x="380" y="210" />
+        <di:waypoint x="420" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1bwowbt_di" bpmnElement="startEvent2">
+        <dc:Bounds x="212" y="192" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="219" y="235" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_19g2qys_di" bpmnElement="Event_19g2qys">
+        <dc:Bounds x="562" y="192" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="571" y="235" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_010h396_di" bpmnElement="user_form_2">
+        <dc:Bounds x="420" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_03iy4cx_di" bpmnElement="Activity_1b7cq5w">
+        <dc:Bounds x="280" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
