@@ -23,6 +23,8 @@ camunda:
     history-publisher:
       kafka:
         bootstrap: localhost:9092
+        ssl:
+          enabled: false
     generic-properties:
       properties:
         enableHistoricInstancePermissions: true

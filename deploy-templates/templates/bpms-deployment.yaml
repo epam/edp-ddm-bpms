@@ -107,6 +107,21 @@ spec:
                 key: BUCKET_NAME
           - name: JAVA_OPTS
             value: {{ .Values.javaOpts }}
+          - name: KAFKA_USER_KEYSTORE_CERTIFICATE
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.kafka.user }}
+                key: user.crt
+          - name: KAFKA_USER_KEYSTORE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.kafka.user }}
+                key: user.key
+          - name: KAFKA_CLUSTER_TRUSTSTORE
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.kafka.clusterName }}-cluster-ca-cert
+                key: ca.crt
         volumeMounts:
           - name: {{ .Chart.Name }}
             mountPath: {{ .Values.appConfigMountPath }}

@@ -16,3 +16,5 @@ camunda:
             num-partitions: 1
             replication-factor: 1
             retention-policy-in-days: 7
+        ssl:
+          enabled: false
