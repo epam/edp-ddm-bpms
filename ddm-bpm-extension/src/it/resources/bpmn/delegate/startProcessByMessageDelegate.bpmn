@@ -3,7 +3,7 @@
   <bpmn:message id="Message_03lyfii" name="Message_1" />
   <bpmn:collaboration id="Collaboration_1j4x0dh">
     <bpmn:participant id="Participant_135tmd3" name="Send message" processRef="sendMessage" />
-    <bpmn:participant id="Participant_1pbvb45" name="Recieve Message" processRef="receiveMessage" />
+    <bpmn:participant id="Participant_1pbvb45" name="Receive Message" processRef="receiveMessage" />
   </bpmn:collaboration>
   <bpmn:process id="sendMessage" isExecutable="true">
     <bpmn:sequenceFlow id="Flow_0jdmtmk" sourceRef="StartEvent_1" targetRef="Event_0nw5sd2" />

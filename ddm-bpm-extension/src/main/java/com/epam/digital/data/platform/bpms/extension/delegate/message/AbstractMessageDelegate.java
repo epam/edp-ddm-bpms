@@ -21,6 +21,7 @@ import com.epam.digital.data.platform.bpms.extension.exception.CamundaMessageExc
 import java.util.Objects;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
+import org.springframework.lang.NonNull;
 
 /**
  * Base class that is used for common messaging functions and variables
@@ -30,7 +31,7 @@ public abstract class AbstractMessageDelegate extends BaseJavaDelegate {
   private static final String MESSAGE_REF_BPMN_MODEL_ATTRIBUTE = "messageRef";
   private static final String MESSAGE_NAME_BPMN_MODEL_ATTRIBUTE = "name";
 
-  protected String getMessageName(DelegateExecution execution) {
+  protected String getMessageName(@NonNull DelegateExecution execution) {
     var bpmnModel = execution.getBpmnModelInstance();
     var currentActivity = bpmnModel.getModelElementById(execution.getCurrentActivityId());
     var messageEventDefinition = currentActivity.getUniqueChildElementByType(
