@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -60,7 +61,7 @@ public class StartProcessByMessageDelegate extends AbstractMessageDelegate {
   }
 
   @Override
-  protected void executeInternal(DelegateExecution execution) throws Exception {
+  protected void executeInternal(@NonNull DelegateExecution execution) {
     var correlationMessage = getMessageName(execution);
     var messagePayloadStorageKey = saveMessagePayloadToStorage(correlationMessage, execution);
 
@@ -77,8 +78,9 @@ public class StartProcessByMessageDelegate extends AbstractMessageDelegate {
     calledProcessInstanceIdVariable.on(execution).set(calledProcessInstanceId);
   }
 
-  private Optional<String> saveMessagePayloadToStorage(String correlationMessage,
-      DelegateExecution execution) {
+  private Optional<String> saveMessagePayloadToStorage(
+      @NonNull String correlationMessage,
+      @NonNull DelegateExecution execution) {
     var messagePayload = messagePayloadVariable.from(execution).getOptional();
     if (messagePayload.isEmpty()) {
       return Optional.empty();
@@ -93,7 +95,8 @@ public class StartProcessByMessageDelegate extends AbstractMessageDelegate {
     return Optional.of(storageKey);
   }
 
-  private String getMessageCorrelationProcessDefinitionKey(String messageName) {
+  private String getMessageCorrelationProcessDefinitionKey(
+      @NonNull String messageName) {
     var repositoryService = processEngine.getRepositoryService();
 
     var processDefinition = repositoryService.createProcessDefinitionQuery()
@@ -106,8 +109,9 @@ public class StartProcessByMessageDelegate extends AbstractMessageDelegate {
     return processDefinition.getKey();
   }
 
-  private ProcessInstance correlateStartMessage(String correlationMessage,
-      Map<String, Object> data) {
+  private ProcessInstance correlateStartMessage(
+      @NonNull String correlationMessage,
+      @NonNull Map<String, Object> data) {
     var runtimeService = processEngine.getRuntimeService();
 
     return runtimeService

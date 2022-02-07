@@ -27,11 +27,11 @@ import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-class SendMessageDelegateIT extends BaseIT {
+class StartProcessByMessageDelegateIT extends BaseIT {
 
   @Test
-  @Deployment(resources = "bpmn/delegate/sendMessageDelegate.bpmn")
-  void sendMessage() throws JSONException {
+  @Deployment(resources = "bpmn/delegate/startProcessByMessageDelegate.bpmn")
+  void startBpByMessage() throws JSONException {
     var sendMessage = runtimeService
         .startProcessInstanceByKey("sendMessage");
 
