@@ -35,7 +35,8 @@ public enum PlatformHttpHeader {
   X_DIGITAL_SIGNATURE_DERIVED("X-Digital-Signature-Derived"),
   X_SOURCE_BUSINESS_PROCESS_INSTANCE_ID("X-Source-Business-Process-Instance-Id"),
   X_SOURCE_BUSINESS_PROCESS_DEFINITION_ID("X-Source-Business-Process-Definition-Id"),
-  X_SOURCE_BUSINESS_ACTIVITY_INSTANCE_ID("X-Source-Business-Activity-Instance-Id");
+  X_SOURCE_BUSINESS_ACTIVITY_INSTANCE_ID("X-Source-Business-Activity-Instance-Id"),
+  X_XSRF_TOKEN("X-XSRF-TOKEN");
 
   private final String name;
 }

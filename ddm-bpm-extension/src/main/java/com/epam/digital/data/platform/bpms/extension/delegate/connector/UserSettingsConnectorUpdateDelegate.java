@@ -57,6 +57,7 @@ public class UserSettingsConnectorUpdateDelegate extends BaseJavaDelegate {
     var headers = headerBuilderFactory.builder()
         .contentTypeJson()
         .accessTokenHeader()
+        .csrfProtectionHeaders()
         .build();
     var response = userSettingsFeignClient.performPut(requestBody, headers);
     log.debug("User settings successfully created or updated");
