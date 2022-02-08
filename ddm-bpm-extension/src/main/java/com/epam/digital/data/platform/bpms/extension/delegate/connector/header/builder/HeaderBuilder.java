@@ -25,12 +25,16 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
+import java.util.UUID;
+
 /**
  * The class represents a builder that is used for collecting headers from the delegate execution
  * context.
  */
 @RequiredArgsConstructor
 public class HeaderBuilder {
+
+  private static final String XSRF_COOKIE_NAME = "XSRF-TOKEN";
 
   private final NamedVariableAccessor<String> xAccessTokenVariable;
   private final NamedVariableAccessor<String> xDigitalSignatureCephKeyVariable;
@@ -78,6 +82,13 @@ public class HeaderBuilder {
 
   public HeaderBuilder contentTypeJson() {
     httpHeadersList.setContentType(MediaType.APPLICATION_JSON);
+    return this;
+  }
+
+  public HeaderBuilder csrfProtectionHeaders() {
+    var requestXsrfToken = UUID.randomUUID().toString();
+    httpHeadersList.add(PlatformHttpHeader.X_XSRF_TOKEN.getName(), requestXsrfToken);
+    httpHeadersList.add("Cookie", String.format("%s=%s", XSRF_COOKIE_NAME, requestXsrfToken));
     return this;
   }
 
