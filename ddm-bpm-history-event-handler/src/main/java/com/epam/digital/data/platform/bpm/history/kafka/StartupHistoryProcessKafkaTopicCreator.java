@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.common.KafkaFuture;
+import org.apache.kafka.common.errors.TopicExistsException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -73,13 +75,20 @@ public class StartupHistoryProcessKafkaTopicCreator {
   private void createTopics(Set<NewTopic> topicsToCreate, AdminClient adminClient) {
     log.info("Creating next topics {}", topicsToCreate);
     var createTopicsResult = adminClient.createTopics(topicsToCreate);
+    createTopicsResult.values().forEach(this::handleTopicCreationResult);
+  }
+
+  private void handleTopicCreationResult(String topicName, KafkaFuture<Void> future) {
     try {
-      createTopicsResult.all().get(TOPIC_CREATION_TIMEOUT, TimeUnit.SECONDS);
-      log.info("All required topics created.");
+      future.get(TOPIC_CREATION_TIMEOUT, TimeUnit.SECONDS);
     } catch (Exception e) {
-      throw new CreateKafkaTopicException(
-              String.format("Failed to create kafka topics %s in %d sec", topicsToCreate,
-                      TOPIC_CREATION_TIMEOUT), e);
+      if (e.getCause() instanceof TopicExistsException) {
+        log.warn("Topic {} was in missing topics list, but now exists", topicName);
+      } else {
+        throw new CreateKafkaTopicException(
+                String.format("Failed to create topic %s in %d sec", topicName, TOPIC_CREATION_TIMEOUT),
+                e);
+      }
     }
   }
 }
