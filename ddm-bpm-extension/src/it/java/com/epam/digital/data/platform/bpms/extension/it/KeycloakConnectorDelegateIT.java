@@ -153,6 +153,24 @@ public class KeycloakConnectorDelegateIT extends BaseIT {
     BpmnAwareTests.assertThat(processInstance).isEnded();
   }
 
+  @Test
+  @Deployment(resources = "bpmn/connector/getKeycloakUsersByAttribute.bpmn")
+  public void testGeyUsersFromKeycloakByAttributes() {
+    var requestAttributes = "{\"attributes\":{\"edrpou\":\"12345678\"}}";
+    mockConnectToKeycloak(officerRealm);
+    mockKeycloakGetUsersByAttributes(requestAttributes,
+        "/json/keycloak/keycloakUsersByAttributesResponse.json");
+
+    var processInstance = runtimeService.startProcessInstanceByKey("testGetUsersByAttributes_key");
+
+    var roleMappingsUrl = "/auth/realms/officer-realm/users/search";
+    keycloakMockServer.verify(1,
+        postRequestedFor(urlEqualTo(roleMappingsUrl)).withRequestBody(
+            equalToJson(requestAttributes)));
+
+    BpmnAwareTests.assertThat(processInstance).isEnded();
+  }
+
   private void mockConnectToKeycloak(String realmName) {
     keycloakMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo("/auth/realms/" + realmName + "/protocol/openid-connect/token"))
@@ -167,6 +185,15 @@ public class KeycloakConnectorDelegateIT extends BaseIT {
         stubFor(get(urlPathEqualTo("/auth/admin/realms/citizen-realm/users"))
             .withQueryParam("username", equalTo(userName))
             .withQueryParam("exact", equalTo(Boolean.TRUE.toString()))
+            .willReturn(aResponse().withStatus(200)
+                .withHeader("Content-type", "application/json")
+                .withBody(convertJsonToString(responseBody)))));
+  }
+
+  private void mockKeycloakGetUsersByAttributes(String requestBody, String responseBody) {
+    keycloakMockServer.addStubMapping(
+        stubFor(post(urlPathEqualTo("/auth/realms/officer-realm/users/search"))
+            .withRequestBody(equalToJson(requestBody))
             .willReturn(aResponse().withStatus(200)
                 .withHeader("Content-type", "application/json")
                 .withBody(convertJsonToString(responseBody)))));

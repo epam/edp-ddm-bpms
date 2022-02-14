@@ -1,0 +1,52 @@
+[
+  {
+    "id": "123",
+    "createdTimestamp": 1618403768879,
+    "username": "testUser123",
+    "enabled": true,
+    "totp": false,
+    "emailVerified": false,
+    "firstName": "Test123",
+    "lastName": "User123",
+    "email": "test_user123@test.com",
+    "attributes": {
+      "edrpou": [
+        "12345678"
+      ],
+      "drfo": [
+        "1212121203"
+      ],
+      "fullName": [
+        "Test123 User123"
+      ]
+    },
+    "disableableCredentialTypes": [],
+    "requiredActions": [],
+    "notBefore": 0
+  },
+  {
+    "id": "1234",
+    "createdTimestamp": 1618403768879,
+    "username": "testUser1234",
+    "enabled": true,
+    "totp": false,
+    "emailVerified": false,
+    "firstName": "Test1234",
+    "lastName": "User1234",
+    "email": "test_user1234@test.com",
+    "attributes": {
+      "edrpou": [
+        "12345678"
+      ],
+      "drfo": [
+        "1212020204"
+      ],
+      "fullName": [
+        "Test1234 User1234"
+      ]
+    },
+    "disableableCredentialTypes": [],
+    "requiredActions": [],
+    "notBefore": 0
+  }
+]
