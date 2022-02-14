@@ -196,9 +196,13 @@ class UserTaskServiceTest {
     var processInstance = new ExecutionEntity();
     processInstance.setId("processInstanceId");
     processInstance.setBusinessKey("businessKey");
-    when(processInstanceRuntimeService.getProcessInstanceDtos(refEq(processInstanceQueryDto),
+    processInstance.setRootProcessInstanceId("processInstanceId");
+    processInstance.setProcessDefinitionId("processDefinitionId");
+    when(processInstanceRuntimeService.getProcessInstances(refEq(processInstanceQueryDto),
         eq(PaginationQueryDto.builder().build())))
-        .thenReturn(List.of(ProcessInstanceDto.fromProcessInstance(processInstance)));
+        .thenReturn(List.of(processInstance));
+    when(processInstanceRuntimeService.getRootProcessInstance(processInstance, 2)).thenReturn(
+        processInstance);
 
     var result = service.getTasksByParams(queryDto, paginationQueryDto);
 
@@ -211,9 +215,9 @@ class UserTaskServiceTest {
     assertThat(service.getTasksByParams(queryDto, paginationQueryDto)).isEmpty();
 
     verify(taskRuntimeService, times(2)).getTasksByParams(queryDto, paginationQueryDto);
-    verify(camundaAdminImpersonation, times(2)).execute(any());
+    verify(camundaAdminImpersonation, times(3)).execute(any());
     verify(processDefinitionRepositoryService).getProcessDefinitionsNames("processDefinitionId");
-    verify(processInstanceRuntimeService).getProcessInstanceDtos(refEq(processInstanceQueryDto),
+    verify(processInstanceRuntimeService).getProcessInstances(refEq(processInstanceQueryDto),
         eq(PaginationQueryDto.builder().build()));
   }
 
