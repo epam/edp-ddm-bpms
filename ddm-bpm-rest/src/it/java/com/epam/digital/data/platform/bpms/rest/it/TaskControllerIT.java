@@ -49,6 +49,23 @@ class TaskControllerIT extends BaseIT {
   }
 
   @Test
+  @Deployment(resources = {"bpmn/testParent.bpmn", "bpmn/testSubprocess1.bpmn",
+      "bpmn/testSubprocess2.bpmn"})
+  public void shouldGetChildTaskWithParentProcessDefinitionName() throws JsonProcessingException {
+    var startResult = postForObject("api/process-definition/key/parent/start",
+        "{\"businessKey\":\"parent\"}", Map.class);
+    var processId = (String) startResult.get("id");
+
+    var result = postForObject("api/extended/task",
+        "{\"assignee\": \"testuser\"}",
+        DdmTaskDto[].class);
+
+    assertThat(result).isNotNull();
+    assertThat(result[0].getTaskDefinitionKey()).isEqualTo("sub-process-2-task");
+    assertThat(result[0].getProcessDefinitionName()).isEqualTo("Parent process");
+  }
+
+  @Test
   void shouldGetTaskWithTaskProperties() throws Exception {
     var startResult = postForObject("api/process-definition/key/testGetExtendedTasks_key/start", "",
         Map.class);
