@@ -27,11 +27,13 @@ import com.epam.digital.data.platform.bpms.rest.service.repository.TaskRuntimeSe
 import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
 import com.epam.digital.data.platform.dso.api.dto.Subject;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import javax.ws.rs.core.Response.Status;
@@ -40,7 +42,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
-import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
@@ -61,6 +62,7 @@ public class UserTaskService {
   private static final String SIGN_PROPERTY = "eSign";
   private static final String FORM_VARIABLES_PROPERTY = "formVariables";
   private static final String FORM_VARIABLES_REGEX = "\\s*,\\s*";
+  private static final int MAX_NUMBER_OF_NESTED_SUB_PROCESSES = 2;
 
   private final ProcessDefinitionRepositoryService processDefinitionRepositoryService;
   private final ProcessInstanceRuntimeService processInstanceRuntimeService;
@@ -89,10 +91,12 @@ public class UserTaskService {
       return List.of();
     }
 
-    var processDefinitionNames = getProcessDefinitionNames(taskDtos);
+    var processInstances = getProcessInstances(taskDtos);
+
+    var processDefinitionNames = getProcessDefinitionNames(taskDtos, processInstances);
     log.trace("Found process definition names - {}", processDefinitionNames.values());
 
-    var processBusinessKeys = getProcessBusinessKeys(taskDtos);
+    var processBusinessKeys = getProcessBusinessKeys(processInstances.values());
     log.trace("Found {} process business keys", processBusinessKeys.size());
 
     var result = taskMapper.toDdmTaskDtos(taskDtos, processDefinitionNames,
@@ -140,7 +144,6 @@ public class UserTaskService {
    * @param id  the task id
    * @param dto dto with request variables
    * @return {@link DdmCompletedTaskDto}
-   *
    * @throws RestException           in case of any process engine exception
    * @throws InvalidRequestException in case of any rest exception
    */
@@ -209,28 +212,49 @@ public class UserTaskService {
     return camundaAdminImpersonation.execute(() -> taskRuntimeService.getTaskProperty(id));
   }
 
-  private Map<String, String> getProcessDefinitionNames(List<TaskDto> taskDtos) {
-    var processDefinitionIds = taskDtos.stream()
-        .map(TaskDto::getProcessDefinitionId)
-        .toArray(String[]::new);
+  private Map<String, String> getProcessDefinitionNames(List<TaskDto> taskDtos,
+      Map<String, ProcessInstance> processInstances) {
+    var taskIdAndRootProcessInstance =
+        taskDtos.stream().collect(Collectors.toMap(TaskDto::getId,
+            t -> getRootProcessInstance(processInstances.get(t.getProcessInstanceId()))));
+
+    var taskIdAndProcessDefinitionId = taskIdAndRootProcessInstance.entrySet().stream()
+        .collect(Collectors.toMap(Entry::getKey, e -> e.getValue().getProcessDefinitionId()));
+
+    var processDefinitionsNames = getProcessDefinitionNames(
+        taskIdAndProcessDefinitionId.values().toArray(String[]::new));
+
+    return taskIdAndProcessDefinitionId.entrySet().stream()
+        .collect(Collectors.toMap(Entry::getKey, e -> processDefinitionsNames.get(e.getValue())));
+  }
+
+  private Map<String, ProcessInstance> getProcessInstances(List<TaskDto> taskDtos) {
+    var processInstanceIds = taskDtos.stream()
+        .map(TaskDto::getProcessInstanceId)
+        .collect(Collectors.toSet());
+    var queryDto = new ProcessInstanceQueryDto();
+    queryDto.setProcessInstanceIds(processInstanceIds);
+    return camundaAdminImpersonation.execute(
+        () -> processInstanceRuntimeService.getProcessInstances(queryDto,
+                PaginationQueryDto.builder().build())
+            .stream().collect(Collectors.toMap(ProcessInstance::getId, Function.identity())));
+  }
+
+  private ProcessInstance getRootProcessInstance(ProcessInstance processInstance) {
+    return camundaAdminImpersonation.execute(
+        () -> processInstanceRuntimeService.getRootProcessInstance(processInstance,
+            MAX_NUMBER_OF_NESTED_SUB_PROCESSES));
+  }
+
+  private Map<String, String> getProcessDefinitionNames(String... processDefinitionIds) {
     return camundaAdminImpersonation.execute(
         () -> processDefinitionRepositoryService.getProcessDefinitionsNames(processDefinitionIds));
   }
 
-  private Map<String, String> getProcessBusinessKeys(List<TaskDto> taskDtos) {
-    var processInstanceIds = taskDtos.stream()
-        .map(TaskDto::getProcessInstanceId)
-        .collect(Collectors.toSet());
-    var processInstanceQueryDto = new ProcessInstanceQueryDto();
-    processInstanceQueryDto.setProcessInstanceIds(processInstanceIds);
-
-    var processInstances = camundaAdminImpersonation.execute(
-        () -> processInstanceRuntimeService.getProcessInstanceDtos(processInstanceQueryDto,
-            PaginationQueryDto.builder().build()));
-
+  private Map<String, String> getProcessBusinessKeys(Collection<ProcessInstance> processInstances) {
     return processInstances.stream()
         .filter(processInstanceDto -> Objects.nonNull(processInstanceDto.getBusinessKey()))
-        .collect(Collectors.toMap(ProcessInstanceDto::getId, ProcessInstanceDto::getBusinessKey));
+        .collect(Collectors.toMap(ProcessInstance::getId, ProcessInstance::getBusinessKey));
   }
 
   private Map<String, Object> getTaskFormVariables(String taskId, String formVariables) {

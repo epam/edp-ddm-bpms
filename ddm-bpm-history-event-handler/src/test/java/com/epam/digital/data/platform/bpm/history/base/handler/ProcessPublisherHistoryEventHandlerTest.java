@@ -28,6 +28,7 @@ import com.epam.digital.data.platform.bphistory.model.HistoryProcess;
 import com.epam.digital.data.platform.bphistory.model.HistoryTask;
 import com.epam.digital.data.platform.bpm.history.base.mapper.HistoryMapper;
 import com.epam.digital.data.platform.bpm.history.base.publisher.ProcessHistoryEventPublisher;
+import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessInstanceRuntimeService;
 import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
 import com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
@@ -44,6 +45,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -73,6 +75,8 @@ class ProcessPublisherHistoryEventHandlerTest {
   private CamundaImpersonation camundaImpersonation;
   @Mock
   private RepositoryService repositoryService;
+  @Mock
+  private ProcessInstanceRuntimeService processInstanceRuntimeService;
 
   @Captor
   private ArgumentCaptor<HistoryProcess> historyProcessArgumentCaptor;
@@ -86,12 +90,19 @@ class ProcessPublisherHistoryEventHandlerTest {
     ReflectionTestUtils.setField(processPublisherHistoryEventHandler, "repositoryService",
         repositoryService);
     ReflectionTestUtils.setField(processPublisherHistoryEventHandler, "historyMapper", historyMapper);
+    ReflectionTestUtils.setField(processPublisherHistoryEventHandler, "processInstanceRuntimeService", processInstanceRuntimeService);
     lenient().when(camundaImpersonationFactory.getCamundaImpersonation())
         .thenReturn(Optional.of(camundaImpersonation));
     lenient().doAnswer(invocation -> {
       Supplier<?> supplier = invocation.getArgument(0);
       return supplier.get();
     }).when(camundaImpersonation).execute(any());
+
+    var processInstance = new ExecutionEntity();
+    processInstance.setId("rootProcessInstanceId");
+    processInstance.setProcessDefinitionId("processDefinitionId");
+    lenient().when(processInstanceRuntimeService.getRootProcessInstance("rootProcessInstanceId", 1))
+        .thenReturn(Optional.of(processInstance));
 
     var processDefinition = new ProcessDefinitionEntity();
     processDefinition.setName("processDefinitionName");

@@ -46,7 +46,7 @@ public interface TaskMapper {
       Map<String, String> processBusinessKeys) {
     return dtos.stream()
         .map(dto -> {
-          var processDefinitionName = processDefinitionNames.get(dto.getProcessDefinitionId());
+          var processDefinitionName = processDefinitionNames.get(dto.getId());
           var businessKey = processBusinessKeys.get(dto.getProcessInstanceId());
 
           return toDdmTaskDto(dto, processDefinitionName, businessKey);

@@ -34,14 +34,49 @@ public class ProcessInstanceRuntimeService {
    */
   public List<ProcessInstanceDto> getProcessInstanceDtos(ProcessInstanceQueryDto queryDto,
       PaginationQueryDto paginationQueryDto) {
-    log.debug("Selecting process instances...");
-    var result = queryDto.toQuery(processEngine)
-        .listPage(paginationQueryDto.getFirstResult(), paginationQueryDto.getMaxResults())
+    return this.getProcessInstances(queryDto, paginationQueryDto)
         .stream().map(ProcessInstanceDto::fromProcessInstance)
         .collect(Collectors.toList());
+  }
 
+  public List<ProcessInstance> getProcessInstances(ProcessInstanceQueryDto queryDto,
+      PaginationQueryDto paginationQueryDto) {
+    log.debug("Selecting process instances...");
+    var result = queryDto.toQuery(processEngine)
+        .listPage(paginationQueryDto.getFirstResult(), paginationQueryDto.getMaxResults());
     log.debug("Selected {} process instances", result.size());
     return result;
+  }
+
+  /**
+   * Get root process instance by provided process instance
+   *
+   * @param processInstance            specified process instance id
+   * @param maxNumberOfNestedProcesses number of the nested processes
+   * @return {@link ProcessInstance process instance object}
+   */
+  public ProcessInstance getRootProcessInstance(ProcessInstance processInstance,
+      int maxNumberOfNestedProcesses) {
+    log.info("Getting root process instance for process instance {}", processInstance.getId());
+    assert maxNumberOfNestedProcesses > 0 : "Invalid number of maximum nested sub processes";
+    var nestedCount = 0;
+    var currentProcessInstance = processInstance;
+    while (nestedCount < maxNumberOfNestedProcesses &&
+        !processInstance.getId().equals(processInstance.getRootProcessInstanceId())) {
+      currentProcessInstance =
+          getProcessInstance(processInstance.getRootProcessInstanceId())
+              .orElseThrow(() -> new IllegalStateException("Root process instance not found"));
+      nestedCount++;
+    }
+    log.info("Got root process instance {}, for provided process instance {}",
+        processInstance.getId(), currentProcessInstance.getId());
+    return currentProcessInstance;
+  }
+
+  public Optional<ProcessInstance> getRootProcessInstance(String processInstanceId,
+      int maxNumberOfNestedProcesses) {
+    return getProcessInstance(processInstanceId).map(
+        pi -> this.getRootProcessInstance(pi, maxNumberOfNestedProcesses));
   }
 
   public Optional<ProcessInstance> getProcessInstance(String processInstanceId) {

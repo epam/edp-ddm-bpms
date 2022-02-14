@@ -111,4 +111,31 @@ class ProcessHistoryEventPublisherIT {
     assertThat(historyService.createHistoricProcessInstanceQuery().list()).isEmpty();
     assertThat(historyService.createHistoricTaskInstanceQuery().list()).isEmpty();
   }
+
+  @Test
+  @Deployment(resources = {"bpmn/testParent.bpmn", "bpmn/testSubprocess.bpmn"})
+  public void testHistoryTaskShouldHaveParentProcessDefinitionName() {
+    identityService.setAuthentication("testUser", List.of("camunda-admin"));
+
+    runtimeService.startProcessInstanceByKey("parent_process", "1",
+        Map.of("initiator", "testUser"));
+
+    var task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+    kafkaConsumer.consumeAll();
+
+    var storage = kafkaConsumer.getStorage();
+    assertThat(storage.getHistoryTaskDtoMap()).hasSize(1);
+    var actualTask = storage.getHistoryTaskDtoMap().values()
+        .stream()
+        .findFirst();
+    assertThat(actualTask).isPresent().get()
+        .hasNoNullFieldsOrProperties()
+        .hasFieldOrPropertyWithValue("taskDefinitionKey", "sub-process-1-task")
+        .hasFieldOrPropertyWithValue("processDefinitionName", "Parent process")
+        .hasFieldOrPropertyWithValue("taskDefinitionName", "task sub process");
+
+    assertThat(historyService.createHistoricTaskInstanceQuery().list()).isEmpty();
+  }
 }

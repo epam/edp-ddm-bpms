@@ -22,6 +22,7 @@ import com.epam.digital.data.platform.bpm.history.it.storage.TestHistoryEventSto
 import com.epam.digital.data.platform.bpm.history.kafka.StartupHistoryProcessKafkaTopicCreator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import javax.annotation.PostConstruct;
@@ -30,6 +31,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
@@ -42,7 +44,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 @Component
 public class KafkaConsumer {
 
-  private final TestHistoryEventStorage storage = new TestHistoryEventStorage();
+  private TestHistoryEventStorage storage;
 
   @Inject
   private StartupHistoryProcessKafkaTopicCreator startupHistoryProcessKafkaTopicCreator;
@@ -51,20 +53,19 @@ public class KafkaConsumer {
   @Inject
   private ObjectMapper objectMapper;
 
-  private Consumer<String, String> consumer;
+  private DefaultKafkaConsumerFactory consumerFactory;
 
   @PostConstruct
   public void setUp() {
     ReflectionTestUtils.setField(embeddedKafkaBroker, "topics",
         new HashSet<>(Set.of("bpm-history-process", "bpm-history-task")));
     var props = KafkaTestUtils.consumerProps("bpm", "false", embeddedKafkaBroker);
-    var consumerFactory = new DefaultKafkaConsumerFactory<String, String>(props);
-    consumer = consumerFactory.createConsumer();
+    props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+    consumerFactory = new DefaultKafkaConsumerFactory<String, String>(props);
   }
 
   public void consumeAll() {
-    embeddedKafkaBroker.consumeFromEmbeddedTopics(consumer,
-        "bpm-history-process", "bpm-history-task");
+    var consumer = this.createConsumer();
     KafkaTestUtils.getRecords(consumer).forEach(record -> {
       if (record.topic().equals("bpm-history-process")) {
         consumeHistoryProcessInstanceDto(record);
@@ -72,7 +73,15 @@ public class KafkaConsumer {
         consumeHistoryTaskDto(record);
       }
     });
+    consumer.commitSync();
     consumer.close();
+  }
+
+  public Consumer<String, String> createConsumer() {
+    var consumer = consumerFactory.createConsumer();
+    consumer.subscribe(List.of("bpm-history-process", "bpm-history-task"));
+    storage = new TestHistoryEventStorage();
+    return consumer;
   }
 
   @SneakyThrows

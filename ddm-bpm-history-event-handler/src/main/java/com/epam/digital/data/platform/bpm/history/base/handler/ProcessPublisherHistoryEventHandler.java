@@ -19,6 +19,7 @@ package com.epam.digital.data.platform.bpm.history.base.handler;
 import com.epam.digital.data.platform.bphistory.model.HistoryProcess;
 import com.epam.digital.data.platform.bpm.history.base.mapper.HistoryMapper;
 import com.epam.digital.data.platform.bpm.history.base.publisher.ProcessHistoryEventPublisher;
+import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessInstanceRuntimeService;
 import com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessExcerptIdVariable;
@@ -32,6 +33,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEnti
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
@@ -43,6 +45,8 @@ import org.springframework.context.annotation.Lazy;
 @RequiredArgsConstructor
 public class ProcessPublisherHistoryEventHandler implements HistoryEventHandler {
 
+  private static final int MAX_NUMBER_OF_NESTED_SUB_PROCESSES = 1;
+
   private final ProcessHistoryEventPublisher publisher;
 
   @Autowired
@@ -52,6 +56,10 @@ public class ProcessPublisherHistoryEventHandler implements HistoryEventHandler 
   private RepositoryService repositoryService;
   @Autowired
   private CamundaImpersonationFactory camundaImpersonationFactory;
+  @Lazy
+  @Autowired
+  private ProcessInstanceRuntimeService processInstanceRuntimeService;
+
 
   /**
    * Handle list of fired {@link HistoryEvent}
@@ -153,8 +161,20 @@ public class ProcessPublisherHistoryEventHandler implements HistoryEventHandler 
     }
 
     var processDefinitionName = camundaAdminImpersonation.get().execute(() ->
-        repositoryService.getProcessDefinition(event.getProcessDefinitionId()).getName());
+        repositoryService.getProcessDefinition(getProcessDefinitionId(event)).getName());
 
     event.setProcessDefinitionName(processDefinitionName);
+  }
+
+  private String getProcessDefinitionId(HistoryEvent event) {
+    if (event instanceof HistoricTaskInstanceEventEntity &&
+        !event.getProcessInstanceId().equals(event.getRootProcessInstanceId())) {
+      var rootProcessInstance = processInstanceRuntimeService.getRootProcessInstance(
+          event.getRootProcessInstanceId(), MAX_NUMBER_OF_NESTED_SUB_PROCESSES);
+      return rootProcessInstance.map(ProcessInstance::getProcessDefinitionId)
+          .orElseGet(event::getProcessDefinitionId);
+
+    }
+    return event.getProcessDefinitionId();
   }
 }
