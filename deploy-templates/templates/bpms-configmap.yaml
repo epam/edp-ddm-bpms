@@ -11,7 +11,7 @@ data:
     camunda.bpm.database.schema-update: true
     dso.url: http://digital-signature-ops:8080
     ceph.http-endpoint: {{ .Values.ceph.host }}
-    keycloak.url: {{ template "keycloak.url" . }}/auth
+    keycloak.url: {{ template "keycloak.url" . }}
     keycloak.citizen.realm: {{ template "keycloak.citizenTargetRealm" . }}
     keycloak.citizen.client-id: {{ .Values.keycloak.citizenClient.clientName }}
     keycloak.officer.realm: {{ template "keycloak.officerTargetRealm" . }}

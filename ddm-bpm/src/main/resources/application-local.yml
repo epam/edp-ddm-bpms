@@ -63,7 +63,7 @@ storage:
         bucket: bucket
 
 keycloak:
-  url: http://localhost:8200/auth
+  url: http://localhost:8200
   citizen:
     realm: citizenRealm
     client-id: citizenClientId

@@ -16,34 +16,39 @@
 
 package com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloak.citizen;
 
-import com.epam.digital.data.platform.bpms.extension.service.KeycloakClientService;
-import com.epam.digital.data.platform.integration.idm.client.KeycloakAdminClient;
+import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
+import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
+import com.epam.digital.data.platform.integration.idm.service.IdmService;
+import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * The class represents an implementation of {@link BaseKeycloakCitizenConnectorDelegate} that
- * is used to add a new role to the keycloak user.
+ * The class represents an implementation of {@link BaseJavaDelegate} that is
+ * used to add a new role to the keycloak user.
  */
+@RequiredArgsConstructor
 @Component(KeycloakAddCitizenRoleConnectorDelegate.DELEGATE_NAME)
-public class KeycloakAddCitizenRoleConnectorDelegate extends
-    BaseKeycloakCitizenConnectorDelegate {
+public class KeycloakAddCitizenRoleConnectorDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "keycloakAddRoleConnectorDelegate";
 
-  protected KeycloakAddCitizenRoleConnectorDelegate(
-      @Qualifier("citizen-keycloak-admin-client") KeycloakAdminClient citizenKeycloakAdminClient,
-      KeycloakClientService keycloakClientService) {
-    super(citizenKeycloakAdminClient, keycloakClientService);
-  }
+  @Qualifier("citizen-keycloak-client-service")
+  private  final  IdmService idmService;
+
+  @SystemVariable(name = "user_name")
+  protected NamedVariableAccessor<String> userNameVariable;
+  @SystemVariable(name = "role")
+  protected NamedVariableAccessor<String> roleVariable;
 
   @Override
   public void executeInternal(DelegateExecution execution) {
     var username = userNameVariable.from(execution).get();
     var role = roleVariable.from(execution).get();
 
-    keycloakClientService.addRole(citizenKeycloakAdminClient, username, role);
+    idmService.addRole(username, role);
   }
 
   @Override

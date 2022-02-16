@@ -16,34 +16,39 @@
 
 package com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloak.citizen;
 
-import com.epam.digital.data.platform.bpms.extension.service.KeycloakClientService;
-import com.epam.digital.data.platform.integration.idm.client.KeycloakAdminClient;
+import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
+import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
+import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
+import com.epam.digital.data.platform.integration.idm.service.IdmService;
+import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * The class represents an implementation of {@link BaseKeycloakCitizenConnectorDelegate} that is
- * used to remove role from the keycloak user.
+ * The class represents an implementation of {@link BaseJavaDelegate} that is used to remove role
+ * from the keycloak user.
  */
+@RequiredArgsConstructor
 @Component(KeycloakRemoveCitizenRoleConnectorDelegate.DELEGATE_NAME)
-public class KeycloakRemoveCitizenRoleConnectorDelegate extends
-    BaseKeycloakCitizenConnectorDelegate {
+public class KeycloakRemoveCitizenRoleConnectorDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "keycloakRemoveRoleConnectorDelegate";
 
-  protected KeycloakRemoveCitizenRoleConnectorDelegate(
-      @Qualifier("citizen-keycloak-admin-client") KeycloakAdminClient citizenKeycloakAdminClient,
-      KeycloakClientService keycloakClientService) {
-    super(citizenKeycloakAdminClient, keycloakClientService);
-  }
+  @Qualifier("citizen-keycloak-client-service")
+  private final IdmService idmService;
+
+  @SystemVariable(name = "user_name")
+  protected NamedVariableAccessor<String> userNameVariable;
+  @SystemVariable(name = "role")
+  protected NamedVariableAccessor<String> roleVariable;
 
   @Override
   public void executeInternal(DelegateExecution execution) {
     var username = userNameVariable.from(execution).get();
     var role = roleVariable.from(execution).get();
 
-    keycloakClientService.removeRole(citizenKeycloakAdminClient, username, role);
+    idmService.removeRole(username, role);
   }
 
   @Override

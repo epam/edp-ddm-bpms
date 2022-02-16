@@ -59,6 +59,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -66,6 +67,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @ActiveProfiles("test")
 @RunWith(SpringRunner.class)
+@EnableFeignClients
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public abstract class BaseIT {
 

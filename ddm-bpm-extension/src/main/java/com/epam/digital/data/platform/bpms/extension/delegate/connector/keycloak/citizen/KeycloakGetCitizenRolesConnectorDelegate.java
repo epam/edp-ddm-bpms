@@ -16,18 +16,19 @@
 
 package com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloak.citizen;
 
-import com.epam.digital.data.platform.bpms.extension.service.KeycloakClientService;
+import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
-import com.epam.digital.data.platform.integration.idm.client.KeycloakAdminClient;
+import com.epam.digital.data.platform.integration.idm.model.IdmRole;
+import com.epam.digital.data.platform.integration.idm.service.IdmService;
 import com.epam.digital.data.platform.starter.security.dto.enums.KeycloakPlatformRole;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -36,26 +37,24 @@ import org.springframework.stereotype.Component;
  * regulations roles from keycloak.
  */
 @Slf4j
+@RequiredArgsConstructor
 @Component(KeycloakGetCitizenRolesConnectorDelegate.DELEGATE_NAME)
-public class KeycloakGetCitizenRolesConnectorDelegate extends BaseKeycloakCitizenConnectorDelegate {
+public class KeycloakGetCitizenRolesConnectorDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "keycloakGetRolesConnectorDelegate";
+
+  @Qualifier("citizen-keycloak-client-service")
+  private final IdmService idmService;
 
   @SystemVariable(name = "roles", isTransient = true)
   private NamedVariableAccessor<List<String>> rolesVariable;
 
-  public KeycloakGetCitizenRolesConnectorDelegate(
-      @Qualifier("citizen-keycloak-admin-client")KeycloakAdminClient citizenKeycloakAdminClient,
-      KeycloakClientService keycloakClientService) {
-    super(citizenKeycloakAdminClient, keycloakClientService);
-  }
-
   @Override
   public void executeInternal(DelegateExecution execution) {
-    var keycloakRoles = keycloakClientService.getKeycloakRoles(citizenKeycloakAdminClient);
+    var keycloakRoles = idmService.getRoles();
     log.debug("Start filtering keycloak roles {}", keycloakRoles);
     var regulationsRoles = keycloakRoles.stream()
-        .map(RoleRepresentation::getName)
+        .map(IdmRole::getName)
         .filter(Predicate.not(KeycloakPlatformRole::containsRole))
         .collect(Collectors.toList());
     log.debug("Keycloak roles {} was filtered", regulationsRoles);
