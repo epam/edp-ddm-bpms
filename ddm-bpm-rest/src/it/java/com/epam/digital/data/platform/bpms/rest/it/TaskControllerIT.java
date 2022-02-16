@@ -20,6 +20,7 @@ package com.epam.digital.data.platform.bpms.rest.it;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.epam.digital.data.platform.bpms.api.dto.DdmCompletedTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmLightweightTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmSignableTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmTaskDto;
 import com.epam.digital.data.platform.dso.api.dto.Subject;
@@ -63,6 +64,60 @@ class TaskControllerIT extends BaseIT {
     assertThat(result).isNotNull();
     assertThat(result[0].getTaskDefinitionKey()).isEqualTo("sub-process-2-task");
     assertThat(result[0].getProcessDefinitionName()).isEqualTo("Parent process");
+  }
+
+  @Test
+  @Deployment(resources = {"bpmn/testParent.bpmn", "bpmn/testSubprocess1.bpmn",
+      "bpmn/testSubprocess2.bpmn"})
+  void shouldGetLightweightTasksWithCallActivities()
+      throws JsonProcessingException {
+    var startResult = postForObject("api/process-definition/key/parent/start",
+        "{\"businessKey\":\"parent\"}", Map.class);
+    var processId = (String) startResult.get("id");
+
+    var result = postForObject("api/extended/task/lightweight",
+        "{\"rootProcessInstanceId\": \"" + processId + "\"}",
+        DdmTaskDto[].class);
+
+    assertThat(result).isNotNull();
+    assertThat(result.length).isOne();
+    assertThat(result[0].getId()).isNotEmpty();
+    assertThat(result[0].getAssignee()).isEqualTo("testuser");
+  }
+
+  @Test
+  @Deployment(resources = "bpmn/testGetExtendedTasks.bpmn")
+  void shouldGetLightweightTasksWithoutCallActivities() throws Exception {
+    var startResult = postForObject("api/process-definition/key/testGetExtendedTasks_key/start",
+        "{\"businessKey\":\"businessKey\"}", Map.class);
+    var processId = (String) startResult.get("id");
+
+    var result = postForObject("api/extended/task/lightweight",
+        "{\"assignee\": \"testuser\", \"processInstanceId\": \"" + processId + "\"}",
+        DdmLightweightTaskDto[].class);
+
+    assertThat(result).isNotNull();
+    assertThat(result[0].getId()).isNotEmpty();
+    assertThat(result[0].getAssignee()).isEqualTo("testuser");
+  }
+
+  @Test
+  @Deployment(resources = {"bpmn/testParent.bpmn", "bpmn/testSubprocess1.bpmn",
+      "bpmn/testSubprocess2.bpmn"})
+  void shouldCompleteTaskAndReturnCorrectRootProcessInstanceId() throws JsonProcessingException {
+    var startResult = postForObject("api/process-definition/key/parent/start",
+        "{\"businessKey\":\"parent\"}", Map.class);
+    var processId = (String) startResult.get("id");
+
+    var tasks = postForObject("api/extended/task/lightweight",
+        "{\"rootProcessInstanceId\": \"" + processId + "\"}",
+        DdmLightweightTaskDto[].class);
+    var task = tasks[0];
+    var result = postForObject("api/extended/task/" + task.getId() + "/complete", "{}",
+        DdmCompletedTaskDto.class);
+
+    assertThat(result).isNotNull();
+    assertThat(result.getRootProcessInstanceId()).isEqualTo(processId);
   }
 
   @Test

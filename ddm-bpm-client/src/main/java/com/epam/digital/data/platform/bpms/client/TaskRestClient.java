@@ -20,6 +20,7 @@ import com.epam.digital.data.platform.bpms.api.dto.DdmClaimTaskQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmCompleteTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmCompletedTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmCountResultDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmLightweightTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmSignableTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmTaskCountQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmTaskDto;
@@ -94,6 +95,18 @@ public interface TaskRestClient extends BaseFeignClient {
   @PostMapping("/extended/task")
   @ErrorHandling
   List<DdmTaskDto> getTasksByParams(@RequestBody DdmTaskQueryDto ddmTaskQueryDto,
+      @SpringQueryMap PaginationQueryDto paginationQueryDto);
+
+  /**
+   * Method for getting list of lightweight camunda user tasks
+   *
+   * @param ddmTaskQueryDto object with search parameters
+   * @return the list of {@link DdmLightweightTaskDto}
+   */
+  @PostMapping("/extended/task/lightweight")
+  @ErrorHandling
+  List<DdmLightweightTaskDto> getLightweightTasksByParams(
+      @RequestBody DdmTaskQueryDto ddmTaskQueryDto,
       @SpringQueryMap PaginationQueryDto paginationQueryDto);
 
   /**

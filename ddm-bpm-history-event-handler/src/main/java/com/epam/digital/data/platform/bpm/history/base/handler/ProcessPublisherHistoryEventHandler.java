@@ -25,6 +25,7 @@ import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResul
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessExcerptIdVariable;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
@@ -44,8 +45,6 @@ import org.springframework.context.annotation.Lazy;
  */
 @RequiredArgsConstructor
 public class ProcessPublisherHistoryEventHandler implements HistoryEventHandler {
-
-  private static final int MAX_NUMBER_OF_NESTED_SUB_PROCESSES = 1;
 
   private final ProcessHistoryEventPublisher publisher;
 
@@ -169,12 +168,23 @@ public class ProcessPublisherHistoryEventHandler implements HistoryEventHandler 
   private String getProcessDefinitionId(HistoryEvent event) {
     if (event instanceof HistoricTaskInstanceEventEntity &&
         !event.getProcessInstanceId().equals(event.getRootProcessInstanceId())) {
-      var rootProcessInstance = processInstanceRuntimeService.getRootProcessInstance(
-          event.getRootProcessInstanceId(), MAX_NUMBER_OF_NESTED_SUB_PROCESSES);
+      var rootProcessInstance = getProcessInstanceOrRoot(
+          event.getRootProcessInstanceId());
       return rootProcessInstance.map(ProcessInstance::getProcessDefinitionId)
           .orElseGet(event::getProcessDefinitionId);
 
     }
     return event.getProcessDefinitionId();
+  }
+
+  private Optional<ProcessInstance> getProcessInstanceOrRoot(String processInstanceId) {
+    var processInstance = processInstanceRuntimeService.getProcessInstance(processInstanceId);
+    return processInstance.map(process -> {
+      if (process.getId().equals(process.getRootProcessInstanceId())) {
+        return process;
+      }
+      return processInstanceRuntimeService.getProcessInstanceBySubProcessInstanceId(
+          processInstanceId).orElse(null);
+    });
   }
 }

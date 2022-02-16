@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.util.Lists;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
@@ -21,6 +22,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ProcessInstanceRuntimeService {
+
+  private static final int MAX_NUMBER_OF_NESTED_SUB_PROCESSES = 2;
 
   private final RuntimeService runtimeService;
   private final ProcessEngine processEngine;
@@ -51,17 +54,14 @@ public class ProcessInstanceRuntimeService {
   /**
    * Get root process instance by provided process instance
    *
-   * @param processInstance            specified process instance id
-   * @param maxNumberOfNestedProcesses number of the nested processes
+   * @param processInstance specified process instance id
    * @return {@link ProcessInstance process instance object}
    */
-  public ProcessInstance getRootProcessInstance(ProcessInstance processInstance,
-      int maxNumberOfNestedProcesses) {
+  public ProcessInstance getRootProcessInstance(ProcessInstance processInstance) {
     log.info("Getting root process instance for process instance {}", processInstance.getId());
-    assert maxNumberOfNestedProcesses > 0 : "Invalid number of maximum nested sub processes";
     var nestedCount = 0;
     var currentProcessInstance = processInstance;
-    while (nestedCount < maxNumberOfNestedProcesses &&
+    while (nestedCount < MAX_NUMBER_OF_NESTED_SUB_PROCESSES &&
         !processInstance.getId().equals(processInstance.getRootProcessInstanceId())) {
       currentProcessInstance =
           getProcessInstance(processInstance.getRootProcessInstanceId())
@@ -73,10 +73,16 @@ public class ProcessInstanceRuntimeService {
     return currentProcessInstance;
   }
 
-  public Optional<ProcessInstance> getRootProcessInstance(String processInstanceId,
-      int maxNumberOfNestedProcesses) {
-    return getProcessInstance(processInstanceId).map(
-        pi -> this.getRootProcessInstance(pi, maxNumberOfNestedProcesses));
+  /**
+   * Get process instances that have the given process instance id as a sub process instance.
+   *
+   * @param processInstanceId specified process instance id
+   * @return {@link ProcessInstance process instance object}
+   */
+  public Optional<ProcessInstance> getProcessInstanceBySubProcessInstanceId(
+      String processInstanceId) {
+    return runtimeService.createProcessInstanceQuery()
+        .subProcessInstanceId(processInstanceId).list().stream().findFirst();
   }
 
   public Optional<ProcessInstance> getProcessInstance(String processInstanceId) {
@@ -93,4 +99,40 @@ public class ProcessInstanceRuntimeService {
         processInstance.isEmpty() ? "not found" : "found");
     return processInstance;
   }
+
+  /**
+   * Get call activity process instances by root process instance id
+   *
+   * @param rootProcessInstanceId specified root process instance id
+   * @return list of call activity {@link ProcessInstance process instance object} that are sub
+   * processes for provided root process instance id
+   */
+  public List<ProcessInstance> getCallActivityProcessInstances(String rootProcessInstanceId) {
+    return this.getCallActivityProcessInstances(rootProcessInstanceId, Lists.newArrayList());
+  }
+
+  private List<ProcessInstance> getCallActivityProcessInstances(String rootProcessInstanceId,
+      List<ProcessInstance> processInstanceList) {
+    if (processInstanceList.size() < MAX_NUMBER_OF_NESTED_SUB_PROCESSES) {
+      var callActivityProcessInstance = getCallActivityProcessInstance(rootProcessInstanceId);
+      if (callActivityProcessInstance.isEmpty()) {
+        return processInstanceList;
+      }
+      processInstanceList.add(callActivityProcessInstance.get());
+
+      return this.getCallActivityProcessInstances(callActivityProcessInstance.get().getId(),
+          processInstanceList);
+    }
+    return processInstanceList;
+  }
+
+  private Optional<ProcessInstance> getCallActivityProcessInstance(String processInstanceId) {
+    return runtimeService.createProcessInstanceQuery()
+        .superProcessInstanceId(processInstanceId).list().stream()
+        .reduce((instance1, instance2) -> {
+          throw new IllegalStateException(
+              "Found more than one call activity process instances by id");
+        });
+  }
+
 }

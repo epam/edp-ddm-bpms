@@ -201,7 +201,7 @@ class UserTaskServiceTest {
     when(processInstanceRuntimeService.getProcessInstances(refEq(processInstanceQueryDto),
         eq(PaginationQueryDto.builder().build())))
         .thenReturn(List.of(processInstance));
-    when(processInstanceRuntimeService.getRootProcessInstance(processInstance, 2)).thenReturn(
+    when(processInstanceRuntimeService.getRootProcessInstance(processInstance)).thenReturn(
         processInstance);
 
     var result = service.getTasksByParams(queryDto, paginationQueryDto);
@@ -243,6 +243,8 @@ class UserTaskServiceTest {
     rootProcessInstance.setId("rootProcessInstance");
     when(processInstanceRuntimeService.getProcessInstance("rootProcessInstance"))
         .thenReturn(Optional.of(rootProcessInstance));
+    when(processInstanceRuntimeService.getRootProcessInstance(processInstance)).thenReturn(
+        rootProcessInstance);
 
     var result = service.completeTask("id", completeTaskDto);
 
@@ -288,6 +290,8 @@ class UserTaskServiceTest {
     processInstance.setRootProcessInstanceId("processInstance");
     when(processInstanceRuntimeService.getProcessInstance("processInstance"))
         .thenReturn(Optional.of(processInstance));
+    when(processInstanceRuntimeService.getRootProcessInstance(processInstance)).thenReturn(
+        processInstance);
 
     var completeTaskDto = new CompleteTaskDto();
     when(taskRuntimeService.completeTask("id", completeTaskDto))

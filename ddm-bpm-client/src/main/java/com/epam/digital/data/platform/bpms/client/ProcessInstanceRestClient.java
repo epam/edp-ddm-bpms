@@ -47,6 +47,7 @@ public interface ProcessInstanceRestClient extends BaseFeignClient {
    * @param query object with search parameters
    * @return the number of camunda process instances
    */
+  @Deprecated
   @GetMapping("/process-instance/count")
   @ErrorHandling
   CountResultDto getProcessInstancesCount(@SpringQueryMap DdmProcessInstanceCountQueryDto query);
@@ -80,6 +81,7 @@ public interface ProcessInstanceRestClient extends BaseFeignClient {
       @PathVariable("variableName") String variableName,
       @RequestBody VariableValueDto variableValueDto);
 
+  @Deprecated
   @PostMapping("/extended/process-instance")
   @ErrorHandling
   List<DdmProcessInstanceDto> getProcessInstances(

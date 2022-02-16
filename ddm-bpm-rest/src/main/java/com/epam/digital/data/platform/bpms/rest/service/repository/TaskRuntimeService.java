@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperties;
@@ -37,6 +38,7 @@ public class TaskRuntimeService {
   private final RepositoryService repositoryService;
   private final ProcessEngine processEngine;
   private final ObjectMapper objectMapper;
+  private final ProcessInstanceRuntimeService processInstanceRuntimeService;
 
   /**
    * Get task list by given parameters
@@ -55,6 +57,36 @@ public class TaskRuntimeService {
         .map(TaskDto::fromEntity)
         .collect(Collectors.toList());
 
+    log.debug("Found {} tasks", result.size());
+    return result;
+  }
+
+  /**
+   * Get task list by given parameters including tasks from call activities.
+   *
+   * @param queryDto              the parameter query dto
+   * @param rootProcessInstanceId specified root process instace id
+   * @param paginationQueryDto    query dto with pagination parameters
+   * @return list of {@link TaskDto task object} that matches given params
+   */
+  public List<TaskDto> getTasksByParamsIncludeCallActivities(TaskQueryDto queryDto,
+      String rootProcessInstanceId, PaginationQueryDto paginationQueryDto) {
+
+    var callActivityProcessInstances = processInstanceRuntimeService.getCallActivityProcessInstances(
+        rootProcessInstanceId);
+    log.debug("Selected {} call activities process instances", callActivityProcessInstances.size());
+
+    var processInstanceIdIn = callActivityProcessInstances.stream().map(
+        ProcessInstance::getId).collect(Collectors.toList());
+    processInstanceIdIn.add(rootProcessInstanceId);
+
+    log.debug("Selecting tasks...");
+    var result = queryDto.toQuery(processEngine)
+        .processInstanceIdIn(processInstanceIdIn.toArray(String[]::new))
+        .listPage(paginationQueryDto.getFirstResult(), paginationQueryDto.getMaxResults())
+        .stream()
+        .map(TaskDto::fromEntity)
+        .collect(Collectors.toList());
     log.debug("Found {} tasks", result.size());
     return result;
   }
