@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * The interface extends {@link BaseFeignClient} and used to perform operations on camunda
  * extended historical user tasks {@link HistoryUserTaskDto}.
  */
+@Deprecated
 @FeignClient(name = "camunda-extended-history-task-client", url = "${bpms.url}/api/extended/history/task")
 public interface ExtendedHistoryUserTaskRestClient extends BaseFeignClient {
 

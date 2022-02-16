@@ -17,8 +17,10 @@
 package com.epam.digital.data.platform.bpms.rest.controller;
 
 import com.epam.digital.data.platform.bpms.api.dto.DdmCompletedTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmLightweightTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmSignableTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmTaskQueryDto;
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
 import com.epam.digital.data.platform.bpms.rest.service.UserTaskService;
 import java.util.List;
@@ -59,6 +61,15 @@ public class TaskController {
   public List<DdmTaskDto> getByParams(TaskQueryDto taskQueryDto,
       @BeanParam PaginationQueryDto paginationQueryDto) {
     return taskService.getTasksByParams(taskQueryDto, paginationQueryDto);
+  }
+
+  @POST
+  @Path("/lightweight")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  public List<DdmLightweightTaskDto> getLightweightTasksByParam(DdmTaskQueryDto taskQueryDto,
+      @BeanParam PaginationQueryDto paginationQueryDto) {
+    return taskService.getLightweightTasksByParam(taskQueryDto, paginationQueryDto);
   }
 
   /**

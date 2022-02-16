@@ -17,8 +17,10 @@
 package com.epam.digital.data.platform.bpms.rest.service;
 
 import com.epam.digital.data.platform.bpms.api.dto.DdmCompletedTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmLightweightTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmSignableTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmTaskDto;
+import com.epam.digital.data.platform.bpms.api.dto.DdmTaskQueryDto;
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
 import com.epam.digital.data.platform.bpms.rest.mapper.TaskMapper;
 import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessDefinitionRepositoryService;
@@ -62,7 +64,6 @@ public class UserTaskService {
   private static final String SIGN_PROPERTY = "eSign";
   private static final String FORM_VARIABLES_PROPERTY = "formVariables";
   private static final String FORM_VARIABLES_REGEX = "\\s*,\\s*";
-  private static final int MAX_NUMBER_OF_NESTED_SUB_PROCESSES = 2;
 
   private final ProcessDefinitionRepositoryService processDefinitionRepositoryService;
   private final ProcessInstanceRuntimeService processInstanceRuntimeService;
@@ -105,6 +106,41 @@ public class UserTaskService {
 
     log.info("Found {} user tasks", result.size());
     return result;
+  }
+
+  /**
+   * Get lightweight user task by specified search parameters and pagination query parameters.
+   *
+   * @param ddmTaskQueryDto    object with search parameters.
+   * @param paginationQueryDto object with pagination parameters.
+   * @return list of {@link DdmLightweightTaskDto}.
+   */
+  public List<DdmLightweightTaskDto> getLightweightTasksByParam(DdmTaskQueryDto ddmTaskQueryDto,
+      PaginationQueryDto paginationQueryDto) {
+    log.info("Getting lightweight user tasks");
+
+    var taskDtos = getTasksByParams(ddmTaskQueryDto, paginationQueryDto);
+    log.trace("Found {} tasks", taskDtos.size());
+
+    if (taskDtos.isEmpty()) {
+      return List.of();
+    }
+
+    var result = taskMapper.toDdmLightweightTaskDtoList(taskDtos);
+    log.trace("Found user task list - {}", result);
+
+    log.info("Found {} user tasks", result.size());
+    return result;
+  }
+
+  private List<TaskDto> getTasksByParams(DdmTaskQueryDto ddmTaskQueryDto,
+      PaginationQueryDto paginationQueryDto) {
+    var taskQueryDto = taskMapper.toTaskQueryDto(ddmTaskQueryDto);
+    if (Objects.nonNull(ddmTaskQueryDto.getRootProcessInstanceId())) {
+      return taskRuntimeService.getTasksByParamsIncludeCallActivities(taskQueryDto,
+          ddmTaskQueryDto.getRootProcessInstanceId(), paginationQueryDto);
+    }
+    return taskRuntimeService.getTasksByParams(taskQueryDto, paginationQueryDto);
   }
 
   /**
@@ -153,13 +189,13 @@ public class UserTaskService {
     var processInstanceId = getTask(id).getProcessInstanceId();
     log.trace("Found user task process-instance id {}", processInstanceId);
 
-    var rootProcessInstanceId = getProcessInstance(processInstanceId)
-        .map(ProcessInstance::getRootProcessInstanceId)
+    var processInstance = getProcessInstance(processInstanceId)
         .orElseThrow(() -> {
           var message = String.format("Process instance %s is missed before task %s completion",
               processInstanceId, id);
           return new IllegalStateException(message);
         });
+    var rootProcessInstanceId = getRootProcessInstance(processInstance).getId();
     log.trace("Found user task root process-instance id {}", rootProcessInstanceId);
 
     var responseVariables = completeRuntimeTask(id, dto);
@@ -242,8 +278,7 @@ public class UserTaskService {
 
   private ProcessInstance getRootProcessInstance(ProcessInstance processInstance) {
     return camundaAdminImpersonation.execute(
-        () -> processInstanceRuntimeService.getRootProcessInstance(processInstance,
-            MAX_NUMBER_OF_NESTED_SUB_PROCESSES));
+        () -> processInstanceRuntimeService.getRootProcessInstance(processInstance));
   }
 
   private Map<String, String> getProcessDefinitionNames(String... processDefinitionIds) {

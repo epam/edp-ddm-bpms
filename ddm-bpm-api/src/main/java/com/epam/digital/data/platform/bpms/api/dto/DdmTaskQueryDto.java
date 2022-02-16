@@ -34,6 +34,7 @@ public class DdmTaskQueryDto {
   private String assignee;
   private Boolean unassigned;
   private String processInstanceId;
+  private String rootProcessInstanceId;
   private List<DdmTaskQueryDto> orQueries;
   private List<String> processInstanceIdIn;
   private List<SortingDto> sorting;

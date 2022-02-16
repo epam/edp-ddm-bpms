@@ -97,6 +97,28 @@ class TaskRestClientIT extends BaseIT {
   }
 
   @Test
+  void shouldReturnListOfTasksLightweight() {
+    var paginationQueryDto = PaginationQueryDto.builder().build();
+    restClientWireMock.addStubMapping(
+        stubFor(post(urlPathEqualTo("/api/extended/task/lightweight"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withStatus(200)
+                .withBody("[{\"id\":\"id\",\"assignee\":\"testAssignee\"}]")
+            )
+        )
+    );
+
+    var tasksByParams = taskRestClient
+        .getLightweightTasksByParams(DdmTaskQueryDto.builder().assignee("testAssignee").build(),
+            paginationQueryDto);
+
+    assertThat(tasksByParams.size()).isOne();
+    assertThat(tasksByParams.get(0).getId()).isEqualTo("id");
+    assertThat(tasksByParams.get(0).getAssignee()).isEqualTo("testAssignee");
+  }
+
+  @Test
   void shouldReturnTaskById() {
     restClientWireMock.addStubMapping(
         stubFor(get(urlPathEqualTo("/api/extended/task/tid"))

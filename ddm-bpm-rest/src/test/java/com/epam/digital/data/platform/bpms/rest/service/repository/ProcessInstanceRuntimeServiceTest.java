@@ -78,4 +78,28 @@ class ProcessInstanceRuntimeServiceTest {
     assertThat(ex).isNotNull()
         .hasMessage("Found more than one process instances by id");
   }
+
+  @Test
+  void getCallActivityProcessInstances() {
+    var processInstanceId = "processInstanceId";
+    var rootProcessInstanceId = "rootProcessInstanceId";
+    var executionEntity = new ExecutionEntity();
+    executionEntity.setId(rootProcessInstanceId);
+    executionEntity.setRootProcessInstanceId(rootProcessInstanceId);
+
+    var query = mock(ProcessInstanceQuery.class);
+    when(runtimeService.createProcessInstanceQuery()).thenReturn(query);
+    when(query.superProcessInstanceId(processInstanceId)).thenReturn(query);
+    when(query.list()).thenReturn(List.of(executionEntity));
+
+    var query2 = mock(ProcessInstanceQuery.class);
+    when(runtimeService.createProcessInstanceQuery()).thenReturn(query);
+    when(query.superProcessInstanceId(rootProcessInstanceId)).thenReturn(query2);
+    when(query2.list()).thenReturn(List.of());
+
+    var result = service.getCallActivityProcessInstances(processInstanceId);
+
+    assertThat(result.size()).isOne();
+    assertThat(result.get(0).getId()).isEqualTo(rootProcessInstanceId);
+  }
 }

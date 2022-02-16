@@ -100,8 +100,9 @@ class ProcessPublisherHistoryEventHandlerTest {
 
     var processInstance = new ExecutionEntity();
     processInstance.setId("rootProcessInstanceId");
+    processInstance.setRootProcessInstanceId("rootProcessInstanceId");
     processInstance.setProcessDefinitionId("processDefinitionId");
-    lenient().when(processInstanceRuntimeService.getRootProcessInstance("rootProcessInstanceId", 1))
+    lenient().when(processInstanceRuntimeService.getProcessInstance("rootProcessInstanceId"))
         .thenReturn(Optional.of(processInstance));
 
     var processDefinition = new ProcessDefinitionEntity();
