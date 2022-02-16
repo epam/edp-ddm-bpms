@@ -54,7 +54,7 @@ user-settings-service-api:
 excerpt-service-api:
   url: http://localhost:9999/excerpt-mock-service
 keycloak:
-  url: http://localhost:8200/auth
+  url: http://localhost:8200
   citizen:
     realm: citizen-realm
     client-id: citizen-client-id
