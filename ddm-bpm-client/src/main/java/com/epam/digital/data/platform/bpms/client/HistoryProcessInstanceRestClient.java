@@ -47,6 +47,7 @@ public interface HistoryProcessInstanceRestClient extends BaseFeignClient {
    * @param paginationQueryDto             object with pagination parameters
    * @return the list of finished camunda user tasks
    */
+  @Deprecated
   @PostMapping("/extended/history/process-instance")
   @ErrorHandling
   List<HistoryProcessInstanceDto> getHistoryProcessInstanceDtosByParams(
@@ -59,6 +60,7 @@ public interface HistoryProcessInstanceRestClient extends BaseFeignClient {
    * @param id process instance identifier
    * @return a camunda historic process instance
    */
+  @Deprecated
   @GetMapping("/extended/history/process-instance/{id}")
   @ErrorHandling(codeSpecific = {
       @ErrorCodes(codes = {404}, generate = ProcessInstanceNotFoundException.class)
