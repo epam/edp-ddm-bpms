@@ -34,12 +34,12 @@
     <groovy.version>3.0.6</groovy.version>
     <ddm-starter-actuator.version>1.5.1-SNAPSHOT</ddm-starter-actuator.version>
     <ddm-starter-error-handler.version>1.5.2-SNAPSHOT</ddm-starter-error-handler.version>
-    <ddm-starter-juel-function.version>1.5.6-SNAPSHOT</ddm-starter-juel-function.version>
+    <ddm-starter-juel-function.version>1.5.7-SNAPSHOT</ddm-starter-juel-function.version>
     <ddm-starter-localization.version>1.5.1-SNAPSHOT</ddm-starter-localization.version>
     <ddm-starter-logging.version>1.5.2-SNAPSHOT</ddm-starter-logging.version>
     <ddm-starter-security.version>1.5.1-SNAPSHOT</ddm-starter-security.version>
     <ddm-starter-trembita-integration.version>1.5.3-SNAPSHOT</ddm-starter-trembita-integration.version>
-    <ddm-idm-client.version>1.5.0-SNAPSHOT</ddm-idm-client.version>
+    <ddm-idm-client.version>1.5.1-SNAPSHOT</ddm-idm-client.version>
     <excerpt-model.version>1.4.0</excerpt-model.version>
     <p6spy-spring-boot-starter.version>1.7.1</p6spy-spring-boot-starter.version>
     <dso.version>1.4.5</dso.version>

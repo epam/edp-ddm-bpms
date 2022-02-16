@@ -16,12 +16,13 @@
 
 package com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloak.officer;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.KeycloakUserDto;
-import com.epam.digital.data.platform.bpms.extension.service.KeycloakClientService;
+import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
-import com.epam.digital.data.platform.integration.idm.client.KeycloakAdminClient;
+import com.epam.digital.data.platform.integration.idm.model.IdmUser;
+import com.epam.digital.data.platform.integration.idm.service.IdmService;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,31 +32,26 @@ import org.springframework.stereotype.Component;
  * The class represents an implementation of {@link JavaDelegate} that is used to get the list of
  * users from keycloak by role.
  */
+@RequiredArgsConstructor
 @Component(KeycloakGetOfficerUsersConnectorDelegate.DELEGATE_NAME)
-public class KeycloakGetOfficerUsersConnectorDelegate extends BaseKeycloakOfficerConnectorDelegate {
+public class KeycloakGetOfficerUsersConnectorDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "keycloakGetUsersConnectorDelegate";
-
   private static final String DEFAULT_ROLE = "officer";
+
+  @Qualifier("officer-keycloak-client-service")
+  private final IdmService idmService;
 
   @SystemVariable(name = "role_name")
   private NamedVariableAccessor<String> roleNameVariable;
   @SystemVariable(name = "usersByRole")
-  private NamedVariableAccessor<List<KeycloakUserDto>> usersByRoleVariable;
-
-  public KeycloakGetOfficerUsersConnectorDelegate(
-      @Qualifier("officer-keycloak-admin-client") KeycloakAdminClient keycloakAdminClient,
-      KeycloakClientService keycloakClientService) {
-    super(keycloakAdminClient, keycloakClientService);
-  }
+  private NamedVariableAccessor<List<IdmUser>> usersByRoleVariable;
 
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
     var role = roleNameVariable.from(execution).getOrDefault(DEFAULT_ROLE);
 
-    var roleUserMembers = keycloakClientService.getRoleUserMembers(officerKeycloakAdminClient,
-        role);
-
+    var roleUserMembers = idmService.getRoleUserMembers(role);
     usersByRoleVariable.on(execution).set(roleUserMembers);
   }
 
