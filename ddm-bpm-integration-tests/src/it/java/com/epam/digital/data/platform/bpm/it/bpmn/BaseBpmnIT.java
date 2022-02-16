@@ -26,7 +26,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.historyService;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.managementService;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
@@ -54,7 +53,6 @@ import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.junit.After;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -96,15 +94,10 @@ public abstract class BaseBpmnIT extends BaseIT {
   protected String testUserToken;
 
   protected final Map<String, Object> expectedVariablesMap = new HashMap<>();
-  private final Map<String, Object> expectedCephStorage = new HashMap<>();
 
   @Before
   public void init() {
     expectedVariablesMap.clear();
-    expectedCephStorage.clear();
-    runtimeService.createProcessInstanceQuery().list().forEach(
-        processInstance -> runtimeService
-            .deleteProcessInstance(processInstance.getId(), "test clear"));
     testUserToken = TestUtils.getContent("/json/testuserAccessToken.json");
     cephKeyProvider = new FormDataKeyProviderImpl();
     SecurityContextHolder.getContext().setAuthentication(
@@ -119,12 +112,6 @@ public abstract class BaseBpmnIT extends BaseIT {
     userSettingsWireMock.resetAll();
     keycloakMockServer.resetAll();
     SecurityContextHolder.getContext().setAuthentication(null);
-  }
-
-  protected void completeTask(String taskId, String processInstanceId, String formData) {
-    formDataStorageService.putFormData(taskId, processInstanceId, deserializeFormData(formData));
-    String id = taskService.createTaskQuery().taskDefinitionKey(taskId).singleResult().getId();
-    taskService.complete(id);
   }
 
   protected void completeTask(CompleteActivityDto completeActivityDto) {
@@ -237,14 +224,6 @@ public abstract class BaseBpmnIT extends BaseIT {
                 .withBody(response))));
   }
 
-  protected void assertCephContent() {
-    expectedCephStorage.forEach((key, value) -> {
-      var actualMap = cephService.get(cephBucketName, key);
-
-      Assertions.assertThat(actualMap).get().isEqualTo(value);
-    });
-  }
-
   protected FormDataDto deserializeFormData(String formData) {
     try {
       return this.objectMapper.readValue(TestUtils.getContent(formData), FormDataDto.class);
@@ -303,15 +282,6 @@ public abstract class BaseBpmnIT extends BaseIT {
     return postForObject(
         String.format("api/process-definition/key/%s/start", processDefinitionKey),
         objectMapper.writeValueAsString(startProcessInstanceDto), Map.class, token);
-  }
-
-  protected void assertWaitingActivity(ProcessInstance processInstance,
-      String searchLabFormActivityDefinitionKey, String formKey) {
-    assertThat(processInstance).isWaitingAt(searchLabFormActivityDefinitionKey);
-    assertThat(task(searchLabFormActivityDefinitionKey)).hasFormKey(formKey);
-    assertThat(processInstance).variables().hasSize(expectedVariablesMap.size())
-        .containsAllEntriesOf(expectedVariablesMap);
-    assertCephContent();
   }
 
   protected void assertSystemSignature(String processInstanceId, String variableName,
