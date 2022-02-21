@@ -155,7 +155,8 @@ public abstract class BaseBpmnIT extends BaseIT {
   }
 
   protected void stubDataFactoryRequest(StubData data) {
-    var uriBuilder = UriComponentsBuilder.fromPath(MOCK_SERVER).pathSegment(data.getResource());
+    var uriBuilder = UriComponentsBuilder.fromPath(MOCK_SERVER)
+        .pathSegment(data.getResource().split("/"));
 
     dataFactoryMockServer.addStubMapping(stubFor(getMappingBuilder(data, uriBuilder)));
   }
