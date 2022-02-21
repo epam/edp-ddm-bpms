@@ -325,8 +325,35 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
 
     var cephKeyToken = cephKeyProvider
         .generateKey("test_token", processInstance.getProcessInstanceId());
-    formDataStorageService.putFormData(cephKeyToken, FormDataDto.builder().accessToken(validAccessToken)
-        .data(new LinkedHashMap<>()).build());
+    formDataStorageService.putFormData(cephKeyToken,
+        FormDataDto.builder().accessToken(validAccessToken).data(new LinkedHashMap<>()).build());
+
+    var taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionCreateDelegateTask")
+        .singleResult()
+        .getId();
+    taskService.complete(taskId);
+
+    BpmnAwareTests.assertThat(processInstance).isEnded();
+  }
+
+  @Test
+  @Deployment(resources = {"bpmn/connector/testDataFactoryConnectorNestedCreateDelegate.bpmn"})
+  public void testDataFactoryConnectorNestedCreateDelegate() {
+    dataFactoryMockServer.addStubMapping(
+        stubFor(post(urlPathEqualTo("/mock-server/nested/test"))
+            .withHeader("X-Access-Token", equalTo(validAccessToken))
+            .withRequestBody(
+                equalTo("{\"data\":\"test data\",\"description\":\"some description\"}"))
+            .willReturn(aResponse().withStatus(201))));
+
+    var processInstance = runtimeService
+        .startProcessInstanceByKey("testDataFactoryConnectorNestedCreateDelegate_key");
+
+    var cephKeyToken = cephKeyProvider
+        .generateKey("test_token", processInstance.getProcessInstanceId());
+    formDataStorageService.putFormData(cephKeyToken,
+        FormDataDto.builder().accessToken(validAccessToken)
+            .data(new LinkedHashMap<>()).build());
 
     var taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionCreateDelegateTask")
         .singleResult()
