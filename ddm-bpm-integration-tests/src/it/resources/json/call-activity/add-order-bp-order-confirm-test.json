@@ -1,0 +1,10 @@
+{
+  "data": {
+    "name": "test test test",
+    "basket": "bin",
+    "phonenumber": "1234567890",
+    "approve": true,
+    "confirm": true,
+    "submit": true
+  }
+}

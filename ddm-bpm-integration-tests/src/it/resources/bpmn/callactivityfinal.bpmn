@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0caryys" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.12.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:collaboration id="Collaboration_0n8yf30">
+    <bpmn:participant id="Participant_1" name="Оформление заказа на сайте" processRef="create-order" />
+    <bpmn:participant id="Participant_2" name="Решение подтверждения заказа" processRef="order-confirm" />
+    <bpmn:messageFlow id="Flow_02kfa4k" sourceRef="Activity_2" targetRef="Event_start" />
+    <bpmn:messageFlow id="Flow_1704w4z" sourceRef="Event_end_callactivity" targetRef="Activity_2" />
+  </bpmn:collaboration>
+  <bpmn:process id="create-order" name="Оформление заказа на сайте" isExecutable="true">
+    <bpmn:startEvent id="start_event" name="корзина покупок" camunda:formKey="add-data" camunda:initiator="initiator">
+      <bpmn:outgoing>Flow_0jjf7fd</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Activity_03ohi65" name="Форма ведення даних онлайн-замовлення" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="add-order-bp-add-order-test" camunda:assignee="${initiator}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="userTaskInputFormDataPrepopulate" />
+        </camunda:inputOutput>
+        <camunda:properties>
+          <camunda:property name="formVariables" value="" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0jjf7fd</bpmn:incoming>
+      <bpmn:outgoing>Flow_1a1k6gs</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:callActivity id="Activity_2" name="Решение подтверждения заказа" camunda:modelerTemplate="callActivity" calledElement="order-confirm">
+      <bpmn:extensionElements>
+        <camunda:out source="outputPayload" target="callActivityOutput" />
+        <camunda:in sourceExpression="${submission(&#39;Activity_03ohi65&#39;).formData}" target="inputPayload" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1a1k6gs</bpmn:incoming>
+      <bpmn:outgoing>Flow_1w27n2o</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:sequenceFlow id="Flow_1a1k6gs" sourceRef="Activity_03ohi65" targetRef="Activity_2" />
+    <bpmn:sequenceFlow id="Flow_1w27n2o" sourceRef="Activity_2" targetRef="Activity_4" />
+    <bpmn:sequenceFlow id="Flow_0jjf7fd" sourceRef="start_event" targetRef="Activity_03ohi65" />
+    <bpmn:sequenceFlow id="Flow_0wtw1y4" sourceRef="Activity_4" targetRef="Event_end" />
+    <bpmn:userTask id="Activity_4" name="Оплата онлайн-замовлення" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="add-order-bp-view-order-test" camunda:assignee="${initiator}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="userTaskInputFormDataPrepopulate">${callActivityOutput}</camunda:inputParameter>
+        </camunda:inputOutput>
+        <camunda:properties>
+          <camunda:property name="formVariables" value="" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1w27n2o</bpmn:incoming>
+      <bpmn:outgoing>Flow_0wtw1y4</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="Event_end" name="заказ оплачен">
+      <bpmn:incoming>Flow_0wtw1y4</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmn:process id="order-confirm" name="Решение подтверждения заказа" isExecutable="true" camunda:isStartableInTasklist="false">
+    <bpmn:userTask id="Activity_3" name="Рішення про погодження онлайн-замовлення" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="add-order-bp-order-confirm-test" camunda:assignee="${initiator}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="userTaskInputFormDataPrepopulate">${inputPayload}</camunda:inputParameter>
+        </camunda:inputOutput>
+        <camunda:properties>
+          <camunda:property name="formVariables" value="" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0uzj1xc</bpmn:incoming>
+      <bpmn:outgoing>Flow_0j1ll17</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:startEvent id="Event_start" name="получение данных заказа" camunda:initiator="initiator">
+      <bpmn:outgoing>Flow_0uzj1xc</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0j1ll17" sourceRef="Activity_3" targetRef="Activity_1dalm1e" />
+    <bpmn:sequenceFlow id="Flow_0uzj1xc" sourceRef="Event_start" targetRef="Activity_3" />
+    <bpmn:endEvent id="Event_end_callactivity" name="заказ подтвержден">
+      <bpmn:incoming>Flow_05ywktd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_05ywktd" sourceRef="Activity_1dalm1e" targetRef="Event_end_callactivity" />
+    <bpmn:scriptTask id="Activity_1dalm1e" name="prepare output payload" scriptFormat="groovy">
+      <bpmn:incoming>Flow_0j1ll17</bpmn:incoming>
+      <bpmn:outgoing>Flow_05ywktd</bpmn:outgoing>
+      <bpmn:script>var data = submission('Activity_3').formData
+execution.removeVariable('outputPayload')
+set_transient_variable('outputPayload', S(data, 'application/json'))</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0n8yf30">
+      <bpmndi:BPMNShape id="Participant_0rhxp3v_di" bpmnElement="Participant_1" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="630" height="177" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0wtw1y4_di" bpmnElement="Flow_0wtw1y4">
+        <di:waypoint x="680" y="170" />
+        <di:waypoint x="722" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0jjf7fd_di" bpmnElement="Flow_0jjf7fd">
+        <di:waypoint x="268" y="170" />
+        <di:waypoint x="300" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1w27n2o_di" bpmnElement="Flow_1w27n2o">
+        <di:waypoint x="540" y="170" />
+        <di:waypoint x="580" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1a1k6gs_di" bpmnElement="Flow_1a1k6gs">
+        <di:waypoint x="400" y="170" />
+        <di:waypoint x="440" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_15d4fla_di" bpmnElement="start_event">
+        <dc:Bounds x="232" y="152" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="209" y="193" width="85" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0hmkg1i_di" bpmnElement="Activity_03ohi65">
+        <dc:Bounds x="300" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0v8c1ib_di" bpmnElement="Activity_2">
+        <dc:Bounds x="440" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0xy2gua_di" bpmnElement="Activity_4">
+        <dc:Bounds x="580" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_054pd26_di" bpmnElement="Event_end">
+        <dc:Bounds x="722" y="152" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="705" y="195" width="73" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_1gfcd3b_di" bpmnElement="Participant_2" isHorizontal="true">
+        <dc:Bounds x="160" y="290" width="630" height="220" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0uzj1xc_di" bpmnElement="Flow_0uzj1xc">
+        <di:waypoint x="348" y="410" />
+        <di:waypoint x="380" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0j1ll17_di" bpmnElement="Flow_0j1ll17">
+        <di:waypoint x="480" y="410" />
+        <di:waypoint x="520" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_05ywktd_di" bpmnElement="Flow_05ywktd">
+        <di:waypoint x="620" y="410" />
+        <di:waypoint x="662" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_0fq2fvg_di" bpmnElement="Activity_3">
+        <dc:Bounds x="380" y="370" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1d65kcj_di" bpmnElement="Event_start">
+        <dc:Bounds x="312" y="392" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="295" y="435" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_00qek1r_di" bpmnElement="Event_end_callactivity">
+        <dc:Bounds x="662" y="392" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="647" y="435" width="68" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1vw3pqe_di" bpmnElement="Activity_1dalm1e">
+        <dc:Bounds x="520" y="370" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_02kfa4k_di" bpmnElement="Flow_02kfa4k">
+        <di:waypoint x="460" y="210" />
+        <di:waypoint x="460" y="301" />
+        <di:waypoint x="330" y="301" />
+        <di:waypoint x="330" y="392" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1704w4z_di" bpmnElement="Flow_1704w4z">
+        <di:waypoint x="680" y="392" />
+        <di:waypoint x="680" y="301" />
+        <di:waypoint x="530" y="301" />
+        <di:waypoint x="530" y="210" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
