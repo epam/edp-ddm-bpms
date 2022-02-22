@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0n7lvxi" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.12.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:collaboration id="Collaboration_1syi2b7">
+    <bpmn:participant id="Participant_1pkwoza" name="Embedded" processRef="embedded" />
+    <bpmn:textAnnotation id="TextAnnotation_156yx54">
+      <bpmn:text>БП2</bpmn:text>
+    </bpmn:textAnnotation>
+  </bpmn:collaboration>
+  <bpmn:process id="embedded" name="Embedded" isExecutable="true">
+    <bpmn:sequenceFlow id="Flow_1sp24hh" sourceRef="Activity_0az53x3" targetRef="Activity_0k3scy3" />
+    <bpmn:sequenceFlow id="Flow_1qfkajd" sourceRef="Activity_0k3scy3" targetRef="Activity_0k9p732" />
+    <bpmn:sequenceFlow id="Flow_1g367j1" sourceRef="Activity_0k9p732" targetRef="Event_0cn0cbt" />
+    <bpmn:sequenceFlow id="Flow_0lwys7s" sourceRef="Event_002owcg" targetRef="Activity_0az53x3" />
+    <bpmn:userTask id="Activity_0az53x3" name="Внесення даних про заяву" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="add-application" camunda:assignee="${initiator}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="userTaskInputFormDataPrepopulate" />
+        </camunda:inputOutput>
+        <camunda:properties>
+          <camunda:property name="formVariables" value="" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0lwys7s</bpmn:incoming>
+      <bpmn:outgoing>Flow_1sp24hh</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:startEvent id="Event_002owcg" camunda:initiator="initiator">
+      <bpmn:outgoing>Flow_0lwys7s</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:subProcess id="Activity_0k3scy3">
+      <bpmn:incoming>Flow_1sp24hh</bpmn:incoming>
+      <bpmn:outgoing>Flow_1qfkajd</bpmn:outgoing>
+      <bpmn:startEvent id="Event_0f873d3" name="стара">
+        <bpmn:outgoing>Flow_1fty0on</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:endEvent id="Event_1cyi025" name="фініш">
+        <bpmn:incoming>Flow_1hs91ux</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:userTask id="Activity_0u4619o" name="Прийняття рішення про погодження заяви" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="add-appgood" camunda:assignee="${initiator}">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="userTaskInputFormDataPrepopulate">${submission("Activity_0az53x3").formData}</camunda:inputParameter>
+          </camunda:inputOutput>
+          <camunda:properties>
+            <camunda:property name="formVariables" value="" />
+          </camunda:properties>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_1fty0on</bpmn:incoming>
+        <bpmn:outgoing>Flow_1hs91ux</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:sequenceFlow id="Flow_1hs91ux" sourceRef="Activity_0u4619o" targetRef="Event_1cyi025" />
+      <bpmn:sequenceFlow id="Flow_1fty0on" sourceRef="Event_0f873d3" targetRef="Activity_0u4619o" />
+    </bpmn:subProcess>
+    <bpmn:userTask id="Activity_0k9p732" name="Перегляд рішення заяви" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="add-appreviewsecond" camunda:assignee="${initiator}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="userTaskInputFormDataPrepopulate">${submission("Activity_0u4619o").formData}</camunda:inputParameter>
+        </camunda:inputOutput>
+        <camunda:properties>
+          <camunda:property name="formVariables" value="" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1qfkajd</bpmn:incoming>
+      <bpmn:outgoing>Flow_1g367j1</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="Event_0cn0cbt" name="завершення">
+      <bpmn:incoming>Flow_1g367j1</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1syi2b7">
+      <bpmndi:BPMNShape id="Participant_1pkwoza_di" bpmnElement="Participant_1pkwoza" isHorizontal="true">
+        <dc:Bounds x="180" y="580" width="950" height="250" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0lwys7s_di" bpmnElement="Flow_0lwys7s">
+        <di:waypoint x="268" y="700" />
+        <di:waypoint x="310" y="700" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1g367j1_di" bpmnElement="Flow_1g367j1">
+        <di:waypoint x="980" y="705" />
+        <di:waypoint x="1022" y="705" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1qfkajd_di" bpmnElement="Flow_1qfkajd">
+        <di:waypoint x="810" y="705" />
+        <di:waypoint x="880" y="705" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1sp24hh_di" bpmnElement="Flow_1sp24hh">
+        <di:waypoint x="410" y="700" />
+        <di:waypoint x="480" y="700" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_0az53x3_di" bpmnElement="Activity_0az53x3">
+        <dc:Bounds x="310" y="660" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_002owcg_di" bpmnElement="Event_002owcg">
+        <dc:Bounds x="232" y="682" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0k3scy3_di" bpmnElement="Activity_0k3scy3" isExpanded="true">
+        <dc:Bounds x="480" y="600" width="330" height="210" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1fty0on_di" bpmnElement="Flow_1fty0on">
+        <di:waypoint x="568" y="700" />
+        <di:waypoint x="600" y="700" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1hs91ux_di" bpmnElement="Flow_1hs91ux">
+        <di:waypoint x="700" y="700" />
+        <di:waypoint x="742" y="700" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0f873d3_di" bpmnElement="Event_0f873d3">
+        <dc:Bounds x="532" y="682" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="537" y="725" width="29" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1cyi025_di" bpmnElement="Event_1cyi025">
+        <dc:Bounds x="742" y="682" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="748" y="725" width="29" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0u4619o_di" bpmnElement="Activity_0u4619o">
+        <dc:Bounds x="600" y="660" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0k9p732_di" bpmnElement="Activity_0k9p732">
+        <dc:Bounds x="880" y="665" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0cn0cbt_di" bpmnElement="Event_0cn0cbt">
+        <dc:Bounds x="1022" y="687" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1009" y="730" width="63" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_156yx54_di" bpmnElement="TextAnnotation_156yx54">
+        <dc:Bounds x="1170" y="80" width="100" height="30" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

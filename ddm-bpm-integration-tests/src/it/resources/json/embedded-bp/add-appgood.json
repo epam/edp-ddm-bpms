@@ -1,0 +1,10 @@
+{
+  "data": {
+    "requiredname": "officer",
+    "approved": true,
+    "submit": true,
+    "name": "john doe",
+    "dateofapplication": "2022-02-02T10:00:00.000Z",
+    "numberofapp": 12345
+  }
+}
