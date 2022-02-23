@@ -340,7 +340,7 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
   @Deployment(resources = {"bpmn/connector/testDataFactoryConnectorNestedCreateDelegate.bpmn"})
   public void testDataFactoryConnectorNestedCreateDelegate() {
     dataFactoryMockServer.addStubMapping(
-        stubFor(post(urlPathEqualTo("/mock-server/nested/test"))
+        stubFor(put(urlPathEqualTo("/mock-server/nested/test"))
             .withHeader("X-Access-Token", equalTo(validAccessToken))
             .withRequestBody(
                 equalTo("{\"data\":\"test data\",\"description\":\"some description\"}"))
