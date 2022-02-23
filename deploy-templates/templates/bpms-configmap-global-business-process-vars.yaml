@@ -7,6 +7,3 @@ metadata:
 data:
   # Values of this config map will be uploaded by registry regulations publication pipeline
   camunda-global-system-vars.yml: |-
-    camunda:
-      system-variables:
-        const_dataFactoryBaseUrl: http://mock

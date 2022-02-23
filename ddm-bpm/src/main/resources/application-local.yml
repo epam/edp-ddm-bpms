@@ -1,6 +1,4 @@
 camunda:
-  system-variables:
-    const_dataFactoryBaseUrl: http://localhost:8877/mock-server
   bpm:
     authorization:
       enabled: false
@@ -14,6 +12,9 @@ camunda:
     history-publisher:
       kafka:
         enabled: false
+
+registry-rest-api:
+  url: http://localhost:8877/mock-server
 
 spring:
   datasource:

@@ -2,9 +2,8 @@ spring:
   application:
     name: ddm-bpm-extension
 
-camunda:
-  system-variables:
-    const_dataFactoryBaseUrl: http://localhost:8877/mock-server
+registry-rest-api:
+  url: http://localhost:8877/mock-server
 dso:
   url: http://localhost:8081
 

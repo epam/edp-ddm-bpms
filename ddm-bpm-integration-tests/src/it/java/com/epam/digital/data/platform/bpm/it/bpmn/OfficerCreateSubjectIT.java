@@ -37,7 +37,6 @@ import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -51,8 +50,6 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
   private static final String ENTREPRENEUR_SUBJECT_TYPE = "ENTREPRENEUR";
   private static final String ENTREPRENEUR_SUBJECT_CODE = "1010101010";
 
-  @Value("${camunda.system-variables.const_dataFactoryBaseUrl}")
-  private String dataFactoryBaseUrl;
   private static String legalUserToken;
   private static String indUserToken;
 
@@ -106,7 +103,6 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
         .expectedFormDataPrePopulation(deserializeFormData(
             "/json/officer-create-subject/ceph/sign-subject-officer-create-task.json"))
         .expectedVariables(Map.of("initiator", testUserName,
-            "const_dataFactoryBaseUrl", dataFactoryBaseUrl,
             StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY))
         .build());
     completeTask(CompleteActivityDto.builder()
@@ -182,7 +178,6 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
         .expectedFormDataPrePopulation(deserializeFormData(
             "/json/officer-create-subject/ceph/entrepreneur2/sign-subject-officer-create-task.json"))
         .expectedVariables(Map.of("initiator", testUserName,
-            "const_dataFactoryBaseUrl", dataFactoryBaseUrl,
             StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY))
         .build());
     completeTask(CompleteActivityDto.builder()
@@ -330,7 +325,6 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
         .expectedFormDataPrePopulation(deserializeFormData(
             "/json/officer-create-subject/ceph/entrepreneur/sign-subject-officer-create-task-flag-false.json"))
         .expectedVariables(Map.of("initiator", testUserName,
-            "const_dataFactoryBaseUrl", dataFactoryBaseUrl,
             StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY))
         .build());
     completeTask(CompleteActivityDto.builder()
