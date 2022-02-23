@@ -263,6 +263,16 @@ public abstract class BaseBpmnIT extends BaseIT {
     return (String) result.get("id");
   }
 
+  protected String startProcessInstance(String processDefinitionKey,
+      StartProcessInstanceDto body, String token) throws JsonProcessingException {
+    var bodyAsStr = objectMapper.writeValueAsString(body);
+    var result = postForObject(
+        String.format("api/process-definition/key/%s/start", processDefinitionKey),
+        bodyAsStr, Map.class, token);
+
+    return (String) result.get("id");
+  }
+
   protected String startProcessInstanceWithStartFormAndGetId(String processDefinitionKey,
       String token, FormDataDto formDataDto) throws JsonProcessingException {
     var result = startProcessInstanceWithStartForm(processDefinitionKey, token, formDataDto);
