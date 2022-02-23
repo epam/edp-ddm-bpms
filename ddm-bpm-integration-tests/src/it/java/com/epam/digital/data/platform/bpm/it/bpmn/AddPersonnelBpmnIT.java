@@ -28,15 +28,11 @@ import java.io.IOException;
 import java.util.Map;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 
 public class AddPersonnelBpmnIT extends BaseBpmnIT {
 
   private static final String PROCESS_DEFINITION_KEY = "add-personnel";
-
-  @Value("${camunda.system-variables.const_dataFactoryBaseUrl}")
-  private String dataFactoryBaseUrl;
 
   @Test
   @Deployment(resources = {"bpmn/add-personnel.bpmn"})
@@ -79,8 +75,7 @@ public class AddPersonnelBpmnIT extends BaseBpmnIT {
         .assignee(testUserName)
         .expectedFormDataPrePopulation(deserializeFormData(
             "/json/add-personnel/form-data/addPersonnelFormActivityPrepopulation.json"))
-        .expectedVariables(
-            Map.of("initiator", testUserName, "const_dataFactoryBaseUrl", dataFactoryBaseUrl))
+        .expectedVariables(Map.of("initiator", testUserName))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)

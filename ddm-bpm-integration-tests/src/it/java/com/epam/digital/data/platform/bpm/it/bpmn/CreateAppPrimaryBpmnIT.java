@@ -31,15 +31,11 @@ import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 
 public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
 
   private static final String PROCESS_DEFINITION_KEY = "create-app-primary";
-
-  @Value("${camunda.system-variables.const_dataFactoryBaseUrl}")
-  private String dataFactoryBaseUrl;
 
   @Test
   @Deployment(resources = {"bpmn/create-app-primary.bpmn", "bpmn/system-signature-bp.bpmn"})
@@ -109,7 +105,6 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
         .expectedFormDataPrePopulation(deserializeFormData(
             "/json/create-app/form-data/name-edrpou-prepopulation.json"))
         .expectedVariables(Map.of("initiator", testUserName,
-            "const_dataFactoryBaseUrl", dataFactoryBaseUrl,
             StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY,
             "fullName", "testuser testuser testuser"))
         .build());
@@ -297,7 +292,6 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
         .formKey("shared-subject-status-error")
         .assignee(testUserName)
         .expectedVariables(Map.of("initiator", testUserName,
-            "const_dataFactoryBaseUrl", dataFactoryBaseUrl,
             StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY))
         .build());
     completeTask(CompleteActivityDto.builder()
@@ -566,7 +560,6 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
         .expectedFormDataPrePopulation(deserializeFormData(
             "/json/create-app/form-data/name-edrpou-prepopulation.json"))
         .expectedVariables(Map.of("initiator", testUserName,
-            "const_dataFactoryBaseUrl", dataFactoryBaseUrl,
             StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY,
             "fullName", "testuser testuser testuser"))
         .build());
@@ -648,7 +641,6 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
         .formKey("shared-subject-status-error")
         .assignee(testUserName)
         .expectedVariables(Map.of("initiator", testUserName,
-            "const_dataFactoryBaseUrl", dataFactoryBaseUrl,
             StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY))
         .build());
     completeTask(CompleteActivityDto.builder()

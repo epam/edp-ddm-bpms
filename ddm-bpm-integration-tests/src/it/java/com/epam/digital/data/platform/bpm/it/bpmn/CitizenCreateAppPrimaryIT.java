@@ -33,15 +33,11 @@ import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 
 public class CitizenCreateAppPrimaryIT extends BaseBpmnIT {
 
   private final String PROCESS_DEFINITION_KEY = "citizen-create-app-primary";
-
-  @Value("${camunda.system-variables.const_dataFactoryBaseUrl}")
-  private String dataFactoryBaseUrl;
 
   private final String officerUserName = "officerusername";
   private final String headOfficerUserName = "headofficer";
@@ -168,7 +164,6 @@ public class CitizenCreateAppPrimaryIT extends BaseBpmnIT {
         .expectedFormDataPrePopulation(deserializeFormData(
             "/json/citizen-create-app/form-data/Activity_citizen-shared-add-factors-pre-population.json"))
         .expectedVariables(Map.of("initiator", testUserName,
-            "const_dataFactoryBaseUrl", dataFactoryBaseUrl,
             StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY,
             "fullName", "testuser testuser testuser"))
         .build());
@@ -481,7 +476,6 @@ public class CitizenCreateAppPrimaryIT extends BaseBpmnIT {
         .expectedFormDataPrePopulation(deserializeFormData(
             "/json/citizen-create-app/form-data/Activity_citizen-shared-add-factors-pre-population.json"))
         .expectedVariables(Map.of("initiator", testUserName,
-            "const_dataFactoryBaseUrl", dataFactoryBaseUrl,
             StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME, START_FORM_CEPH_KEY,
             "fullName", "testuser testuser testuser"))
         .build());

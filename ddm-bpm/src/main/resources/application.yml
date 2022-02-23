@@ -3,8 +3,6 @@ server:
   max-http-header-size: 16KB
 
 camunda:
-  system-variables:
-    const_dataFactoryBaseUrl: http://registry-rest-api:8080
   admin-user-id: camunda
   admin-group-id: camunda-admin
   bpm:
@@ -38,6 +36,9 @@ camunda:
             num-partitions: 1
             replication-factor: 1
             retention-policy-in-days: 7
+
+registry-rest-api:
+  url: http://registry-rest-api:8080
 
 spring:
   main:

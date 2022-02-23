@@ -32,7 +32,6 @@ import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,9 +40,6 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
 
   private static final String TEST_USER_NAME = "testuser";
   private static final String PROCESS_DEFINITION_KEY = "citizen-onboarding-bp";
-
-  @Value("${camunda.system-variables.const_dataFactoryBaseUrl}")
-  private String dataFactoryBaseUrl;
 
   @Before
   public void setUp() {
@@ -107,8 +103,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         .expectedFormDataPrePopulation(deserializeFormData(
             "/json/citizen-onboarding/ceph/create_subject_task_ind_prep.json"))
         .expectedVariables(
-            Map.of("initiator", testUserName, "initiator_role", "unregistered-individual",
-                "const_dataFactoryBaseUrl", dataFactoryBaseUrl))
+            Map.of("initiator", testUserName, "initiator_role", "unregistered-individual"))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
@@ -255,8 +250,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
             "/json/citizen-onboarding/ceph/create_subject_task_entr_prep.json"))
         .expectedVariables(
             Map.of("initiator", testUserName, "initiator_role", "unregistered-entrepreneur",
-                "const_dataFactoryBaseUrl", dataFactoryBaseUrl, "subjectId",
-                "subjectId"))
+                "subjectId", "subjectId"))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
@@ -391,8 +385,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
             "/json/citizen-onboarding/ceph/create_subject_task_legal_prep.json"))
         .expectedVariables(
             Map.of("initiator", testUserName, "initiator_role", "unregistered-legal",
-                "const_dataFactoryBaseUrl", dataFactoryBaseUrl, "subjectId",
-                "subjectId"))
+                "subjectId", "subjectId"))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
@@ -525,8 +518,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         .activityDefinitionId("error_logout_task")
         .formKey("shared-error-logout")
         .assignee(testUserName)
-        .expectedVariables(Map.of("initiator", testUserName, "const_dataFactoryBaseUrl",
-            dataFactoryBaseUrl))
+        .expectedVariables(Map.of("initiator", testUserName))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)

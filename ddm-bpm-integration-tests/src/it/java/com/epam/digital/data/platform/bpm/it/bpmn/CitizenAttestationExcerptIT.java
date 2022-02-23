@@ -38,16 +38,12 @@ import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public class CitizenAttestationExcerptIT extends BaseBpmnIT {
 
   private static final String PROCESS_DEFINITION_KEY = "citizen-attestation-excerpt";
-
-  @Value("${camunda.system-variables.const_dataFactoryBaseUrl}")
-  private String dataFactoryBaseUrl;
 
   @Before
   public void setUp() {
@@ -138,8 +134,8 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .activityDefinitionId("searchLabFormActivity")
         .formKey("citizen-attestation-excerpt-bp-choose-lab")
         .assignee(testUserName)
-        .expectedVariables(Map.of("initiator", testUserName, "const_dataFactoryBaseUrl",
-            dataFactoryBaseUrl, "subjectId", "subjectId1", "subjectName", "lab owner"))
+        .expectedVariables(Map.of("initiator", testUserName, "subjectId", "subjectId1",
+            "subjectName", "lab owner"))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
@@ -272,8 +268,8 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .activityDefinitionId("searchLabFormActivity")
         .formKey("citizen-attestation-excerpt-bp-choose-lab")
         .assignee(testUserName)
-        .expectedVariables(Map.of("initiator", testUserName, "const_dataFactoryBaseUrl",
-            dataFactoryBaseUrl, "subjectId", "subjectId1", "subjectName", "absent subject name"))
+        .expectedVariables(Map.of("initiator", testUserName, "subjectId", "subjectId1",
+            "subjectName", "absent subject name"))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
@@ -405,8 +401,8 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .activityDefinitionId("searchLabFormActivity")
         .formKey("citizen-attestation-excerpt-bp-choose-lab")
         .assignee(testUserName)
-        .expectedVariables(Map.of("initiator", testUserName, "const_dataFactoryBaseUrl",
-            dataFactoryBaseUrl, "subjectId", "subjectId1", "subjectName", "lab owner"))
+        .expectedVariables(Map.of("initiator", testUserName, "subjectId", "subjectId1",
+            "subjectName", "lab owner"))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
@@ -535,8 +531,8 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .activityDefinitionId("searchLabFormActivity")
         .formKey("citizen-attestation-excerpt-bp-choose-lab")
         .assignee(testUserName)
-        .expectedVariables(Map.of("initiator", testUserName, "const_dataFactoryBaseUrl",
-            dataFactoryBaseUrl, "subjectId", "subjectId1", "subjectName", "lab owner"))
+        .expectedVariables(Map.of("initiator", testUserName, "subjectId", "subjectId1",
+            "subjectName", "lab owner"))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
@@ -651,8 +647,8 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .activityDefinitionId("searchLabFormActivity")
         .formKey("citizen-attestation-excerpt-bp-choose-lab")
         .assignee(testUserName)
-        .expectedVariables(Map.of("initiator", testUserName, "const_dataFactoryBaseUrl",
-            dataFactoryBaseUrl, "subjectId", "subjectId1", "subjectName", "lab owner"))
+        .expectedVariables(Map.of("initiator", testUserName, "subjectId", "subjectId1",
+            "subjectName", "lab owner"))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
@@ -717,8 +713,7 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .activityDefinitionId("subjectStatusErrorActivity")
         .formKey("citizen-attestation-excerpt-bp-status-error")
         .assignee(testUserName)
-        .expectedVariables(
-            Map.of("initiator", testUserName, "const_dataFactoryBaseUrl", dataFactoryBaseUrl))
+        .expectedVariables(Map.of("initiator", testUserName))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
@@ -758,8 +753,7 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
         .activityDefinitionId("subjectNotFoundActivity")
         .formKey("citizen-attestation-excerpt-bp-no-subject-error")
         .assignee(testUserName)
-        .expectedVariables(
-            Map.of("initiator", testUserName, "const_dataFactoryBaseUrl", dataFactoryBaseUrl))
+        .expectedVariables(Map.of("initiator", testUserName))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)

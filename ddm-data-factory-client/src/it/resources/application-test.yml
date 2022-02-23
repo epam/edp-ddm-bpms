@@ -1,6 +1,5 @@
-camunda:
-  system-variables:
-    const_dataFactoryBaseUrl: http://localhost:8777
+registry-rest-api:
+  url: http://localhost:8777
 
 user-settings-service-api:
   url: http://localhost:8778

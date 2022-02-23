@@ -33,9 +33,8 @@
 4. Required properties:
 
 ```yaml
-camunda:
-  system-variables:
-    const_dataFactoryBaseUrl: data factory base url
+registry-rest-api:
+  url: data factory base url
 
 user-settings-service-api:
   url: user settings base url
