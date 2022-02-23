@@ -63,7 +63,7 @@ public class NestedEntityBpmnIT extends BaseBpmnIT {
         .build());
 
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.POST)
+        .httpMethod(HttpMethod.PUT)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("nested/nested-transaction-entity")
         .requestBody("/json/nested_entity_test_process/createNestedTransactionEntityRequest.json")

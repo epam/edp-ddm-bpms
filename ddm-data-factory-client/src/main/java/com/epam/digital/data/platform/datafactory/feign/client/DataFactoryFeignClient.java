@@ -63,15 +63,15 @@ public interface DataFactoryFeignClient {
       @RequestBody String body, @RequestHeader HttpHeaders headers);
 
   /**
-   * Perform POST operation for creating nested data factory entity
+   * Perform PUT operation for creating nested data factory entity
    *
    * @param resource url resource
    * @param headers  http headers
    * @return mapped response
    * @see ConnectorResponse
    */
-  @PostMapping(path = "/nested/{resource}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-  ConnectorResponse performPostNested(@PathVariable("resource") String resource,
+  @PutMapping(path = "/nested/{resource}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+  ConnectorResponse performPutNested(@PathVariable("resource") String resource,
       @RequestBody String body, @RequestHeader HttpHeaders headers);
 
   /**
