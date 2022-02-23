@@ -65,7 +65,7 @@ public class DataFactoryConnectorNestedCreateDelegate extends BaseJavaDelegate {
         .build();
 
     var response = dataFactoryFeignClient
-        .performPostNested(resource, payload.map(Objects::toString).orElse(null), headers);
+        .performPutNested(resource, payload.map(Objects::toString).orElse(null), headers);
     log.debug("Nested entity successfully created");
 
     responseVariable.on(execution).set(response);
