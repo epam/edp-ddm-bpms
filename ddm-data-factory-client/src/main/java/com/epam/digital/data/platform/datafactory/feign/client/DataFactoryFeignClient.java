@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 /**
  * The interface represents a feign client and used to perform operations in data factory service.
  */
-@FeignClient(name = "data-factory-client", url = "${camunda.system-variables.const_dataFactoryBaseUrl}", configuration = FeignDecoderConfiguration.class)
+@FeignClient(name = "data-factory-client", url = "${registry-rest-api.url}", configuration = FeignDecoderConfiguration.class)
 public interface DataFactoryFeignClient {
 
   /**

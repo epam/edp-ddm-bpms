@@ -26,10 +26,11 @@ camunda:
         bootstrap: localhost:9092
         ssl:
           enabled: false
-  system-variables:
-    const_dataFactoryBaseUrl: http://localhost:8877/mock-server
 dso:
   url: http://localhost:8081
+
+registry-rest-api:
+  url: http://localhost:8877/mock-server
 
 ceph:
   bucket: bucket

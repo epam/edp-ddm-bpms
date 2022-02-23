@@ -29,15 +29,11 @@ import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 
 public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
 
   private static final String PROCESS_DEFINITION_KEY = "create-app-exclude";
-
-  @Value("${camunda.system-variables.const_dataFactoryBaseUrl}")
-  private String dataFactoryBaseUrl;
 
   @Test
   @Deployment(resources = {"bpmn/create-app-exclude.bpmn", "bpmn/system-signature-bp.bpmn"})
@@ -118,8 +114,7 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
         .assignee(testUserName)
         .expectedFormDataPrePopulation(deserializeFormData(
             "/json/create-app-exclude/form-data/addApplicationFormActivityPrePopulation.json"))
-        .expectedVariables(
-            Map.of("initiator", testUserName, "const_dataFactoryBaseUrl", dataFactoryBaseUrl))
+        .expectedVariables(Map.of("initiator", testUserName))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)
@@ -290,8 +285,7 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
         .assignee(testUserName)
         .expectedFormDataPrePopulation(deserializeFormData(
             "/json/create-app-exclude/form-data/addApplicationFormActivityPrePopulation.json"))
-        .expectedVariables(
-            Map.of("initiator", testUserName, "const_dataFactoryBaseUrl", dataFactoryBaseUrl))
+        .expectedVariables(Map.of("initiator", testUserName))
         .build());
     completeTask(CompleteActivityDto.builder()
         .processInstanceId(processInstanceId)

@@ -28,9 +28,8 @@ spring:
     username: user name;
     password: password;
     
-camunda:
-  system-variables:
-    const_dataFactoryBaseUrl: data factory base url;
+registry-rest-api:
+  url: data factory base url;
     
 dso:
   url: digital signature ops service base url;
