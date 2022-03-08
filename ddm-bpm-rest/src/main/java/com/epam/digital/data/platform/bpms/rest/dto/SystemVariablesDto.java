@@ -2,7 +2,7 @@ package com.epam.digital.data.platform.bpms.rest.dto;
 
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessExcerptIdVariable;
-import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessStartTimeVariable;
+
 import java.time.LocalDateTime;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,4 @@ public class SystemVariablesDto {
     return (String) variables.get(ProcessExcerptIdVariable.SYS_VAR_PROCESS_EXCERPT_ID);
   }
 
-  public LocalDateTime getStartTime() {
-    return (LocalDateTime) variables.get(ProcessStartTimeVariable.SYS_VAR_PROCESS_START_TIME);
-  }
 }

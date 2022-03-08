@@ -28,7 +28,6 @@ import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessorFa
 import com.epam.digital.data.platform.dataaccessor.sysvar.CallerProcessInstanceIdVariable;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessExcerptIdVariable;
-import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessStartTimeVariable;
 import com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable;
 import com.epam.digital.data.platform.dataaccessor.sysvar.StartMessagePayloadStorageKeyVariable;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -104,13 +103,6 @@ public class VariableAccessorAutoConfiguration {
   public ProcessExcerptIdVariable processExcerptIdVariable(
       VariableAccessorFactory variableAccessorFactory) {
     return new ProcessExcerptIdVariable(variableAccessorFactory);
-  }
-
-  @Bean
-  @ConditionalOnMissingBean(ProcessStartTimeVariable.class)
-  public ProcessStartTimeVariable processStartTimeVariable(
-      VariableAccessorFactory variableAccessorFactory) {
-    return new ProcessStartTimeVariable(variableAccessorFactory);
   }
 
   @Bean

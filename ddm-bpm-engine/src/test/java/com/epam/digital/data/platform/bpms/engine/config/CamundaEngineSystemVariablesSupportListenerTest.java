@@ -24,9 +24,7 @@ import static org.mockito.Mockito.when;
 
 import com.epam.digital.data.platform.dataaccessor.VariableAccessor;
 import com.epam.digital.data.platform.dataaccessor.VariableAccessorFactory;
-import com.epam.digital.data.platform.dataaccessor.named.NamedVariableWriteAccessor;
-import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessStartTimeVariable;
-import java.time.LocalDateTime;
+
 import org.assertj.core.util.Maps;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
@@ -50,16 +48,11 @@ class CamundaEngineSystemVariablesSupportListenerTest {
   @Mock
   private VariableAccessorFactory variableAccessorFactory;
   @Mock
-  private ProcessStartTimeVariable processStartTimeVariable;
-  @Mock
   private ProcessDefinitionImpl processDefinition;
 
   @Captor
   private ArgumentCaptor<ExecutionListener> executionListenerArgumentCaptor;
-  @Captor
-  private ArgumentCaptor<LocalDateTime> localDateTimeArgumentCaptor;
 
-  @SuppressWarnings("unchecked")
   @Test
   void shouldAddListenerThatAddsCamundaSystemPropertiesToBpmn() throws Exception {
     when(camundaProperties.getSystemVariables()).thenReturn(Maps.newHashMap("var1", "value1"));
@@ -67,9 +60,6 @@ class CamundaEngineSystemVariablesSupportListenerTest {
     var delegateExecution = mock(DelegateExecution.class);
     var variableAccessor = mock(VariableAccessor.class);
     when(variableAccessorFactory.from(delegateExecution)).thenReturn(variableAccessor);
-
-    var startTimeAccessor = mock(NamedVariableWriteAccessor.class);
-    when(processStartTimeVariable.on(delegateExecution)).thenReturn(startTimeAccessor);
 
     var activity = mock(ActivityImpl.class);
     camundaSystemVariablesSupportListener.parseStartEvent(null, processDefinition, activity);
@@ -80,9 +70,5 @@ class CamundaEngineSystemVariablesSupportListenerTest {
     assertThat(executionListener).isNotNull();
     executionListener.notify(delegateExecution);
     verify(variableAccessor).setVariable("var1", "value1");
-    verify(processStartTimeVariable).on(delegateExecution);
-    verify(startTimeAccessor).set(localDateTimeArgumentCaptor.capture());
-
-    assertThat(localDateTimeArgumentCaptor.getValue()).isNotNull();
   }
 }

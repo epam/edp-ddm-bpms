@@ -17,7 +17,7 @@
 package com.epam.digital.data.platform.bpms.engine.config;
 
 import com.epam.digital.data.platform.dataaccessor.VariableAccessorFactory;
-import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessStartTimeVariable;
+
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +40,6 @@ public class CamundaEngineSystemVariablesSupportListener extends AbstractBpmnPar
   private final CamundaProperties systemProperties;
   private final VariableAccessorFactory variableAccessorFactory;
 
-  private final ProcessStartTimeVariable processStartTimeVariable;
-
   @Override
   public void parseStartEvent(Element startEventElement, ScopeImpl scope,
       ActivityImpl startEventActivity) {
@@ -50,8 +48,6 @@ public class CamundaEngineSystemVariablesSupportListener extends AbstractBpmnPar
           (ExecutionListener) execution -> {
             var variableAccessor = variableAccessorFactory.from(execution);
             systemProperties.getSystemVariables().forEach(variableAccessor::setVariable);
-
-            processStartTimeVariable.on(execution).set(LocalDateTime.now(ZoneOffset.UTC));
           });
     }
   }

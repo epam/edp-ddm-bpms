@@ -59,7 +59,6 @@ public interface ProcessInstanceMapper {
   @Mapping(target = "id", source = "dto.id")
   @Mapping(target = "processDefinitionId", source = "dto.definitionId")
   @Mapping(target = "processDefinitionName", source = "processDefinitionName")
-  @Mapping(target = "startTime", source = "systemVariablesDto.startTime")
   @Mapping(target = "state", source = "dto.suspended", qualifiedByName = "toProcessInstanceStatus")
   DdmProcessInstanceDto toDdmProcessInstanceDto(
       ProcessInstanceDto dto,

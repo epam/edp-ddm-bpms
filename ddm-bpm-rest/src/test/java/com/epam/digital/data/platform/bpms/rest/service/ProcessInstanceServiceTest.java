@@ -21,7 +21,7 @@ import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessInstan
 import com.epam.digital.data.platform.bpms.rest.service.repository.TaskRuntimeService;
 import com.epam.digital.data.platform.bpms.rest.service.repository.VariableInstanceRuntimeService;
 import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
-import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessStartTimeVariable;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +85,6 @@ class ProcessInstanceServiceTest {
             .id("id1")
             .processDefinitionId("processDefinitionId1")
             .processDefinitionName("processDefinitionName1")
-            .startTime(LocalDateTime.of(2020, 12, 1, 11, 11, 11))
             .state(DdmProcessInstanceStatus.PENDING)
             .build());
   }
@@ -128,10 +127,7 @@ class ProcessInstanceServiceTest {
   }
 
   private void mockQuerySystemVariablesForProcessInstanceIds() {
-    var startTime = LocalDateTime.of(2020, 12, 1, 11, 11, 11);
-    Map<String, Object> variables = Map.of(ProcessStartTimeVariable.SYS_VAR_PROCESS_START_TIME,
-        startTime);
-    var systemVariablesDto = new SystemVariablesDto(variables);
+    var systemVariablesDto = new SystemVariablesDto(Map.of());
 
     when(variableInstanceRuntimeService.getSystemVariablesForProcessInstanceIds("id1"))
         .thenReturn(Map.of("id1", systemVariablesDto));
