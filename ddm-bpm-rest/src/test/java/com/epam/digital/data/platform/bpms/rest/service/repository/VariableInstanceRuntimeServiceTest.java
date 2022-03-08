@@ -8,8 +8,7 @@ import static org.mockito.Mockito.when;
 import com.epam.digital.data.platform.dataaccessor.sysvar.Constants;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessExcerptIdVariable;
-import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessStartTimeVariable;
-import java.time.LocalDateTime;
+
 import java.util.List;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
@@ -42,19 +41,15 @@ class VariableInstanceRuntimeServiceTest {
         ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT, "BP COMPLETED");
     var variable3 = buildVariableInstanceEntity(processInstanceId,
         ProcessExcerptIdVariable.SYS_VAR_PROCESS_EXCERPT_ID, "excerptId");
-    var variable4 = buildVariableInstanceEntity(processInstanceId,
-        ProcessStartTimeVariable.SYS_VAR_PROCESS_START_TIME,
-        LocalDateTime.of(2021, 12, 8, 11, 48, 1));
 
-    when(queryMock.list()).thenReturn(List.of(variable1, variable2, variable3, variable4));
+    when(queryMock.list()).thenReturn(List.of(variable1, variable2, variable3));
 
     var result = service.getSystemVariablesForProcessInstanceIds(processInstanceId);
 
     assertThat(result).hasSize(1)
         .extractingByKey(processInstanceId)
         .hasFieldOrPropertyWithValue("processCompletionResult", "BP COMPLETED")
-        .hasFieldOrPropertyWithValue("excerptId", "excerptId")
-        .hasFieldOrPropertyWithValue("startTime", LocalDateTime.of(2021, 12, 8, 11, 48, 1));
+        .hasFieldOrPropertyWithValue("excerptId", "excerptId");
   }
 
   private VariableInstanceEntity buildVariableInstanceEntity(
