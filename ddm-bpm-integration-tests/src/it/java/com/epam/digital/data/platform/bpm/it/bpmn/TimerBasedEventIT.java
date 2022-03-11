@@ -21,7 +21,6 @@ import com.epam.digital.data.platform.bpm.it.dto.CompleteActivityDto;
 import com.epam.digital.data.platform.bpm.it.util.CamundaAssertionUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Map;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.junit.Test;
@@ -33,11 +32,6 @@ public class TimerBasedEventIT extends BaseBpmnIT {
   @Test
   @Deployment(resources = "bpmn/testTimerProcess.bpmn")
   public void testTimerBoundaryEvent() throws JsonProcessingException {
-    var processEngineConfiguration = (ProcessEngineConfigurationImpl) BpmnAwareTests.processEngine()
-        .getProcessEngineConfiguration();
-    var jobExecutor = processEngineConfiguration.getJobExecutor();
-    jobExecutor.start();
-
     var processInstanceId = startProcessInstance(PROCESS_DEFINITION_KEY, testUserToken);
     var processInstance = CamundaAssertionUtil.processInstance(processInstanceId);
 
@@ -58,11 +52,6 @@ public class TimerBasedEventIT extends BaseBpmnIT {
   @Test
   @Deployment(resources = "bpmn/testTimerProcess.bpmn")
   public void testTimerIntermediateEvent() throws JsonProcessingException {
-    var processEngineConfiguration = (ProcessEngineConfigurationImpl) BpmnAwareTests.processEngine()
-        .getProcessEngineConfiguration();
-    var jobExecutor = processEngineConfiguration.getJobExecutor();
-    jobExecutor.start();
-
     var processInstanceId = startProcessInstance(PROCESS_DEFINITION_KEY, testUserToken);
     var processInstance = CamundaAssertionUtil.processInstance(processInstanceId);
 
