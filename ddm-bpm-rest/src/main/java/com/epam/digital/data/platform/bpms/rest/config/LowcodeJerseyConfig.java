@@ -16,8 +16,6 @@
 
 package com.epam.digital.data.platform.bpms.rest.config;
 
-import com.epam.digital.data.platform.bpms.rest.controller.HistoricProcessInstanceController;
-import com.epam.digital.data.platform.bpms.rest.controller.HistoricTaskController;
 import com.epam.digital.data.platform.bpms.rest.controller.ProcessDefinitionController;
 import com.epam.digital.data.platform.bpms.rest.controller.ProcessInstanceController;
 import com.epam.digital.data.platform.bpms.rest.controller.TaskController;
@@ -47,8 +45,6 @@ public class LowcodeJerseyConfig extends CamundaJerseyResourceConfig {
   @Override
   protected void registerAdditionalResources() {
     register(TaskController.class);
-    register(HistoricTaskController.class);
-    register(HistoricProcessInstanceController.class);
     register(ProcessInstanceController.class);
     register(ProcessDefinitionController.class);
 
