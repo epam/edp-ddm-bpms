@@ -21,12 +21,10 @@ import com.epam.digital.data.platform.bpms.api.dto.DdmSignableTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmTaskDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmTaskQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmVariableValueDto;
-import com.epam.digital.data.platform.bpms.api.dto.HistoryUserTaskDto;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
-import org.camunda.bpm.engine.rest.dto.history.HistoricTaskInstanceDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.mapstruct.Mapper;
@@ -58,22 +56,6 @@ public interface TaskMapper {
 
   @Mapping(target = "created", qualifiedByName = "toLocalDateTime")
   DdmSignableTaskDto toSignableUserTaskDto(TaskDto taskDto);
-
-  @Mapping(target = "startTime", qualifiedByName = "toLocalDateTime")
-  @Mapping(target = "endTime", qualifiedByName = "toLocalDateTime")
-  @Mapping(target = "processDefinitionName", source = "processDefinitionName")
-  HistoryUserTaskDto toHistoryUserTaskDto(HistoricTaskInstanceDto historicTaskInstanceDto,
-      String processDefinitionName);
-
-  default List<HistoryUserTaskDto> toHistoryUserTaskDtos(List<HistoricTaskInstanceDto> dtos,
-      Map<String, String> processDefinitionNames) {
-    return dtos.stream()
-        .map(dto -> {
-          var processDefinitionName = processDefinitionNames.get(dto.getProcessDefinitionId());
-          return toHistoryUserTaskDto(dto, processDefinitionName);
-        })
-        .collect(Collectors.toList());
-  }
 
   Map<String, DdmVariableValueDto> toDdmVariableValueDtoMap(Map<String, VariableValueDto> dtoMap);
 

@@ -16,7 +16,6 @@
 
 package com.epam.digital.data.platform.bpms.rest.mapper;
 
-import com.epam.digital.data.platform.bpms.api.dto.HistoryProcessInstanceDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmProcessInstanceDto;
 import com.epam.digital.data.platform.bpms.api.dto.enums.DdmProcessInstanceStatus;
 import com.epam.digital.data.platform.bpms.rest.dto.SystemVariablesDto;
@@ -24,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
@@ -35,26 +33,6 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring",
     uses = LocalDateTimeMapper.class)
 public interface ProcessInstanceMapper {
-
-  @Mapping(target = "startTime", source = "dto.startTime", qualifiedByName = "toLocalDateTime")
-  @Mapping(target = "endTime", qualifiedByName = "toLocalDateTime")
-  @Mapping(target = "state", source = "dto.state")
-  @Mapping(target = "processCompletionResult", source = "variables.processCompletionResult")
-  @Mapping(target = "excerptId", source = "variables.excerptId")
-  HistoryProcessInstanceDto toHistoryProcessInstanceDto(HistoricProcessInstanceDto dto,
-      SystemVariablesDto variables);
-
-  default List<HistoryProcessInstanceDto> toHistoryProcessInstanceDtos(
-      List<HistoricProcessInstanceDto> dtos,
-      Map<String, SystemVariablesDto> variables) {
-    return dtos.stream()
-        .map(dto -> {
-          var processInstanceVariables = variables.get(dto.getId());
-
-          return toHistoryProcessInstanceDto(dto, processInstanceVariables);
-        })
-        .collect(Collectors.toList());
-  }
 
   @Mapping(target = "id", source = "dto.id")
   @Mapping(target = "processDefinitionId", source = "dto.definitionId")
