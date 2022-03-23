@@ -305,6 +305,7 @@ public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
         .build());
 
     var data = deserializeFormData("/json/create-app-expanse/form-data/start_event.json");
+    data.setAccessToken(testUserToken);
     var processInstanceId = startProcessInstanceWithStartFormAndGetId(PROCESS_DEFINITION_KEY,
         testUserToken, data);
     var processInstance = processInstance(processInstanceId);
@@ -665,6 +666,7 @@ public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
         .build());
 
     var data = deserializeFormData("/json/create-app-expanse/form-data/start_event.json");
+    data.setAccessToken(testUserToken);
     var processInstanceId = startProcessInstanceWithStartFormAndGetId(PROCESS_DEFINITION_KEY,
         testUserToken, data);
 
