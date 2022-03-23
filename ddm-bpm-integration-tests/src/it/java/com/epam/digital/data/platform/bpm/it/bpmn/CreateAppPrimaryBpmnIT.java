@@ -281,6 +281,7 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
         .build());
 
     var data = deserializeFormData("/json/create-app/form-data/start_event.json");
+    data.setAccessToken(testUserToken);
     var processInstanceId = startProcessInstanceWithStartFormAndGetId(PROCESS_DEFINITION_KEY,
         testUserToken, data);
     var processInstance = processInstance(processInstanceId);
@@ -416,7 +417,7 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
             "/json/create-app/form-data/Activity_shared-sign-app-deny.json")
         .build());
 
-    addExpectedVariable("fullName", null);
+    addExpectedVariable("fullName", "testuser testuser testuser");
     addExpectedVariable("Activity_shared-sign-app-deny_completer", testUserName);
     addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
         "Прийнято рішення про залишення без розгляду");
@@ -631,6 +632,7 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
         .build());
 
     var data = deserializeFormData("/json/create-app/form-data/start_event.json");
+    data.setAccessToken(testUserToken);
     var processInstanceId = startProcessInstanceWithStartFormAndGetId(PROCESS_DEFINITION_KEY,
         testUserToken, data);
 
