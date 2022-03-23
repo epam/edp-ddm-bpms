@@ -25,6 +25,7 @@ import com.epam.digital.data.platform.bpm.it.dto.AssertWaitingActivityDto;
 import com.epam.digital.data.platform.bpm.it.dto.CompleteActivityDto;
 import com.epam.digital.data.platform.bpm.it.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
+import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
 import com.google.common.io.ByteStreams;
 import java.util.Map;
 import java.util.Objects;
@@ -90,8 +91,10 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         .headers(Map.of("X-Access-Token", testUserToken))
         .response("/json/citizen-onboarding/data-factory/getSettingsResponse.json")
         .build());
-
-    var processInstanceId = startProcessInstance(PROCESS_DEFINITION_KEY, testUserToken);
+    FormDataDto dto = new FormDataDto();
+    dto.setAccessToken(testUserToken);
+    var map = startProcessInstanceWithStartForm(PROCESS_DEFINITION_KEY, testUserToken, dto);
+    String processInstanceId = (String) map.get("id");
     var processInstance = processInstance(processInstanceId);
 
     CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
@@ -236,8 +239,10 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         .headers(Map.of("X-Access-Token", testUserToken))
         .response("/json/citizen-onboarding/data-factory/getNullSettingsResponse.json")
         .build());
-
-    var processInstanceId = startProcessInstance(PROCESS_DEFINITION_KEY, testUserToken);
+    FormDataDto dto = new FormDataDto();
+    dto.setAccessToken(testUserToken);
+    var map = startProcessInstanceWithStartForm(PROCESS_DEFINITION_KEY, testUserToken, dto);
+    String processInstanceId = (String) map.get("id");
     var processInstance = processInstance(processInstanceId);
 
     CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
@@ -372,7 +377,10 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         .response("[]")
         .build());
 
-    var processInstanceId = startProcessInstance(PROCESS_DEFINITION_KEY, testUserToken);
+    FormDataDto dto = new FormDataDto();
+    dto.setAccessToken(testUserToken);
+    var map = startProcessInstanceWithStartForm(PROCESS_DEFINITION_KEY, testUserToken, dto);
+    String processInstanceId = (String) map.get("id");
     var processInstance = processInstance(processInstanceId);
 
     CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
