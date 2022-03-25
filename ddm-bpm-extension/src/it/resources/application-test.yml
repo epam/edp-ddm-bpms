@@ -17,6 +17,8 @@ user-settings-service-api:
   url: http://localhost:8878/user-settings-mock-server
 excerpt-service-api:
   url: http://localhost:9999/excerpt-mock-service
+platform-gateway:
+  url: http://localhost:9779
 
 keycloak:
   url: http://localhost:8200

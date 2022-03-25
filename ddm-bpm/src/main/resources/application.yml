@@ -39,6 +39,9 @@ data-platform:
 registry-rest-api:
   url: http://registry-rest-api:8080
 
+platform-gateway:
+  url: http://platform-gateway:8080
+
 spring:
   main:
     allow-bean-definition-overriding: true

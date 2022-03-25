@@ -39,6 +39,9 @@ dso:
 registry-rest-api:
   url: http://localhost:8877/mock-server
 
+platform-gateway:
+  url: http://localhost:9779
+
 ceph:
   http-endpoint: http://localhost:8100
   access-key: access-key
