@@ -26,6 +26,7 @@ import com.epam.digital.data.platform.bpms.extension.delegate.storage.GetContent
 import com.epam.digital.data.platform.bpms.extension.delegate.storage.PutContentToCephDelegate;
 import com.epam.digital.data.platform.datafactory.excerpt.client.ExcerptFeignClient;
 import com.epam.digital.data.platform.datafactory.factory.client.DataFactoryFeignClient;
+import com.epam.digital.data.platform.datafactory.factory.client.PlatformGatewayFeignClient;
 import com.epam.digital.data.platform.datafactory.settings.client.UserSettingsFeignClient;
 import com.epam.digital.data.platform.dso.client.DigitalSealRestClient;
 import com.epam.digital.data.platform.integration.ceph.service.CephService;
@@ -49,10 +50,11 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 @EnableFeignClients(
     clients = {
-      DigitalSealRestClient.class,
-      DataFactoryFeignClient.class,
-      ExcerptFeignClient.class,
-      UserSettingsFeignClient.class
+        DigitalSealRestClient.class,
+        DataFactoryFeignClient.class,
+        ExcerptFeignClient.class,
+        UserSettingsFeignClient.class,
+        PlatformGatewayFeignClient.class
     })
 public class ExtensionGeneralConfig {
 
