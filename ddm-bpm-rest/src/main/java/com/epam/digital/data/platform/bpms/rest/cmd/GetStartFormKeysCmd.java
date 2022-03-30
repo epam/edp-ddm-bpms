@@ -18,6 +18,7 @@ package com.epam.digital.data.platform.bpms.rest.cmd;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,7 +32,7 @@ import org.camunda.bpm.engine.impl.form.handler.DelegateStartFormHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.commons.utils.cache.Cache;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -61,10 +62,11 @@ public class GetStartFormKeysCmd implements Command<Map<String, String>> {
     log.trace("Found process definitions {}", processDefinitionList);
 
     var deploymentCache = processEngineConfiguration.getDeploymentCache();
+    var processDefinitionCache = deploymentCache.getProcessDefinitionCache();
 
     return processDefinitionList.stream()
-        .filter(ProcessDefinition::hasStartFormKey)
-        .map(pd -> deploymentCache.resolveProcessDefinition((ProcessDefinitionEntity) pd))
+        .filter(pd -> pd.hasStartFormKey() && isCached(pd.getId(), processDefinitionCache))
+        .map(pd -> processDefinitionCache.get(pd.getId()))
         .collect(Collectors.toMap(CoreModelElement::getId, this::getStartFormKey));
   }
 
@@ -85,6 +87,16 @@ public class GetStartFormKeysCmd implements Command<Map<String, String>> {
     }
     return Optional.ofNullable(formKeyExpression).map(Expression::getExpressionText)
         .orElseThrow(() -> new IllegalStateException("Couldn't get form key expression"));
+  }
+
+  private boolean isCached(String processDefinitionId,
+      Cache<String, ProcessDefinitionEntity> processDefinitionEntityCache) {
+    var cached = Objects.nonNull(processDefinitionEntityCache.get(processDefinitionId));
+    if (!cached) {
+      log.warn("ProcessDefinition with specified ProcessDefinitionId {} is not presented in cache",
+          processDefinitionId);
+    }
+    return cached;
   }
 
 }
