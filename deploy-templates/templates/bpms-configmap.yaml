@@ -29,4 +29,3 @@ data:
     camunda.bpm.history-publisher.kafka.ssl.keystore-certificate: {{ .Values.kafka.sslUserCertificate }}
     camunda.bpm.history-publisher.kafka.ssl.keystore-key: {{ .Values.kafka.sslUserKey }}
     camunda.bpm.history-publisher.kafka.ssl.truststore-certificate: {{ .Values.kafka.sslClusterCertificate }}
-    platform.security.csrf.enabled: {{ .Values.platform.security.csrf.enabled }}
