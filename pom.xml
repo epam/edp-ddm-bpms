@@ -24,7 +24,6 @@
     <module>ddm-bpm-extension</module>
     <module>ddm-bpm-rest</module>
     <module>ddm-bpm-security</module>
-    <module>ddm-data-factory-client</module>
     <module>ddm-bpm-history-event-handler</module>
     <module>ddm-bpm-storage</module>
     <module>ddm-bpm-integration-tests</module>
