@@ -24,7 +24,9 @@ import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.edr.SubjectDetailEdrRegistryConnectorDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.storage.GetContentFromCephDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.storage.PutContentToCephDelegate;
-import com.epam.digital.data.platform.datafactory.feign.config.DataFactoryFeignConfiguration;
+import com.epam.digital.data.platform.datafactory.excerpt.client.ExcerptFeignClient;
+import com.epam.digital.data.platform.datafactory.factory.client.DataFactoryFeignClient;
+import com.epam.digital.data.platform.datafactory.settings.client.UserSettingsFeignClient;
 import com.epam.digital.data.platform.dso.client.DigitalSealRestClient;
 import com.epam.digital.data.platform.integration.ceph.service.CephService;
 import com.epam.digital.data.platform.integration.ceph.service.impl.CephServiceS3Impl;
@@ -44,8 +46,13 @@ import org.springframework.context.annotation.Import;
  * should create, set up and return an instance of a bean.
  */
 @Configuration
-@EnableFeignClients(clients = DigitalSealRestClient.class)
-@Import(DataFactoryFeignConfiguration.class)
+@EnableFeignClients(
+    clients = {
+      DigitalSealRestClient.class,
+      DataFactoryFeignClient.class,
+      ExcerptFeignClient.class,
+      UserSettingsFeignClient.class
+    })
 public class ExtensionGeneralConfig {
 
   @ConditionalOnProperty(prefix = "trembita-exchange-gateway.registries.edr-registry",

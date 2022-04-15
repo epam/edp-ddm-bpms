@@ -373,7 +373,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject-settings-equal-settings-id")
-        .queryParams(Map.of("settingsId", "settingsId"))
+        .queryParams(Map.of("settingsId", "c2c19401-f1b7-4954-a230-ab15566e7318"))
         .response("[]")
         .build());
 
@@ -513,7 +513,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject-settings-equal-settings-id")
-        .queryParams(Map.of("settingsId", "settingsId"))
+        .queryParams(Map.of("settingsId", "c2c19401-f1b7-4954-a230-ab15566e7318"))
         .response("[{}]")
         .build());
 
