@@ -20,11 +20,12 @@ import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.header.builder.HeaderBuilderFactory;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
-import com.epam.digital.data.platform.datafactory.feign.client.UserSettingsFeignClient;
 import com.epam.digital.data.platform.datafactory.feign.model.response.ConnectorResponse;
+import com.epam.digital.data.platform.datafactory.settings.client.UserSettingsFeignClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.spin.Spin;
 import org.springframework.stereotype.Component;
 
 /**
@@ -52,10 +53,12 @@ public class UserSettingsConnectorReadDelegate extends BaseJavaDelegate {
         .contentTypeJson()
         .accessTokenHeader()
         .build();
-    var response = userSettingsFeignClient.performGet(headers);
+    var settingsResponse = userSettingsFeignClient.performGet(headers);
     log.debug("User settings successfully read");
 
-    responseVariable.on(execution).set(response);
+    var connectorResponse =
+        ConnectorResponse.builder().responseBody(Spin.JSON(settingsResponse)).build();
+    responseVariable.on(execution).set(connectorResponse);
   }
 
   @Override

@@ -15,7 +15,7 @@
   <properties>
     <camunda.bpm.assert.version>7.0.0</camunda.bpm.assert.version>
     <dso.version>1.5.1-SNAPSHOT</dso.version>
-    <datafactory.client.version>1.5.0-SNAPSHOT</datafactory.client.version>
+    <datafactory.client.version>1.6.0-SNAPSHOT</datafactory.client.version>
   </properties>
 
   <dependencies>
@@ -26,7 +26,17 @@
     </dependency>
     <dependency>
       <groupId>com.epam.digital.data.platform</groupId>
-      <artifactId>ddm-data-factory-client</artifactId>
+      <artifactId>ddm-data-factory-feign-client</artifactId>
+      <version>${datafactory.client.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.epam.digital.data.platform</groupId>
+      <artifactId>ddm-excerpt-feign-client</artifactId>
+      <version>${datafactory.client.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.epam.digital.data.platform</groupId>
+      <artifactId>ddm-settings-feign-client</artifactId>
       <version>${datafactory.client.version}</version>
     </dependency>
     <dependency>

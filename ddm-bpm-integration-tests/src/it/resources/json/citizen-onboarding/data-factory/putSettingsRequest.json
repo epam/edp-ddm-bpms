@@ -1,3 +1,5 @@
 {
-  "e-mail": "email@epam.com"
+  "e-mail": "email@epam.com",
+  "phone": null,
+  "communicationIsAllowed": false
 }
