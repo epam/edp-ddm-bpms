@@ -20,7 +20,7 @@ import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.header.builder.HeaderBuilderFactory;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
-import com.epam.digital.data.platform.datafactory.feign.client.DataFactoryFeignClient;
+import com.epam.digital.data.platform.datafactory.factory.client.DataFactoryFeignClient;
 import com.epam.digital.data.platform.datafactory.feign.model.response.ConnectorResponse;
 import com.epam.digital.data.platform.integration.ceph.service.CephService;
 import java.util.Map;

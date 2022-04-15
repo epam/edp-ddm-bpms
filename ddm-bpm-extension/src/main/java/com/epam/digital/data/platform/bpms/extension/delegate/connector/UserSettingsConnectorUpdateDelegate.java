@@ -20,11 +20,13 @@ import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.header.builder.HeaderBuilderFactory;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
-import com.epam.digital.data.platform.datafactory.feign.client.UserSettingsFeignClient;
 import com.epam.digital.data.platform.datafactory.feign.model.response.ConnectorResponse;
+import com.epam.digital.data.platform.datafactory.settings.client.UserSettingsFeignClient;
+import com.epam.digital.data.platform.settings.model.dto.SettingsUpdateInputDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.spin.Spin;
 import org.camunda.spin.json.SpinJsonNode;
 import org.springframework.stereotype.Component;
 
@@ -52,17 +54,20 @@ public class UserSettingsConnectorUpdateDelegate extends BaseJavaDelegate {
     var payload = payloadVariable.from(execution).getOptional();
 
     log.debug("Start creating or updating user settings");
-    var requestBody = payload.map(Object::toString).orElse(null);
+    var requestBody = payload.map(node -> node.mapTo(SettingsUpdateInputDto.class))
+            .orElse(null);
 
     var headers = headerBuilderFactory.builder()
         .contentTypeJson()
         .accessTokenHeader()
         .csrfProtectionHeaders()
         .build();
-    var response = userSettingsFeignClient.performPut(requestBody, headers);
+    var settingsResponse = userSettingsFeignClient.performPut(requestBody, headers);
     log.debug("User settings successfully created or updated");
 
-    responseVariable.on(execution).set(response);
+    var connectorResponse =
+        ConnectorResponse.builder().responseBody(Spin.JSON(settingsResponse)).build();
+    responseVariable.on(execution).set(connectorResponse);
   }
 
   @Override

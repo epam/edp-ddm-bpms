@@ -19,7 +19,7 @@ package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.header.builder.HeaderBuilderFactory;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
-import com.epam.digital.data.platform.datafactory.feign.client.DataFactoryFeignClient;
+import com.epam.digital.data.platform.datafactory.factory.client.DataFactoryFeignClient;
 import com.epam.digital.data.platform.datafactory.feign.model.response.ConnectorResponse;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
