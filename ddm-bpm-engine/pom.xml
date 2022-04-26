@@ -7,7 +7,7 @@
   <parent>
     <artifactId>ddm-bpm-parent</artifactId>
     <groupId>com.epam.digital.data.platform</groupId>
-    <version>1.5.8-SNAPSHOT</version>
+    <version>1.6.0</version>
   </parent>
 
   <artifactId>ddm-bpm-engine</artifactId>
