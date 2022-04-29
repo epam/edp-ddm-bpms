@@ -22,20 +22,19 @@ camunda:
     authorization:
       enabled: true
     history-level: FULL
-    history-publisher:
-      kafka:
+
+data-platform:
+  kafka:
+    producer:
+      enabled: true
+    topic-properties:
+      creation:
         enabled: true
-        topics:
-          history-process-instance-topic:
-            name: bpm-history-process
-            num-partitions: 1
-            replication-factor: 1
-            retention-policy-in-days: 7
-          history-task-topic:
-            name: bpm-history-task
-            num-partitions: 1
-            replication-factor: 1
-            retention-policy-in-days: 7
+        num-partitions: 1
+        replication-factor: 1
+    topics:
+      history-process-instance-topic: bpm-history-process
+      history-task-topic: bpm-history-task
 
 registry-rest-api:
   url: http://registry-rest-api:8080
