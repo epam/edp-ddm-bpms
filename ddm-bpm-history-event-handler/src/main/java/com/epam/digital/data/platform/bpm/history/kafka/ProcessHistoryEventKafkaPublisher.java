@@ -19,6 +19,7 @@ package com.epam.digital.data.platform.bpm.history.kafka;
 import com.epam.digital.data.platform.bphistory.model.HistoryProcess;
 import com.epam.digital.data.platform.bphistory.model.HistoryTask;
 import com.epam.digital.data.platform.bpm.history.base.publisher.ProcessHistoryEventPublisher;
+import com.epam.digital.data.platform.starter.kafka.config.properties.KafkaProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -54,12 +55,12 @@ public class ProcessHistoryEventKafkaPublisher implements ProcessHistoryEventPub
   }
 
   private void sendHistoryProcessInstanceDto(HistoryProcess dto) {
-    var topicName = kafkaProperties.getTopics().getHistoryProcessInstanceTopic().getName();
+    var topicName = kafkaProperties.getTopics().get("history-process-instance-topic");
     send(topicName, dto);
   }
 
   private void sendHistoryTaskDto(HistoryTask dto) {
-    var topicName = kafkaProperties.getTopics().getHistoryTaskTopic().getName();
+    var topicName = kafkaProperties.getTopics().get("history-task-topic");
     send(topicName, dto);
   }
 

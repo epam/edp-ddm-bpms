@@ -21,11 +21,11 @@ camunda:
       password: camunda
     job-execution:
       enabled: false
-    history-publisher:
-      kafka:
-        bootstrap: localhost:9092
-        ssl:
-          enabled: false
+
+data-platform:
+  kafka:
+    enabled: false
+
 dso:
   url: http://localhost:8081
 
