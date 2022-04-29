@@ -19,7 +19,7 @@ package com.epam.digital.data.platform.bpm.history.it.kafka;
 import com.epam.digital.data.platform.bphistory.model.HistoryProcess;
 import com.epam.digital.data.platform.bphistory.model.HistoryTask;
 import com.epam.digital.data.platform.bpm.history.it.storage.TestHistoryEventStorage;
-import com.epam.digital.data.platform.bpm.history.kafka.StartupHistoryProcessKafkaTopicCreator;
+import com.epam.digital.data.platform.starter.kafka.service.StartupKafkaTopicsCreator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashSet;
 import java.util.List;
@@ -47,7 +47,7 @@ public class KafkaConsumer {
   private TestHistoryEventStorage storage;
 
   @Inject
-  private StartupHistoryProcessKafkaTopicCreator startupHistoryProcessKafkaTopicCreator;
+  private StartupKafkaTopicsCreator startupHistoryProcessKafkaTopicCreator;
   @Inject
   private EmbeddedKafkaBroker embeddedKafkaBroker;
   @Inject

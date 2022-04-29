@@ -24,8 +24,10 @@ data:
     {{- end }}
     storage: {{ toYaml .Values.storage | nindent 6 }}
     s3: {{ .Values.s3 | toYaml | nindent 6 }}
-    camunda.bpm.history-publisher.kafka.bootstrap: {{ .Values.kafka.service }}
-    camunda.bpm.history-publisher.kafka.ssl.enabled: {{ .Values.kafka.sslEnabled }}
-    camunda.bpm.history-publisher.kafka.ssl.keystore-certificate: {{ .Values.kafka.sslUserCertificate }}
-    camunda.bpm.history-publisher.kafka.ssl.keystore-key: {{ .Values.kafka.sslUserKey }}
-    camunda.bpm.history-publisher.kafka.ssl.truststore-certificate: {{ .Values.kafka.sslClusterCertificate }}
+    data-platform.kafka.bootstrap: {{ .Values.kafka.service }}
+    data-platform.kafka.ssl.enabled: {{ .Values.kafka.sslEnabled }}
+    data-platform.kafka.ssl.keystore-type: {{ .Values.kafka.sslCertType }}
+    data-platform.kafka.ssl.truststore-type: {{ .Values.kafka.sslCertType }}
+    data-platform.kafka.ssl.keystore-certificate: {{ .Values.kafka.sslUserCertificate }}
+    data-platform.kafka.ssl.keystore-key: {{ .Values.kafka.sslUserKey }}
+    data-platform.kafka.ssl.truststore-certificate: {{ .Values.kafka.sslClusterCertificate }}

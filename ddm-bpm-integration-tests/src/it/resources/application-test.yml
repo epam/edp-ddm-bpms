@@ -20,11 +20,6 @@ camunda:
   admin-user-id: camunda
   admin-group-id: camunda-admin
   bpm:
-    history-publisher:
-      kafka:
-        bootstrap: localhost:9092
-        ssl:
-          enabled: false
     generic-properties:
       properties:
         enableHistoricInstancePermissions: true
@@ -35,6 +30,9 @@ camunda:
       password: camunda
     job-execution:
       enabled: false
+data-platform:
+  kafka:
+    enabled: false
 dso:
   url: http://localhost:8081
 

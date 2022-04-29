@@ -50,8 +50,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.springframework.kafka</groupId>
-      <artifactId>spring-kafka</artifactId>
+      <groupId>com.epam.digital.data.platform</groupId>
+      <artifactId>ddm-starter-kafka</artifactId>
+      <version>${ddm-starter-kafka.version}</version>
     </dependency>
 
     <dependency>

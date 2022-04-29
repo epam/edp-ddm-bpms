@@ -9,9 +9,10 @@ camunda:
     admin-user:
       id: ${camunda.admin-user-id}
       password: camunda
-    history-publisher:
-      kafka:
-        enabled: false
+
+data-platform:
+  kafka:
+    enabled: false
 
 registry-rest-api:
   url: http://localhost:8877/mock-server
