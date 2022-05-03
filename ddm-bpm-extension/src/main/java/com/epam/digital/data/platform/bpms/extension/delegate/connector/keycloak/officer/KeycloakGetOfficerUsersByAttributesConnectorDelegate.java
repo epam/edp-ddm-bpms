@@ -58,7 +58,9 @@ public class KeycloakGetOfficerUsersByAttributesConnectorDelegate extends BaseJa
 
     var searchUsersQueryBuilder = SearchUserQuery.builder()
         .edrpou(edrpou);
-    drfo.ifPresent(searchUsersQueryBuilder::drfo);
+    if (drfo.isPresent() && !drfo.get().isEmpty()) {
+      searchUsersQueryBuilder.drfo(drfo.get());
+    }
 
     var usernames = idmService.searchUsers(searchUsersQueryBuilder.build())
         .stream()
@@ -71,7 +73,7 @@ public class KeycloakGetOfficerUsersByAttributesConnectorDelegate extends BaseJa
   @NonNull
   private String getRequiredEdrpou(@NonNull DelegateExecution execution) {
     var edrpou = edrpouVariable.from(execution).getOptional();
-    if (edrpou.isEmpty()) {
+    if (edrpou.isEmpty() || edrpou.get().isEmpty()) {
       throw new IllegalArgumentException(
           String.format("Edrpou wasn't specified for %s delegate in process with id %s",
               DELEGATE_NAME, execution.getProcessDefinitionId()));
