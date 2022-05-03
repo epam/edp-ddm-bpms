@@ -19,6 +19,7 @@ package com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloa
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -86,12 +87,41 @@ class KeycloakGetOfficerUsersByAttributesConnectorDelegateTest {
     when(edrpouVariableReadAccessor.getOptional()).thenReturn(Optional.empty());
     when(delegateExecution.getProcessDefinitionId()).thenReturn("processDefinitionId");
 
-    var ex = assertThrows(IllegalArgumentException.class,
+    var nullEx = assertThrows(IllegalArgumentException.class,
         () -> delegate.execute(delegateExecution));
 
-    assertThat(ex.getMessage()).isEqualTo(
+    assertThat(nullEx.getMessage()).isEqualTo(
         "Edrpou wasn't specified for keycloakGetOfficerUsersByAttributesConnectorDelegate "
             + "delegate in process with id processDefinitionId");
+
+    when(edrpouVariableReadAccessor.getOptional()).thenReturn(Optional.of(""));
+    when(delegateExecution.getProcessDefinitionId()).thenReturn("processDefinitionId");
+
+    var emptyEx = assertThrows(IllegalArgumentException.class,
+        () -> delegate.execute(delegateExecution));
+
+    assertThat(emptyEx.getMessage()).isEqualTo(
+        "Edrpou wasn't specified for keycloakGetOfficerUsersByAttributesConnectorDelegate "
+            + "delegate in process with id processDefinitionId");
+  }
+
+  @Test
+  void testHappyPathWithEmptyDrfo() throws Exception {
+    when(edrpouVariableReadAccessor.getOptional()).thenReturn(Optional.of("edrpou"));
+    when(drfoVariableReadAccessor.getOptional()).thenReturn(Optional.empty());
+
+    var nullExpectedUsers = List.of(IdmUser.builder().userName("username1").build(),
+        IdmUser.builder().userName("username2").build());
+    when(idmService.searchUsers(SearchUserQuery.builder().edrpou("edrpou").build()))
+        .thenReturn(nullExpectedUsers);
+
+    delegate.execute(delegateExecution);
+
+    when(drfoVariableReadAccessor.getOptional()).thenReturn(Optional.empty());
+
+    delegate.execute(delegateExecution);
+
+    verify(usersByAttributeVariableWriteAccessor, times(2)).set(List.of("username1", "username2"));
   }
 
   @Test
