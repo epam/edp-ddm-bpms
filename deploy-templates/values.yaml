@@ -1,5 +1,7 @@
 global:
   disableRequestsLimits: false
+  kafkaOperator:
+    replicationFactor: 3
 
 image:
   name: business-process-management
@@ -105,3 +107,7 @@ kafka:
   sslUserKey: ${KAFKA_USER_KEYSTORE_KEY}
   sslUserCertificate: ${KAFKA_USER_KEYSTORE_CERTIFICATE}
   sslClusterCertificate: ${KAFKA_CLUSTER_TRUSTSTORE}
+  numPartitions: 15
+  errorHandlerInitialInterval: 1500
+  errorHandlerMaxElapsedTime: 6000
+  errorHandlerMultiplier: 2

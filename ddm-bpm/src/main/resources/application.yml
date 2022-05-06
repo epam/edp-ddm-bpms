@@ -35,6 +35,7 @@ data-platform:
     topics:
       history-process-instance-topic: bpm-history-process
       history-task-topic: bpm-history-task
+      user-notifications: user-notifications
 
 registry-rest-api:
   url: http://registry-rest-api:8080

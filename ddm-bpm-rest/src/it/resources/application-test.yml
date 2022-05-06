@@ -5,3 +5,7 @@ spring:
 camunda:
   admin-user-id: camunda
   admin-group-id: camunda-admin
+
+data-platform:
+  kafka:
+    enabled: false
