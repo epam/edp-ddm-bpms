@@ -66,3 +66,19 @@ trembita-exchange-gateway:
         member-class: GOV
         member-code: 11115887
         subsystem-code: DRACS_test
+
+data-platform:
+  kafka:
+    enabled: true
+    bootstrap: localhost:9092
+    topic-properties:
+      num-partitions: 1
+      replication-factor: 1
+    ssl:
+      enabled: false
+    error-handler:
+      initial-interval: 1500
+      max-elapsed-time: 6000
+      multiplier: 2
+    topics:
+      user-notifications: user-notifications

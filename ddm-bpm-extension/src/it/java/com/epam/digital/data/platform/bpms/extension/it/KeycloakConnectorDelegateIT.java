@@ -158,12 +158,30 @@ public class KeycloakConnectorDelegateIT extends BaseIT {
   public void testGeyUsersFromKeycloakByAttributes() {
     var requestAttributes = "{\"attributes\":{\"edrpou\":\"12345678\"}}";
     mockConnectToKeycloak(officerRealm);
-    mockKeycloakGetUsersByAttributes(requestAttributes,
+    mockKeycloakGetUsersByAttributes(officerRealm, requestAttributes,
         "/json/keycloak/keycloakUsersByAttributesResponse.json");
 
     var processInstance = runtimeService.startProcessInstanceByKey("testGetUsersByAttributes_key");
 
     var roleMappingsUrl = "/auth/realms/officer-realm/users/search";
+    keycloakMockServer.verify(1,
+        postRequestedFor(urlEqualTo(roleMappingsUrl)).withRequestBody(
+            equalToJson(requestAttributes)));
+
+    BpmnAwareTests.assertThat(processInstance).isEnded();
+  }
+
+  @Test
+  @Deployment(resources = "bpmn/connector/getKeycloakCitizenUsersByAttribute.bpmn")
+  public void testGeyCitizenUsersFromKeycloakByAttributes() {
+    var requestAttributes = "{\"attributes\":{\"edrpou\":\"12345678\"}}";
+    mockConnectToKeycloak(citizenRealm);
+    mockKeycloakGetUsersByAttributes(citizenRealm, requestAttributes,
+        "/json/keycloak/keycloakUsersByAttributesResponse.json");
+
+    var processInstance = runtimeService.startProcessInstanceByKey("testGetCitizenUsersByAttributes_key");
+
+    var roleMappingsUrl = "/auth/realms/citizen-realm/users/search";
     keycloakMockServer.verify(1,
         postRequestedFor(urlEqualTo(roleMappingsUrl)).withRequestBody(
             equalToJson(requestAttributes)));
@@ -190,9 +208,9 @@ public class KeycloakConnectorDelegateIT extends BaseIT {
                 .withBody(convertJsonToString(responseBody)))));
   }
 
-  private void mockKeycloakGetUsersByAttributes(String requestBody, String responseBody) {
+  private void mockKeycloakGetUsersByAttributes(String realm, String requestBody, String responseBody) {
     keycloakMockServer.addStubMapping(
-        stubFor(post(urlPathEqualTo("/auth/realms/officer-realm/users/search"))
+        stubFor(post(urlPathEqualTo(String.format("/auth/realms/%s/users/search", realm)))
             .withRequestBody(equalToJson(requestBody))
             .willReturn(aResponse().withStatus(200)
                 .withHeader("Content-type", "application/json")

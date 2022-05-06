@@ -1,6 +1,7 @@
 camunda:
   bpm:
     database-history-level: NONE
+
 data-platform:
   kafka:
     bootstrap: localhost:9092
@@ -14,3 +15,7 @@ data-platform:
     topics:
       history-process-instance-topic: bpm-history-process
       history-task-topic: bpm-history-task
+    error-handler:
+      initial-interval: 1500
+      max-elapsed-time: 6000
+      multiplier: 2
