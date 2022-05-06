@@ -24,10 +24,16 @@ data:
     {{- end }}
     storage: {{ toYaml .Values.storage | nindent 6 }}
     s3: {{ .Values.s3 | toYaml | nindent 6 }}
+    data-platform.kafka.enabled: true
     data-platform.kafka.bootstrap: {{ .Values.kafka.service }}
+    data-platform.kafka.topic-properties.num-partitions: {{ .Values.kafka.numPartitions }}
+    data-platform.kafka.topic-properties.replication-factor: {{ .Values.global.kafkaOperator.replicationFactor }}
     data-platform.kafka.ssl.enabled: {{ .Values.kafka.sslEnabled }}
-    data-platform.kafka.ssl.keystore-type: {{ .Values.kafka.sslCertType }}
-    data-platform.kafka.ssl.truststore-type: {{ .Values.kafka.sslCertType }}
     data-platform.kafka.ssl.keystore-certificate: {{ .Values.kafka.sslUserCertificate }}
     data-platform.kafka.ssl.keystore-key: {{ .Values.kafka.sslUserKey }}
     data-platform.kafka.ssl.truststore-certificate: {{ .Values.kafka.sslClusterCertificate }}
+    data-platform.kafka.ssl.keystore-type: {{ .Values.kafka.sslCertType }}
+    data-platform.kafka.ssl.truststore-type: {{ .Values.kafka.sslCertType }}
+    data-platform.kafka.error-handler.initial-interval: {{ .Values.kafka.errorHandlerInitialInterval }}
+    data-platform.kafka.error-handler.max-elapsed-time: {{ .Values.kafka.errorHandlerMaxElapsedTime }}
+    data-platform.kafka.error-handler.multiplier: {{ .Values.kafka.errorHandlerMultiplier }}

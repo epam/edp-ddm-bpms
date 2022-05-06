@@ -33,6 +33,11 @@ camunda:
 data-platform:
   kafka:
     enabled: false
+    topic-properties:
+      creation:
+        enabled: false
+    ssl:
+      enabled: false
 dso:
   url: http://localhost:8081
 
