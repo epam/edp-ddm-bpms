@@ -19,8 +19,10 @@ package com.epam.digital.data.platform.bpms.extension.it;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.matching;
+import static com.github.tomakehurst.wiremock.client.WireMock.patch;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
@@ -33,6 +35,8 @@ import com.epam.digital.data.platform.starter.errorhandling.exception.SystemExce
 import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.http.RequestMethod;
+import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import com.google.common.collect.ImmutableMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -195,6 +199,30 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
         .isEqualTo("Значення змінної не відповідає правилам вказаним в домені");
     assertThat(ex.getDetails().getErrors().get(0).getField()).isEqualTo("field1");
     assertThat(ex.getDetails().getErrors().get(0).getValue()).isEqualTo("value1");
+  }
+
+  @Test
+  @Deployment(resources = {"bpmn/connector/testDataFactoryConnectorPartialUpdateDelegate.bpmn"})
+  public void testDataFactoryConnectorPartialUpdateDelegate() {
+    formDataStorageService.putFormData("cephKey", FormDataDto.builder()
+        .accessToken("token").build());
+
+    dataFactoryMockServer.addStubMapping(
+        stubFor(patch(urlPathEqualTo("/mock-server/laboratory/id"))
+            .withHeader("Content-Type", equalTo("application/json"))
+            .withHeader("X-Source-System", equalTo("Low-code Platform"))
+            .withHeader("X-Source-Application", equalTo("ddm-bpm-extension"))
+            .withHeader("X-Digital-Signature-Derived", equalTo("cephKey"))
+            .withRequestBody(equalToJson("{\"var\":\"value\"}"))
+            .willReturn(aResponse().withHeader("Content-Type", "application/json")
+                .withStatus(201))));
+
+    Map<String, Object> variables = ImmutableMap
+        .of("secure-sys-var-ref-task-form-data-testActivity", "cephKey");
+    var processInstance = runtimeService.startProcessInstanceByKey(
+        "testDataFactoryConnectorPartialUpdateDelegate_key", variables);
+
+    BpmnAwareTests.assertThat(processInstance).isEnded();
   }
 
   @Test
