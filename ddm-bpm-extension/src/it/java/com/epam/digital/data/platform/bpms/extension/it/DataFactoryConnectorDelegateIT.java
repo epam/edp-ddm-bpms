@@ -226,6 +226,30 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
   }
 
   @Test
+  @Deployment(resources = {"bpmn/connector/testDataFactoryConnectorDelegate.bpmn"})
+  public void testDataFactoryConnectorDelegate_withPartialUpdate() {
+    formDataStorageService.putFormData("cephKey", FormDataDto.builder()
+        .accessToken("token").build());
+
+    dataFactoryMockServer.addStubMapping(
+        stubFor(patch(urlPathEqualTo("/mock-server/laboratory/id"))
+            .withHeader("Content-Type", equalTo("application/json"))
+            .withHeader("X-Source-System", equalTo("Low-code Platform"))
+            .withHeader("X-Source-Application", equalTo("ddm-bpm-extension"))
+            .withHeader("X-Digital-Signature-Derived", equalTo("cephKey"))
+            .withRequestBody(equalToJson("{\"var\":\"value\"}"))
+            .willReturn(aResponse().withHeader("Content-Type", "application/json")
+                .withStatus(201))));
+
+    Map<String, Object> variables = ImmutableMap
+        .of("secure-sys-var-ref-task-form-data-testActivity", "cephKey");
+    var processInstance = runtimeService.startProcessInstanceByKey(
+        "testDataFactoryConnectorDelegate_key", variables);
+
+    BpmnAwareTests.assertThat(processInstance).isEnded();
+  }
+
+  @Test
   @Deployment(resources = {"bpmn/connector/testDataFactoryConnectorSearchDelegate.bpmn"})
   public void testDataFactoryConnectorSearchDelegate() {
     dataFactoryMockServer.addStubMapping(

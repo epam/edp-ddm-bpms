@@ -35,10 +35,11 @@ import com.epam.digital.data.platform.starter.trembita.integration.edr.service.E
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * The class represents a holder for beans of the general configuration. Each method produces a bean
@@ -103,5 +104,11 @@ public class ExtensionGeneralConfig {
         .cephSecretKey(cephSecretKey)
         .cephEndpoint(cephEndpoint)
         .build();
+  }
+
+  @Bean
+  @ConditionalOnMissingBean(RestTemplate.class)
+  public RestTemplate restTemplate(RestTemplateBuilder builder) {
+    return builder.build();
   }
 }
