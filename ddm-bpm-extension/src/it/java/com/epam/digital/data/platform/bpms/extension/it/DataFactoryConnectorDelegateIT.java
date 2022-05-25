@@ -208,7 +208,7 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
         .accessToken("token").build());
 
     dataFactoryMockServer.addStubMapping(
-        stubFor(patch(urlPathEqualTo("/mock-server/laboratory/id"))
+        stubFor(patch(urlPathEqualTo("/mock-server/partial/laboratory/id"))
             .withHeader("Content-Type", equalTo("application/json"))
             .withHeader("X-Source-System", equalTo("Low-code Platform"))
             .withHeader("X-Source-Application", equalTo("ddm-bpm-extension"))
