@@ -21,9 +21,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import com.epam.digital.data.platform.dso.api.dto.SignResponseDto;
 import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.service.FormDataKeyProviderImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import java.util.LinkedHashMap;
@@ -33,7 +35,7 @@ import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-public class DigitalSignatureConnectorDelegateIT extends BaseIT {
+public class DigitalSystemSignatureDelegateIT extends BaseIT {
 
   @Inject
   @Qualifier("digitalSignatureMockServer")
@@ -47,7 +49,7 @@ public class DigitalSignatureConnectorDelegateIT extends BaseIT {
         stubFor(post(urlPathEqualTo("/api/eseal/sign"))
             .withHeader("Content-Type", equalTo("application/json"))
             .withHeader("X-Access-Token", equalTo(validAccessToken))
-            .withRequestBody(equalTo("{\"data\":\"data to sign\"}"))
+            .withRequestBody(equalTo("{\"data\":\"{\\\"name\\\":\\\"John\\\"}\"}"))
             .willReturn(
                 aResponse().withHeader("Content-Type", "application/json").withStatus(200)
                     .withBody(objectMapper.writeValueAsString(response)))));
@@ -65,5 +67,14 @@ public class DigitalSignatureConnectorDelegateIT extends BaseIT {
     taskService.complete(taskId);
 
     BpmnAwareTests.assertThat(processInstance).isEnded();
+
+    var key = String.format(FormDataKeyProviderImpl.SYSTEM_SIGNATURE_STORAGE_KEY,
+        processInstance.getId(),
+        processInstance.getId());
+    var signedFormData = formDataStorageService.getFormData(key);
+    assertThat(signedFormData).isPresent();
+    assertThat(signedFormData.get().getSignature()).isEqualTo(response.getSignature());
+    assertThat(objectMapper.writeValueAsString(signedFormData.get().getData()))
+        .isEqualTo("{\"name\":\"John\"}");
   }
 }

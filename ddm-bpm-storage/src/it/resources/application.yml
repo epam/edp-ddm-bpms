@@ -7,3 +7,6 @@ spring:
 
 ceph:
   bucket: bucketName
+
+digital-document-service:
+  url: http://localhost:1111
