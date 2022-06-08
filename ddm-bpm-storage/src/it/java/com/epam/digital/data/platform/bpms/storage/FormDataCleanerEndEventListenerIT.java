@@ -91,4 +91,24 @@ class FormDataCleanerEndEventListenerIT extends BaseIT {
     BpmnAwareTests.assertThat(processInstance).isEnded();
     Assertions.assertThat(cephService.getStorage()).isEmpty();
   }
+
+  @Test
+  @Deployment(resources = "bpmn/testCleanSystemSignature.bpmn")
+  void shouldDeleteSystemSignatures() {
+    var processInstance = runtimeService
+        .startProcessInstanceByKey("clean_system_signatures_key");
+    var processInstanceId = processInstance.getId();
+
+    var storageKey = formDataKeyProvider.generateSystemSignatureKey(processInstanceId,
+        processInstanceId);
+    formDataStorageService.putFormData(storageKey, FormDataDto.builder().build());
+    assertThat(cephService.getStorage()).hasSize(1);
+
+    var taskId = taskService.createTaskQuery().taskDefinitionKey("Activity_1")
+        .singleResult().getId();
+    taskService.complete(taskId);
+
+    BpmnAwareTests.assertThat(processInstance).isEnded();
+    assertThat(cephService.getStorage()).isEmpty();
+  }
 }

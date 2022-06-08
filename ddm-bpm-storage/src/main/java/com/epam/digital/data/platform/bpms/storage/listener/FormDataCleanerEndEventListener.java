@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FormDataCleanerEndEventListener implements ExecutionListener {
 
-  private final FormDataStorageService fromDataStorageService;
+  private final FormDataStorageService formDataStorageService;
   private final StartFormCephKeyVariable startFormCephKeyVariable;
 
   @Override
@@ -44,6 +44,7 @@ public class FormDataCleanerEndEventListener implements ExecutionListener {
     var processInstanceId = execution.getProcessInstanceId();
     try {
       deleteFormData(processInstanceId, startFormDataCephKey);
+      formDataStorageService.deleteSystemSignaturesByRootProcessInstanceId(processInstanceId);
     } catch (RuntimeException ex) {
       log.warn(
           "Error while deleting form data from ceph, processDefinitionId={}, processInstanceId={}, startFormDataCephKey={}",
@@ -53,9 +54,9 @@ public class FormDataCleanerEndEventListener implements ExecutionListener {
 
   private void deleteFormData(String processInstanceId, String startFormDataCephKey) {
     if (Objects.isNull(startFormDataCephKey)) {
-      fromDataStorageService.deleteByProcessInstanceId(processInstanceId);
+      formDataStorageService.deleteByProcessInstanceId(processInstanceId);
     } else {
-      fromDataStorageService.deleteByProcessInstanceId(processInstanceId, startFormDataCephKey);
+      formDataStorageService.deleteByProcessInstanceId(processInstanceId, startFormDataCephKey);
     }
   }
 }

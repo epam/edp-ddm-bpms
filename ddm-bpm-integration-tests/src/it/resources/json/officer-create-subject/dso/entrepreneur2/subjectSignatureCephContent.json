@@ -1,4 +1,9 @@
 {
-  "data": "{\"subjectName\":\"testSubjectName\",\"subjectType\":\"ENTREPRENEUR\",\"subjectCode\":\"1010101010\",\"subjectStatus\":null}",
+  "data": {
+    "subjectName": "testSubjectName",
+    "subjectType": "ENTREPRENEUR",
+    "subjectCode": "1010101010",
+    "subjectStatus": null
+  },
   "signature": "userSignature"
 }

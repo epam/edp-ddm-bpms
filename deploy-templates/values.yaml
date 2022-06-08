@@ -76,12 +76,14 @@ deployProfile: prod
 storage:
   form-data:
     type: ceph
-    backend:
-      ceph:
-        http-endpoint: ${ceph.http-endpoint}
-        access-key: ${ceph.access-key}
-        secret-key: ${ceph.secret-key}
-        bucket: ${ceph.bucket}
+  message-payload:
+    type: ceph
+  backend:
+    ceph:
+      http-endpoint: ${ceph.http-endpoint}
+      access-key: ${ceph.access-key}
+      secret-key: ${ceph.secret-key}
+      bucket: ${ceph.bucket}
   file-data:
     type: ceph
     backend:

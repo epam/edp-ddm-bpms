@@ -16,19 +16,24 @@
 
 package com.epam.digital.data.platform.bpms.extension.delegate;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.epam.digital.data.platform.bpms.extension.delegate.storage.PutContentToCephDelegate;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableReadAccessor;
-import com.epam.digital.data.platform.integration.ceph.service.CephService;
+import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.service.FormDataStorageService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -40,9 +45,11 @@ public class PutContentToCephDelegateTest {
   @InjectMocks
   private PutContentToCephDelegate putContentToCephDelegate;
   @Mock
-  private CephService cephService;
+  private FormDataStorageService formDataStorageService;
   @Mock
   private ExecutionEntity delegateExecution;
+  @Spy
+  private ObjectMapper objectMapper = new ObjectMapper();
 
   @Mock
   private NamedVariableAccessor<String> keyVariableAccessor;
@@ -68,11 +75,11 @@ public class PutContentToCephDelegateTest {
   @Test
   public void execute() throws Exception {
     when(keyVariableReadAccessor.get()).thenReturn("someKey");
-    when(contentVariableReadAccessor.get()).thenReturn("someContent");
+    when(contentVariableReadAccessor.get()).thenReturn("{\"data\": {}}");
 
     putContentToCephDelegate.execute(delegateExecution);
 
-    verify(cephService).put(CEPH_BUCKET_NAME, "someKey", "someContent");
+    verify(formDataStorageService).putFormData(eq("someKey"), any(FormDataDto.class));
   }
 
 }

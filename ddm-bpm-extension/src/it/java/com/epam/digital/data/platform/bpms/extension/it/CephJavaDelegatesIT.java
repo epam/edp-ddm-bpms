@@ -23,8 +23,8 @@ import static org.junit.Assert.assertTrue;
 
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
 import com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable;
-import com.epam.digital.data.platform.integration.ceph.exception.MisconfigurationException;
 import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.exception.FormDataRepositoryMisconfigurationException;
 import com.google.common.collect.ImmutableMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -53,13 +53,13 @@ public class CephJavaDelegatesIT extends BaseIT {
   @Test
   @Deployment(resources = {"bpmn/delegate/testCephJavaDelegates.bpmn"})
   public void shouldThrowAnExceptionIfBucketNotExists() {
-    String contentToPut = "{ \"var1\":\"value1\", \"var2\":\"value2\" }";
+    String contentToPut = "{\"data\":{\"var1\":\"value1\",\"var2\":\"value2\"}}";
     Map<String, Object> vars = new HashMap<>();
     vars.put("key", "testKey");
     vars.put("content", Variables.stringValue(contentToPut, true));
 
     this.cephService.setCephBucketName("newName");
-    var ex = assertThrows(MisconfigurationException.class, () -> runtimeService
+    var ex = assertThrows(FormDataRepositoryMisconfigurationException.class, () -> runtimeService
         .startProcessInstanceByKey("testCephJavaDelegates_key", "1", vars));
 
     assertThat(ex.getMessage()).isEqualTo("Bucket bucket hasn't found");
@@ -68,7 +68,7 @@ public class CephJavaDelegatesIT extends BaseIT {
   @Test
   @Deployment(resources = {"bpmn/delegate/testCephJavaDelegates.bpmn"})
   public void shouldUseCephJavaDelegatesInServiceTasks() {
-    String contentToPut = "{ \"var1\":\"value1\", \"var2\":\"value2\" }";
+    String contentToPut = "{\"data\":{\"var1\":\"value1\",\"var2\":\"value2\"}}";
 
     Map<String, Object> vars = ImmutableMap.of(
         "key", "testKey",
@@ -92,7 +92,8 @@ public class CephJavaDelegatesIT extends BaseIT {
     var processInstance = runtimeService
         .startProcessInstanceByKey("testCephFormDataDelegates_key", "key", vars);
 
-    var expectedCephKey = cephKeyProvider.generateKey("userTask", processInstance.getProcessInstanceId());
+    var expectedCephKey = cephKeyProvider.generateKey("userTask",
+        processInstance.getProcessInstanceId());
 
     var data = formDataStorageService.getFormData(expectedCephKey);
     assertThat(data).isNotEmpty();

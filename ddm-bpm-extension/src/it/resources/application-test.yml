@@ -21,6 +21,8 @@ excerpt-service-api:
   url: http://localhost:9999/excerpt-mock-service
 platform-gateway:
   url: http://localhost:9779
+digital-document-service:
+  url: http://localhost:1111/digital-document-service-mock
 
 keycloak:
   url: http://localhost:8200

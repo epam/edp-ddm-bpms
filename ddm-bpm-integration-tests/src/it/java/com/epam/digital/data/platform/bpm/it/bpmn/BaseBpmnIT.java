@@ -26,6 +26,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.historyService;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.managementService;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
@@ -85,6 +86,9 @@ public abstract class BaseBpmnIT extends BaseIT {
   @Inject
   @Qualifier("trembitaMockServer")
   protected WireMockServer trembitaMockServer;
+  @Inject
+  @Qualifier("documentServiceWireMock")
+  protected WireMockServer documentServiceWireMock;
   @Value("${ceph.bucket}")
   protected String cephBucketName;
 
@@ -103,6 +107,7 @@ public abstract class BaseBpmnIT extends BaseIT {
     SecurityContextHolder.getContext().setAuthentication(
         new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
     CamundaAssertionUtil.setFromDataStorageService(formDataStorageService);
+    stubDocumentsDeleting();
   }
 
   @After
@@ -360,5 +365,11 @@ public abstract class BaseBpmnIT extends BaseIT {
     var dataMapStr = objectMapper.writeValueAsString(dataMap);
     jsonDataMap.put("data", dataMapStr);
     return objectMapper.writeValueAsString(jsonDataMap);
+  }
+
+  protected void stubDocumentsDeleting() {
+    documentServiceWireMock.addStubMapping(
+        stubFor(delete(urlPathMatching(".*/documents/.*"))
+            .willReturn(aResponse().withStatus(200))));
   }
 }

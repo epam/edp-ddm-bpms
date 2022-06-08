@@ -16,9 +16,6 @@
 
 package com.epam.digital.data.platform.bpms.config;
 
-import com.epam.digital.data.platform.bpms.storage.config.FormDataStorageServiceConfig;
-import java.util.stream.Stream;
-import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
@@ -26,8 +23,10 @@ import org.springframework.boot.jdbc.DatabaseDriver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.support.DatabaseStartupValidator;
+
+import javax.sql.DataSource;
+import java.util.stream.Stream;
 
 /**
  * The class represents a holder for beans of the general configuration. Each method produces a bean

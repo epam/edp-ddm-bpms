@@ -38,3 +38,4 @@ data:
     data-platform.kafka.error-handler.max-elapsed-time: {{ .Values.kafka.errorHandlerMaxElapsedTime }}
     data-platform.kafka.error-handler.multiplier: {{ .Values.kafka.errorHandlerMultiplier }}
     spring.rest-template.ssl-checking-enabled: {{ .Values.restTemplate.sslCheckingEnabled }}
+    digital-document-service.url: http://digital-document-service:8080
