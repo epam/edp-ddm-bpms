@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_18gpu2t" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_18gpu2t" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.12.0">
   <bpmn:process id="test-batch-read" isExecutable="true">
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>Flow_0j6d5zu</bpmn:outgoing>
@@ -31,13 +31,13 @@ var chemResearch = researches.stream()
         .filter(r -&gt;
                 r.prop("researchId").value().equals("7074945f-e088-446b-8c28-325aca4f423f"))
         .findFirst().get()
-assert Objects.nonNull(chemResearch)
+assert chemResearch != null
 assert chemResearch.prop("researchType").value().equals("Chemical factors")
 var physResearch = researches.stream()
         .filter(r -&gt;
                 r.prop("researchId").value().equals("0b3c9f55-ba50-4d87-970a-bfbb8e31adeb"))
         .findFirst().get()
-assert Objects.nonNull(physResearch)
+assert physResearch != null
 assert physResearch.prop("researchType").value().equals("Physical factors")</bpmn:script>
     </bpmn:scriptTask>
   </bpmn:process>

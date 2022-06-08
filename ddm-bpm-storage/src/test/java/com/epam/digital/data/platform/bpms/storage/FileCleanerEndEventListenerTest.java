@@ -16,12 +16,14 @@
 
 package com.epam.digital.data.platform.bpms.storage;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.epam.digital.data.platform.bpms.storage.client.DigitalDocumentServiceRestClient;
 import com.epam.digital.data.platform.bpms.storage.listener.FileCleanerEndEventListener;
-import com.epam.digital.data.platform.storage.file.service.FormDataFileStorageService;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,7 +41,7 @@ class FileCleanerEndEventListenerTest {
   @Mock
   private ExecutionEntity executionEntity;
   @Mock
-  private FormDataFileStorageService formDataFileStorageService;
+  private DigitalDocumentServiceRestClient client;
 
   @InjectMocks
   private FileCleanerEndEventListener fileCleanerEndEventListener;
@@ -56,6 +58,6 @@ class FileCleanerEndEventListenerTest {
     fileCleanerEndEventListener.notify(executionEntity);
 
     verify(executionEntity, times(1)).getProcessInstanceId();
-    verify(formDataFileStorageService, times(1)).deleteByProcessInstanceId(PROCESS_INSTANCE_ID);
+    verify(client, times(1)).delete(eq(PROCESS_INSTANCE_ID), any());
   }
 }

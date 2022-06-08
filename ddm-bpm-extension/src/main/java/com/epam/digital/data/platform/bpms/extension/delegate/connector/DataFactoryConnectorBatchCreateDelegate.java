@@ -22,14 +22,12 @@ import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.datafactory.factory.client.DataFactoryFeignClient;
 import com.epam.digital.data.platform.datafactory.feign.model.response.ConnectorResponse;
-import com.epam.digital.data.platform.integration.ceph.service.CephService;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.spin.Spin;
 import org.camunda.spin.json.SpinJsonNode;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -48,16 +46,15 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseJavaDelegate {
   protected NamedVariableAccessor<String> resourceVariable;
   @SystemVariable(name = "payload", isTransient = true)
   protected NamedVariableAccessor<SpinJsonNode> payloadVariable;
+  @SystemVariable(name = "payloadIndex", isTransient = true)
+  protected NamedVariableAccessor<Integer> payloadIndexVariable;
   @SystemVariable(name = "response", isTransient = true)
   protected NamedVariableAccessor<ConnectorResponse> responseVariable;
   @SystemVariable(name = "x_digital_signature_derived_ceph_key")
   private NamedVariableAccessor<String> xDigitalSignatureDerivedCephKeyVariable;
 
-  private final DigitalSignatureConnectorDelegate digitalSignatureConnectorDelegate;
-  private final CephService cephService;
+  private final DigitalSystemSignatureDelegate digitalSystemSignatureDelegate;
   private final DataFactoryFeignClient dataFactoryFeignClient;
-  @Value("${ceph.bucket}")
-  private final String cephBucketName;
   private final HeaderBuilderFactory headerBuilderFactory;
 
   @Override
@@ -77,13 +74,8 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseJavaDelegate {
     var spinJsonNodes = payload.elements();
     for (int nodeIndex = 0; nodeIndex < spinJsonNodes.size(); nodeIndex++) {
       var spinJsonNode = spinJsonNodes.get(nodeIndex);
-      var stringJsonNode = spinJsonNode.toString();
 
-      var systemSignature = signNode(execution, stringJsonNode);
-
-      log.debug("Start putting signature to ceph for {} entity", nodeIndex);
-      putSignatureToCeph(execution, stringJsonNode, systemSignature, nodeIndex);
-      log.debug("Signature put successfully for {} entity", nodeIndex);
+      signNode(execution, spinJsonNode, nodeIndex);
 
       log.debug("Start creating {} entity", nodeIndex);
       var headers = headerBuilderFactory.builder()
@@ -92,7 +84,7 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseJavaDelegate {
           .digitalSignatureHttpHeaders()
           .accessTokenHeader()
           .build();
-      dataFactoryFeignClient.performPost(resource, stringJsonNode, headers);
+      dataFactoryFeignClient.performPost(resource, spinJsonNode.toString(), headers);
       log.debug("Entity {} was created successfully", nodeIndex);
     }
     return ConnectorResponse.builder()
@@ -100,29 +92,17 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseJavaDelegate {
         .build();
   }
 
-  private void putSignatureToCeph(DelegateExecution execution, String stringJsonNode,
-      Object systemSignature, int nodeIndex) {
-    var cephSignatureMap = Map.of("data", stringJsonNode, "signature", systemSignature);
-    var cephContent = Spin.JSON(cephSignatureMap).toString();
-
-    var processInstanceId = execution.getProcessInstanceId();
-    var systemSignatureCephKey =
-        "lowcode_" + processInstanceId + "_system_signature_ceph_key_" + nodeIndex;
-    cephService.put(cephBucketName, systemSignatureCephKey, cephContent);
-    xDigitalSignatureDerivedCephKeyVariable.on(execution).set(systemSignatureCephKey);
-  }
-
-  private Object signNode(DelegateExecution execution, String stringJsonNode) throws Exception {
-    var signRequestMap = Map.of("data", stringJsonNode);
-    var signRequestPayload = Spin.JSON(signRequestMap);
-
+  private void signNode(DelegateExecution execution, SpinJsonNode stringJsonNode, Integer index)
+      throws Exception {
     payloadVariable.on(execution).remove();
-    payloadVariable.on(execution).set(signRequestPayload);
-    digitalSignatureConnectorDelegate.execute(execution);
-    var responseVariable = digitalSignatureConnectorDelegate.getDsoResponseVariable();
-    var stringSystemSignature = responseVariable.from(execution).get();
+    payloadVariable.on(execution).set(stringJsonNode);
+    payloadIndexVariable.on(execution).remove();
+    payloadIndexVariable.on(execution).set(index);
+    digitalSystemSignatureDelegate.execute(execution);
+    var responseVariable = digitalSystemSignatureDelegate.getSystemSignatureStorageKey();
+    var systemSignatureStorageKey = responseVariable.from(execution).get();
+    xDigitalSignatureDerivedCephKeyVariable.on(execution).set(systemSignatureStorageKey);
     responseVariable.on(execution).remove();
-    return Spin.JSON(stringSystemSignature).prop("signature").value();
   }
 
   @Override

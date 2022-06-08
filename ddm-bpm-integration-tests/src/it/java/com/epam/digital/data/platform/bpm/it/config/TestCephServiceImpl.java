@@ -85,7 +85,8 @@ public class TestCephServiceImpl implements CephService {
   @Override
   public void delete(String cephBucketName, Set<String> keys) {
     verifyBucketName(cephBucketName);
-    keys.forEach(storage::remove);
+    var systemSignaturePrefix = "lowcode_";
+    keys.stream().filter(k -> !k.startsWith(systemSignaturePrefix)).peek(storage::remove);
   }
 
   @Override

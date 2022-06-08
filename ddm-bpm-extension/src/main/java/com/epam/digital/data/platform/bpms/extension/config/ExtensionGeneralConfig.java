@@ -46,6 +46,8 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
+import com.epam.digital.data.platform.storage.form.service.FormDataKeyProvider;
+import com.epam.digital.data.platform.storage.form.service.FormDataKeyProviderImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -166,5 +168,10 @@ public class ExtensionGeneralConfig {
   @ConditionalOnMissingBean
   public KubernetesClient kubernetesClient() {
     return new DefaultKubernetesClient();
+  }
+
+  @Bean
+  public FormDataKeyProvider formDataKeyProvider() {
+    return new FormDataKeyProviderImpl();
   }
 }

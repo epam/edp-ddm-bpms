@@ -70,4 +70,12 @@ public class WireMockConfig {
       throws MalformedURLException {
     return WireMockUtil.createAndStartMockServerForUrl(urlStr);
   }
+
+  @Bean(destroyMethod = "stop")
+  @Qualifier("documentServiceWireMock")
+  public WireMockServer documentServiceWireMock(
+      @Value("${digital-document-service.url}") String urlStr)
+      throws MalformedURLException {
+    return WireMockUtil.createAndStartMockServerForUrl(urlStr);
+  }
 }
