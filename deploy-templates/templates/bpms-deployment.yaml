@@ -47,7 +47,7 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: {{ .Values.db.secret }}
-                key: username
+                key: user
           - name: PGPASSWORD
             valueFrom:
               secretKeyRef:
@@ -183,7 +183,7 @@ spec:
           secret:
             secretName: {{ .Values.db.secret }}
             items:
-            - key: username
+            - key: user
               path: spring.datasource.username
             - key: password
               path: spring.datasource.password

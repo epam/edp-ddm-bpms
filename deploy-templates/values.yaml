@@ -48,7 +48,7 @@ db:
   url: citus-master
   port: 5432
   defaultDatabase: camunda
-  secret: citus-secrets
+  secret: operational-pguser-postgres
 
 camunda:
   bpm:
