@@ -1,6 +1,8 @@
 spring:
   application:
     name: ddm-bpm-extension
+  rest-template:
+    ssl-checking-enabled: false
 
 registry-rest-api:
   url: http://localhost:8877/mock-server
@@ -82,3 +84,35 @@ data-platform:
       multiplier: 2
     topics:
       user-notifications: user-notifications
+
+external-system:
+  url: http://localhost:8989
+
+external-systems:
+  system1:
+    url: ${external-system.url}
+    methods:
+      method1:
+        path: /api/get
+        method: GET
+      method2:
+        path: /api/post
+        method: POST
+    auth:
+      type: BASIC
+      secret-name: secret1
+  system-with-partner-token-auth:
+    url: ${external-system.url}
+    methods:
+      method1:
+        path: /api/get
+        method: GET
+    auth:
+      type: PARTNER_TOKEN
+      secret-name: secret2
+      partner-token-auth-url: ${external-system.url}/api/auth/partner
+      token-json-path: $.token
+
+kubernetes:
+  namespace:
+    current: current-namespace

@@ -111,3 +111,8 @@ kafka:
   errorHandlerInitialInterval: 1500
   errorHandlerMaxElapsedTime: 6000
   errorHandlerMultiplier: 2
+
+restTemplate:
+  sslCheckingEnabled: false
+
+readSecretsRoleName: read-secrets-role
