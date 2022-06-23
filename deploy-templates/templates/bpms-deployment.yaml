@@ -122,6 +122,10 @@ spec:
               secretKeyRef:
                 name: {{ .Values.kafka.clusterName }}-cluster-ca-cert
                 key: ca.crt
+          - name: kubernetes.namespace.current
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
         volumeMounts:
           - name: {{ .Chart.Name }}
             mountPath: {{ .Values.appConfigMountPath }}

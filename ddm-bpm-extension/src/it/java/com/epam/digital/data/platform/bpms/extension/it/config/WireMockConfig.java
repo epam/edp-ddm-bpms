@@ -84,4 +84,11 @@ public class WireMockConfig {
       throws MalformedURLException {
     return WireMockUtil.createAndStartMockServerForUrl(urlStr);
   }
+
+  @Bean(destroyMethod = "stop")
+  @Qualifier("external-system")
+  public WireMockServer externalSystemWireMock(@Value("${external-system.url}") String urlStr)
+      throws MalformedURLException {
+    return WireMockUtil.createAndStartMockServerForUrl(urlStr);
+  }
 }
