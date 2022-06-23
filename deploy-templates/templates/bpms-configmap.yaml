@@ -37,3 +37,4 @@ data:
     data-platform.kafka.error-handler.initial-interval: {{ .Values.kafka.errorHandlerInitialInterval }}
     data-platform.kafka.error-handler.max-elapsed-time: {{ .Values.kafka.errorHandlerMaxElapsedTime }}
     data-platform.kafka.error-handler.multiplier: {{ .Values.kafka.errorHandlerMultiplier }}
+    spring.rest-template.ssl-checking-enabled: {{ .Values.restTemplate.sslCheckingEnabled }}

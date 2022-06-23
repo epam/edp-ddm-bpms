@@ -107,3 +107,7 @@ management:
 decorator:
   datasource:
     enabled: false
+
+kubernetes:
+  namespace:
+    current: current-namespace

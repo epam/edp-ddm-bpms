@@ -16,6 +16,7 @@
 
 package com.epam.digital.data.platform.bpms.extension.config;
 
+import com.epam.digital.data.platform.bpms.extension.config.properties.ExternalSystemConfigurationProperties;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.DataFactoryConnectorBatchCreateDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.DataFactoryConnectorBatchReadDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.dracs.GetCertificateByBirthdateDracsRegistryDelegate;
@@ -33,14 +34,29 @@ import com.epam.digital.data.platform.integration.ceph.service.CephService;
 import com.epam.digital.data.platform.integration.ceph.service.impl.CephServiceS3Impl;
 import com.epam.digital.data.platform.starter.trembita.integration.dracs.service.DracsRemoteService;
 import com.epam.digital.data.platform.starter.trembita.integration.edr.service.EdrRemoteService;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustAllStrategy;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
+import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor;
 
 /**
  * The class represents a holder for beans of the general configuration. Each method produces a bean
@@ -110,7 +126,45 @@ public class ExtensionGeneralConfig {
 
   @Bean
   @ConditionalOnMissingBean(RestTemplate.class)
-  public RestTemplate restTemplate(RestTemplateBuilder builder) {
-    return builder.build();
+  public RestTemplate restTemplate(RestTemplateBuilder builder,
+      @Value("${spring.rest-template.ssl-checking-enabled:true}") String sslCheckingEnabled,
+      LogbookClientHttpRequestInterceptor interceptor)
+      throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+
+    if (!Boolean.parseBoolean(sslCheckingEnabled)) {
+
+      var sslContext = SSLContexts.custom()
+          .loadTrustMaterial(TrustAllStrategy.INSTANCE)
+          .build();
+
+      var csf = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
+
+      var httpClient = HttpClients.custom()
+          .setSSLSocketFactory(csf)
+          .build();
+
+      var requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
+
+      return builder
+          .requestFactory(() -> requestFactory)
+          .additionalInterceptors(interceptor)
+          .build();
+    }
+
+    return builder
+        .additionalInterceptors(interceptor)
+        .build();
+  }
+
+  @Bean
+  @ConfigurationProperties(prefix = "external-systems")
+  public Map<String, ExternalSystemConfigurationProperties> externalSystemsConfiguration() {
+    return new HashMap<>();
+  }
+
+  @Bean(destroyMethod = "close")
+  @ConditionalOnMissingBean
+  public KubernetesClient kubernetesClient() {
+    return new DefaultKubernetesClient();
   }
 }

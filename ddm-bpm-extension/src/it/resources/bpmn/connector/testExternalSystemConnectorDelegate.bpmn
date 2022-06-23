@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1jkr9m2" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:collaboration id="Collaboration_0k3s04s">
+    <bpmn:participant id="Participant_1v5gfpr" name="no system name defined" processRef="external_system_connector_no_system_name_defined" />
+    <bpmn:participant id="Participant_0dkz4s5" name="no method name defined" processRef="external_system_connector_no_method_name_defined" />
+    <bpmn:participant id="Participant_10wzd26" name="wrong system name defined" processRef="external_system_connector_wrong_system_name_defined" />
+    <bpmn:participant id="Participant_0n3kbp0" name="wrong method name defined" processRef="external_system_connector_wrong_method_name_defined" />
+    <bpmn:participant id="Participant_1h2rr9q" name="external system connector method 1" processRef="external_system_connector_method_1" />
+    <bpmn:participant id="Participant_11iecve" name="external system partner-token-auth" processRef="external_system_partner_token_auth" />
+  </bpmn:collaboration>
+  <bpmn:process id="external_system_connector_no_system_name_defined" name="external_system_connector_no_system_name_defined" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="start">
+      <bpmn:outgoing>Flow_0l9fymz</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0l9fymz" sourceRef="StartEvent_1" targetRef="Activity_0ls1ekf" />
+    <bpmn:sequenceFlow id="Flow_0d5heo6" sourceRef="Activity_0ls1ekf" targetRef="Event_06xpr2n" />
+    <bpmn:serviceTask id="Activity_0ls1ekf" name="no system name defined" camunda:delegateExpression="${externalSystemConnectorDelegate}">
+      <bpmn:incoming>Flow_0l9fymz</bpmn:incoming>
+      <bpmn:outgoing>Flow_0d5heo6</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_06xpr2n" name="end">
+      <bpmn:incoming>Flow_0d5heo6</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmn:process id="external_system_connector_no_method_name_defined" name="external_system_connector_no_method_name_defined" isExecutable="true">
+    <bpmn:startEvent id="Event_01hkg3z" name="start">
+      <bpmn:outgoing>Flow_1agpe9t</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_1gak9mk" name="no method name defined" camunda:delegateExpression="${externalSystemConnectorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="systemName">system</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1agpe9t</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ych4y1</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1agpe9t" sourceRef="Event_01hkg3z" targetRef="Activity_1gak9mk" />
+    <bpmn:sequenceFlow id="Flow_0ych4y1" sourceRef="Activity_1gak9mk" targetRef="Event_0bjxpkq" />
+    <bpmn:endEvent id="Event_0bjxpkq" name="end">
+      <bpmn:incoming>Flow_0ych4y1</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmn:process id="external_system_connector_wrong_system_name_defined" name="external_system_connector_wrong_system_name_defined" isExecutable="true">
+    <bpmn:startEvent id="Event_0pkjoby" name="start">
+      <bpmn:outgoing>Flow_071rn9r</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_13ufiji" name="wrong system name defined" camunda:delegateExpression="${externalSystemConnectorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="methodName">method</camunda:inputParameter>
+          <camunda:inputParameter name="systemName">system</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_071rn9r</bpmn:incoming>
+      <bpmn:outgoing>Flow_0o8fzja</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_071rn9r" sourceRef="Event_0pkjoby" targetRef="Activity_13ufiji" />
+    <bpmn:sequenceFlow id="Flow_0o8fzja" sourceRef="Activity_13ufiji" targetRef="Event_0iri7tz" />
+    <bpmn:endEvent id="Event_0iri7tz" name="end">
+      <bpmn:incoming>Flow_0o8fzja</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmn:process id="external_system_connector_wrong_method_name_defined" name="external_system_connector_wrong_method_name_defined" isExecutable="true">
+    <bpmn:startEvent id="Event_1mgqy3j" name="start">
+      <bpmn:outgoing>Flow_0ho2uw0</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_1g8n8hs" name="wrong method name defined" camunda:delegateExpression="${externalSystemConnectorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="methodName">method</camunda:inputParameter>
+          <camunda:inputParameter name="systemName">system1</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0ho2uw0</bpmn:incoming>
+      <bpmn:outgoing>Flow_08c9dl1</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0ho2uw0" sourceRef="Event_1mgqy3j" targetRef="Activity_1g8n8hs" />
+    <bpmn:sequenceFlow id="Flow_08c9dl1" sourceRef="Activity_1g8n8hs" targetRef="Event_1omg1hz" />
+    <bpmn:endEvent id="Event_1omg1hz" name="end">
+      <bpmn:incoming>Flow_08c9dl1</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmn:process id="external_system_connector_method_1" name="external_system_connector_method_1" isExecutable="true">
+    <bpmn:startEvent id="Event_1isi2lw" name="start">
+      <bpmn:outgoing>Flow_10b6dtm</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_0lkgkbz" name="external system connector method 1" camunda:delegateExpression="${externalSystemConnectorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="methodName">method1</camunda:inputParameter>
+          <camunda:inputParameter name="systemName">system1</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_10b6dtm</bpmn:incoming>
+      <bpmn:outgoing>Flow_1esstf6</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_10b6dtm" sourceRef="Event_1isi2lw" targetRef="Activity_0lkgkbz" />
+    <bpmn:sequenceFlow id="Flow_1esstf6" sourceRef="Activity_0lkgkbz" targetRef="Event_1s7twuh" />
+    <bpmn:endEvent id="Event_1s7twuh" name="end">
+      <bpmn:incoming>Flow_1esstf6</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmn:process id="external_system_partner_token_auth" name="external system partner-token-auth" isExecutable="true">
+    <bpmn:startEvent id="Event_0ph66ch" name="start">
+      <bpmn:outgoing>Flow_0c5i2ob</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_0rfnos8" name="external system partner-token-auth" camunda:delegateExpression="${externalSystemConnectorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="methodName">method1</camunda:inputParameter>
+          <camunda:inputParameter name="systemName">system-with-partner-token-auth</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0c5i2ob</bpmn:incoming>
+      <bpmn:outgoing>Flow_1noctz9</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1noctz9" sourceRef="Activity_0rfnos8" targetRef="Event_0ts1awc" />
+    <bpmn:sequenceFlow id="Flow_0c5i2ob" sourceRef="Event_0ph66ch" targetRef="Activity_0rfnos8" />
+    <bpmn:endEvent id="Event_0ts1awc" name="end">
+      <bpmn:incoming>Flow_1noctz9</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0k3s04s">
+      <bpmndi:BPMNShape id="Participant_1v5gfpr_di" bpmnElement="Participant_1v5gfpr" isHorizontal="true">
+        <dc:Bounds x="129" y="110" width="361" height="130" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0d5heo6_di" bpmnElement="Flow_0d5heo6">
+        <di:waypoint x="370" y="177" />
+        <di:waypoint x="432" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0l9fymz_di" bpmnElement="Flow_0l9fymz">
+        <di:waypoint x="215" y="177" />
+        <di:waypoint x="270" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="159" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="202" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_06xpr2n_di" bpmnElement="Event_06xpr2n">
+        <dc:Bounds x="432" y="159" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="441" y="202" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0vzwreg_di" bpmnElement="Activity_0ls1ekf">
+        <dc:Bounds x="270" y="137" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_0dkz4s5_di" bpmnElement="Participant_0dkz4s5" isHorizontal="true">
+        <dc:Bounds x="129" y="250" width="361" height="130" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0ych4y1_di" bpmnElement="Flow_0ych4y1">
+        <di:waypoint x="370" y="317" />
+        <di:waypoint x="432" y="317" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1agpe9t_di" bpmnElement="Flow_1agpe9t">
+        <di:waypoint x="215" y="317" />
+        <di:waypoint x="270" y="317" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_01hkg3z_di" bpmnElement="Event_01hkg3z">
+        <dc:Bounds x="179" y="299" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="342" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0bjxpkq_di" bpmnElement="Event_0bjxpkq">
+        <dc:Bounds x="432" y="299" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="441" y="342" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1gak9mk_di" bpmnElement="Activity_1gak9mk">
+        <dc:Bounds x="270" y="277" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_10wzd26_di" bpmnElement="Participant_10wzd26" isHorizontal="true">
+        <dc:Bounds x="129" y="390" width="361" height="130" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0o8fzja_di" bpmnElement="Flow_0o8fzja">
+        <di:waypoint x="370" y="457" />
+        <di:waypoint x="432" y="457" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_071rn9r_di" bpmnElement="Flow_071rn9r">
+        <di:waypoint x="215" y="457" />
+        <di:waypoint x="270" y="457" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0pkjoby_di" bpmnElement="Event_0pkjoby">
+        <dc:Bounds x="179" y="439" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="482" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0iri7tz_di" bpmnElement="Event_0iri7tz">
+        <dc:Bounds x="432" y="439" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="441" y="482" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_13ufiji_di" bpmnElement="Activity_13ufiji">
+        <dc:Bounds x="270" y="417" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_0n3kbp0_di" bpmnElement="Participant_0n3kbp0" isHorizontal="true">
+        <dc:Bounds x="129" y="530" width="361" height="130" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_08c9dl1_di" bpmnElement="Flow_08c9dl1">
+        <di:waypoint x="370" y="597" />
+        <di:waypoint x="432" y="597" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ho2uw0_di" bpmnElement="Flow_0ho2uw0">
+        <di:waypoint x="215" y="597" />
+        <di:waypoint x="270" y="597" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1mgqy3j_di" bpmnElement="Event_1mgqy3j">
+        <dc:Bounds x="179" y="579" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="622" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1omg1hz_di" bpmnElement="Event_1omg1hz">
+        <dc:Bounds x="432" y="579" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="441" y="622" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1g8n8hs_di" bpmnElement="Activity_1g8n8hs">
+        <dc:Bounds x="270" y="557" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_1h2rr9q_di" bpmnElement="Participant_1h2rr9q" isHorizontal="true">
+        <dc:Bounds x="129" y="670" width="361" height="130" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1esstf6_di" bpmnElement="Flow_1esstf6">
+        <di:waypoint x="370" y="737" />
+        <di:waypoint x="432" y="737" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10b6dtm_di" bpmnElement="Flow_10b6dtm">
+        <di:waypoint x="215" y="737" />
+        <di:waypoint x="270" y="737" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1isi2lw_di" bpmnElement="Event_1isi2lw">
+        <dc:Bounds x="179" y="719" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="762" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1s7twuh_di" bpmnElement="Event_1s7twuh">
+        <dc:Bounds x="432" y="719" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="441" y="762" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0lkgkbz_di" bpmnElement="Activity_0lkgkbz">
+        <dc:Bounds x="270" y="697" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_11iecve_di" bpmnElement="Participant_11iecve" isHorizontal="true">
+        <dc:Bounds x="129" y="810" width="361" height="130" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1noctz9_di" bpmnElement="Flow_1noctz9">
+        <di:waypoint x="370" y="877" />
+        <di:waypoint x="432" y="877" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0c5i2ob_di" bpmnElement="Flow_0c5i2ob">
+        <di:waypoint x="215" y="877" />
+        <di:waypoint x="270" y="877" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0ph66ch_di" bpmnElement="Event_0ph66ch">
+        <dc:Bounds x="179" y="859" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="902" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0ts1awc_di" bpmnElement="Event_0ts1awc">
+        <dc:Bounds x="432" y="859" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="441" y="902" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0rfnos8_di" bpmnElement="Activity_0rfnos8">
+        <dc:Bounds x="270" y="837" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -111,6 +111,10 @@
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
     </dependency>
+    <dependency>
+      <groupId>io.fabric8</groupId>
+      <artifactId>openshift-client</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -134,6 +138,11 @@
           <artifactId>json-smart</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.epam.digital.data.platform</groupId>
+      <artifactId>ddm-starter-logger</artifactId>
+      <version>${ddm-starter-logging.version}</version>
     </dependency>
 
     <dependency>
@@ -168,6 +177,11 @@
       <groupId>com.epam.digital.data.platform</groupId>
       <artifactId>ddm-bpm-engine</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.fabric8</groupId>
+      <artifactId>kubernetes-server-mock</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
