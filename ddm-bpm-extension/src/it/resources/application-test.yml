@@ -70,10 +70,24 @@ trembita-exchange-gateway:
         member-class: GOV
         member-code: 11115887
         subsystem-code: DRACS_test
+    idp-exchange-service-registry:
+      trembita-url: http://localhost:7780/trembita-mock-server
+      user-id: DDM
+      protocol-version: 4.0
+      client:
+        x-road-instance: CLIENT-TEST
+        member-class: GOV
+        member-code: 666777666
+        subsystem-code: GOV_test
+      service:
+        x-road-instance: IDP-TEST
+        member-class: GOV
+        member-code: 11115887
+        subsystem-code: IDP_test
 
 data-platform:
   kafka:
-    enabled: true
+    enabled: false
     bootstrap: localhost:9092
     topic-properties:
       num-partitions: 1

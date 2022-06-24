@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0ux0sqn" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.12.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:process id="test_ipd_exchange_service_registry" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_1jny9px</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1jny9px" sourceRef="StartEvent_1" targetRef="Activity_15ayst6" />
+    <bpmn:serviceTask id="Activity_0ctwlpc" name="Call to registry" camunda:modelerTemplate="dataFactoryConnectorDelegate" camunda:delegateExpression="${idpExchangeServiceRegistryConnector}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="url">${url}</camunda:inputParameter>
+          <camunda:inputParameter name="method">${method}</camunda:inputParameter>
+          <camunda:inputParameter name="body">${body}</camunda:inputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0kvdxst</bpmn:incoming>
+      <bpmn:outgoing>Flow_14wi8hf</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_14wi8hf" sourceRef="Activity_0ctwlpc" targetRef="Activity_0e2cs3q" />
+    <bpmn:endEvent id="Event_0wmiwnd">
+      <bpmn:incoming>Flow_1lom9ql</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1lom9ql" sourceRef="Activity_0e2cs3q" targetRef="Event_0wmiwnd" />
+    <bpmn:scriptTask id="Activity_0e2cs3q" name="Assert" scriptFormat="groovy">
+      <bpmn:incoming>Flow_14wi8hf</bpmn:incoming>
+      <bpmn:outgoing>Flow_1lom9ql</bpmn:outgoing>
+      <bpmn:script>assert response.statusCode == 200
+assert "123".equals(response.responseBody.prop('id').value())</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_0kvdxst" sourceRef="Activity_15ayst6" targetRef="Activity_0ctwlpc" />
+    <bpmn:scriptTask id="Activity_15ayst6" name="Prepare" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1jny9px</bpmn:incoming>
+      <bpmn:outgoing>Flow_0kvdxst</bpmn:outgoing>
+      <bpmn:script>var body = [
+  'name': 'labName'
+]
+set_transient_variable('url', 'https://excample.com')
+set_transient_variable('method', 'POST')
+set_transient_variable('body', S(body, 'application/json'))
+</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="test_ipd_exchange_service_registry">
+      <bpmndi:BPMNEdge id="Flow_1jny9px_di" bpmnElement="Flow_1jny9px">
+        <di:waypoint x="198" y="117" />
+        <di:waypoint x="240" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14wi8hf_di" bpmnElement="Flow_14wi8hf">
+        <di:waypoint x="500" y="117" />
+        <di:waypoint x="560" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1lom9ql_di" bpmnElement="Flow_1lom9ql">
+        <di:waypoint x="660" y="117" />
+        <di:waypoint x="722" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kvdxst_di" bpmnElement="Flow_0kvdxst">
+        <di:waypoint x="340" y="117" />
+        <di:waypoint x="400" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_09ddxrl_di" bpmnElement="Activity_0ctwlpc">
+        <dc:Bounds x="400" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0wmiwnd_di" bpmnElement="Event_0wmiwnd">
+        <dc:Bounds x="722" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0hwbpgd_di" bpmnElement="Activity_0e2cs3q">
+        <dc:Bounds x="560" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="162" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0nnnwbc_di" bpmnElement="Activity_15ayst6">
+        <dc:Bounds x="240" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

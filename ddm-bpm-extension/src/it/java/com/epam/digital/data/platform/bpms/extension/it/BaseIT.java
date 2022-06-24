@@ -106,6 +106,9 @@ public abstract class BaseIT {
   @Inject
   @Qualifier("trembitaMockServerDracs")
   protected WireMockServer trembitaMockServerDracs;
+  @Inject
+  @Qualifier("trembitaMockServerIdpExchangeService")
+  protected WireMockServer trembitaMockServerIdpExchangeService;
   @Value("${keycloak.citizen.realm}")
   protected String citizenRealm;
   @Value("${keycloak.officer.realm}")
@@ -161,6 +164,10 @@ public abstract class BaseIT {
   @SneakyThrows
   protected void stubGetCertByNumRoleNames(String responseXmlFilePath) {
     stubTrembita(responseXmlFilePath, "GetCertByNumRoleNames", trembitaMockServerDracs);
+  }
+
+  protected void stubIDPexchangeService(String responseXmlFilePath) throws Exception {
+    stubTrembita(responseXmlFilePath, "IDPexchangeService", trembitaMockServerIdpExchangeService);
   }
 
   protected void stubTrembita(String responseXmlFilePath, String serviceCode,
