@@ -23,6 +23,7 @@ import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.dracs.GetCertificateByNameDracsRegistryDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.edr.SearchSubjectsEdrRegistryConnectorDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.edr.SubjectDetailEdrRegistryConnectorDelegate;
+import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.idp.exchangeservice.IdpExchangeServiceRegistryConnector;
 import com.epam.digital.data.platform.bpms.extension.delegate.storage.GetContentFromCephDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.storage.PutContentToCephDelegate;
 import com.epam.digital.data.platform.datafactory.excerpt.client.ExcerptFeignClient;
@@ -34,6 +35,9 @@ import com.epam.digital.data.platform.integration.ceph.service.CephService;
 import com.epam.digital.data.platform.integration.ceph.service.impl.CephServiceS3Impl;
 import com.epam.digital.data.platform.starter.trembita.integration.dracs.service.DracsRemoteService;
 import com.epam.digital.data.platform.starter.trembita.integration.edr.service.EdrRemoteService;
+import com.epam.digital.data.platform.starter.trembita.integration.idp.exchangeservice.service.IdpExchangeRegistryService;
+import com.epam.digital.data.platform.storage.form.service.FormDataKeyProvider;
+import com.epam.digital.data.platform.storage.form.service.FormDataKeyProviderImpl;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import java.security.KeyManagementException;
@@ -46,8 +50,6 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
-import com.epam.digital.data.platform.storage.form.service.FormDataKeyProvider;
-import com.epam.digital.data.platform.storage.form.service.FormDataKeyProviderImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -106,6 +108,14 @@ public class ExtensionGeneralConfig {
   public GetCertificateByNameDracsRegistryDelegate getCertificateByNameDracsRegistryDelegate(
       DracsRemoteService dracsRemoteService) {
     return new GetCertificateByNameDracsRegistryDelegate(dracsRemoteService);
+  }
+
+  @Bean(name = IdpExchangeServiceRegistryConnector.DELEGATE_NAME)
+  @ConditionalOnProperty(prefix = "trembita-exchange-gateway.registries.idp-exchange-service-registry",
+      value = {"client.x-road-instance", "service.x-road-instance"})
+  public IdpExchangeServiceRegistryConnector idpExchangeServiceRegistryConnector(
+      IdpExchangeRegistryService idpExchangeRegistryService) {
+    return new IdpExchangeServiceRegistryConnector(idpExchangeRegistryService);
   }
 
   /**

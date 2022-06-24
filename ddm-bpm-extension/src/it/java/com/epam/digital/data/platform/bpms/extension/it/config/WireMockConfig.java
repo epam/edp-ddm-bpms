@@ -71,6 +71,14 @@ public class WireMockConfig {
   }
 
   @Bean(destroyMethod = "stop")
+  @Qualifier("trembitaMockServerIdpExchangeService")
+  public WireMockServer trembitaMockServerIdpExchangeService(
+      @Value("${trembita-exchange-gateway.registries.idp-exchange-service-registry.trembita-url}") String urlStr)
+      throws MalformedURLException {
+    return WireMockUtil.createAndStartMockServerForUrl(urlStr);
+  }
+
+  @Bean(destroyMethod = "stop")
   @Qualifier("excerptServiceWireMock")
   public WireMockServer userExcerptServiceWireMock(
       @Value("${excerpt-service-api.url}") String urlStr)
