@@ -31,7 +31,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
 
-    <ddm-file-storage.version>1.6.0.2</ddm-file-storage.version>
+    <ddm-file-storage.version>1.7.0.1</ddm-file-storage.version>
     <ddm-message-payload-storage.version>1.7.0.2</ddm-message-payload-storage.version>
     <ddm-form-data-storage.version>1.7.0.1</ddm-form-data-storage.version>
     <camunda.bpm.assert.version>7.0.0</camunda.bpm.assert.version>
