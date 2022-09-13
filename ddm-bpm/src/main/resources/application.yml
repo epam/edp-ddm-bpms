@@ -6,12 +6,12 @@ camunda:
   admin-user-id: camunda
   admin-group-id: camunda-admin
   bpm:
-    database-history-level: AUDIT
+    database-history-level: ACTIVITY
     generic-properties:
       properties:
         enable-historic-instance-permissions: true
         user-resource-whitelist-pattern: '[a-zA-Z0-9_@.]+|camunda-admin'
-        history-cleanup-enabled: true
+        history-cleanup-enabled: false
         history-cleanup-strategy: removalTimeBased
         history-removal-time-strategy: end
         history-time-to-live: P10D
@@ -21,7 +21,7 @@ camunda:
         history-cleanup-batch-size: 200
     authorization:
       enabled: true
-    history-level: FULL
+    history-level: AUDIT
 
 data-platform:
   kafka:
