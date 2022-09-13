@@ -11,6 +11,7 @@ camunda:
   admin-user-id: camunda
   admin-group-id: camunda-admin
   bpm:
+    database-history-level: AUDIT
     generic-properties:
       properties:
         enableHistoricInstancePermissions: true
