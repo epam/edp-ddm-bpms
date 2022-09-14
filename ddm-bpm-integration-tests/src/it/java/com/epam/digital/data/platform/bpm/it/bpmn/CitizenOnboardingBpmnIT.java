@@ -86,11 +86,12 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         .response("[]")
         .build());
     stubSettingsRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
-        .resource("settings")
-        .headers(Map.of("X-Access-Token", testUserToken))
-        .response("/json/citizen-onboarding/data-factory/getSettingsResponse.json")
-        .build());
+            .httpMethod(HttpMethod.GET)
+            .resource("me")
+            .headers(Map.of("X-Access-Token", testUserToken))
+            .response("/json/citizen-onboarding/data-factory/getSettingsResponse.json")
+            .build());
+
     FormDataDto dto = new FormDataDto();
     dto.setAccessToken(testUserToken);
     var map = startProcessInstanceWithStartForm(PROCESS_DEFINITION_KEY, testUserToken, dto);
@@ -128,13 +129,6 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         .resource("subject")
         .requestBody("/json/citizen-onboarding/data-factory/postIndSubjectRequest.json")
         .response("{}")
-        .build());
-    stubSettingsRequest(StubData.builder()
-        .resource("settings")
-        .httpMethod(HttpMethod.PUT)
-        .headers(Map.of("X-Access-Token", testUserToken))
-        .requestBody("/json/citizen-onboarding/data-factory/putSettingsRequest.json")
-        .response("/json/citizen-onboarding/data-factory/putSettingsResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
@@ -233,12 +227,21 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         .queryParams(Map.of("subjectType", "ENTREPRENEUR", "subjectCode", "1010101010"))
         .response("/json/citizen-onboarding/data-factory/searchSubjectResponse.json")
         .build());
-    stubSettingsRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
-        .resource("settings")
-        .headers(Map.of("X-Access-Token", testUserToken))
-        .response("/json/citizen-onboarding/data-factory/getNullSettingsResponse.json")
-        .build());
+    stubSettingsRequest(
+        StubData.builder()
+            .resource("me")
+            .httpMethod(HttpMethod.GET)
+            .headers(Map.of("X-Access-Token", testUserToken))
+            .response("/json/citizen-onboarding/data-factory/getSettingsResponse.json")
+            .build());
+    stubDataFactoryRequest(StubData.builder()
+            .httpMethod(HttpMethod.GET)
+            .headers(Map.of("X-Access-Token", testUserToken))
+            .resource("subject-settings-equal-settings-id")
+            .queryParams(Map.of("settingsId", "c2c19401-f1b7-4954-a230-ab15566e7318"))
+            .response("[]")
+            .build());
+
     FormDataDto dto = new FormDataDto();
     dto.setAccessToken(testUserToken);
     var map = startProcessInstanceWithStartForm(PROCESS_DEFINITION_KEY, testUserToken, dto);
@@ -265,13 +268,6 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         .expectedFormData("/json/citizen-onboarding/ceph/create_subject_task_entr.json")
         .build());
 
-    stubSettingsRequest(StubData.builder()
-        .resource("settings")
-        .httpMethod(HttpMethod.PUT)
-        .headers(Map.of("X-Access-Token", testUserToken))
-        .requestBody("/json/citizen-onboarding/data-factory/putSettingsRequest.json")
-        .response("/json/citizen-onboarding/data-factory/putSettingsResponse.json")
-        .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -364,11 +360,11 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         .response("/json/citizen-onboarding/data-factory/searchSubjectResponse.json")
         .build());
     stubSettingsRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
-        .resource("settings")
-        .headers(Map.of("X-Access-Token", testUserToken))
-        .response("/json/citizen-onboarding/data-factory/getSettingsResponse.json")
-        .build());
+            .httpMethod(HttpMethod.GET)
+            .resource("me")
+            .headers(Map.of("X-Access-Token", testUserToken))
+            .response("/json/citizen-onboarding/data-factory/getSettingsResponse.json")
+            .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -403,13 +399,6 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         .expectedFormData("/json/citizen-onboarding/ceph/create_subject_task_legal.json")
         .build());
 
-    stubSettingsRequest(StubData.builder()
-        .resource("settings")
-        .httpMethod(HttpMethod.PUT)
-        .headers(Map.of("X-Access-Token", testUserToken))
-        .requestBody("/json/citizen-onboarding/data-factory/putSettingsRequest.json")
-        .response("/json/citizen-onboarding/data-factory/putSettingsResponse.json")
-        .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
@@ -503,12 +492,13 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         .queryParams(Map.of("subjectType", "ENTREPRENEUR", "subjectCode", "1010101010"))
         .response("/json/citizen-onboarding/data-factory/searchSubjectResponse.json")
         .build());
-    stubSettingsRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
-        .resource("settings")
-        .headers(Map.of("X-Access-Token", testUserToken))
-        .response("/json/citizen-onboarding/data-factory/getSettingsResponse.json")
-        .build());
+    stubSettingsRequest(
+        StubData.builder()
+            .httpMethod(HttpMethod.GET)
+            .resource("me")
+            .headers(Map.of("X-Access-Token", testUserToken))
+            .response("/json/citizen-onboarding/data-factory/getSettingsResponse.json")
+            .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.GET)
         .headers(Map.of("X-Access-Token", testUserToken))
