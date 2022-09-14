@@ -37,7 +37,7 @@ public class WireMockConfig {
   @Bean(destroyMethod = "stop")
   @Qualifier("userSettingsWireMock")
   public WireMockServer userSettingsWireMock(
-      @Value("${user-settings-service-api.url}") String urlStr)
+      @Value("${user-settings-service.url}") String urlStr)
       throws MalformedURLException {
     return WireMockUtil.createAndStartMockServerForUrl(urlStr);
   }
