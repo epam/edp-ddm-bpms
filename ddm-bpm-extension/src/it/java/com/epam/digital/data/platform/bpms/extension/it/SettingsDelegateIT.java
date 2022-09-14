@@ -17,29 +17,34 @@
 package com.epam.digital.data.platform.bpms.extension.it;
 
 import com.epam.digital.data.platform.bpms.api.dto.enums.PlatformHttpHeader;
-import com.epam.digital.data.platform.bpms.extension.it.builder.StubData;
 import java.util.List;
 import java.util.Map;
+
+import com.github.tomakehurst.wiremock.matching.EqualToJsonPattern;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.spin.Spin;
 import org.junit.Test;
-import org.springframework.http.HttpMethod;
 import org.springframework.util.CollectionUtils;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 
 public class SettingsDelegateIT extends BaseIT {
 
   @Test
   @Deployment(resources = {"bpmn/connector/testGetSettings.bpmn"})
   public void shouldGetSettings() {
-    stubSettingsRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
-        .resource("settings")
-        .response("/json/getSettingsResponse.json")
-        .headers(Map.of(
-            PlatformHttpHeader.X_ACCESS_TOKEN.getName(), "token"))
-        .build());
+    userSettingsWireMock.stubFor(
+            get(urlPathEqualTo("/user-settings-mock-server/api/settings/me"))
+                    .withHeader(PlatformHttpHeader.X_ACCESS_TOKEN.getName(), equalTo("token"))
+                    .willReturn(aResponse().withStatus(200)
+                            .withHeader("Content-type", "application/json")
+                            .withBody(convertJsonToString("/json/getSettingsResponse.json"))));
 
     var processInstance = runtimeService
         .startProcessInstanceByKey("get_settings_key");
@@ -53,24 +58,40 @@ public class SettingsDelegateIT extends BaseIT {
   @Test
   @Deployment(resources = {"bpmn/connector/testUpdateSettings.bpmn"})
   public void shouldUpdateSettings() {
-    stubSettingsRequest(StubData.builder()
-        .httpMethod(HttpMethod.PUT)
-        .resource("settings")
-        .requestBody("/json/updateSettingsRequestBody.json")
-        .response("/json/updateSettingsResponse.json")
-        .headers(Map.of(
-            PlatformHttpHeader.X_ACCESS_TOKEN.getName(), "token"))
-        .build());
+    userSettingsWireMock.stubFor(
+        post(urlPathEqualTo("/user-settings-mock-server/api/settings/me/channels/email/activate"))
+            .withHeader(PlatformHttpHeader.X_ACCESS_TOKEN.getName(), equalTo("token"))
+            .withRequestBody(
+                new EqualToJsonPattern(
+                    convertJsonToString("/json/updateSettingsActivate.json"), false, false))
+            .willReturn(
+                aResponse().withStatus(200).withHeader("Content-type", "application/json")));
+    userSettingsWireMock.stubFor(
+        post(urlPathEqualTo("/user-settings-mock-server/api/settings/me/channels/email/deactivate"))
+            .withHeader(PlatformHttpHeader.X_ACCESS_TOKEN.getName(), equalTo("token"))
+            .withRequestBody(
+                new EqualToJsonPattern(
+                    convertJsonToString("/json/updateSettingsDeactivate.json"), false, false))
+            .willReturn(
+                aResponse().withStatus(200).withHeader("Content-type", "application/json")));
+    userSettingsWireMock.stubFor(
+        get(urlPathEqualTo("/user-settings-mock-server/api/settings/me"))
+            .withHeader(PlatformHttpHeader.X_ACCESS_TOKEN.getName(), equalTo("token"))
+            .willReturn(
+                aResponse()
+                    .withStatus(200)
+                    .withHeader("Content-type", "application/json")
+                    .withBody(convertJsonToString("/json/getSettingsAfterDeactivateResponse.json"))));
 
     var processInstance = runtimeService
-        .startProcessInstanceByKey("update_settings_key",
-            Map.of("dataPayload", Spin.JSON(Map.of(
-                "e-mail", "test@test.com",
-                "phone", "+380444444444",
-                "communicationIsAllowed", true))));
+            .startProcessInstanceByKey("update_settings_key",
+                    Map.of("dataPayload", Spin.JSON(Map.of(
+                            "e-mail", "test@test.com",
+                            "phone", "+380444444444",
+                            "communicationIsAllowed", true))));
 
     List<ProcessInstance> processInstanceList = runtimeService.createProcessInstanceQuery()
-        .processInstanceId(processInstance.getId()).list();
+            .processInstanceId(processInstance.getId()).list();
 
     Assertions.assertThat(CollectionUtils.isEmpty(processInstanceList)).isTrue();
   }

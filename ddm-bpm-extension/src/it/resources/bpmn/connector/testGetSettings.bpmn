@@ -13,7 +13,7 @@
       <bpmn:incoming>Flow_0gl2ex9</bpmn:incoming>
       <bpmn:outgoing>Flow_1dy8psi</bpmn:outgoing>
       <bpmn:script>
-        assert response.responseBody.toString().equals('{"phone":"+380441111111","settings_id":"c2c19401-f1b7-4954-a230-ab15566e7318","e-mail":"test@test.com","communicationIsAllowed":true}')</bpmn:script>
+        assert response.responseBody.toString().equals('{"phone":null,"settings_id":"c2c19401-f1b7-4954-a230-ab15566e7318","e-mail":"test@test.com","communicationIsAllowed":false}')</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:sequenceFlow id="Flow_0gl2ex9" sourceRef="Activity_164t8p9" targetRef="Activity_1odm3qh" />
     <bpmn:serviceTask id="Activity_164t8p9" name="Get Settings" camunda:modelerTemplate="userSettingsConnectorReadDelegate" camunda:delegateExpression="${userSettingsConnectorReadDelegate}">

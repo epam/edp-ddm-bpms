@@ -1,8 +1,7 @@
 {
   "data": {
     "subjectType": "LEGAL",
-    "subjectCode": "1010101010",
-    "e-mail": "email@epam.com"
+    "subjectCode": "1010101010"
   },
   "signature": "userSignature"
 }

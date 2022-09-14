@@ -89,7 +89,7 @@ management:
 ceph:
   bucket: ${CEPH_BUCKET_NAME:bucket}
 
-user-settings-service-api:
+user-settings-service:
   url: http://user-settings-service-api:8080
 
 platform:

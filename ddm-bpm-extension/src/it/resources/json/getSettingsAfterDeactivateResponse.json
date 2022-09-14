@@ -5,11 +5,7 @@
       "channel": "email",
       "activated": false,
       "address": "test@test.com",
-      "deactivationReason": "USER_DEACTIVATED"
-    },
-    {
-      "channel": "diia",
-      "activated": true
+      "deactivationReason": "USER_DEACTIVATED_FROM_BP"
     }
   ]
 }

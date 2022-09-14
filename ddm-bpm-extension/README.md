@@ -40,7 +40,7 @@ dso:
 excerpt-service-api:
   url: base url for Excerpt connectors;
 
-user-settings-service-api:
+user-settings-service:
   url: base url for user settings connectors;
 
 # for working with GetContentFromCephDelegate and PutContentToCephDelegate

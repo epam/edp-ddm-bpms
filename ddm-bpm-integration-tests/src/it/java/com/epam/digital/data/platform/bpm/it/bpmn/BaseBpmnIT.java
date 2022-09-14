@@ -160,7 +160,7 @@ public abstract class BaseBpmnIT extends BaseIT {
   }
 
   protected void stubSettingsRequest(StubData data) {
-    var uriBuilder = UriComponentsBuilder.fromPath(SETTINGS_MOCK_SERVER)
+    var uriBuilder = UriComponentsBuilder.fromPath(SETTINGS_MOCK_SERVER + "/api/settings")
         .pathSegment(data.getResource());
 
     userSettingsWireMock.addStubMapping(stubFor(getMappingBuilder(data, uriBuilder)));

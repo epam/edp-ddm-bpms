@@ -15,7 +15,7 @@ ceph:
   secret-key: secret-key
   bucket: bucket
 
-user-settings-service-api:
+user-settings-service:
   url: http://localhost:8878/user-settings-mock-server
 excerpt-service-api:
   url: http://localhost:9999/excerpt-mock-service
