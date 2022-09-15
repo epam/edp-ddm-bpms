@@ -42,15 +42,23 @@ Create chart name and version as used by the chart label.
 {{- end }}
 
 {{- define "keycloak.citizenTargetRealm" -}}
-{{- printf "%s-%s" .Values.namespace .Values.keycloak.citizenClient.realm }}
+{{- printf "%s-%s" .Release.Namespace .Values.keycloak.citizenClient.realm }}
 {{- end -}}
 
 {{- define "keycloak.officerTargetRealm" -}}
-{{- printf "%s-%s" .Values.namespace .Values.keycloak.officerClient.realm }}
+{{- printf "%s-%s" .Release.Namespace .Values.keycloak.officerClient.realm }}
+{{- end -}}
+
+{{- define "keycloak.host" -}}
+{{- if .Values.keycloak.customHost }}
+{{- .Values.keycloak.customHost }}
+{{- else }}
+{{- .Values.keycloak.host }}
+{{- end }}
 {{- end -}}
 
 {{- define "keycloak.url" -}}
-{{- printf "%s%s" "https://" .Values.keycloak.host }}
+{{- printf "%s%s" "https://" (include "keycloak.host" .) }}
 {{- end -}}
 
 {{- define "keycloak.urlPrefix" -}}
