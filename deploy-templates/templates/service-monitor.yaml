@@ -1,10 +1,10 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ .Chart.Name }}-{{ .Values.namespace }}
+  name: {{ .Chart.Name }}-{{ .Release.Namespace }}
   namespace: {{ .Values.monitoring.namespace }}
   labels:
-    app: bpms-{{ .Values.namespace }}
+    app: bpms-{{ .Release.Namespace }}
     relatedNamespace: {{ .Release.Namespace }}
 spec:
   endpoints:
@@ -16,7 +16,7 @@ spec:
   jobLabel: app
   namespaceSelector:
     matchNames:
-      - {{ .Values.namespace }}
+      - {{ .Release.Namespace }}
   selector:
     matchExpressions:
       - key: app
