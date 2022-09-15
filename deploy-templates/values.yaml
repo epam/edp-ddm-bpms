@@ -37,6 +37,11 @@ db:
   defaultDatabase: camunda
   secret: citus-secrets
 
+camunda:
+  bpm:
+    historyLevel: AUDIT
+    databaseHistoryLevel: ACTIVITY
+
 ingress: # expose the service with a route or an ingress depending on platform type
   platform: openshift # openshift or kubernetes
 
