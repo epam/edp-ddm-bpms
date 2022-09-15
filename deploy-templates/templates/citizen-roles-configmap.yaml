@@ -1,4 +1,4 @@
-{{- $configmap := (lookup "v1" "ConfigMap" .Values.namespace .Values.citizenConfigMapName) -}}
+{{- $configmap := (lookup "v1" "ConfigMap" .Release.Namespace .Values.citizenConfigMapName) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
