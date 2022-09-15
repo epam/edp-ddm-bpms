@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: update-history-level-configmap
+data:
+  update-history-level.sql: |-
+    SELECT 'UPDATE ACT_GE_PROPERTY SET VALUE_ = '||
+    case '{{ .Values.camunda.bpm.historyLevel }}'
+    when 'NONE' then 0
+    when 'ACTIVITY' then 1
+    when 'AUDIT' then 2
+    when 'FULL' then 3
+    end ||' WHERE NAME_ = ''historyLevel''' from pg_tables where tablename = 'act_ge_property' \gexec

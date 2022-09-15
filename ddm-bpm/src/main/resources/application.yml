@@ -6,7 +6,6 @@ camunda:
   admin-user-id: camunda
   admin-group-id: camunda-admin
   bpm:
-    database-history-level: AUDIT
     generic-properties:
       properties:
         enable-historic-instance-permissions: true
@@ -21,7 +20,6 @@ camunda:
         history-cleanup-batch-size: 200
     authorization:
       enabled: true
-    history-level: FULL
 
 data-platform:
   kafka:

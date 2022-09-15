@@ -47,10 +47,15 @@ spec:
                 key: password
         imagePullPolicy: IfNotPresent
         command:
-          - sh
+          - 'sh'
           - '-c'
           - >-
-            echo "SELECT 'CREATE DATABASE {{ .Values.db.defaultDatabase }}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '{{ .Values.db.defaultDatabase }}')\gexec" | psql -U $PSQL_USER --host={{ .Values.db.url }}
+            echo "SELECT 'CREATE DATABASE {{ .Values.db.defaultDatabase }}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '{{ .Values.db.defaultDatabase }}')\gexec" | psql -U $PSQL_USER --host={{ .Values.db.url }};
+            psql {{ .Values.db.defaultDatabase }} -U $PSQL_USER --host={{ .Values.db.url }} -f /app/update-history-level.sql
+        volumeMounts:
+          - name: update-history-level-configmap
+            mountPath: /app/update-history-level.sql
+            subPath: update-history-level.sql
       containers:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
@@ -214,3 +219,6 @@ spec:
         - name: {{ .Values.trembitaConfConfigmapName }}
           configMap:
             name: {{ .Values.trembitaConfConfigmapName }}
+        - name: update-history-level-configmap
+          configMap:
+            name: update-history-level-configmap
