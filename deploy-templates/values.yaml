@@ -2,7 +2,20 @@ global:
   disableRequestsLimits: false
   kafkaOperator:
     replicationFactor: 3
+  registry:
+    bpms:
+      istio:
+        sidecar:
+          enabled: true
+          resources:
+            limits: {}
+            requests: {}
+      container:
+        resources: {}
+        envVars:
+          JAVA_OPTS: "-Xms1536m -Xmx1536m -Duser.timezone=UTC"
 
+podAnnotations: {}
 image:
   name: business-process-management
   version: latest
@@ -30,8 +43,6 @@ redisSecretsMountPath: "/app/secrets/redis"
 officerConfigMapName: officer-roles
 citizenConfigMapName: citizen-roles
 trembitaConfConfigmapName: trembita-configuration
-
-javaOpts: "-Xms1536m -Xmx1536m -Duser.timezone=UTC"
 
 db:
   url: citus-master

@@ -96,3 +96,18 @@ Create chart name and version as used by the chart label.
 {{- define "jwksUri.external" -}}
 {{- printf "%s-%s%s" (include "keycloak.urlPrefix" .) .Values.keycloak.realms.external .Values.keycloak.certificatesEndpoint -}}
 {{- end -}}
+
+{{- define "bpms.istioResources" -}}
+{{- if .Values.global.registry.bpms.istio.sidecar.resources.limits.cpu }}
+sidecar.istio.io/proxyCPULimit: {{ .Values.global.registry.bpms.istio.sidecar.resources.limits.cpu | quote }}
+{{- end }}
+{{- if .Values.global.registry.bpms.istio.sidecar.resources.limits.memory }}
+sidecar.istio.io/proxyMemoryLimit: {{ .Values.global.registry.bpms.istio.sidecar.resources.limits.memory | quote }}
+{{- end }}
+{{- if .Values.global.registry.bpms.istio.sidecar.resources.requests.cpu }}
+sidecar.istio.io/proxyCPU: {{ .Values.global.registry.bpms.istio.sidecar.resources.requests.cpu | quote }}
+{{- end }}
+{{- if .Values.global.registry.bpms.istio.sidecar.resources.requests.memory }}
+sidecar.istio.io/proxyMemory: {{ .Values.global.registry.bpms.istio.sidecar.resources.requests.memory | quote }}
+{{- end }}
+{{- end -}}

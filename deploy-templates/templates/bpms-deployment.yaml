@@ -16,9 +16,17 @@ spec:
     type: RollingUpdate
   template:
     metadata:
+      {{- if or .Values.podAnnotations .Values.global.registry.bpms.istio.sidecar.enabled }}
       annotations:
+        {{- range $key, $value := .Values.podAnnotations }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+        {{- if .Values.global.registry.bpms.istio.sidecar.enabled }}
         traffic.sidecar.istio.io/excludeOutboundPorts: '5432,6379'
-        sidecar.istio.io/inject: "true"
+        sidecar.istio.io/inject: 'true'
+        {{- include "bpms.istioResources" . | nindent 8 }}
+        {{- end }}
+      {{- end }}
       labels:
         app: {{ .Chart.Name }}
     spec:
@@ -82,14 +90,13 @@ spec:
           timeoutSeconds: 5
         {{- if not .Values.global.disableRequestsLimits }}
         resources:
-          limits:
-            cpu: '1'
-            memory: 2Gi
-          requests:
-            cpu: '1'
-            memory: 2Gi
+          {{- toYaml .Values.global.registry.bpms.container.resources | nindent 10 }}
         {{- end }}
         env:
+          {{- range $name, $value := .Values.global.registry.bpms.container.envVars }}
+          - name: {{ $name }}
+            value: {{ $value | quote}}
+          {{- end }}
           - name: CEPH_BUCKET_HOST
             valueFrom:
               configMapKeyRef:
@@ -110,8 +117,6 @@ spec:
               configMapKeyRef:
                 name: {{ .Values.fileStorage.bucketName }}
                 key: BUCKET_NAME
-          - name: JAVA_OPTS
-            value: {{ .Values.javaOpts }}
           - name: KAFKA_USER_KEYSTORE_CERTIFICATE
             valueFrom:
               secretKeyRef:
