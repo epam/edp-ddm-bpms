@@ -24,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
-import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -59,7 +58,6 @@ public class AuthorizationStartEventListener implements ExecutionListener {
     try {
       camundaImpersonation.impersonate();
       addPermissionForProcessInstances(processEngine, execution, impersonator.getUserId());
-      addPermissionReadHistory(processEngine, execution, impersonator.getUserId());
     } finally {
       camundaImpersonation.revertToSelf();
     }
@@ -72,16 +70,6 @@ public class AuthorizationStartEventListener implements ExecutionListener {
         execution.getProcessInstanceId(),
         Resources.PROCESS_INSTANCE, new Permission[]{ProcessInstancePermissions.READ,
             ProcessInstancePermissions.UPDATE_VARIABLE}, userId);
-    processEngine.getAuthorizationService().saveAuthorization(authorization);
-  }
-
-  private void addPermissionReadHistory(ProcessEngine processEngine, DelegateExecution execution,
-      String userId) {
-    Authorization authorization = createAuthorization(processEngine,
-        execution.getProcessInstanceId(),
-        Resources.PROCESS_DEFINITION,
-        new Permission[]{ProcessDefinitionPermissions.READ_HISTORY,
-            ProcessDefinitionPermissions.READ_HISTORY_VARIABLE}, userId);
     processEngine.getAuthorizationService().saveAuthorization(authorization);
   }
 
