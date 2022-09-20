@@ -27,6 +27,7 @@ import com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory;
 import java.util.Optional;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -70,7 +71,10 @@ public class AuthorizationStartEventListenerTest {
     authorizationStartEventListener.notify(execution);
 
     var captor = ArgumentCaptor.forClass(AuthorizationEntity.class);
-    verify(authorizationService, times(2)).saveAuthorization(captor.capture());
-    captor.getAllValues().forEach(a -> assertThat(a.getUserId()).isEqualTo(userId));
+    verify(authorizationService, times(1)).saveAuthorization(captor.capture());
+    captor.getAllValues().forEach(a -> {
+      assertThat(a.getUserId()).isEqualTo(userId);
+      assertThat(a.getResource()).isEqualTo(Resources.PROCESS_INSTANCE.resourceType());
+    });
   }
 }

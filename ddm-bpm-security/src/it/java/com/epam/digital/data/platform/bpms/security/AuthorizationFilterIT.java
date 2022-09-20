@@ -22,8 +22,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.google.common.io.ByteStreams;
 import java.io.IOException;
 import java.util.stream.Stream;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
-import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
@@ -36,98 +34,6 @@ public class AuthorizationFilterIT extends BaseIT {
   @Before
   public void init() {
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-  }
-
-  @Test
-  @Deployment(resources = "bpmn/testInitSystemVariablesProcess.bpmn")
-  public void shouldReadProcessInstanceHistory() throws Exception {
-    //get process-definition
-    ProcessDefinitionDto[] processDefinitionDtos = getForObject("api/process-definition",
-        ProcessDefinitionDto[].class);
-    ProcessDefinitionDto processDefinition = Stream.of(processDefinitionDtos)
-        .filter(pd -> "testInitSystemVariablesProcess_key".equals(pd.getKey())).findFirst().get();
-
-    //create process instance
-    ProcessInstanceDto createdProcessInstance = postForObject(
-        "api/process-definition/" + processDefinition.getId() + "/start", "{}",
-        ProcessInstanceDto.class);
-
-    //get process-instance history
-    HistoricProcessInstanceDto[] historyProcessInstanceDtos = getForObject(
-        "api/history/process-instance", HistoricProcessInstanceDto[].class);
-
-    assertThat(historyProcessInstanceDtos).isNotEmpty();
-    Stream.of(historyProcessInstanceDtos).forEach(historyProcessInstance -> {
-      assertThat(historyProcessInstance.getStartUserId()).isEqualTo("testuser");
-    });
-  }
-
-  @Test
-  @Deployment(resources = "bpmn/testInitSystemVariablesProcess.bpmn")
-  public void shouldNotReadProcessInstanceHistory() throws IOException {
-    ProcessDefinitionDto[] processDefinitionDtos = getForObject("api/process-definition",
-        ProcessDefinitionDto[].class);
-    ProcessDefinitionDto processDefinition = Stream.of(processDefinitionDtos)
-        .filter(pd -> "testInitSystemVariablesProcess_key".equals(pd.getKey())).findFirst().get();
-
-    //create process instance
-    ProcessInstanceDto createdProcessInstance = postForObject(
-        "api/process-definition/" + processDefinition.getId() + "/start", "{}",
-        ProcessInstanceDto.class);
-    var processInstanceId = createdProcessInstance.getId();
-
-    //get process-instance history by another user
-    String testuser2Token = new String(ByteStreams
-        .toByteArray(BaseIT.class.getResourceAsStream("/json/testuser2AccessToken.json")));
-    HistoricProcessInstanceDto[] historyProcessInstanceDtos = getForObject(
-        String.format("api/history/process-instance?processInstanceId=%s", processInstanceId),
-        HistoricProcessInstanceDto[].class, testuser2Token);
-
-    assertThat(historyProcessInstanceDtos).isEmpty();
-  }
-
-  @Test
-  @Deployment(resources = "bpmn/testInitSystemVariablesProcess.bpmn")
-  public void shouldReadUserTasksHistory() throws IOException {
-    ProcessDefinitionDto[] processDefinitionDtos = getForObject("api/process-definition",
-        ProcessDefinitionDto[].class);
-    ProcessDefinitionDto processDefinition = Stream.of(processDefinitionDtos)
-        .filter(pd -> "testInitSystemVariablesProcess_key".equals(pd.getKey())).findFirst().get();
-
-    ProcessInstanceDto processInstance = postForObject(
-        "api/process-definition/" + processDefinition.getId() + "/start", "{}",
-        ProcessInstanceDto.class);
-
-    HistoricTaskInstanceEntity[] historyProcessInstanceDtos = getForObject(
-        String.format("api/history/task?processInstanceId=%s", processInstance.getId()),
-        HistoricTaskInstanceEntity[].class);
-
-    assertThat(historyProcessInstanceDtos).isNotEmpty();
-    Stream.of(historyProcessInstanceDtos).forEach(historyTask -> {
-      assertThat(historyTask.getAssignee()).isEqualTo("testuser");
-    });
-  }
-
-  @Test
-  @Deployment(resources = "bpmn/testInitSystemVariablesProcess.bpmn")
-  public void shouldNotReadUserTasksHistory() throws IOException {
-    ProcessDefinitionDto[] processDefinitionDtos = getForObject("api/process-definition",
-        ProcessDefinitionDto[].class);
-    ProcessDefinitionDto processDefinition = Stream.of(processDefinitionDtos)
-        .filter(pd -> "testInitSystemVariablesProcess_key".equals(pd.getKey())).findFirst().get();
-    //create process instance
-    ProcessInstanceDto processInstance = postForObject(
-        "api/process-definition/" + processDefinition.getId() + "/start", "{}",
-        ProcessInstanceDto.class);
-
-    //get user tasks by another user
-    String testuser2Token = new String(ByteStreams
-        .toByteArray(BaseIT.class.getResourceAsStream("/json/testuser2AccessToken.json")));
-    HistoricTaskInstanceEntity[] historyProcessInstanceDtos = getForObject(
-        String.format("api/history/task?processInstanceId=%s", processInstance.getId()),
-        HistoricTaskInstanceEntity[].class, testuser2Token);
-
-    assertThat(historyProcessInstanceDtos).isEmpty();
   }
 
   @Test
