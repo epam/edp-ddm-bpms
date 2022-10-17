@@ -21,6 +21,7 @@ import com.epam.digital.data.platform.bpms.rest.controller.ProcessInstanceContro
 import com.epam.digital.data.platform.bpms.rest.controller.TaskController;
 import com.epam.digital.data.platform.bpms.rest.exception.mapper.CamundaRestExceptionMapper;
 import com.epam.digital.data.platform.bpms.rest.exception.mapper.CamundaSystemExceptionMapper;
+import com.epam.digital.data.platform.bpms.rest.exception.mapper.ConstraintViolationExceptionMapper;
 import com.epam.digital.data.platform.bpms.rest.exception.mapper.KeycloakExceptionMapper;
 import com.epam.digital.data.platform.bpms.rest.exception.mapper.TaskAlreadyInCompletionExceptionMapper;
 import com.epam.digital.data.platform.bpms.rest.exception.mapper.UserDataValidationExceptionMapper;
@@ -53,5 +54,6 @@ public class LowcodeJerseyConfig extends CamundaJerseyResourceConfig {
     register(CamundaRestExceptionMapper.class);
     register(TaskAlreadyInCompletionExceptionMapper.class);
     register(KeycloakExceptionMapper.class);
+    register(ConstraintViolationExceptionMapper.class);
   }
 }
