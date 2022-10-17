@@ -48,7 +48,7 @@
   <properties>
     <groovy.version>3.0.6</groovy.version>
     <ddm-starter-actuator.version>1.6.0.1</ddm-starter-actuator.version>
-    <ddm-starter-error-handler.version>1.6.0.4</ddm-starter-error-handler.version>
+    <ddm-starter-error-handler.version>1.6.0.6</ddm-starter-error-handler.version>
     <ddm-starter-juel-function.version>1.8.0.1</ddm-starter-juel-function.version>
     <ddm-starter-localization.version>1.6.0.1</ddm-starter-localization.version>
     <ddm-starter-logging.version>1.6.0.1</ddm-starter-logging.version>
