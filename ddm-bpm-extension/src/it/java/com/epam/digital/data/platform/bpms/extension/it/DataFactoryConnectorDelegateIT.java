@@ -332,6 +332,80 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
   }
 
   @Test
+  @Deployment(resources = {"bpmn/connector/testDataFactoryConnectorBatchCreateDelegateV2ListUpload.bpmn"})
+  public void testDataFactoryConnectorBatchCreateDelegateV2ListUpload() {
+    digitalSignatureMockServer.addStubMapping(stubFor(
+        post(urlPathEqualTo("/api/eseal/sign"))
+            .withHeader("X-Access-Token", equalTo(validAccessToken))
+            .withRequestBody(equalTo(
+                "{\"data\":\"{\\\"entities\\\":[{\\\"data\\\":\\\"test data\\\",\\\"description\\\":\\\"some description\\\"},{\\\"data2\\\":\\\"test data2\\\",\\\"description2\\\":\\\"some description2\\\"}]}\"}"))
+            .willReturn(aResponse().withHeader("Content-Type", "application/json").withStatus(200)
+                .withBody("{\"signature\":\"signature\"}"))));
+
+    dataFactoryMockServer.addStubMapping(
+        stubFor(post(urlPathEqualTo("/mock-server/test/list"))
+            .withHeader("X-Access-Token", equalTo(validAccessToken))
+            .withHeader("X-Digital-Signature",
+                matching("process/.*/task/test_token"))
+            .withHeader("X-Digital-Signature-Derived",
+                matching("lowcode_.*_system_signature_ceph_key"))
+            .withRequestBody(
+                equalTo("{\"entities\":[{\"data\":\"test data\",\"description\":\"some description\"},{\"data2\":\"test data2\",\"description2\":\"some description2\"}]}"))
+            .willReturn(aResponse().withStatus(201))));
+
+    var processInstance = runtimeService
+        .startProcessInstanceByKey("testDataFactoryConnectorBatchCreateDelegateV2ListUpload_key");
+
+    var storageKeyToken = formDataKeyProvider
+        .generateKey("test_token", processInstance.getProcessInstanceId());
+    formDataStorageService.putFormData(storageKeyToken, FormDataDto.builder().accessToken(validAccessToken)
+        .data(new LinkedHashMap<>()).build());
+
+    var taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionTask").singleResult()
+        .getId();
+    taskService.complete(taskId);
+
+    BpmnAwareTests.assertThat(processInstance).isEnded();
+  }
+
+  @Test
+  @Deployment(resources = {"bpmn/connector/testDataFactoryConnectorBatchCreateDelegateV2CsvUpload.bpmn"})
+  public void testDataFactoryConnectorBatchCreateDelegateV2CsvUpload() {
+    digitalSignatureMockServer.addStubMapping(stubFor(
+        post(urlPathEqualTo("/api/eseal/sign"))
+            .withHeader("X-Access-Token", equalTo(validAccessToken))
+            .withRequestBody(equalTo(
+                "{\"data\":\"{\\\"id\\\":\\\"dataId\\\",\\\"checksum\\\":\\\"dataChecksum\\\"}\"}"))
+            .willReturn(aResponse().withHeader("Content-Type", "application/json").withStatus(200)
+                .withBody("{\"signature\":\"signature\"}"))));
+
+    dataFactoryMockServer.addStubMapping(
+        stubFor(post(urlPathEqualTo("/mock-server/test/csv"))
+            .withHeader("X-Access-Token", equalTo(validAccessToken))
+            .withHeader("X-Digital-Signature",
+                matching("process/.*/task/test_token"))
+            .withHeader("X-Digital-Signature-Derived",
+                matching("lowcode_.*_system_signature_ceph_key"))
+            .withRequestBody(
+                equalTo("{\"id\":\"dataId\",\"checksum\":\"dataChecksum\"}"))
+            .willReturn(aResponse().withStatus(201))));
+
+    var processInstance = runtimeService
+        .startProcessInstanceByKey("testDataFactoryConnectorBatchCreateDelegateV2CsvUpload_key");
+
+    var storageKeyToken = formDataKeyProvider
+        .generateKey("test_token", processInstance.getProcessInstanceId());
+    formDataStorageService.putFormData(storageKeyToken, FormDataDto.builder().accessToken(validAccessToken)
+        .data(new LinkedHashMap<>()).build());
+
+    var taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionTask").singleResult()
+        .getId();
+    taskService.complete(taskId);
+
+    BpmnAwareTests.assertThat(processInstance).isEnded();
+  }
+
+  @Test
   @Deployment(resources = {"bpmn/connector/testDataFactoryConnectorBatchReadDelegate.bpmn"})
   public void testDataFactoryConnectorBatchReadDelegate() {
     String chemResearchId = "7074945f-e088-446b-8c28-325aca4f423f";
