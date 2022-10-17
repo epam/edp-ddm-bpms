@@ -19,6 +19,7 @@ package com.epam.digital.data.platform.bpms.extension.config;
 import com.epam.digital.data.platform.bpms.extension.config.properties.ExternalSystemConfigurationProperties;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.DataFactoryConnectorBatchCreateDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.DataFactoryConnectorBatchReadDelegate;
+import com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloak.officer.KeycloakSaveOfficerAttributeDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.dracs.GetCertificateByBirthdateDracsRegistryDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.dracs.GetCertificateByNameDracsRegistryDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.edr.SearchSubjectsEdrRegistryConnectorDelegate;
@@ -33,6 +34,7 @@ import com.epam.digital.data.platform.datafactory.settings.client.UserSettingsFe
 import com.epam.digital.data.platform.dso.client.DigitalSealRestClient;
 import com.epam.digital.data.platform.integration.ceph.service.CephService;
 import com.epam.digital.data.platform.integration.ceph.service.impl.CephServiceS3Impl;
+import com.epam.digital.data.platform.integration.idm.service.IdmService;
 import com.epam.digital.data.platform.starter.trembita.integration.dracs.service.DracsRemoteService;
 import com.epam.digital.data.platform.starter.trembita.integration.edr.service.EdrRemoteService;
 import com.epam.digital.data.platform.starter.trembita.integration.idp.exchangeservice.service.IdpExchangeRegistryService;
@@ -50,6 +52,7 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -183,5 +186,12 @@ public class ExtensionGeneralConfig {
   @Bean
   public FormDataKeyProvider formDataKeyProvider() {
     return new FormDataKeyProviderImpl();
+  }
+
+  @Bean(KeycloakSaveOfficerAttributeDelegate.DELEGATE_NAME)
+  @ConditionalOnProperty(prefix = "keycloak.officer-system-client", name = "realm")
+  public KeycloakSaveOfficerAttributeDelegate keycloakSaveOfficerAttributeDelegate(
+      @Qualifier("officer-system-client-service") IdmService officerSystemUserIdmService) {
+    return new KeycloakSaveOfficerAttributeDelegate(officerSystemUserIdmService);
   }
 }

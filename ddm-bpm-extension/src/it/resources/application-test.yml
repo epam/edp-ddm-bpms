@@ -38,6 +38,10 @@ keycloak:
     realm: system-user-realm
     client-id: system-user-client-id
     client-secret: system-user-client-secret
+  officer-system-client:
+    realm: officer-system-client-realm
+    client-id: officer-system-client-id
+    client-secret: officer-system-client-secret
 
 trembita-exchange-gateway:
   registries:

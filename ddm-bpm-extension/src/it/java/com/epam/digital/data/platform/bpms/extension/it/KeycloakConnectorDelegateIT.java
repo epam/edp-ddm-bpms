@@ -45,7 +45,7 @@ public class KeycloakConnectorDelegateIT extends BaseIT {
   @Deployment(resources = {"bpmn/connector/testAddRoleKeycloak.bpmn"})
   public void shouldAddRealmRoleToKeycloak() {
     mockConnectToKeycloak(citizenRealm);
-    mockKeycloakGetUsers("testuser", RESPONSE_BODY_USER);
+    mockKeycloakGetUserByUsername("testuser", citizenRealm, RESPONSE_BODY_USER);
     mockKeycloakGetRole("citizen", RESPONSE_BODY_ROLE, 200);
     mockKeycloakAddRole("7004ebde-68cf-4e25-bb76-b1642a3814e5",
         "/json/keycloak/keycloakRequestBodyRoles.json");
@@ -64,7 +64,7 @@ public class KeycloakConnectorDelegateIT extends BaseIT {
   @Deployment(resources = {"bpmn/connector/testRemoveRoleKeycloak.bpmn"})
   public void shouldRemoveRealmRoleFromKeycloak() {
     mockConnectToKeycloak(citizenRealm);
-    mockKeycloakGetUsers("testuser", RESPONSE_BODY_USER);
+    mockKeycloakGetUserByUsername("testuser", citizenRealm, RESPONSE_BODY_USER);
     mockKeycloakGetRole("citizen", RESPONSE_BODY_ROLE, 200);
     mockKeycloakDeleteRole("7004ebde-68cf-4e25-bb76-b1642a3814e5",
         "/json/keycloak/keycloakRequestBodyRoles.json");
@@ -96,7 +96,7 @@ public class KeycloakConnectorDelegateIT extends BaseIT {
   @Deployment(resources = {"bpmn/connector/testAddRoleKeycloak.bpmn"})
   public void shouldGetExceptionWhenUserNotFound() {
     mockConnectToKeycloak(citizenRealm);
-    mockKeycloakGetUsers("testuser", "[]");
+    mockKeycloakGetUserByUsername("testuser", citizenRealm, "[]");
     mockKeycloakGetRole("citizen", RESPONSE_BODY_ROLE, 200);
 
     var ex = assertThrows(KeycloakException.class, () -> runtimeService
@@ -155,18 +155,13 @@ public class KeycloakConnectorDelegateIT extends BaseIT {
 
   @Test
   @Deployment(resources = "bpmn/connector/getKeycloakUsersByAttribute.bpmn")
-  public void testGeyUsersFromKeycloakByAttributes() {
+  public void testGetUsersFromKeycloakByAttributes() {
     var requestAttributes = "{\"attributes\":{\"edrpou\":\"12345678\"}}";
     mockConnectToKeycloak(officerRealm);
     mockKeycloakGetUsersByAttributes(officerRealm, requestAttributes,
         "/json/keycloak/keycloakUsersByAttributesResponse.json");
 
     var processInstance = runtimeService.startProcessInstanceByKey("testGetUsersByAttributes_key");
-
-    var roleMappingsUrl = "/auth/realms/officer-realm/users/search";
-    keycloakMockServer.verify(1,
-        postRequestedFor(urlEqualTo(roleMappingsUrl)).withRequestBody(
-            equalToJson(requestAttributes)));
 
     BpmnAwareTests.assertThat(processInstance).isEnded();
   }
@@ -187,34 +182,6 @@ public class KeycloakConnectorDelegateIT extends BaseIT {
             equalToJson(requestAttributes)));
 
     BpmnAwareTests.assertThat(processInstance).isEnded();
-  }
-
-  private void mockConnectToKeycloak(String realmName) {
-    keycloakMockServer.addStubMapping(
-        stubFor(post(urlPathEqualTo("/auth/realms/" + realmName + "/protocol/openid-connect/token"))
-            .withRequestBody(equalTo("grant_type=client_credentials"))
-            .willReturn(aResponse().withStatus(200)
-                .withHeader("Content-type", "application/json")
-                .withBody(convertJsonToString("/json/keycloak/keycloakConnectResponse.json")))));
-  }
-
-  private void mockKeycloakGetUsers(String userName, String responseBody) {
-    keycloakMockServer.addStubMapping(
-        stubFor(get(urlPathEqualTo("/auth/admin/realms/citizen-realm/users"))
-            .withQueryParam("username", equalTo(userName))
-            .withQueryParam("exact", equalTo(Boolean.TRUE.toString()))
-            .willReturn(aResponse().withStatus(200)
-                .withHeader("Content-type", "application/json")
-                .withBody(convertJsonToString(responseBody)))));
-  }
-
-  private void mockKeycloakGetUsersByAttributes(String realm, String requestBody, String responseBody) {
-    keycloakMockServer.addStubMapping(
-        stubFor(post(urlPathEqualTo(String.format("/auth/realms/%s/users/search", realm)))
-            .withRequestBody(equalToJson(requestBody))
-            .willReturn(aResponse().withStatus(200)
-                .withHeader("Content-type", "application/json")
-                .withBody(convertJsonToString(responseBody)))));
   }
 
   private void mockKeycloakGetUsersByRole(String role, String response) {

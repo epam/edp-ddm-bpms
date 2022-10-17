@@ -148,6 +148,8 @@ spec:
             mountPath: {{ .Values.officerKeycloakClientSecretsMountPath }}
           - name: {{ .Values.keycloak.systemUserClient.secretName }}
             mountPath: {{ .Values.systemUserKeycloakClientSecretsMountPath }}
+          - name: {{ .Values.keycloak.officerSystemClient.secretName }}
+            mountPath: {{ .Values.officerSystemClientSecretsMountPath }}
           - name: {{ .Values.officerConfigMapName }}
             mountPath: {{ .Values.officerConfigMountPath }}
           - name: {{ .Values.citizenConfigMapName }}
@@ -210,6 +212,12 @@ spec:
             items:
             - key: clientSecret
               path: keycloak.system-user.client-secret
+        - name: {{ .Values.keycloak.officerSystemClient.secretName }}
+          secret:
+            secretName: {{ .Values.keycloak.officerSystemClient.secretName }}
+            items:
+              - key: clientSecret
+                path: keycloak.officer-system-client.client-secret
         - name: {{ .Values.officerConfigMapName }}
           configMap:
             name: {{ .Values.officerConfigMapName }}

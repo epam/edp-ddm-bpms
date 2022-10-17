@@ -48,13 +48,13 @@
   <properties>
     <groovy.version>3.0.6</groovy.version>
     <ddm-starter-actuator.version>1.6.0.1</ddm-starter-actuator.version>
-    <ddm-starter-error-handler.version>1.6.0.1</ddm-starter-error-handler.version>
-    <ddm-starter-juel-function.version>1.7.0.1</ddm-starter-juel-function.version>
+    <ddm-starter-error-handler.version>1.6.0.4</ddm-starter-error-handler.version>
+    <ddm-starter-juel-function.version>1.7.0.2</ddm-starter-juel-function.version>
     <ddm-starter-localization.version>1.6.0.1</ddm-starter-localization.version>
     <ddm-starter-logging.version>1.6.0.1</ddm-starter-logging.version>
-    <ddm-starter-security.version>1.6.0.1</ddm-starter-security.version>
+    <ddm-starter-security.version>1.6.0.3</ddm-starter-security.version>
     <ddm-starter-trembita-integration.version>1.6.0.3</ddm-starter-trembita-integration.version>
-    <ddm-idm-client.version>1.6.0.1</ddm-idm-client.version>
+    <ddm-idm-client.version>1.6.0.11</ddm-idm-client.version>
     <excerpt-model.version>1.6.0.1</excerpt-model.version>
     <process-history-model.version>1.6.0.1</process-history-model.version>
     <ddm-starter-kafka.version>1.6.0.2</ddm-starter-kafka.version>
@@ -103,6 +103,17 @@
       <groupId>com.epam.digital.data.platform</groupId>
       <artifactId>ddm-starter-error-handler</artifactId>
       <version>${ddm-starter-error-handler.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.epam.digital.data.platform</groupId>
+          <artifactId>ddm-starter-security</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.epam.digital.data.platform</groupId>
+      <artifactId>ddm-starter-security</artifactId>
+      <version>${ddm-starter-security.version}</version>
     </dependency>
     <dependency>
       <artifactId>wiremock</artifactId>

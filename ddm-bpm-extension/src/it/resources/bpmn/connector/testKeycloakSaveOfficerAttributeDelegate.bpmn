@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1uz9c6r" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.12.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:process id="test_save_attribute" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_1al6zqt</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1al6zqt" sourceRef="StartEvent_1" targetRef="Activity_0cm34y3" />
+    <bpmn:sequenceFlow id="Flow_06c3iiu" sourceRef="Activity_0cm34y3" targetRef="Activity_1sr18mq" />
+    <bpmn:endEvent id="Event_0ulnm1m">
+      <bpmn:incoming>Flow_1vkmavo</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1vkmavo" sourceRef="Activity_1sr18mq" targetRef="Event_0ulnm1m" />
+    <bpmn:scriptTask id="Activity_0cm34y3" name="prepare data" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1al6zqt</bpmn:incoming>
+      <bpmn:outgoing>Flow_06c3iiu</bpmn:outgoing>
+      <bpmn:script>def attributeValues = ['UA03020010010112345', 'UA04020010010112345']
+set_transient_variable('attributeValues', attributeValues)</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:serviceTask id="Activity_1sr18mq" name="Save Attribute" camunda:modelerTemplate="keycloakSaveOfficerAttributeDelegate" camunda:delegateExpression="${keycloakSaveOfficerAttributeDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="username">testuser</camunda:inputParameter>
+          <camunda:inputParameter name="attributeName">test</camunda:inputParameter>
+          <camunda:inputParameter name="attributeValue">${attributeValues}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_06c3iiu</bpmn:incoming>
+      <bpmn:outgoing>Flow_1vkmavo</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="test_save_attribute">
+      <bpmndi:BPMNEdge id="Flow_1vkmavo_di" bpmnElement="Flow_1vkmavo">
+        <di:waypoint x="530" y="117" />
+        <di:waypoint x="592" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06c3iiu_di" bpmnElement="Flow_06c3iiu">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="430" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1al6zqt_di" bpmnElement="Flow_1al6zqt">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0ulnm1m_di" bpmnElement="Event_0ulnm1m">
+        <dc:Bounds x="592" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ojry4t_di" bpmnElement="Activity_0cm34y3">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_11ooi9v_di" bpmnElement="Activity_1sr18mq">
+        <dc:Bounds x="430" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

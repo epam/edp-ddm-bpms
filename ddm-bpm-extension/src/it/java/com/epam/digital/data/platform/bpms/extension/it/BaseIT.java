@@ -113,6 +113,8 @@ public abstract class BaseIT {
   protected String citizenRealm;
   @Value("${keycloak.officer.realm}")
   protected String officerRealm;
+  @Value("${keycloak.officer-system-client.realm}")
+  protected String officerSystemClientRealm;
 
   protected static String validAccessToken;
 
@@ -240,5 +242,49 @@ public abstract class BaseIT {
       default:
         throw new NullPointerException("Stub method isn't defined");
     }
+  }
+
+  protected void mockConnectToKeycloak(String realmName) {
+    keycloakMockServer.addStubMapping(
+        stubFor(post(urlPathEqualTo("/auth/realms/" + realmName + "/protocol/openid-connect/token"))
+            .withRequestBody(equalTo("grant_type=client_credentials"))
+            .willReturn(aResponse().withStatus(200)
+                .withHeader("Content-type", "application/json")
+                .withBody(convertJsonToString("/json/keycloak/keycloakConnectResponse.json")))));
+  }
+
+  protected void mockKeycloakGetUserByUsername(String username, String realm, String responseBody) {
+    keycloakMockServer.addStubMapping(
+        stubFor(get(urlPathEqualTo(String.format("/auth/admin/realms/%s/users", realm)))
+            .withQueryParam("username", equalTo(username))
+            .withQueryParam("exact", equalTo(Boolean.TRUE.toString()))
+            .willReturn(aResponse().withStatus(200)
+                .withHeader("Content-type", "application/json")
+                .withBody(convertJsonToString(responseBody)))));
+  }
+
+  protected void mockGetKeycloakGetUserById(String userId, String realm, String responseBody) {
+    keycloakMockServer.addStubMapping(
+        stubFor(get(urlPathEqualTo(String.format("/auth/admin/realms/%s/users/%s", realm, userId)))
+            .willReturn(aResponse().withStatus(200)
+                .withHeader("Content-type", "application/json")
+                .withBody(convertJsonToString(responseBody)))));
+  }
+
+  protected void mockKeycloakUpdateUser(String userId, String realm, String requestBody) {
+    var roleMappingsUrl = String.format("/auth/admin/realms/%s/users/%s", realm, userId);
+    keycloakMockServer.addStubMapping(
+        stubFor(put(urlPathEqualTo(roleMappingsUrl)).withRequestBody(
+                equalToJson(convertJsonToString(requestBody)))
+            .willReturn(aResponse().withStatus(200))));
+  }
+
+  protected void mockKeycloakGetUsersByAttributes(String realm, String requestBody, String responseBody) {
+    keycloakMockServer.addStubMapping(
+        stubFor(post(urlPathEqualTo(String.format("/auth/realms/%s/users/search", realm)))
+            .withRequestBody(equalToJson(requestBody))
+            .willReturn(aResponse().withStatus(200)
+                .withHeader("Content-type", "application/json")
+                .withBody(convertJsonToString(responseBody)))));
   }
 }
