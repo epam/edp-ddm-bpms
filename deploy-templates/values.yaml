@@ -17,6 +17,7 @@ appSecretsMountPath: "/app/secrets/main"
 cephSecretMountPath: "/app/secrets/ceph"
 fileStorageSecretMountPath: "/app/secrets/fileStorage"
 systemUserKeycloakClientSecretsMountPath: "/app/secrets/system-user-client"
+officerSystemClientSecretsMountPath: "/app/secrets/officer-system-client"
 citizenKeycloakClientSecretsMountPath: "/app/secrets/citizen-realm-admin-client"
 officerKeycloakClientSecretsMountPath: "/app/secrets/officer-realm-admin-client"
 prometheusScrapePath: "/actuator/prometheus"
@@ -71,6 +72,11 @@ keycloak:
     realm: citizen-portal
     public: false
     secretName: keycloak-system-user-citizen-client-secret
+  officerSystemClient:
+    clientName: user-attributes-management
+    realm: officer-portal
+    public: false
+    secretName: keycloak-realm-officer-user-attributes-management-client-secret
   realms:
     admin: admin
     external: external-system
