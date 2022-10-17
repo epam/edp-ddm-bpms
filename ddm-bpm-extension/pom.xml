@@ -31,7 +31,7 @@
   <properties>
     <camunda.bpm.assert.version>7.0.0</camunda.bpm.assert.version>
     <dso.version>1.6.0.1</dso.version>
-    <datafactory.client.version>1.8.0.1</datafactory.client.version>
+    <datafactory.client.version>1.8.0.3</datafactory.client.version>
   </properties>
 
   <dependencies>
