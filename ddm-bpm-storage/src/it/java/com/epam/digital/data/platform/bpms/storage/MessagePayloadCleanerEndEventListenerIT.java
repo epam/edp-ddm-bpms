@@ -34,19 +34,19 @@ class MessagePayloadCleanerEndEventListenerIT extends BaseIT {
     var messagePayload = MessagePayloadDto.builder()
         .data(Map.of("name", "TestName"))
         .build();
-    var cephKey = messagePayloadStorageService.putStartMessagePayload(processDefinition, randomUUID,
+    var storageKey = messagePayloadStorageService.putStartMessagePayload(processDefinition, randomUUID,
         messagePayload);
     Map<String, Object> vars = Map.of(
-        StartMessagePayloadStorageKeyVariable.START_MESSAGE_PAYLOAD_STORAGE_KEY_VARIABLE_NAME, cephKey);
+        StartMessagePayloadStorageKeyVariable.START_MESSAGE_PAYLOAD_STORAGE_KEY_VARIABLE_NAME, storageKey);
 
     var processInstance = BpmnAwareTests.runtimeService()
         .startProcessInstanceByMessage("messagePayloadCleanerListenerMessage", vars);
 
-    Assertions.assertThat(cephService.getStorage()).hasSize(1);
+    Assertions.assertThat(messagePayloadStorageService.getMessagePayload(storageKey)).isPresent();
 
     BpmnAwareTests.complete(BpmnAwareTests.task(processInstance));
 
     BpmnAwareTests.assertThat(processInstance).isEnded();
-    Assertions.assertThat(cephService.getStorage()).isEmpty();
+    Assertions.assertThat(messagePayloadStorageService.getMessagePayload(storageKey)).isEmpty();
   }
 }

@@ -5,8 +5,18 @@ spring:
     username: bpms
     password: password
 
-ceph:
-  bucket: bucketName
+storage:
+  form-data:
+    type: redis
+  message-payload:
+    type: redis
+  backend:
+    redis:
+      sentinel:
+        master: mymaster
+        nodes: 127.0.0.1:26379
+    ceph:
+      bucket: bucketName
 
 digital-document-service:
   url: http://localhost:1111

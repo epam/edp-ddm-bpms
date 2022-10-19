@@ -61,7 +61,7 @@ public class AddPersonnelBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken, "X-Digital-Signature",
-            cephKeyProvider.generateKey("signPersonnelFormActivity", processInstanceId)))
+            formDataKeyProvider.generateKey("signPersonnelFormActivity", processInstanceId)))
         .resource("staff")
         .requestBody("/json/add-personnel/data-factory/createStaffRequest.json")
         .response("{}")

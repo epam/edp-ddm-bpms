@@ -81,9 +81,10 @@ public class StartProcessByMessageIT extends BaseBpmnIT {
         .singleResult()
         .getValue().toString();
 
-    Assertions.assertThat(cephService.getStorage()).containsKey(messagePayloadStorageKey);
-    JSONAssert.assertEquals(cephService.getStorage().get(messagePayloadStorageKey).toString(),
-        getContent("/json/start-process-by-message/expectedMessagePayload.json"), true);
+    JSONAssert.assertEquals(objectMapper.writeValueAsString(
+        messagePayloadStorageService.getMessagePayload(messagePayloadStorageKey).get()),
+        getContent("/json/start-process-by-message/expectedMessagePayload.json"),
+        true);
 
     CamundaAssertionUtil.assertWaitingActivity(AssertWaitingActivityDto.builder()
         .processDefinitionKey(TARGET_PROCESS_DEFINITION_KEY)

@@ -85,7 +85,7 @@ public class CitizenAddLabIT extends BaseBpmnIT {
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testuser2Token))
         .headers(Map.of("X-Digital-Signature",
-            cephKeyProvider.generateKey("signLabOfficerActivity", processInstanceId)))
+            formDataKeyProvider.generateKey("signLabOfficerActivity", processInstanceId)))
         .resource("laboratory")
         .requestBody("/json/citizen-add-lab/data-factory/addLabRequestBody.json")
         .response("{}")

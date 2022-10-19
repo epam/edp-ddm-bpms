@@ -30,11 +30,11 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(prefix = "storage.file-data", name = "type", havingValue = "ceph")
 public class CephFileDataStorageConfig {
 
-  @Bean
-  public FormDataFileStorageServiceFactory fileStorageServiceFactory(ObjectMapper objectMapper,
-      CephS3Factory cephS3Factory) {
-    return new FormDataFileStorageServiceFactory(cephS3Factory);
-  }
+    @Bean
+    public FormDataFileStorageServiceFactory fileStorageServiceFactory(ObjectMapper objectMapper,
+                                                                   CephS3Factory cephS3Factory) {
+        return new FormDataFileStorageServiceFactory(cephS3Factory);
+    }
 
   @Bean
   public FormDataFileStorageService formDataFileStorageService(
@@ -43,9 +43,9 @@ public class CephFileDataStorageConfig {
     return fileStorageServiceFactory.fromDataFileStorageService(fileDataCephStorageConfiguration);
   }
 
-  @Bean
-  @ConfigurationProperties(prefix = "storage.file-data.backend.ceph")
-  public FileDataCephStorageConfiguration fileDataCephStorageConfiguration() {
-    return new FileDataCephStorageConfiguration();
-  }
+    @Bean
+    @ConfigurationProperties(prefix = "storage.file-data.backend.ceph")
+    public FileDataCephStorageConfiguration fileDataCephStorageConfiguration() {
+        return new FileDataCephStorageConfiguration();
+    }
 }

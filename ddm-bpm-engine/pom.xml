@@ -23,7 +23,7 @@
   <parent>
     <artifactId>ddm-bpm-parent</artifactId>
     <groupId>com.epam.digital.data.platform</groupId>
-    <version>1.7.2</version>
+    <version>1.8.0</version>
   </parent>
 
   <artifactId>ddm-bpm-engine</artifactId>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2022 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,7 @@
 
 package com.epam.digital.data.platform.bpms.storage.config;
 
-import com.epam.digital.data.platform.integration.ceph.factory.CephS3Factory;
-import com.epam.digital.data.platform.storage.form.config.CephStorageConfiguration;
+import com.epam.digital.data.platform.storage.form.config.RedisStorageConfiguration;
 import com.epam.digital.data.platform.storage.form.factory.StorageServiceFactory;
 import com.epam.digital.data.platform.storage.form.service.FormDataStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,28 +25,24 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * The configurations contains beans for form and file data management
- */
 @Configuration
-@ConditionalOnProperty(prefix = "storage.form-data", name = "type", havingValue = "ceph")
-public class CephFormDataStorageServiceConfig {
+@ConditionalOnProperty(prefix = "storage.form-data", name = "type", havingValue = "redis")
+public class RedisFormDataStorageServiceConfig {
 
   @Bean
-  public StorageServiceFactory formDataStorageServiceFactory(ObjectMapper objectMapper,
-                                                     CephS3Factory cephS3Factory) {
-    return new StorageServiceFactory(objectMapper, cephS3Factory);
+  public StorageServiceFactory storageServiceFactory(ObjectMapper objectMapper) {
+    return new StorageServiceFactory(objectMapper);
   }
 
   @Bean
-  public FormDataStorageService formDataStorageService(StorageServiceFactory formDataStorageServiceFactory,
-      CephStorageConfiguration formDataCephStorageConfiguration) {
-    return formDataStorageServiceFactory.formDataStorageService(formDataCephStorageConfiguration);
+  @ConfigurationProperties(prefix = "storage.backend.redis")
+  public RedisStorageConfiguration redisStorageConfiguration() {
+    return new RedisStorageConfiguration();
   }
 
   @Bean
-  @ConfigurationProperties(prefix = "storage.backend.ceph")
-  public CephStorageConfiguration formDataCephStorageConfiguration() {
-    return new CephStorageConfiguration();
+  public FormDataStorageService formDataStorageService(StorageServiceFactory factory,
+      RedisStorageConfiguration config) {
+    return factory.formDataStorageService(config);
   }
 }

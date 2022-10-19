@@ -28,13 +28,15 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.spin.Spin;
 import org.camunda.spin.json.SpinJsonNode;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
  * The class represents an implementation of {@link JavaDelegate} that is used to put data in ceph
  * as string using {@link CephService} service.
+ *
+ * @deprecated because of form data storage migration from ceph to redis
  */
+@Deprecated
 @Slf4j
 @Component(PutContentToCephDelegate.DELEGATE_NAME)
 public class PutContentToCephDelegate extends BaseCephDelegate {
@@ -46,10 +48,8 @@ public class PutContentToCephDelegate extends BaseCephDelegate {
   private final FormDataStorageService formDataStorageService;
   private final ObjectMapper objectMapper;
 
-  public PutContentToCephDelegate(@Value("${ceph.bucket}") String cephBucketName,
-      CephService cephService, FormDataStorageService formDataStorageService,
+  public PutContentToCephDelegate(FormDataStorageService formDataStorageService,
       ObjectMapper objectMapper) {
-    super(cephBucketName, cephService);
     this.formDataStorageService = formDataStorageService;
     this.objectMapper = objectMapper;
   }
@@ -61,7 +61,7 @@ public class PutContentToCephDelegate extends BaseCephDelegate {
 
     log.debug("Start putting content with key {}", key);
     formDataStorageService.putFormData(key, deserializeContent(content));
-    log.debug("Content put successfully with key {}, bucket name {}", key, cephBucketName);
+    log.debug("Content put successfully with key {}", key);
   }
 
   private FormDataDto deserializeContent(String content) {

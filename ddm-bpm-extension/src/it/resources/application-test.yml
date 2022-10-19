@@ -9,6 +9,17 @@ registry-rest-api:
 dso:
   url: http://localhost:8081
 
+storage:
+  form-data:
+    type: redis
+  message-payload:
+    type: redis
+  backend:
+    redis:
+      sentinel:
+        master: mymaster
+        nodes: 127.0.0.1:26379
+
 ceph:
   http-endpoint: http://localhost:8100
   access-key: access-key

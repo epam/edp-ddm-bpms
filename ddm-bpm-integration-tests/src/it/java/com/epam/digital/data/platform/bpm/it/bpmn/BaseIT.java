@@ -27,9 +27,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
 
 import com.epam.digital.data.platform.bpm.it.config.TestCephServiceImpl;
+import com.epam.digital.data.platform.bpm.it.config.TestRedisFormDataRepository;
 import com.epam.digital.data.platform.bpm.it.util.TestUtils;
 import com.epam.digital.data.platform.starter.security.SystemRole;
 import com.epam.digital.data.platform.storage.form.service.FormDataStorageService;
+import com.epam.digital.data.platform.storage.message.service.MessagePayloadStorageService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -86,11 +88,16 @@ public abstract class BaseIT {
   @Inject
   protected FormDataStorageService formDataStorageService;
   @Inject
+  protected MessagePayloadStorageService messagePayloadStorageService;
+  @Inject
   protected ObjectMapper objectMapper;
   @Inject
   private AuthorizationService authorizationService;
   @Inject
   private IdentityService identityService;
+  @Inject
+  private TestRedisFormDataRepository redisFormDataRepository;
+
 
   @Inject
   @Qualifier("keycloakMockServer")
@@ -117,6 +124,7 @@ public abstract class BaseIT {
     SecurityContextHolder.getContext().setAuthentication(null);
     Stream.of(SystemRole.getRoleNames()).forEach(this::createAuthorizationsIfNotExists);
     cephService.clearStorage();
+    redisFormDataRepository.clearStorage();
 
     identityService.setAuthentication("testUser", List.of("camunda-admin"));
   }

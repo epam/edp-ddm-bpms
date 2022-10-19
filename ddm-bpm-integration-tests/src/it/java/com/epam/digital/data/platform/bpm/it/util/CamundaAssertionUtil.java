@@ -72,8 +72,8 @@ public final class CamundaAssertionUtil {
 
     var expectedFormData = assertWaitingActivityDto.getExpectedFormDataPrePopulation();
     if (Objects.nonNull(expectedFormData)) {
-      var cephKey = generateCephKey(activityDefinitionId, processInstanceId);
-      assertCephContains(cephKey, expectedFormData);
+      var cephKey = generateStorageKey(activityDefinitionId, processInstanceId);
+      assertStorageContains(cephKey, expectedFormData);
     }
 
     var expectedVariables = assertWaitingActivityDto.getExpectedVariables();
@@ -83,11 +83,11 @@ public final class CamundaAssertionUtil {
     }
   }
 
-  public static String generateCephKey(String activityDefinitionId, String processInstanceId) {
+  public static String generateStorageKey(String activityDefinitionId, String processInstanceId) {
     return String.format("process/%s/task/%s", processInstanceId, activityDefinitionId);
   }
 
-  public static void assertCephContains(String cephKey, FormDataDto cephContent) {
+  public static void assertStorageContains(String cephKey, FormDataDto cephContent) {
     Assertions.assertThat(formDataStorageService().getFormData(cephKey)).get()
         .isEqualTo(cephContent);
   }

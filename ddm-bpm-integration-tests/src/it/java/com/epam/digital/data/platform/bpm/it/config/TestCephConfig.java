@@ -32,6 +32,7 @@ import com.epam.digital.data.platform.storage.message.service.MessagePayloadStor
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -77,6 +78,7 @@ public class TestCephConfig {
   }
 
   @Bean
+  @ConditionalOnProperty(prefix = "storage.form-data", name = "type", havingValue = "test-ceph")
   public FormDataStorageService formDataStorageService(FormDataRepository formDataRepository) {
     return FormDataStorageService.builder()
         .keyProvider(new FormDataKeyProviderImpl())
@@ -94,6 +96,7 @@ public class TestCephConfig {
   }
 
   @Bean
+  @ConditionalOnProperty(prefix = "storage.message-payload", name = "type", havingValue = "test-ceph")
   public MessagePayloadStorageService messagePayloadStorageService(
       MessagePayloadRepository messagePayloadRepository) {
     return MessagePayloadStorageService.builder()

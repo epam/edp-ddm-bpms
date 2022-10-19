@@ -44,6 +44,17 @@ dso:
 registry-rest-api:
   url: http://localhost:8877/mock-server
 
+storage:
+  form-data:
+    type: test-redis
+  message-payload:
+    type: redis
+  backend:
+    redis:
+      sentinel:
+        master: mymaster
+        nodes: 127.0.0.1:26379
+
 platform-gateway:
   url: http://localhost:9779
 

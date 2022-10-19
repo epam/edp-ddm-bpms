@@ -131,6 +131,11 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.redis.secretName }}
+                key: password
         volumeMounts:
           - name: {{ .Chart.Name }}
             mountPath: {{ .Values.appConfigMountPath }}
@@ -156,6 +161,8 @@ spec:
             mountPath: {{ .Values.citizenConfigMountPath }}
           - name: {{ .Values.trembitaConfConfigmapName }}
             mountPath: {{ .Values.trembitaConfigMountPath }}
+          - name: {{ .Chart.Name }}-redis-credentials
+            mountPath: {{ .Values.redisSecretsMountPath }}
       serviceAccountName: {{ .Chart.Name }}
       {{- if .Values.nodeSelector }}
       nodeSelector: {{ toYaml .Values.nodeSelector | nindent 8 }}
@@ -227,6 +234,12 @@ spec:
         - name: {{ .Values.trembitaConfConfigmapName }}
           configMap:
             name: {{ .Values.trembitaConfConfigmapName }}
+        - name: {{ .Chart.Name }}-redis-credentials
+          secret:
+            secretName: {{ .Values.redis.secretName }}
+            items:
+            - key: password
+              path: redis.password
         - name: update-history-level-configmap
           configMap:
             name: update-history-level-configmap

@@ -108,6 +108,11 @@ public class TestCephServiceImpl implements CephService {
   }
 
   @Override
+  public Set<String> getKeys(String s) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public List<CephObjectMetadata> getMetadata(String cephBucketName, Set<String> keys) {
     boolean allContains = keys.stream().allMatch(storage::containsKey);
     if (!allContains) {

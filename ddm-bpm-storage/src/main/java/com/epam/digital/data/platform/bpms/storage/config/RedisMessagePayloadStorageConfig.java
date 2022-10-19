@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2022 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package com.epam.digital.data.platform.bpms.storage.config;
 
 import com.epam.digital.data.platform.integration.ceph.factory.CephS3Factory;
-import com.epam.digital.data.platform.storage.message.config.MessagePayloadCephStorageConfiguration;
+import com.epam.digital.data.platform.storage.message.config.MessagePayloadRedisStorageConfiguration;
 import com.epam.digital.data.platform.storage.message.factory.MessagePayloadStorageServiceFactory;
 import com.epam.digital.data.platform.storage.message.service.MessagePayloadStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,26 +27,24 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConditionalOnProperty(prefix = "storage.message-payload", name = "type", havingValue = "ceph")
-public class CephMessagePayloadStorageConfig {
-
-    @Bean
-    public MessagePayloadStorageServiceFactory messagePayloadStorageServiceFactory(ObjectMapper objectMapper,
-                                                       CephS3Factory cephS3Factory) {
-        return new MessagePayloadStorageServiceFactory(objectMapper, cephS3Factory);
-    }
-
-    @Bean
-    public MessagePayloadStorageService messagePayloadStorageService(
-            MessagePayloadStorageServiceFactory messagePayloadStorageServiceFactory,
-            MessagePayloadCephStorageConfiguration formDataCephStorageConfiguration) {
-        return messagePayloadStorageServiceFactory.messagePayloadStorageService(formDataCephStorageConfiguration);
-    }
+@ConditionalOnProperty(prefix = "storage.message-payload", name = "type", havingValue = "redis")
+public class RedisMessagePayloadStorageConfig {
 
   @Bean
-  @ConfigurationProperties(prefix = "storage.backend.ceph")
-  public MessagePayloadCephStorageConfiguration formDataCephStorageConfiguration() {
-    return new MessagePayloadCephStorageConfiguration();
+  public MessagePayloadStorageServiceFactory messagePayloadStorageServiceFactory(ObjectMapper objectMapper,
+      CephS3Factory cephS3Factory) {
+    return new MessagePayloadStorageServiceFactory(objectMapper, cephS3Factory);
   }
 
+  @Bean
+  @ConfigurationProperties(prefix = "storage.backend.redis")
+  public MessagePayloadRedisStorageConfiguration messagePayloadRedisStorageConfiguration() {
+    return new MessagePayloadRedisStorageConfiguration();
+  }
+
+  @Bean
+  public MessagePayloadStorageService messagePayloadStorageService(MessagePayloadStorageServiceFactory factory,
+      MessagePayloadRedisStorageConfiguration config) {
+    return factory.redisMessagePayloadStorageService(config);
+  }
 }

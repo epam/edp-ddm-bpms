@@ -17,25 +17,34 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.storage;
 
 import com.epam.digital.data.platform.integration.ceph.service.CephService;
+import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.service.FormDataStorageService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
  * The class represents an implementation of {@link JavaDelegate} that is used to get data from ceph
  * as string using {@link CephService} service.
+ *
+ * @deprecated because of form data storage migration from ceph to redis
  */
+@Deprecated
 @Slf4j
 @Component(GetContentFromCephDelegate.DELEGATE_NAME)
 public class GetContentFromCephDelegate extends BaseCephDelegate {
 
   public static final String DELEGATE_NAME = "getContentFromCephDelegate";
+  private final FormDataStorageService formDataStorageService;
+  private final ObjectMapper objectMapper;
 
-  public GetContentFromCephDelegate(@Value("${ceph.bucket}") String cephBucketName,
-      CephService cephService) {
-    super(cephBucketName, cephService);
+  public GetContentFromCephDelegate(FormDataStorageService formDataStorageService,
+      ObjectMapper objectMapper) {
+    this.formDataStorageService = formDataStorageService;
+    this.objectMapper = objectMapper;
   }
 
   @Override
@@ -43,14 +52,22 @@ public class GetContentFromCephDelegate extends BaseCephDelegate {
     var key = keyVariable.from(execution).get();
 
     log.debug("Start getting content by key {}", key);
-    var content = cephService.getAsString(cephBucketName, key).orElse(null);
+    var content = formDataStorageService.getFormData(key);
     log.debug("Got content by key {}", key);
 
-    contentVariable.on(execution).set(content);
+    contentVariable.on(execution).set(serializeFormData(content.orElse(null)));
   }
 
   @Override
   public String getDelegateName() {
     return DELEGATE_NAME;
+  }
+
+  private String serializeFormData(FormDataDto formDataDto) {
+    try {
+      return objectMapper.writeValueAsString(formDataDto);
+    } catch (JsonProcessingException e) {
+      throw new IllegalArgumentException("Couldn't serialize content", e);
+    }
   }
 }

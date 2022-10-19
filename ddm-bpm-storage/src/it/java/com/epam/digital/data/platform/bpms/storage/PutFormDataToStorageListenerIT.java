@@ -22,11 +22,11 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.junit.jupiter.api.Test;
 
-class PutFormDataToCephListenerIT extends BaseIT {
+class PutFormDataToStorageListenerIT extends BaseIT {
 
   @Test
   @Deployment(resources = "/bpmn/testPutFormDataListener.bpmn")
-  void testPutFormDataToCephListener() {
+  void testPutFormDataToStorageListener() {
     var taskDefKey = "user_task";
     var processInstance = runtimeService.startProcessInstanceByKey("testPutFormDataListener");
 

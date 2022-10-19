@@ -35,6 +35,17 @@ registry-rest-api:
 ceph:
   bucket: bucket
 
+storage:
+  form-data:
+    type: redis
+  message-payload:
+    type: redis
+  backend:
+    redis:
+      sentinel:
+        master: mymaster
+        nodes: 127.0.0.1:26379
+
 user-settings-service:
   url: http://localhost:8878/user-settings-mock-server
 excerpt-service-api:

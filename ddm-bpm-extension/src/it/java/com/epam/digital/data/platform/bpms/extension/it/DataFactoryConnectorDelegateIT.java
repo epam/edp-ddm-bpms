@@ -35,8 +35,6 @@ import com.epam.digital.data.platform.starter.errorhandling.exception.SystemExce
 import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
 import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.http.RequestMethod;
-import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import com.google.common.collect.ImmutableMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -321,7 +319,7 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
     var processInstance = runtimeService
         .startProcessInstanceByKey("testDataFactoryConnectorBatchCreateDelegate_key");
 
-    var cephKeyToken = cephKeyProvider
+    var cephKeyToken = formDataKeyProvider
         .generateKey("test_token", processInstance.getProcessInstanceId());
     formDataStorageService.putFormData(cephKeyToken, FormDataDto.builder().accessToken(validAccessToken)
         .data(new LinkedHashMap<>()).build());
@@ -375,7 +373,7 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
     var processInstance = runtimeService
         .startProcessInstanceByKey("testDataFactoryConnectorCreateDelegate_key");
 
-    var cephKeyToken = cephKeyProvider
+    var cephKeyToken = formDataKeyProvider
         .generateKey("test_token", processInstance.getProcessInstanceId());
     formDataStorageService.putFormData(cephKeyToken,
         FormDataDto.builder().accessToken(validAccessToken).data(new LinkedHashMap<>()).build());
@@ -401,7 +399,7 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
     var processInstance = runtimeService
         .startProcessInstanceByKey("testDataFactoryConnectorNestedCreateDelegate_key");
 
-    var cephKeyToken = cephKeyProvider
+    var cephKeyToken = formDataKeyProvider
         .generateKey("test_token", processInstance.getProcessInstanceId());
     formDataStorageService.putFormData(cephKeyToken,
         FormDataDto.builder().accessToken(validAccessToken)

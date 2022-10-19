@@ -26,6 +26,7 @@ livenessPath: "/actuator/health/liveness"
 officerConfigMountPath: "/app/config/registry-regulation/officer-roles"
 citizenConfigMountPath: "/app/config/registry-regulation/citizen-roles"
 trembitaConfigMountPath: "/app/config/registry-regulation/trembita-configuration"
+redisSecretsMountPath: "/app/secrets/redis"
 officerConfigMapName: officer-roles
 citizenConfigMapName: citizen-roles
 trembitaConfConfigmapName: trembita-configuration
@@ -86,10 +87,15 @@ deployProfile: prod
 
 storage:
   form-data:
-    type: ceph
+    type: redis
   message-payload:
-    type: ceph
+    type: redis
   backend:
+    redis:
+      password: ${REDIS_PASSWORD}
+      sentinel:
+        master: mymaster
+        nodes: ${redis.endpoint}
     ceph:
       http-endpoint: ${ceph.http-endpoint}
       access-key: ${ceph.access-key}
@@ -129,3 +135,6 @@ restTemplate:
   sslCheckingEnabled: false
 
 readSecretsRoleName: read-secrets-role
+
+redis:
+  secretName: redis-auth

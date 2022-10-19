@@ -34,6 +34,7 @@ import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
 import com.epam.digital.data.platform.storage.form.service.FormDataKeyProvider;
 import com.epam.digital.data.platform.storage.form.service.FormDataKeyProviderImpl;
 import com.epam.digital.data.platform.storage.form.service.FormDataStorageService;
+import com.epam.digital.data.platform.storage.message.service.MessagePayloadStorageService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -88,7 +89,9 @@ public abstract class BaseIT {
   protected TestCephServiceImpl cephService;
   @Inject
   protected FormDataStorageService formDataStorageService;
-  protected FormDataKeyProvider cephKeyProvider;
+  @Inject
+  protected MessagePayloadStorageService messagePayloadStorageService;
+  protected FormDataKeyProvider formDataKeyProvider;
   @Inject
   private AuthorizationService authorizationService;
   @Inject
@@ -131,12 +134,12 @@ public abstract class BaseIT {
     runtimeService.createProcessInstanceQuery().list().forEach(
         processInstance -> runtimeService
             .deleteProcessInstance(processInstance.getId(), "test clear"));
-    cephKeyProvider = new FormDataKeyProviderImpl();
+    formDataKeyProvider = new FormDataKeyProviderImpl();
   }
 
   protected void completeTask(String taskId, String processInstanceId, String formData) {
-    var cephKey = cephKeyProvider.generateKey(taskId, processInstanceId);
-    cephService.put(cephService.getCephBucketName(), cephKey, formData);
+    var storageKey = formDataKeyProvider.generateKey(taskId, processInstanceId);
+    formDataStorageService.putFormData(storageKey, deserializeFormData(formData));
     String id = taskService.createTaskQuery().taskDefinitionKey(taskId).singleResult().getId();
     taskService.complete(id);
   }
