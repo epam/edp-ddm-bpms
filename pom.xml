@@ -28,7 +28,7 @@
   </parent>
 
   <artifactId>ddm-bpm-parent</artifactId>
-  <version>1.7.2</version>
+  <version>1.8.0</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -49,7 +49,7 @@
     <groovy.version>3.0.6</groovy.version>
     <ddm-starter-actuator.version>1.6.0.1</ddm-starter-actuator.version>
     <ddm-starter-error-handler.version>1.6.0.4</ddm-starter-error-handler.version>
-    <ddm-starter-juel-function.version>1.7.0.2</ddm-starter-juel-function.version>
+    <ddm-starter-juel-function.version>1.8.0.1</ddm-starter-juel-function.version>
     <ddm-starter-localization.version>1.6.0.1</ddm-starter-localization.version>
     <ddm-starter-logging.version>1.6.0.1</ddm-starter-logging.version>
     <ddm-starter-security.version>1.6.0.3</ddm-starter-security.version>
@@ -65,6 +65,7 @@
     <embedded.database.spring-test.version>2.1.1</embedded.database.spring-test.version>
     <ddm-starter-notifications.version>1.6.0.1</ddm-starter-notifications.version>
     <ddm-notification-service-api.version>1.6.0.5</ddm-notification-service-api.version>
+    <embedded-redis.version>0.7.1</embedded-redis.version>
     <deployable.module>ddm-bpm</deployable.module>
 
     <!-- This property is set by jacoco and used in the surefire config
@@ -118,6 +119,12 @@
     <dependency>
       <artifactId>wiremock</artifactId>
       <groupId>com.github.tomakehurst</groupId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>it.ozimov</groupId>
+      <artifactId>embedded-redis</artifactId>
+      <version>${embedded-redis.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

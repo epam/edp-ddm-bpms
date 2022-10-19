@@ -24,6 +24,10 @@ import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableReadAccessor;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableWriteAccessor;
 import com.epam.digital.data.platform.integration.ceph.service.CephService;
+import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.service.FormDataStorageService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.LinkedHashMap;
 import java.util.Optional;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.junit.Before;
@@ -31,6 +35,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -42,9 +47,11 @@ public class GetContentFromCephDelegateTest {
   @InjectMocks
   private GetContentFromCephDelegate getContentFromCephDelegate;
   @Mock
-  private CephService cephService;
+  private FormDataStorageService formDataStorageService;
   @Mock
   private ExecutionEntity delegateExecution;
+  @Spy
+  private ObjectMapper objectMapper = new ObjectMapper();
 
   @Mock
   private NamedVariableAccessor<String> keyVariableAccessor;
@@ -58,7 +65,6 @@ public class GetContentFromCephDelegateTest {
 
   @Before
   public void setUp() {
-    ReflectionTestUtils.setField(getContentFromCephDelegate, "cephBucketName", CEPH_BUCKET_NAME);
     ReflectionTestUtils.setField(getContentFromCephDelegate, "keyVariable", keyVariableAccessor);
     ReflectionTestUtils.setField(getContentFromCephDelegate, "contentVariable",
         contentVariableAccessor);
@@ -69,11 +75,14 @@ public class GetContentFromCephDelegateTest {
 
   @Test
   public void execute() throws Exception {
+    LinkedHashMap<String, Object> data = new LinkedHashMap<>();
+    data.put("field", "value");
+    var content = FormDataDto.builder().data(data).build();
     when(keyVariableReadAccessor.get()).thenReturn("key");
-    when(cephService.getAsString(CEPH_BUCKET_NAME, "key")).thenReturn(Optional.of("someContent"));
+    when(formDataStorageService.getFormData("key")).thenReturn(Optional.of(content));
 
     getContentFromCephDelegate.execute(delegateExecution);
 
-    verify(contentVariableWriteAccessor).set("someContent");
+    verify(contentVariableWriteAccessor).set("{\"data\":{\"field\":\"value\"}}");
   }
 }

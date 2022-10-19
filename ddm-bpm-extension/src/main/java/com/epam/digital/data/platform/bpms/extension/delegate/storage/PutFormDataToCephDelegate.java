@@ -31,7 +31,10 @@ import org.springframework.stereotype.Component;
 /**
  * The class used to map {@link SpinJsonNode} to {@link FormDataDto} entity and put in storage using
  * {@link FormDataStorageService} service.
+ *
+ * @deprecated because of form data storage migration from ceph to redis
  */
+@Deprecated
 @Slf4j
 @Component(PutFormDataToCephDelegate.DELEGATE_NAME)
 public class PutFormDataToCephDelegate extends BaseFormDataDelegate {

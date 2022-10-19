@@ -62,7 +62,7 @@ public class AddLabBpmnIT extends BaseBpmnIT {
         .httpMethod(HttpMethod.POST)
         .resource("laboratory")
         .headers(Map.of("X-Access-Token", testUserToken, "X-Digital-Signature",
-            cephKeyProvider.generateKey("signLabFormActivity", processInstanceId)))
+            formDataKeyProvider.generateKey("signLabFormActivity", processInstanceId)))
         .requestBody("/json/add-lab/data-factory/addLabRequestBody.json")
         .response("{}")
         .build());

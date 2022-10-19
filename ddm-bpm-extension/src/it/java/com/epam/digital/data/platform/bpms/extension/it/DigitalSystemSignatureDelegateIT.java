@@ -57,7 +57,7 @@ public class DigitalSystemSignatureDelegateIT extends BaseIT {
     var processInstance = runtimeService
         .startProcessInstanceByKey("testDigitalSignatureConnectorDelegate_key");
 
-    var cephKey = cephKeyProvider
+    var cephKey = formDataKeyProvider
         .generateKey("testActivity", processInstance.getProcessInstanceId());
     formDataStorageService.putFormData(cephKey, FormDataDto.builder().accessToken(validAccessToken)
         .data(new LinkedHashMap<>()).build());

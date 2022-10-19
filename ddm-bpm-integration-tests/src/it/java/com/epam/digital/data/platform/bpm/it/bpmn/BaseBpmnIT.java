@@ -49,8 +49,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import javax.inject.Inject;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
@@ -92,7 +94,7 @@ public abstract class BaseBpmnIT extends BaseIT {
   @Value("${ceph.bucket}")
   protected String cephBucketName;
 
-  protected FormDataKeyProvider cephKeyProvider;
+  protected FormDataKeyProvider formDataKeyProvider;
 
   protected String testUserName = "testuser";
   protected String testUserToken;
@@ -103,7 +105,7 @@ public abstract class BaseBpmnIT extends BaseIT {
   public void init() {
     expectedVariablesMap.clear();
     testUserToken = TestUtils.getContent("/json/testuserAccessToken.json");
-    cephKeyProvider = new FormDataKeyProviderImpl();
+    formDataKeyProvider = new FormDataKeyProviderImpl();
     SecurityContextHolder.getContext().setAuthentication(
         new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
     CamundaAssertionUtil.setFromDataStorageService(formDataStorageService);
@@ -121,7 +123,7 @@ public abstract class BaseBpmnIT extends BaseIT {
 
   protected void completeTask(CompleteActivityDto completeActivityDto) {
     var activityDefinitionId = completeActivityDto.getActivityDefinitionId();
-    saveFormDataToCeph(completeActivityDto);
+    saveFormDataToStorage(completeActivityDto);
 
     var url = String.format("api/task/%s/complete", task(activityDefinitionId).getId());
     postForNoContent(url, "{}", completeActivityDto.getCompleterAccessToken());
@@ -131,19 +133,21 @@ public abstract class BaseBpmnIT extends BaseIT {
   protected Map<String, Map<String, List<Map<String, String>>>> completeTaskWithError(
       CompleteActivityDto completeActivityDto) throws JsonProcessingException {
     var activityDefinitionId = completeActivityDto.getActivityDefinitionId();
-    saveFormDataToCeph(completeActivityDto);
+    saveFormDataToStorage(completeActivityDto);
 
     var url = String.format("api/task/%s/complete", task(activityDefinitionId).getId());
     return (Map<String, Map<String, List<Map<String, String>>>>) postForObject(url, "{}", Map.class,
         completeActivityDto.getCompleterAccessToken());
   }
 
-  private void saveFormDataToCeph(CompleteActivityDto completeActivityDto) {
+  private void saveFormDataToStorage(CompleteActivityDto completeActivityDto) {
     var activityDefinitionId = completeActivityDto.getActivityDefinitionId();
     var processInstanceId = completeActivityDto.getProcessInstanceId();
-    var cephKey = cephKeyProvider.generateKey(activityDefinitionId, processInstanceId);
-    cephService.put(cephBucketName, cephKey,
-        TestUtils.getContent(completeActivityDto.getExpectedFormData()));
+    var content = TestUtils.getContent(completeActivityDto.getExpectedFormData());
+
+    var formData = StringUtils.isBlank(content) ? new FormDataDto()
+        : deserializeFormData(content);
+    formDataStorageService.putFormData(activityDefinitionId, processInstanceId, formData);
   }
 
   protected void stubDataFactoryRequest(StubData data) {
@@ -324,7 +328,8 @@ public abstract class BaseBpmnIT extends BaseIT {
 
   @SneakyThrows
   private void assertSignature(String systemSignatureCephKey, String cephContent) {
-    var signature = cephService.getAsString(cephBucketName, systemSignatureCephKey);
+    var signature = Optional.of(objectMapper.writeValueAsString(
+        formDataStorageService.getFormData(systemSignatureCephKey)));
     Assertions.assertThat(signature).isNotEmpty();
 
     var signatureMap = objectMapper.readerForMapOf(Object.class).readValue(signature.get());
