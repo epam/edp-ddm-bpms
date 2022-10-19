@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertT
 
 import com.epam.digital.data.platform.dataaccessor.sysvar.CallerProcessInstanceIdVariable;
 import com.epam.digital.data.platform.dataaccessor.sysvar.StartMessagePayloadStorageKeyVariable;
+import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -30,6 +31,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 class StartProcessByMessageDelegateIT extends BaseIT {
 
   @Test
+  @SneakyThrows
   @Deployment(resources = "bpmn/delegate/startProcessByMessageDelegate.bpmn")
   void startBpByMessage() throws JSONException {
     var sendMessage = runtimeService
@@ -60,10 +62,12 @@ class StartProcessByMessageDelegateIT extends BaseIT {
         .extracting(HistoricVariableInstance::getValue)
         .asString().startsWith("process-definition/receiveMessage/start-message/");
 
-    Assertions.assertThat(cephService.getStorage())
-        .containsKey((String) messagePayload.getValue());
-    JSONAssert.assertEquals(
-        cephService.getStorage().get((String) messagePayload.getValue()).toString(),
-        "{\"data\":{\"payloadPart\":\"payloadPartValue\"}}", true);
+    Assertions.assertThat(messagePayloadStorageService.getMessagePayload(
+        (String) messagePayload.getValue())).isPresent();
+
+    var actual = objectMapper.writeValueAsString(
+        messagePayloadStorageService.getMessagePayload((String) messagePayload.getValue()).get());
+    JSONAssert.assertEquals("{\"data\":{\"payloadPart\":\"payloadPartValue\"}}",
+        actual, true);
   }
 }

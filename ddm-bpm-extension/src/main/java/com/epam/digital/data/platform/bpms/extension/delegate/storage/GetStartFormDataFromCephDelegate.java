@@ -29,7 +29,10 @@ import org.springframework.stereotype.Component;
  * The class used to get {@link FormDataDto} entity from storage using {@link FormDataStorageService}
  * service for start form, map the formData to {@link org.camunda.spin.json.SpinJsonNode} and return
  * it.
+ *
+ * @deprecated because of form data storage migration from ceph to redis
  */
+@Deprecated
 @Slf4j
 @Component(GetStartFormDataFromCephDelegate.DELEGATE_NAME)
 public class GetStartFormDataFromCephDelegate extends BaseFormDataDelegate {

@@ -27,7 +27,6 @@ import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResul
 import java.io.IOException;
 import java.util.Map;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.junit.Test;
 import org.springframework.http.HttpMethod;
 
@@ -57,7 +56,7 @@ public class UpdateDictBpmnIT extends BaseBpmnIT {
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
-        .headers(Map.of("X-Access-Token", testUserToken, "X-Digital-Signature", cephKeyProvider
+        .headers(Map.of("X-Access-Token", testUserToken, "X-Digital-Signature", formDataKeyProvider
             .generateKey("Activity_update-dict-bp-sign-add-name", processInstanceId)))
         .resource("factor")
         .requestBody("/json/update-dict/data-factory/factorRequestBody.json")
