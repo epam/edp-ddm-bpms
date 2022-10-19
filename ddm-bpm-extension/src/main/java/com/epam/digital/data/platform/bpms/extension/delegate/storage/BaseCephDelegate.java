@@ -28,9 +28,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public abstract class BaseCephDelegate extends BaseJavaDelegate {
 
-  protected final String cephBucketName;
-  protected final CephService cephService;
-
   @SystemVariable(name = "key")
   protected NamedVariableAccessor<String> keyVariable;
   @SystemVariable(name = "content", isTransient = true)

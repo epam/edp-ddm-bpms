@@ -32,28 +32,26 @@ class FormDataCleanerEndEventListenerIT extends BaseIT {
   @Test
   @Deployment(resources = "bpmn/start_form_data_cleaner_listener.bpmn")
   void shouldDeleteStartFormDataTest() {
-    var cephKey = "process-definition/processDefinitionId/start-form/randomUUID";
+    var storageKey = "process-definition/processDefinitionId/start-form/randomUUID";
     var data = new LinkedHashMap<String, Object>();
     data.put("name", "TestName");
     var formData = FormDataDto.builder()
         .data(data)
         .build();
     Map<String, Object> vars = Map.of(StartFormCephKeyVariable.START_FORM_CEPH_KEY_VARIABLE_NAME,
-        cephKey);
+        storageKey);
 
     var processInstance = runtimeService
         .startProcessInstanceByKey("startFormDataCleanerListenerKey", vars);
     var taskId = taskService.createTaskQuery().taskDefinitionKey("startFormDataCleanerListenerId")
         .singleResult().getId();
 
-    formDataStorageService.putFormData(cephKey, formData);
-
-    assertThat(cephService.getStorage()).hasSize(1);
+    formDataStorageService.putFormData(storageKey, formData);
 
     taskService.complete(taskId);
 
     BpmnAwareTests.assertThat(processInstance).isEnded();
-    assertThat(cephService.getStorage()).isEmpty();
+    assertThat(formDataStorageService.getFormData(storageKey)).isEmpty();
   }
 
   @Test
@@ -84,12 +82,14 @@ class FormDataCleanerEndEventListenerIT extends BaseIT {
     var key2 = String.format("process/%s/task/%s", processInstance.getId(), secondTaskDefinitionId);
     formDataStorageService.putFormData(key2, formData2);
 
-    Assertions.assertThat(cephService.getStorage()).hasSize(2);
+    Assertions.assertThat(formDataStorageService.getFormData(key)).isPresent();
+    Assertions.assertThat(formDataStorageService.getFormData(key2)).isPresent();
 
     taskService.complete(secondTaskId);
 
     BpmnAwareTests.assertThat(processInstance).isEnded();
-    Assertions.assertThat(cephService.getStorage()).isEmpty();
+    assertThat(formDataStorageService.getFormData(key)).isEmpty();
+    assertThat(formDataStorageService.getFormData(key2)).isEmpty();
   }
 
   @Test
@@ -102,13 +102,13 @@ class FormDataCleanerEndEventListenerIT extends BaseIT {
     var storageKey = formDataKeyProvider.generateSystemSignatureKey(processInstanceId,
         processInstanceId);
     formDataStorageService.putFormData(storageKey, FormDataDto.builder().build());
-    assertThat(cephService.getStorage()).hasSize(1);
+    assertThat(formDataStorageService.getFormData(storageKey)).isPresent();
 
     var taskId = taskService.createTaskQuery().taskDefinitionKey("Activity_1")
         .singleResult().getId();
     taskService.complete(taskId);
 
     BpmnAwareTests.assertThat(processInstance).isEnded();
-    assertThat(cephService.getStorage()).isEmpty();
+    assertThat(formDataStorageService.getFormData(storageKey)).isEmpty();
   }
 }

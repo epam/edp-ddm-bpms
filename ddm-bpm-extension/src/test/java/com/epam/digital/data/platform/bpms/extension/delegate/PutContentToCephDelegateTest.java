@@ -63,7 +63,6 @@ public class PutContentToCephDelegateTest {
 
   @Before
   public void setUp() {
-    ReflectionTestUtils.setField(putContentToCephDelegate, "cephBucketName", CEPH_BUCKET_NAME);
     ReflectionTestUtils.setField(putContentToCephDelegate, "keyVariable", keyVariableAccessor);
     ReflectionTestUtils.setField(putContentToCephDelegate, "contentVariable",
         contentVariableAccessor);

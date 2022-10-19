@@ -16,7 +16,6 @@
 
 package com.epam.digital.data.platform.bpms.storage;
 
-import com.epam.digital.data.platform.bpms.storage.config.TestCephServiceImpl;
 import com.epam.digital.data.platform.storage.file.service.FormDataFileStorageService;
 import com.epam.digital.data.platform.storage.form.service.FormDataKeyProvider;
 import com.epam.digital.data.platform.storage.form.service.FormDataKeyProviderImpl;
@@ -25,7 +24,6 @@ import com.epam.digital.data.platform.storage.message.service.MessagePayloadStor
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,8 +41,6 @@ public abstract class BaseIT {
   @Autowired
   protected TaskService taskService;
   @Autowired
-  protected TestCephServiceImpl cephService;
-  @Autowired
   protected FormDataStorageService formDataStorageService;
   @Autowired
   protected FormDataFileStorageService formDataFileStorageService;
@@ -54,9 +50,4 @@ public abstract class BaseIT {
 
   @Autowired
   protected WireMockServer digitalDocumentService;
-
-  @BeforeEach
-  void setup() {
-    cephService.clearStorage();
-  }
 }

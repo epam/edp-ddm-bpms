@@ -91,7 +91,7 @@ public class CitizenUpdatePersonnelBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.PUT)
         .headers(Map.of("X-Access-Token", testUserToken, "X-Digital-Signature",
-            cephKeyProvider
+            formDataKeyProvider
                 .generateKey("signUpdatedCitizenPersonnelFormActivity", processInstanceId)))
         .resource("staff")
         .resourceId("02e68684-1335-47f0-9bd6-17d937267527")
