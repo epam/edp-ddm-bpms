@@ -290,4 +290,13 @@ public abstract class BaseIT {
                 .withHeader("Content-type", "application/json")
                 .withBody(convertJsonToString(responseBody)))));
   }
+
+  protected void mockKeycloakSearchUsersByAttributes(String realm, String requestBody, String responseBody) {
+    keycloakMockServer.addStubMapping(
+        stubFor(post(urlPathEqualTo(String.format("/auth/realms/%s/users/search-by-attributes", realm)))
+            .withRequestBody(equalToJson(requestBody))
+            .willReturn(aResponse().withStatus(200)
+                .withHeader("Content-type", "application/json")
+                .withBody(convertJsonToString(responseBody)))));
+  }
 }

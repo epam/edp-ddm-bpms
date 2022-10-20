@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1a2evkt" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.12.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:process id="test_start_with" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_19v8tpi</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_19v8tpi" sourceRef="StartEvent_1" targetRef="Activity_1o5urm3" />
+    <bpmn:sequenceFlow id="Flow_09t1onf" sourceRef="Activity_0agbv0p" targetRef="Activity_0j9edic" />
+    <bpmn:endEvent id="Event_12mxjwd">
+      <bpmn:incoming>Flow_1q8gkix</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1q8gkix" sourceRef="Activity_0j9edic" targetRef="Event_12mxjwd" />
+    <bpmn:serviceTask id="Activity_0agbv0p" name="Get users" camunda:modelerTemplate="keycloakGetOfficerUsersByAttributesEqualsAndStartWith" camunda:delegateExpression="${keycloakGetOfficerUsersByAttributesEqualsAndStartWith}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="attributesEquals">${attributesEquals}</camunda:inputParameter>
+          <camunda:inputParameter name="attributesStartWith">${attributesStartsWith}</camunda:inputParameter>
+          <camunda:outputParameter name="usersByAttributes">${ usersByAttribute }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0x5i7sn</bpmn:incoming>
+      <bpmn:outgoing>Flow_09t1onf</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Activity_0j9edic" name="assert" scriptFormat="groovy">
+      <bpmn:incoming>Flow_09t1onf</bpmn:incoming>
+      <bpmn:outgoing>Flow_1q8gkix</bpmn:outgoing>
+      <bpmn:script>assert usersByAttributes.get(0).userName.equals('testUser123')</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_0x5i7sn" sourceRef="Activity_1o5urm3" targetRef="Activity_0agbv0p" />
+    <bpmn:scriptTask id="Activity_1o5urm3" name="prepare data" scriptFormat="groovy">
+      <bpmn:incoming>Flow_19v8tpi</bpmn:incoming>
+      <bpmn:outgoing>Flow_0x5i7sn</bpmn:outgoing>
+      <bpmn:script>def attributesEquals = [
+  'edrpou': '12345678'
+]
+def attributesStartsWith = [
+  'KATOTTG': ['UA03']
+]
+execution.setVariable('attributesEquals', attributesEquals)
+execution.setVariable('attributesStartsWith', attributesStartsWith)</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="test_start_with">
+      <bpmndi:BPMNEdge id="Flow_19v8tpi_di" bpmnElement="Flow_19v8tpi">
+        <di:waypoint x="198" y="117" />
+        <di:waypoint x="240" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_09t1onf_di" bpmnElement="Flow_09t1onf">
+        <di:waypoint x="490" y="117" />
+        <di:waypoint x="530" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1q8gkix_di" bpmnElement="Flow_1q8gkix">
+        <di:waypoint x="630" y="117" />
+        <di:waypoint x="692" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0x5i7sn_di" bpmnElement="Flow_0x5i7sn">
+        <di:waypoint x="340" y="117" />
+        <di:waypoint x="390" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_12mxjwd_di" bpmnElement="Event_12mxjwd">
+        <dc:Bounds x="692" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0hfx6pt_di" bpmnElement="Activity_0j9edic">
+        <dc:Bounds x="530" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_03huefr_di" bpmnElement="Activity_0agbv0p">
+        <dc:Bounds x="390" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="162" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1pig8yc_di" bpmnElement="Activity_1o5urm3">
+        <dc:Bounds x="240" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
