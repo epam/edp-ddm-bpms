@@ -49,36 +49,52 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Release.Namespace .Values.keycloak.officerClient.realm }}
 {{- end -}}
 
-{{- define "keycloak.host" -}}
-{{- if .Values.keycloak.customHost }}
-{{- .Values.keycloak.customHost }}
-{{- else }}
-{{- .Values.keycloak.host }}
-{{- end }}
+{{- define "keycloak.url" -}}
+{{- printf "%s%s" "https://" .Values.keycloak.host }}
 {{- end -}}
 
-{{- define "keycloak.url" -}}
-{{- printf "%s%s" "https://" (include "keycloak.host" .) }}
+{{- define "keycloak.customUrl" -}}
+{{- printf "%s%s" "https://" .Values.keycloak.customHost }}
 {{- end -}}
 
 {{- define "keycloak.urlPrefix" -}}
 {{- printf "%s%s%s" (include "keycloak.url" .) "/auth/realms/" .Release.Namespace -}}
 {{- end -}}
 
+{{- define "keycloak.customUrlPrefix" -}}
+{{- printf "%s%s%s" (include "keycloak.customUrl" .) "/auth/realms/" .Release.Namespace -}}
+{{- end -}}
+
 {{- define "issuer.officer" -}}
+{{- if .Values.keycloak.customHost }}
+{{- printf "%s-%s" (include "keycloak.customUrlPrefix" .) .Values.keycloak.officerClient.realm -}}
+{{- else }}
 {{- printf "%s-%s" (include "keycloak.urlPrefix" .) .Values.keycloak.officerClient.realm -}}
+{{- end }}
 {{- end -}}
 
 {{- define "issuer.citizen" -}}
+{{- if .Values.keycloak.customHost }}
+{{- printf "%s-%s" (include "keycloak.customUrlPrefix" .) .Values.keycloak.citizenClient.realm -}}
+{{- else }}
 {{- printf "%s-%s" (include "keycloak.urlPrefix" .) .Values.keycloak.citizenClient.realm -}}
+{{- end }}
 {{- end -}}
 
 {{- define "issuer.admin" -}}
+{{- if .Values.keycloak.customHost }}
+{{- printf "%s-%s" (include "keycloak.customUrlPrefix" .) .Values.keycloak.realms.admin -}}
+{{- else }}
 {{- printf "%s-%s" (include "keycloak.urlPrefix" .) .Values.keycloak.realms.admin -}}
+{{- end }}
 {{- end -}}
 
 {{- define "issuer.external" -}}
+{{- if .Values.keycloak.customHost }}
+{{- printf "%s-%s" (include "keycloak.customUrlPrefix" .) .Values.keycloak.realms.external -}}
+{{- else }}
 {{- printf "%s-%s" (include "keycloak.urlPrefix" .) .Values.keycloak.realms.external -}}
+{{- end }}
 {{- end -}}
 
 {{- define "jwksUri.officer" -}}
