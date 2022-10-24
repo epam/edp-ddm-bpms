@@ -168,6 +168,8 @@ spec:
             mountPath: {{ .Values.trembitaConfigMountPath }}
           - name: {{ .Chart.Name }}-redis-credentials
             mountPath: {{ .Values.redisSecretsMountPath }}
+          - name: {{ .Values.trembitaRegistriesSecretsName }}
+            mountPath: {{ .Values.trembitaRegistriesSecretsPath }}
       serviceAccountName: {{ .Chart.Name }}
       {{- if .Values.nodeSelector }}
       nodeSelector: {{ toYaml .Values.nodeSelector | nindent 8 }}
@@ -248,3 +250,9 @@ spec:
         - name: update-history-level-configmap
           configMap:
             name: update-history-level-configmap
+        - name: {{ .Values.trembitaRegistriesSecretsName }}
+          secret:
+            secretName: {{ .Values.trembitaRegistriesSecretsName }}
+            items:
+              - key: trembita.registries.edr-registry.auth.secret.token
+                path: trembita-exchange-gateway.registries.edr-registry.authorization-token

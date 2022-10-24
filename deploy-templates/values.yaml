@@ -43,6 +43,8 @@ redisSecretsMountPath: "/app/secrets/redis"
 officerConfigMapName: officer-roles
 citizenConfigMapName: citizen-roles
 trembitaConfConfigmapName: trembita-configuration
+trembitaRegistriesSecretsName: trembita-registries-secrets
+trembitaRegistriesSecretsPath: "/app/secrets/trembita-registries-secrets"
 
 db:
   url: citus-master
