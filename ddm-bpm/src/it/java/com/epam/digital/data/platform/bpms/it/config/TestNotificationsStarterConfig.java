@@ -16,7 +16,7 @@
 
 package com.epam.digital.data.platform.bpms.it.config;
 
-import com.epam.digital.data.platform.starter.notifications.facade.NotificationFacade;
+import com.epam.digital.data.platform.starter.notifications.facade.UserNotificationFacade;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +27,7 @@ public class TestNotificationsStarterConfig {
 
     @Bean
     @Primary
-    public NotificationFacade notificationFacade() {
-        return Mockito.mock(NotificationFacade.class);
+    public UserNotificationFacade notificationFacade() {
+        return Mockito.mock(UserNotificationFacade.class);
     }
 }
