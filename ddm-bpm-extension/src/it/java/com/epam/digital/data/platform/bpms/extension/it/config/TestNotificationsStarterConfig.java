@@ -17,7 +17,7 @@
 package com.epam.digital.data.platform.bpms.extension.it.config;
 
 import com.epam.digital.data.platform.bpms.extension.delegate.notification.SendUserNotificationDelegate;
-import com.epam.digital.data.platform.starter.notifications.facade.NotificationFacade;
+import com.epam.digital.data.platform.starter.notifications.facade.UserNotificationFacade;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,13 +28,13 @@ public class TestNotificationsStarterConfig {
 
     @Bean
     @Primary
-    public NotificationFacade notificationFacade() {
-        return Mockito.mock(NotificationFacade.class);
+    public UserNotificationFacade notificationFacade() {
+        return Mockito.mock(UserNotificationFacade.class);
     }
 
     @Bean(name = SendUserNotificationDelegate.DELEGATE_NAME)
     public SendUserNotificationDelegate sendUserNotificationDelegate(
-        NotificationFacade notificationFacade) {
+        UserNotificationFacade notificationFacade) {
         return new SendUserNotificationDelegate(notificationFacade);
     }
 }

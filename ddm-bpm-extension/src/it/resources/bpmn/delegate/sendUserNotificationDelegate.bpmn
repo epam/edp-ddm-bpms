@@ -7,10 +7,10 @@
     <bpmn:sendTask id="send_exerpt_notification" name="Send User Notification" camunda:modelerTemplate="sendUserNotification" camunda:delegateExpression="${sendUserNotificationDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="notificationRecipient">${initiator().userName}</camunda:inputParameter>
           <camunda:inputParameter name="notificationSubject">Excerpt successfully generated</camunda:inputParameter>
           <camunda:inputParameter name="notificationTemplate">specific_exerpt_generated</camunda:inputParameter>
           <camunda:inputParameter name="notificationTemplateModel">${templateModel}</camunda:inputParameter>
+          <camunda:inputParameter name="notificationRecipient">testuser</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0u05j4q</bpmn:incoming>
@@ -36,6 +36,10 @@ set_transient_variable('templateModel', S(templateModel, 'application/json'))
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="sendUserNotificationDelegate_key">
+      <bpmndi:BPMNEdge id="Flow_0u05j4q_di" bpmnElement="Flow_0u05j4q">
+        <di:waypoint x="340" y="107" />
+        <di:waypoint x="370" y="107" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_13ranlf_di" bpmnElement="Flow_13ranlf">
         <di:waypoint x="470" y="107" />
         <di:waypoint x="502" y="107" />
@@ -43,10 +47,6 @@ set_transient_variable('templateModel', S(templateModel, 'application/json'))
       <bpmndi:BPMNEdge id="Flow_18kqrtx_di" bpmnElement="Flow_18kqrtx">
         <di:waypoint x="215" y="107" />
         <di:waypoint x="240" y="107" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0u05j4q_di" bpmnElement="Flow_0u05j4q">
-        <di:waypoint x="340" y="107" />
-        <di:waypoint x="370" y="107" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
         <dc:Bounds x="179" y="89" width="36" height="36" />
