@@ -23,9 +23,11 @@ import com.epam.digital.data.platform.bpms.extension.delegate.notification.SendU
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableReadAccessor;
 import com.epam.digital.data.platform.notification.dto.NotificationContextDto;
-import com.epam.digital.data.platform.notification.dto.NotificationDto;
-import com.epam.digital.data.platform.notification.dto.NotificationRecordDto;
-import com.epam.digital.data.platform.starter.notifications.facade.NotificationFacade;
+import com.epam.digital.data.platform.notification.dto.Recipient;
+import com.epam.digital.data.platform.notification.dto.UserNotificationDto;
+import com.epam.digital.data.platform.notification.dto.UserNotificationMessageDto;
+import com.epam.digital.data.platform.starter.notifications.facade.UserNotificationFacade;
+import java.util.List;
 import java.util.Map;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -68,7 +70,7 @@ class SendUserNotificationDelegateTest {
   private NamedVariableReadAccessor<SpinJsonNode> templateModelVariableReadAccessor;
 
   @Mock
-  private NotificationFacade notificationFacade;
+  private UserNotificationFacade notificationFacade;
 
   @Mock
   private ProcessDefinitionEntity processDefinitionEntity;
@@ -108,7 +110,11 @@ class SendUserNotificationDelegateTest {
 
     sendUserNotificationDelegate.execute(execution);
 
-    var notificationRecordDto = NotificationRecordDto.builder()
+    var notificationRecordDto = UserNotificationMessageDto.builder()
+        .recipients(List.of(Recipient.builder()
+            .parameters(Map.of("key", "value"))
+            .id("recipient")
+            .build()))
         .context(NotificationContextDto.builder()
             .system("Low-code Platform")
             .businessActivity("Activity_1")
@@ -117,11 +123,10 @@ class SendUserNotificationDelegateTest {
             .businessProcess("add-lab")
             .businessProcessDefinitionId("add-lab:5:ac2dfa60-bbe2-11ec-8421-0a58")
             .build())
-        .notification(NotificationDto.builder()
-            .templateModel(Map.of("key", "value"))
-            .recipient("recipient")
-            .subject("subject")
-            .template("template")
+        .notification(UserNotificationDto.builder()
+            .ignoreChannelPreferences(false)
+            .templateName("template")
+            .title("subject")
             .build())
         .build();
 

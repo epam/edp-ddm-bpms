@@ -17,8 +17,8 @@
 package com.epam.digital.data.platform.bpms.extension.config;
 
 import com.epam.digital.data.platform.bpms.extension.delegate.notification.SendUserNotificationDelegate;
-import com.epam.digital.data.platform.starter.notifications.facade.KafkaNotificationFacade;
-import com.epam.digital.data.platform.starter.notifications.facade.NotificationFacade;
+import com.epam.digital.data.platform.starter.notifications.facade.UserKafkaNotificationFacade;
+import com.epam.digital.data.platform.starter.notifications.facade.UserNotificationFacade;
 import com.epam.digital.data.platform.starter.notifications.producer.NotificationProducer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -36,14 +36,14 @@ public class NotificationConfig {
   }
 
   @Bean
-  @ConditionalOnMissingBean(NotificationFacade.class)
-  public NotificationFacade notificationFacade(NotificationProducer notificationProducer) {
-    return new KafkaNotificationFacade(notificationProducer);
+  @ConditionalOnMissingBean(UserNotificationFacade.class)
+  public UserNotificationFacade notificationFacade(NotificationProducer notificationProducer) {
+    return new UserKafkaNotificationFacade(notificationProducer);
   }
 
   @Bean(name = SendUserNotificationDelegate.DELEGATE_NAME)
   public SendUserNotificationDelegate sendUserNotificationDelegate(
-      NotificationFacade notificationFacade) {
+      UserNotificationFacade notificationFacade) {
     return new SendUserNotificationDelegate(notificationFacade);
   }
 }

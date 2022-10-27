@@ -20,9 +20,11 @@ import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.notification.dto.NotificationContextDto;
-import com.epam.digital.data.platform.notification.dto.NotificationDto;
-import com.epam.digital.data.platform.notification.dto.NotificationRecordDto;
-import com.epam.digital.data.platform.starter.notifications.facade.NotificationFacade;
+import com.epam.digital.data.platform.notification.dto.Recipient;
+import com.epam.digital.data.platform.notification.dto.UserNotificationDto;
+import com.epam.digital.data.platform.notification.dto.UserNotificationMessageDto;
+import com.epam.digital.data.platform.starter.notifications.facade.UserNotificationFacade;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +37,7 @@ import org.springframework.beans.factory.annotation.Value;
 public class SendUserNotificationDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "sendUserNotificationDelegate";
-  private final NotificationFacade notificationFacade;
+  private final UserNotificationFacade notificationFacade;
   @SystemVariable(name = "notificationRecipient", isTransient = true)
   protected NamedVariableAccessor<String> notificationRecipientVariable;
   @SystemVariable(name = "notificationSubject", isTransient = true)
@@ -56,8 +58,11 @@ public class SendUserNotificationDelegate extends BaseJavaDelegate {
     var notificationTemplateModel = (Map<String, Object>) Objects.requireNonNull(
         notificationTemplateModelVariable.from(execution).get()).mapTo(Map.class);
 
-    var notificationRecordDto = NotificationRecordDto
-        .builder()
+    var notificationMessage = UserNotificationMessageDto.builder()
+        .recipients(List.of(Recipient.builder()
+            .parameters(notificationTemplateModel)
+            .id(notificationRecipient)
+            .build()))
         .context(NotificationContextDto.builder()
             .system("Low-code Platform")
             .application(springAppName)
@@ -67,15 +72,14 @@ public class SendUserNotificationDelegate extends BaseJavaDelegate {
             .businessProcess(((ExecutionEntity) execution).getProcessDefinition().getKey())
             .businessProcessDefinitionId(execution.getProcessDefinitionId())
             .build())
-        .notification(NotificationDto.builder()
-            .recipient(notificationRecipient)
-            .subject(notificationSubject)
-            .template(notificationTemplate)
-            .templateModel(notificationTemplateModel)
+        .notification(UserNotificationDto.builder()
+            .ignoreChannelPreferences(false)
+            .templateName(notificationTemplate)
+            .title(notificationSubject)
             .build())
         .build();
 
-    notificationFacade.sendNotification(notificationRecordDto);
+    notificationFacade.sendNotification(notificationMessage);
   }
 
   @Override
