@@ -17,12 +17,10 @@
 package com.epam.digital.data.platform.bpms.extension.it;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
-import com.epam.digital.data.platform.notification.dto.NotificationDto;
-import com.epam.digital.data.platform.notification.dto.NotificationRecordDto;
-import com.epam.digital.data.platform.starter.notifications.facade.NotificationFacade;
+import com.epam.digital.data.platform.notification.dto.UserNotificationMessageDto;
+import com.epam.digital.data.platform.starter.notifications.facade.UserNotificationFacade;
 import java.util.Map;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
@@ -33,10 +31,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class SendUserNotificationDelegateIT extends BaseIT {
 
   @Autowired
-  private NotificationFacade notificationFacade;
+  private UserNotificationFacade notificationFacade;
 
   @Captor
-  private ArgumentCaptor<NotificationRecordDto> notificationRecordCaptor;
+  private ArgumentCaptor<UserNotificationMessageDto> notificationRecordCaptor;
 
   @Test
   @Deployment(resources = "bpmn/delegate/sendUserNotificationDelegate.bpmn")
@@ -45,15 +43,20 @@ public class SendUserNotificationDelegateIT extends BaseIT {
         .startProcessInstanceByKey("sendUserNotificationDelegate_key");
 
     verify(notificationFacade).sendNotification(notificationRecordCaptor.capture());
-    assertEquals(createNotification(), notificationRecordCaptor.getValue().getNotification());
-    assertThat(processInstance.isEnded()).isTrue();
-  }
+    var actual = notificationRecordCaptor.getValue();
+    assertThat(actual.getRecipients().get(0).getParameters()).isEqualTo(Map.of("name", "John"));
+    assertThat(actual.getRecipients().get(0).getId()).isEqualTo("testuser");
+    assertThat(actual.getContext().getSystem()).isEqualTo("Low-code Platform");
+    assertThat(actual.getContext().getBusinessActivity()).isEqualTo("send_exerpt_notification");
+    assertThat(actual.getContext().getBusinessProcessInstanceId()).isEqualTo(
+        processInstance.getId());
+    assertThat(actual.getContext().getBusinessProcessDefinitionId()).isEqualTo(
+        processInstance.getProcessDefinitionId());
+    assertThat(actual.getContext().getBusinessProcess()).isEqualTo(
+        "sendUserNotificationDelegate_key");
+    assertThat(actual.getNotification().getTemplateName()).isEqualTo("specific_exerpt_generated");
+    assertThat(actual.getNotification().getTitle()).isEqualTo("Excerpt successfully generated");
 
-  private NotificationDto createNotification() {
-    return NotificationDto.builder()
-        .templateModel(Map.of("name", "John"))
-        .subject("Excerpt successfully generated")
-        .template("specific_exerpt_generated")
-        .build();
+    assertThat(processInstance.isEnded()).isTrue();
   }
 }
