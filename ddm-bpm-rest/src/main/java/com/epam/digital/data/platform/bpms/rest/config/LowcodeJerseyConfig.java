@@ -19,6 +19,7 @@ package com.epam.digital.data.platform.bpms.rest.config;
 import com.epam.digital.data.platform.bpms.rest.controller.ProcessDefinitionController;
 import com.epam.digital.data.platform.bpms.rest.controller.ProcessInstanceController;
 import com.epam.digital.data.platform.bpms.rest.controller.TaskController;
+import com.epam.digital.data.platform.bpms.rest.exception.mapper.CamundaForbiddenOperationExceptionMapper;
 import com.epam.digital.data.platform.bpms.rest.exception.mapper.CamundaRestExceptionMapper;
 import com.epam.digital.data.platform.bpms.rest.exception.mapper.CamundaSystemExceptionMapper;
 import com.epam.digital.data.platform.bpms.rest.exception.mapper.ConstraintViolationExceptionMapper;
@@ -55,5 +56,6 @@ public class LowcodeJerseyConfig extends CamundaJerseyResourceConfig {
     register(TaskAlreadyInCompletionExceptionMapper.class);
     register(KeycloakExceptionMapper.class);
     register(ConstraintViolationExceptionMapper.class);
+    register(CamundaForbiddenOperationExceptionMapper.class);
   }
 }
