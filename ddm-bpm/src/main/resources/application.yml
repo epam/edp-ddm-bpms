@@ -25,6 +25,9 @@ data-platform:
   kafka:
     producer:
       enabled: true
+      custom-config:
+        "[transactional.id]": tx-
+        "[enable.idempotence]": true
     topic-properties:
       creation:
         enabled: true
