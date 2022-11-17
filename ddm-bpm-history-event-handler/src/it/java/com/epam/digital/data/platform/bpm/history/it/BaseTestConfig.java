@@ -21,8 +21,10 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
+import com.epam.digital.data.platform.bpms.extension.delegate.UserDataValidationErrorDelegate;
 import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
 import com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.springframework.beans.factory.config.CustomScopeConfigurer;
@@ -57,5 +59,10 @@ public class BaseTestConfig {
     doReturn(Optional.of(impersonation)).when(factory).getCamundaImpersonation();
 
     return factory;
+  }
+
+  @Bean
+  public UserDataValidationErrorDelegate userDataValidationErrorDelegate() {
+    return new UserDataValidationErrorDelegate(new ObjectMapper());
   }
 }
