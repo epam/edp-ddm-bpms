@@ -59,8 +59,9 @@
     <process-history-model.version>1.6.0.1</process-history-model.version>
     <ddm-starter-kafka.version>1.6.0.2</ddm-starter-kafka.version>
     <p6spy-spring-boot-starter.version>1.7.1</p6spy-spring-boot-starter.version>
+    <spring-security-core.version>5.7.5</spring-security-core.version>
     <dso.version>1.4.5</dso.version>
-    <log4j.version>2.17.0</log4j.version>
+    <log4j.version>2.19.0</log4j.version>
     <zonky.embedded.postgres.version>1.3.1</zonky.embedded.postgres.version>
     <embedded.database.spring-test.version>2.1.1</embedded.database.spring-test.version>
     <ddm-starter-notifications.version>1.6.0.4</ddm-starter-notifications.version>
@@ -75,6 +76,11 @@
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-core</artifactId>
+        <version>${spring-security-core.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-api</artifactId>
