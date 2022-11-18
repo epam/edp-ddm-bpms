@@ -167,14 +167,32 @@ public class KeycloakConnectorDelegateIT extends BaseIT {
   }
 
   @Test
-  @Deployment(resources = "bpmn/connector/getKeycloakCitizenUsersByAttribute.bpmn")
-  public void testGeyCitizenUsersFromKeycloakByAttributes() {
+  @Deployment(resources = "bpmn/connector/getKeycloakCitizenUsersByAttributeEdrpou.bpmn")
+  public void testGeyCitizenUsersFromKeycloakByAttributesEdrpou() {
     var requestAttributes = "{\"attributes\":{\"edrpou\":\"12345678\"}}";
     mockConnectToKeycloak(citizenRealm);
     mockKeycloakGetUsersByAttributes(citizenRealm, requestAttributes,
         "/json/keycloak/keycloakUsersByAttributesResponse.json");
 
-    var processInstance = runtimeService.startProcessInstanceByKey("testGetCitizenUsersByAttributes_key");
+    var processInstance = runtimeService.startProcessInstanceByKey("testGetCitizenUsersByAttributesEdrpou_key");
+
+    var roleMappingsUrl = "/auth/realms/citizen-realm/users/search";
+    keycloakMockServer.verify(1,
+        postRequestedFor(urlEqualTo(roleMappingsUrl)).withRequestBody(
+            equalToJson(requestAttributes)));
+
+    BpmnAwareTests.assertThat(processInstance).isEnded();
+  }
+
+  @Test
+  @Deployment(resources = "bpmn/connector/getKeycloakCitizenUsersByAttributeDrfo.bpmn")
+  public void testGeyCitizenUsersFromKeycloakByAttributesDrfo() {
+    var requestAttributes = "{\"attributes\":{\"drfo\":\"12345678\"}}";
+    mockConnectToKeycloak(citizenRealm);
+    mockKeycloakGetUsersByAttributes(citizenRealm, requestAttributes,
+        "/json/keycloak/keycloakUsersByAttributesResponse.json");
+
+    var processInstance = runtimeService.startProcessInstanceByKey("testGetCitizenUsersByAttributesDrfo_key");
 
     var roleMappingsUrl = "/auth/realms/citizen-realm/users/search";
     keycloakMockServer.verify(1,
