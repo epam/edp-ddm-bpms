@@ -24,11 +24,12 @@ import com.epam.digital.data.platform.integration.idm.model.SearchUserQuery;
 import com.epam.digital.data.platform.integration.idm.service.IdmService;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -58,9 +59,21 @@ public class KeycloakGetCitizenUsersByAttributesConnectorDelegate extends BaseJa
 
   @Override
   protected void executeInternal(DelegateExecution execution) throws Exception {
-    var searchUsersQueryBuilder = SearchUserQuery.builder()
-        .edrpou(getRequiredEdrpou(execution));
-    drfoVariable.from(execution).getOptional().ifPresent(searchUsersQueryBuilder::drfo);
+    var edrpou = edrpouVariable.from(execution).get();
+    var drfo = drfoVariable.from(execution).get();
+    if (Strings.isNullOrEmpty(edrpou) && Strings.isNullOrEmpty(drfo)) {
+      throw new IllegalArgumentException(
+          String.format("Edrpou or drfo wasn't specified for %s delegate in process with id %s",
+              DELEGATE_NAME, execution.getProcessDefinitionId()));
+    }
+    var searchUsersQueryBuilder = SearchUserQuery.builder();
+
+    if (!Strings.isNullOrEmpty(edrpou)) {
+      searchUsersQueryBuilder.edrpou(edrpou);
+    }
+    if (!Strings.isNullOrEmpty(drfo)) {
+      searchUsersQueryBuilder.drfo(drfo);
+    }
 
     var usernames = idmService.searchUsers(searchUsersQueryBuilder.build())
         .stream()
@@ -68,16 +81,5 @@ public class KeycloakGetCitizenUsersByAttributesConnectorDelegate extends BaseJa
         .collect(Collectors.toList());
 
     usersByAttributeVariable.on(execution).set(usernames);
-  }
-
-  @NonNull
-  private String getRequiredEdrpou(@NonNull DelegateExecution execution) {
-    var edrpou = edrpouVariable.from(execution).getOptional();
-    if (edrpou.isEmpty()) {
-      throw new IllegalArgumentException(
-          String.format("Edrpou wasn't specified for %s delegate in process with id %s",
-              DELEGATE_NAME, execution.getProcessDefinitionId()));
-    }
-    return edrpou.get();
   }
 }
