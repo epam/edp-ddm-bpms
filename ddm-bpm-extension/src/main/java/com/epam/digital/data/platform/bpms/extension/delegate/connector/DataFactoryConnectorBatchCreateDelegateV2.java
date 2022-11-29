@@ -21,6 +21,7 @@ import static com.epam.digital.data.platform.bpms.extension.delegate.connector.D
 
 import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.header.builder.HeaderBuilderFactory;
+import com.epam.digital.data.platform.bpms.extension.service.DigitalSystemSignatureService;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.datafactory.factory.client.DataFactoryFeignClient;
@@ -56,7 +57,7 @@ public class DataFactoryConnectorBatchCreateDelegateV2 extends BaseJavaDelegate 
   @SystemVariable(name = "uploadType")
   private NamedVariableAccessor<String> uploadType;
 
-  private final DigitalSystemSignatureDelegate digitalSystemSignatureDelegate;
+  private final DigitalSystemSignatureService digitalSystemSignatureService;
   private final DataFactoryFeignClient dataFactoryFeignClient;
   private final HeaderBuilderFactory headerBuilderFactory;
 
@@ -97,15 +98,13 @@ public class DataFactoryConnectorBatchCreateDelegateV2 extends BaseJavaDelegate 
         .build();
   }
 
-  private void signNode(DelegateExecution execution, SpinJsonNode stringJsonNode)
-      throws Exception {
-    payloadVariable.on(execution).remove();
-    payloadVariable.on(execution).set(stringJsonNode);
-    digitalSystemSignatureDelegate.execute(execution);
-    var responseVariable = digitalSystemSignatureDelegate.getSystemSignatureStorageKey();
-    var systemSignatureStorageKey = responseVariable.from(execution).get();
+  private void signNode(DelegateExecution execution, SpinJsonNode stringJsonNode) throws Exception {
+    var systemSignatureDto =
+        DigitalSystemSignatureService.SystemSignatureDto.builder()
+            .payload(stringJsonNode)
+            .build();
+    var systemSignatureStorageKey = digitalSystemSignatureService.sign(systemSignatureDto);
     xDigitalSignatureDerivedStorageKeyVariable.on(execution).set(systemSignatureStorageKey);
-    responseVariable.on(execution).remove();
   }
 
   enum DataUploadType {

@@ -18,6 +18,7 @@ package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
 import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.header.builder.HeaderBuilderFactory;
+import com.epam.digital.data.platform.bpms.extension.service.DigitalSystemSignatureService;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.datafactory.excerpt.client.ExcerptFeignClient;
@@ -25,9 +26,12 @@ import com.epam.digital.data.platform.datafactory.feign.model.response.Connector
 import com.epam.digital.data.platform.excerpt.model.ExcerptEventDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
+
+import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.spin.Spin;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,16 +45,20 @@ public class ExcerptConnectorGenerateDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "excerptConnectorGenerateDelegate";
 
-
   @SystemVariable(name = "excerptType")
   private NamedVariableAccessor<String> excerptTypeVariable;
   @SystemVariable(name = "excerptInputData")
   private NamedVariableAccessor<Map<String, Object>> excerptInputDataVariable;
   @SystemVariable(name = "requiresSystemSignature")
   private NamedVariableAccessor<String> requiresSystemSignatureVariable;
+
+  @SystemVariable(name = "x_digital_signature_derived_ceph_key")
+  private NamedVariableAccessor<String> xDigitalSignatureDerivedCephKeyVariable;
+
   @SystemVariable(name = "response", isTransient = true)
   protected NamedVariableAccessor<ConnectorResponse> responseVariable;
 
+  private final DigitalSystemSignatureService digitalSystemSignatureService;
   private final ExcerptFeignClient excerptFeignClient;
   private final ObjectMapper objectMapper;
   private final HeaderBuilderFactory headerBuilderFactory;
@@ -59,21 +67,33 @@ public class ExcerptConnectorGenerateDelegate extends BaseJavaDelegate {
   public void executeInternal(DelegateExecution execution) throws Exception {
     var excerptType = excerptTypeVariable.from(execution).get();
     var excerptInputData = excerptInputDataVariable.from(execution).getOrDefault(Map.of());
-    var requiresSystemSignature = Boolean.parseBoolean(
-        requiresSystemSignatureVariable.from(execution).get());
+    var requiresSystemSignature =
+        Boolean.parseBoolean(requiresSystemSignatureVariable.from(execution).get());
 
-    var requestBody = new ExcerptEventDto(null, excerptType, excerptInputData,
-        requiresSystemSignature);
+    var requestBody =
+        new ExcerptEventDto(null, excerptType, excerptInputData, requiresSystemSignature);
 
-    var headers = headerBuilderFactory.builder()
-        .contentTypeJson()
-        .processExecutionHttpHeaders()
-        .digitalSignatureHttpHeaders()
-        .accessTokenHeader()
-        .build();
+    var signatureDerived = xDigitalSignatureDerivedCephKeyVariable.from(execution).get();
+    if (Strings.isNullOrEmpty(signatureDerived)) {
+      var systemSignatureDto =
+          DigitalSystemSignatureService.SystemSignatureDto.builder()
+              .payload(Spin.JSON(requestBody))
+              .build();
+      var storageKey = digitalSystemSignatureService.sign(systemSignatureDto);
+      xDigitalSignatureDerivedCephKeyVariable.on(execution).set(storageKey);
+    }
+
+    var headers =
+        headerBuilderFactory
+            .builder()
+            .contentTypeJson()
+            .processExecutionHttpHeaders()
+            .digitalSignatureHttpHeaders()
+            .accessTokenHeader()
+            .build();
     log.debug("Start generating excerpt");
-    var response = excerptFeignClient
-        .performPost(objectMapper.writeValueAsString(requestBody), headers);
+    var response =
+        excerptFeignClient.performPost(objectMapper.writeValueAsString(requestBody), headers);
     log.debug("Excerpt successfully generated");
 
     responseVariable.on(execution).set(response);

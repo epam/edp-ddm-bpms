@@ -293,6 +293,7 @@
           <camunda:inputParameter name="x_access_token">${completer('signAttestationExcerptActivity').accessToken}</camunda:inputParameter>
           <camunda:inputParameter name="excerptType">subject-laboratories-attestation-excerpt</camunda:inputParameter>
           <camunda:inputParameter name="excerptInputData">${excerpt}</camunda:inputParameter>
+          <camunda:inputParameter name="x_digital_signature_derived_ceph_key">${system_signature_ceph_key}</camunda:inputParameter>
           <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
