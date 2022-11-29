@@ -18,6 +18,7 @@ package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
 import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.header.builder.HeaderBuilderFactory;
+import com.epam.digital.data.platform.bpms.extension.service.DigitalSystemSignatureService;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.datafactory.factory.client.DataFactoryFeignClient;
@@ -46,14 +47,12 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseJavaDelegate {
   protected NamedVariableAccessor<String> resourceVariable;
   @SystemVariable(name = "payload", isTransient = true)
   protected NamedVariableAccessor<SpinJsonNode> payloadVariable;
-  @SystemVariable(name = "payloadIndex", isTransient = true)
-  protected NamedVariableAccessor<Integer> payloadIndexVariable;
   @SystemVariable(name = "response", isTransient = true)
   protected NamedVariableAccessor<ConnectorResponse> responseVariable;
   @SystemVariable(name = "x_digital_signature_derived_ceph_key")
   private NamedVariableAccessor<String> xDigitalSignatureDerivedCephKeyVariable;
 
-  private final DigitalSystemSignatureDelegate digitalSystemSignatureDelegate;
+  private final DigitalSystemSignatureService digitalSystemSignatureService;
   private final DataFactoryFeignClient dataFactoryFeignClient;
   private final HeaderBuilderFactory headerBuilderFactory;
 
@@ -94,15 +93,14 @@ public class DataFactoryConnectorBatchCreateDelegate extends BaseJavaDelegate {
 
   private void signNode(DelegateExecution execution, SpinJsonNode stringJsonNode, Integer index)
       throws Exception {
-    payloadVariable.on(execution).remove();
-    payloadVariable.on(execution).set(stringJsonNode);
-    payloadIndexVariable.on(execution).remove();
-    payloadIndexVariable.on(execution).set(index);
-    digitalSystemSignatureDelegate.execute(execution);
-    var responseVariable = digitalSystemSignatureDelegate.getSystemSignatureStorageKey();
-    var systemSignatureStorageKey = responseVariable.from(execution).get();
+    var systemSignatureDto =
+        DigitalSystemSignatureService.SystemSignatureDto.builder()
+            .payload(stringJsonNode)
+            .index(index)
+            .build();
+    var systemSignatureStorageKey =
+        digitalSystemSignatureService.sign(systemSignatureDto);
     xDigitalSignatureDerivedCephKeyVariable.on(execution).set(systemSignatureStorageKey);
-    responseVariable.on(execution).remove();
   }
 
   @Override

@@ -16,16 +16,27 @@
 
 package com.epam.digital.data.platform.bpms.extension.it;
 
-import com.epam.digital.data.platform.bpms.extension.it.builder.StubData;
+import com.epam.digital.data.platform.bpms.api.dto.enums.PlatformHttpHeader;
+import com.epam.digital.data.platform.dso.api.dto.SignRequestDto;
+import com.epam.digital.data.platform.dso.api.dto.SignResponseDto;
 import com.epam.digital.data.platform.excerpt.model.ExcerptEntityId;
 import com.epam.digital.data.platform.excerpt.model.ExcerptEventDto;
-import java.util.Map;
-import java.util.UUID;
+import com.epam.digital.data.platform.storage.form.service.FormDataKeyProviderImpl;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
-import org.springframework.http.HttpMethod;
 import org.springframework.util.CollectionUtils;
+
+import java.util.Map;
+import java.util.UUID;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.matching;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class ExcerptConnectorGenerateDelegateIT extends BaseIT {
 
@@ -37,13 +48,37 @@ public class ExcerptConnectorGenerateDelegateIT extends BaseIT {
     requestDto.setExcerptInputData(Map.of("subjectId", "1234"));
     requestDto.setRequiresSystemSignature(true);
 
-    stubExcerptServiceRequest(StubData.builder()
-        .httpMethod(HttpMethod.POST)
-        .resource("excerpts")
-        .requestBody(objectMapper.writeValueAsString(requestDto))
-        .response(objectMapper.writeValueAsString(
-            new ExcerptEntityId(UUID.fromString("d564f2ab-eec6-11eb-9efa-0a580a820439"))))
-        .build());
+    var requestBody = objectMapper.writeValueAsString(requestDto);
+
+    var dsoResponse = SignResponseDto.builder().signature("sign").build();
+    digitalSignatureMockServer.addStubMapping(
+        stubFor(
+            post(urlPathEqualTo("/api/eseal/sign"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(
+                    equalTo(
+                        objectMapper.writeValueAsString(
+                            SignRequestDto.builder().data(requestBody).build())))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withStatus(200)
+                        .withBody(objectMapper.writeValueAsString(dsoResponse)))));
+
+    excerptServiceWireMock.addStubMapping(
+        stubFor(
+            post(urlPathEqualTo("/excerpt-mock-service/excerpts"))
+                .withHeader(
+                    PlatformHttpHeader.X_DIGITAL_SIGNATURE_DERIVED.getName(),
+                    matching("lowcode_.*_system_signature_ceph_key"))
+                .withRequestBody(equalTo(requestBody))
+                .willReturn(
+                    aResponse()
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                new ExcerptEntityId(
+                                    UUID.fromString("d564f2ab-eec6-11eb-9efa-0a580a820439"))))
+                        .withStatus(200))));
 
     var processInstance = runtimeService
         .startProcessInstanceByKey("test_generate_excerpt");
@@ -51,5 +86,12 @@ public class ExcerptConnectorGenerateDelegateIT extends BaseIT {
     var processInstanceList = runtimeService.createProcessInstanceQuery()
         .processInstanceId(processInstance.getId()).list();
     Assertions.assertThat(CollectionUtils.isEmpty(processInstanceList)).isTrue();
+
+    var derivedSignatureCephKey = String.format(FormDataKeyProviderImpl.SYSTEM_SIGNATURE_STORAGE_KEY,
+            processInstance.getId(),
+            processInstance.getId());
+    var signedFormData = formDataStorageService.getFormData(derivedSignatureCephKey);
+    assertThat(signedFormData).isPresent();
+    assertThat(signedFormData.get().getSignature()).isEqualTo(dsoResponse.getSignature());
   }
 }

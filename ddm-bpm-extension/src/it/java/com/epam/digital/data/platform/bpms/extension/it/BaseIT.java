@@ -72,7 +72,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public abstract class BaseIT {
 
-  private static final String SETTINGS_MOCK_SERVER = "/user-settings-mock-server";
   protected static final String EXCERPT_SERVICE_MOCK_SERVER = "/excerpt-mock-service";
 
   @Inject
@@ -100,6 +99,9 @@ public abstract class BaseIT {
   @Inject
   @Qualifier("excerptServiceWireMock")
   protected WireMockServer excerptServiceWireMock;
+  @Inject
+  @Qualifier("digitalSignatureMockServer")
+  protected WireMockServer digitalSignatureMockServer;
   @Inject
   @Qualifier("userSettingsWireMock")
   protected WireMockServer userSettingsWireMock;
@@ -193,13 +195,6 @@ public abstract class BaseIT {
     var uriBuilder = Objects.nonNull(data.getUri()) ? data.getUri() :
         UriComponentsBuilder.fromPath(EXCERPT_SERVICE_MOCK_SERVER).pathSegment(data.getResource());
     excerptServiceWireMock.addStubMapping(stubFor(getMappingBuilder(data, uriBuilder)));
-  }
-
-  protected void stubSettingsRequest(StubData data) {
-    var uriBuilder = UriComponentsBuilder.fromPath(SETTINGS_MOCK_SERVER)
-        .pathSegment(data.getResource());
-
-    userSettingsWireMock.addStubMapping(stubFor(getMappingBuilder(data, uriBuilder)));
   }
 
   @SneakyThrows
