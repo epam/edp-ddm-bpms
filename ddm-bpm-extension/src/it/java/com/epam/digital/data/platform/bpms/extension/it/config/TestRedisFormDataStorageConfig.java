@@ -20,11 +20,11 @@ import com.epam.digital.data.platform.storage.form.config.RedisStorageConfigurat
 import com.epam.digital.data.platform.storage.form.factory.StorageServiceFactory;
 import com.epam.digital.data.platform.storage.form.service.FormDataStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import javax.inject.Inject;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 
 @Configuration
 @ConditionalOnProperty(prefix = "storage.form-data", name = "type", havingValue = "redis")
@@ -43,7 +43,13 @@ public class TestRedisFormDataStorageConfig {
 
   @Bean
   public FormDataStorageService formDataStorageService(StorageServiceFactory factory,
+      RedisConnectionFactory redisConnectionFactory) {
+    return factory.formDataStorageService(redisConnectionFactory);
+  }
+
+  @Bean
+  public RedisConnectionFactory redisConnectionFactory(StorageServiceFactory factory,
       RedisStorageConfiguration config) {
-    return factory.formDataStorageService(config);
+    return factory.redisConnectionFactory(config);
   }
 }
