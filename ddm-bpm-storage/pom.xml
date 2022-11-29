@@ -33,7 +33,7 @@
 
     <ddm-file-storage.version>1.7.0.1</ddm-file-storage.version>
     <ddm-message-payload-storage.version>1.8.0.1</ddm-message-payload-storage.version>
-    <ddm-form-data-storage.version>1.8.0.2</ddm-form-data-storage.version>
+    <ddm-form-data-storage.version>1.8.0.1</ddm-form-data-storage.version>
     <camunda.bpm.assert.version>7.0.0</camunda.bpm.assert.version>
   </properties>
 
