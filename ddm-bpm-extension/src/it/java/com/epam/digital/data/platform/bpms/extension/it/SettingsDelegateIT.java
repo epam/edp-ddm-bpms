@@ -59,14 +59,6 @@ public class SettingsDelegateIT extends BaseIT {
   @Deployment(resources = {"bpmn/connector/testUpdateSettings.bpmn"})
   public void shouldUpdateSettings() {
     userSettingsWireMock.stubFor(
-        post(urlPathEqualTo("/user-settings-mock-server/api/settings/me/channels/email/activate"))
-            .withHeader(PlatformHttpHeader.X_ACCESS_TOKEN.getName(), equalTo("token"))
-            .withRequestBody(
-                new EqualToJsonPattern(
-                    convertJsonToString("/json/updateSettingsActivate.json"), false, false))
-            .willReturn(
-                aResponse().withStatus(200).withHeader("Content-type", "application/json")));
-    userSettingsWireMock.stubFor(
         post(urlPathEqualTo("/user-settings-mock-server/api/settings/me/channels/email/deactivate"))
             .withHeader(PlatformHttpHeader.X_ACCESS_TOKEN.getName(), equalTo("token"))
             .withRequestBody(
