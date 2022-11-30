@@ -24,7 +24,6 @@ import com.epam.digital.data.platform.datafactory.feign.model.response.Connector
 import com.epam.digital.data.platform.datafactory.settings.client.UserSettingsFeignClient;
 import com.epam.digital.data.platform.settings.model.dto.Channel;
 import com.epam.digital.data.platform.settings.model.dto.SettingsDeactivateChannelInputDto;
-import com.epam.digital.data.platform.settings.model.dto.SettingsEmailInputDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -74,23 +73,17 @@ public class UserSettingsConnectorUpdateDelegate extends BaseJavaDelegate {
             .accessTokenHeader()
             .csrfProtectionHeaders()
             .build();
-    var settingsEmailDto =
+    var emailDeactivationDto =
         requestBodyOpt
             .map(
                 input -> {
-                  var emailInputDto = new SettingsEmailInputDto();
-                  emailInputDto.setAddress(input.getEmail());
-                  return emailInputDto;
+                  var deactivationDto = new SettingsDeactivateChannelInputDto();
+                  deactivationDto.setAddress(input.getEmail());
+                  deactivationDto.setDeactivationReason("USER_DEACTIVATED_FROM_BP");
+                  return deactivationDto;
                 })
             .orElse(null);
-
-    // create channel info
-    userSettingsFeignClient.activateEmailChannel(settingsEmailDto, headers);
-    log.debug("Email channel info is created");
-    // deactivate channel
-    var deactivationDto = new SettingsDeactivateChannelInputDto();
-    deactivationDto.setDeactivationReason("USER_DEACTIVATED_FROM_BP");
-    userSettingsFeignClient.deactivateChannel(Channel.EMAIL.getValue(), deactivationDto, headers);
+    userSettingsFeignClient.deactivateChannel(Channel.EMAIL.getValue(), emailDeactivationDto, headers);
     log.debug("Email channel is deactivated");
 
     // get user settings id
