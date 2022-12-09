@@ -12,8 +12,7 @@ global:
             requests: {}
       container:
         resources: {}
-        envVars:
-          JAVA_OPTS: "-Xms1536m -Xmx1536m -Duser.timezone=UTC"
+        envVars: {}
 
 podAnnotations: {}
 image:
