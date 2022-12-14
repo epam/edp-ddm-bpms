@@ -50,4 +50,6 @@ public abstract class BaseIT {
 
   @Autowired
   protected WireMockServer digitalDocumentService;
+  @Autowired
+  protected WireMockServer keycloakMockServer;
 }

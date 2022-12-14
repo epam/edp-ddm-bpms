@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 import com.epam.digital.data.platform.bpms.storage.client.DigitalDocumentServiceRestClient;
 import com.epam.digital.data.platform.bpms.storage.listener.FileCleanerEndEventListener;
+import com.epam.digital.data.platform.integration.idm.service.IdmService;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,7 +43,8 @@ class FileCleanerEndEventListenerTest {
   private ExecutionEntity executionEntity;
   @Mock
   private DigitalDocumentServiceRestClient client;
-
+  @Mock
+  private IdmService idmService;
   @InjectMocks
   private FileCleanerEndEventListener fileCleanerEndEventListener;
 
@@ -54,6 +56,7 @@ class FileCleanerEndEventListenerTest {
   @Test
   void shouldDeleteFilesByListOfKeys() {
     when(executionEntity.getProcessInstanceId()).thenReturn(PROCESS_INSTANCE_ID);
+    when(idmService.getClientAccessToken()).thenReturn("token");
 
     fileCleanerEndEventListener.notify(executionEntity);
 

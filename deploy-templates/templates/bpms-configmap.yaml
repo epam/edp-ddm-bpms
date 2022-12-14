@@ -19,7 +19,7 @@ data:
     keycloak.officer.realm: {{ template "keycloak.officerTargetRealm" . }}
     keycloak.officer.client-id: {{ .Values.keycloak.officerClient.clientName }}
     excerpt-service-api.url: http://excerpt-service-api:8080
-    keycloak.system-user.realm: {{ template "keycloak.citizenTargetRealm" . }}
+    keycloak.system-user.realm: {{ template "keycloak.systemUserTargetRealm" . }}
     keycloak.system-user.client-id: {{ .Values.keycloak.systemUserClient.clientName }}
     keycloak.officer-system-client.realm: {{ template "keycloak.officerTargetRealm" . }}
     keycloak.officer-system-client.client-id: {{ .Values.keycloak.officerSystemClient.clientName }}

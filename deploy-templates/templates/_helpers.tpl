@@ -49,6 +49,10 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Release.Namespace .Values.keycloak.officerClient.realm }}
 {{- end -}}
 
+{{- define "keycloak.systemUserTargetRealm" -}}
+{{- printf "%s-%s" .Release.Namespace .Values.keycloak.systemUserClient.realm }}
+{{- end -}}
+
 {{- define "keycloak.url" -}}
 {{- printf "%s%s" "https://" .Values.keycloak.host }}
 {{- end -}}

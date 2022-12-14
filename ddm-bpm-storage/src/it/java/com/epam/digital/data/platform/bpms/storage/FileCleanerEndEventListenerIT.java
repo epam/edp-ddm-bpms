@@ -18,9 +18,13 @@ package com.epam.digital.data.platform.bpms.storage;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 
+import java.io.IOException;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.junit.jupiter.api.Test;
@@ -29,12 +33,13 @@ class FileCleanerEndEventListenerIT extends BaseIT {
 
   @Test
   @Deployment(resources = "bpmn/file_cleaner_listener.bpmn")
-  void testFileCleanerEndEventListener() {
+  void testFileCleanerEndEventListener() throws IOException {
     var processInstance = runtimeService.startProcessInstanceByKey("fileCleanerListenerKey");
     var processInstanceId = processInstance.getId();
     var taskId = taskService.createTaskQuery().taskDefinitionKey("fileCleanerListenerId")
         .singleResult().getId();
 
+    mockConnectToKeycloak();
     digitalDocumentService.addStubMapping(
         stubFor(delete(urlEqualTo(String.format("/documents/%s", processInstanceId)))
             .willReturn(aResponse()
@@ -44,5 +49,15 @@ class FileCleanerEndEventListenerIT extends BaseIT {
     taskService.complete(taskId);
 
     BpmnAwareTests.assertThat(processInstance).isEnded();
+  }
+
+  protected void mockConnectToKeycloak() throws IOException {
+    keycloakMockServer.addStubMapping(
+        stubFor(post(urlPathEqualTo("/auth/realms/test-realm/protocol/openid-connect/token"))
+            .withRequestBody(equalTo("grant_type=client_credentials"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-type", "application/json")
+            )));
   }
 }

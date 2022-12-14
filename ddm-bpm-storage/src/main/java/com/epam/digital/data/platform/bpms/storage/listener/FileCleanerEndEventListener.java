@@ -18,13 +18,14 @@ package com.epam.digital.data.platform.bpms.storage.listener;
 
 import com.epam.digital.data.platform.bpms.api.dto.enums.PlatformHttpHeader;
 import com.epam.digital.data.platform.bpms.storage.client.DigitalDocumentServiceRestClient;
+import com.epam.digital.data.platform.integration.idm.service.IdmService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,6 +37,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FileCleanerEndEventListener implements ExecutionListener {
 
+  @Qualifier("system-user-keycloak-client-service")
+  private final IdmService idmService;
   private final DigitalDocumentServiceRestClient digitalDocumentServiceRestClient;
 
   @Override
@@ -51,20 +54,10 @@ public class FileCleanerEndEventListener implements ExecutionListener {
 
   private HttpHeaders createHeaders() {
     var headers = new HttpHeaders();
-    headers.add(PlatformHttpHeader.X_ACCESS_TOKEN.getName(), getToken());
+    headers.add(PlatformHttpHeader.X_ACCESS_TOKEN.getName(), idmService.getClientAccessToken());
     var requestXsrfToken = UUID.randomUUID().toString();
     headers.add(PlatformHttpHeader.X_XSRF_TOKEN.getName(), requestXsrfToken);
     headers.add("Cookie", String.format("%s=%s", "XSRF-TOKEN", requestXsrfToken));
     return headers;
-  }
-
-  private String getToken() {
-    var auth = SecurityContextHolder.getContext().getAuthentication();
-    if (auth == null || !(auth.getCredentials() instanceof String)) {
-      log.warn("User wasn't authenticated by token... Setting null");
-      return null;
-    } else {
-      return (String) auth.getCredentials();
-    }
   }
 }
