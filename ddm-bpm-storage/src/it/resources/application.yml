@@ -20,3 +20,10 @@ storage:
 
 digital-document-service:
   url: http://localhost:1111
+
+keycloak:
+  url: http://localhost:8200
+  system-user:
+    realm: system-user-realm
+    client-id: system-user-client-id
+    client-secret: system-user-client-secret
