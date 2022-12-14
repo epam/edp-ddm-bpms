@@ -82,9 +82,9 @@ keycloak:
     secretName: keycloak-realm-admin-officer-client-secret
   systemUserClient:
     clientName: system-user
-    realm: citizen-portal
+    realm: admin
     public: false
-    secretName: keycloak-system-user-citizen-client-secret
+    secretName: keycloak-system-user-admin-client-secret
   officerSystemClient:
     clientName: user-attributes-management
     realm: officer-portal
