@@ -22,9 +22,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.epam.digital.data.platform.bpms.storage.client.DigitalDocumentServiceRestClient;
 import com.epam.digital.data.platform.bpms.storage.listener.FileCleanerEndEventListener;
 import com.epam.digital.data.platform.integration.idm.service.IdmService;
+import com.epam.digital.data.platform.dgtldcmnt.client.DigitalDocumentServiceRestClient;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
