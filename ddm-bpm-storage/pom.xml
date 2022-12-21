@@ -40,6 +40,11 @@
   <dependencies>
     <dependency>
       <groupId>com.epam.digital.data.platform</groupId>
+      <artifactId>ddm-digital-document-client</artifactId>
+      <version>${ddm-digital-document-client.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.epam.digital.data.platform</groupId>
       <artifactId>ddm-file-storage</artifactId>
       <version>${ddm-file-storage.version}</version>
     </dependency>
