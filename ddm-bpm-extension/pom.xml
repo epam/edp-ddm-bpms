@@ -101,11 +101,6 @@
       <artifactId>excerpt-model</artifactId>
       <version>${excerpt-model.version}</version>
     </dependency>
-    <dependency>
-      <groupId>com.epam.digital.data.platform</groupId>
-      <artifactId>ddm-starter-security</artifactId>
-      <version>${ddm-starter-security.version}</version>
-    </dependency>
 
     <dependency>
       <groupId>org.projectlombok</groupId>

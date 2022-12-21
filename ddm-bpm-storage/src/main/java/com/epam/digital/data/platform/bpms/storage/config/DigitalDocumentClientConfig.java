@@ -16,12 +16,12 @@
 
 package com.epam.digital.data.platform.bpms.storage.config;
 
-import com.epam.digital.data.platform.bpms.storage.client.DigitalDocumentServiceRestClient;
-import org.springframework.cloud.openfeign.EnableFeignClients;
+import com.epam.digital.data.platform.dgtldcmnt.config.RestClientConfig;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 @Configuration
-@EnableFeignClients(clients = {DigitalDocumentServiceRestClient.class})
-public class FeignClientConfig {
+@Import(RestClientConfig.class)
+public class DigitalDocumentClientConfig {
 
 }

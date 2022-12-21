@@ -17,7 +17,7 @@
 package com.epam.digital.data.platform.bpms.storage.listener;
 
 import com.epam.digital.data.platform.bpms.api.dto.enums.PlatformHttpHeader;
-import com.epam.digital.data.platform.bpms.storage.client.DigitalDocumentServiceRestClient;
+import com.epam.digital.data.platform.dgtldcmnt.client.DigitalDocumentServiceRestClient;
 import com.epam.digital.data.platform.integration.idm.service.IdmService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
