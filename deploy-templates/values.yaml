@@ -56,7 +56,7 @@ registryConfigs:
 db:
   url: citus-master
   port: 5432
-  defaultDatabase: camunda
+  name: camunda
   secret: operational-pguser-postgres
 
 camunda:
