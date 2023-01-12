@@ -5,7 +5,7 @@ camunda:
     job-execution:
       deployment-aware: true
     database:
-      schema-update: true
+      schema-update: false
     admin-user:
       id: ${camunda.admin-user-id}
       password: camunda

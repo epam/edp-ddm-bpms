@@ -5,10 +5,10 @@ metadata:
 data:
   application.yml: |-
     spring.datasource.driver-class-name: org.postgresql.Driver
-    spring.datasource.url: jdbc:postgresql://{{ .Values.db.url }}:{{ .Values.db.port }}/{{ .Values.db.defaultDatabase }}?ApplicationName={{ .Chart.Name }}
+    spring.datasource.url: jdbc:postgresql://{{ .Values.db.url }}:{{ .Values.db.port }}/{{ .Values.db.name }}
     spring.zipkin.baseUrl: http://zipkin.istio-system:9411
     camunda.bpm.job-execution.deployment-aware: false
-    camunda.bpm.database.schema-update: true
+    camunda.bpm.database.schema-update: false
     camunda.bpm.history-level: {{ .Values.camunda.bpm.historyLevel }}
     camunda.bpm.database-history-level: {{ .Values.camunda.bpm.databaseHistoryLevel }}
     dso.url: http://digital-signature-ops:8080
