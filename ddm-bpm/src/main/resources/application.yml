@@ -26,7 +26,7 @@ data-platform:
     producer:
       enabled: true
       custom-config:
-        "[transactional.id]": tx-
+        "[transactional.id]": tx-${random.uuid}
         "[enable.idempotence]": true
     topic-properties:
       creation:
