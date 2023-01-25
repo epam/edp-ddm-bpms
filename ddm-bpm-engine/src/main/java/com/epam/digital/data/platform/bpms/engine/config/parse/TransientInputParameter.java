@@ -21,7 +21,6 @@ import org.camunda.bpm.engine.impl.core.variable.mapping.InputParameter;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.variable.Variables;
-import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * The class extends {@link InputParameter} class and used for saving transient flag in setting
@@ -42,10 +41,6 @@ public class TransientInputParameter extends InputParameter {
         .debugMappingValueFromOuterScopeToInnerScope(value, outerScope, name, innerScope);
 
     // set variable in inner scope
-    if (!(value instanceof TypedValue) || !((TypedValue) value).isTransient()) {
-      innerScope.setVariableLocal(name, value);
-    } else {
-      innerScope.setVariableLocal(name, Variables.untypedValue(value, true));
-    }
+    innerScope.setVariableLocal(name, Variables.untypedValue(value, true));
   }
 }

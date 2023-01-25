@@ -238,7 +238,6 @@ public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
         processInstances.get(0).getId() + "_system_signature_ceph_key";
     addExpectedVariable("system_signature_ceph_key", systemSignatureCephKey);
     addExpectedVariable(signAppIncludeActivityDefinitionKey + "_completer", testUserName);
-    addExpectedVariable("x_digital_signature_derived_ceph_key", systemSignatureCephKey);
     addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
         "Прийнято рішення про розширення факторів");
 
@@ -453,7 +452,6 @@ public class CreateAppExpanseBpmnIT extends BaseBpmnIT {
 
     addExpectedVariable("system_signature_ceph_key", systemSignatureCephKey);
     addExpectedVariable(signAppDenyActivityDefinitionKey + "_completer", testUserName);
-    addExpectedVariable("x_digital_signature_derived_ceph_key", systemSignatureCephKey);
     addExpectedVariable(ProcessCompletionResultVariable.SYS_VAR_PROCESS_COMPLETION_RESULT,
         "Прийнято рішення про залишення без розгляду");
 
