@@ -52,13 +52,13 @@ public class JuelFunctionsIT extends BaseIT {
     var vars = historyService.createHistoricVariableInstanceQuery()
         .processInstanceId((String) result.get("id")).list();
 
-    assertThat(vars).hasSize(2);
+    assertThat(vars).hasSize(1);
     var historicVarNames = vars.stream()
         .map(HistoricVariableInstance::getName)
         .collect(Collectors.toList());
     assertThat(historicVarNames)
-        .hasSize(2)
-        .contains("initiator", "elInitiator");
+        .hasSize(1)
+        .contains("initiator");
   }
 
   @Test

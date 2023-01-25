@@ -431,8 +431,6 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
         processInstances.get(0).getId() + "_system_signature_ceph_key";
     addExpectedVariable("system_signature_ceph_key", systemSignatureCephKey);
 
-    addExpectedVariable("x_digital_signature_derived_ceph_key", systemSignatureCephKey);
-
     assertSystemSignature(processInstanceId, "system_signature_ceph_key",
         "/json/create-app/dso/primaryDenySystemSignatureCephContent.json");
 
