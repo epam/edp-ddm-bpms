@@ -52,7 +52,7 @@ public class DataFactoryConnectorBatchCreateDelegateV2 extends BaseJavaDelegate 
   protected NamedVariableAccessor<SpinJsonNode> payloadVariable;
   @SystemVariable(name = "response", isTransient = true)
   protected NamedVariableAccessor<ConnectorResponse> responseVariable;
-  @SystemVariable(name = "x_digital_signature_derived_ceph_key")
+  @SystemVariable(name = "x_digital_signature_derived_ceph_key", isTransient = true)
   private NamedVariableAccessor<String> xDigitalSignatureDerivedStorageKeyVariable;
   @SystemVariable(name = "uploadType")
   private NamedVariableAccessor<String> uploadType;

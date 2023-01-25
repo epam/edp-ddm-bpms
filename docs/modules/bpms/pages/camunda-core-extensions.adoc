@@ -68,7 +68,7 @@ TransientBpmnParse .> TransientInputParameter
 ----
 
 - Перевантажений метод `parseActivityOutput` виконує input/output маппинг за замовчуванням, отримує згенеровані input параметри та заміщує їх екземплярами класу `TransientInputParameter`
-- `TransientInputParameter::execute` використовує `AbstractVariableScope::setVariableLocal` для зберігання не transient параметру та `AbstractVariableScope::setVariableLocalTransient` для зберігання transient параметру
+- `TransientInputParameter::execute` використовує `AbstractVariableScope::setVariableLocal` з ознакою `isTransient = true` для зберігання параметру як `transient`
 
 === Заміщення логіки expression language resolver
 
