@@ -52,7 +52,7 @@ public class ExcerptConnectorGenerateDelegate extends BaseJavaDelegate {
   @SystemVariable(name = "requiresSystemSignature")
   private NamedVariableAccessor<String> requiresSystemSignatureVariable;
 
-  @SystemVariable(name = "x_digital_signature_derived_ceph_key")
+  @SystemVariable(name = "x_digital_signature_derived_ceph_key", isTransient = true)
   private NamedVariableAccessor<String> xDigitalSignatureDerivedCephKeyVariable;
 
   @SystemVariable(name = "response", isTransient = true)
