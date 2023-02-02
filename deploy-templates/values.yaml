@@ -37,13 +37,21 @@ readinessPath: "/actuator/health/readiness"
 livenessPath: "/actuator/health/liveness"
 officerConfigMountPath: "/app/config/registry-regulation/officer-roles"
 citizenConfigMountPath: "/app/config/registry-regulation/citizen-roles"
-trembitaConfigMountPath: "/app/config/registry-regulation/trembita-configuration"
 redisSecretsMountPath: "/app/secrets/redis"
 officerConfigMapName: officer-roles
 citizenConfigMapName: citizen-roles
-trembitaConfConfigmapName: trembita-configuration
-trembitaRegistriesSecretsName: trembita-registries-secrets
-trembitaRegistriesSecretsPath: "/app/secrets/trembita-registries-secrets"
+
+registrySecrets:
+  secretRootPath: "/app/secrets"
+  trembitaRegistriesSecretsName: trembita-registries-secrets
+  externalSystemsSecretsName: external-systems-secrets
+registryConfigs:
+  configRootPath: "/app/config/registry-regulation"
+  trembitaRegistriesConfigurationName: trembita-registries-configuration
+  trembitaRegistriesConfigurationPath: "registry-regulation/trembita-registries-configuration"
+  diiaConfigurationName: diia-configuration
+  externalSystemsConfigurationName: external-systems-configuration
+  externalSystemsEndpointConfigurationName: external-systems-endpoint-configuration
 
 db:
   url: citus-master

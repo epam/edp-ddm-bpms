@@ -40,8 +40,6 @@ import com.epam.digital.data.platform.starter.trembita.integration.edr.service.E
 import com.epam.digital.data.platform.starter.trembita.integration.idp.exchangeservice.service.IdpExchangeRegistryService;
 import com.epam.digital.data.platform.storage.form.service.FormDataKeyProvider;
 import com.epam.digital.data.platform.storage.form.service.FormDataKeyProviderImpl;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -81,7 +79,7 @@ import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor;
     })
 public class ExtensionGeneralConfig {
 
-  @ConditionalOnProperty(prefix = "trembita-exchange-gateway.registries.edr-registry",
+  @ConditionalOnProperty(prefix = "trembita.registries.edr-registry",
       value = {"client.x-road-instance", "service.x-road-instance"})
   @Bean(name = SearchSubjectsEdrRegistryConnectorDelegate.DELEGATE_NAME)
   public SearchSubjectsEdrRegistryConnectorDelegate searchSubjectsEdrRegistryConnectorDelegate(
@@ -89,7 +87,7 @@ public class ExtensionGeneralConfig {
     return new SearchSubjectsEdrRegistryConnectorDelegate(edrRemoteService);
   }
 
-  @ConditionalOnProperty(prefix = "trembita-exchange-gateway.registries.edr-registry",
+  @ConditionalOnProperty(prefix = "trembita.registries.edr-registry",
       value = {"client.x-road-instance", "service.x-road-instance"})
   @Bean(name = SubjectDetailEdrRegistryConnectorDelegate.DELEGATE_NAME)
   public SubjectDetailEdrRegistryConnectorDelegate subjectDetailEdrRegistryConnectorDelegate(
@@ -98,7 +96,7 @@ public class ExtensionGeneralConfig {
   }
 
   @Bean(name = GetCertificateByBirthdateDracsRegistryDelegate.DELEGATE_NAME)
-  @ConditionalOnProperty(prefix = "trembita-exchange-gateway.registries.dracs-registry",
+  @ConditionalOnProperty(prefix = "trembita.registries.dracs-registry",
       value = {"client.x-road-instance", "service.x-road-instance"})
   public GetCertificateByBirthdateDracsRegistryDelegate getCertificateByBirthdateDracsRegistryDelegate(
       DracsRemoteService dracsRemoteService) {
@@ -106,7 +104,7 @@ public class ExtensionGeneralConfig {
   }
 
   @Bean(name = GetCertificateByNameDracsRegistryDelegate.DELEGATE_NAME)
-  @ConditionalOnProperty(prefix = "trembita-exchange-gateway.registries.dracs-registry",
+  @ConditionalOnProperty(prefix = "trembita.registries.dracs-registry",
       value = {"client.x-road-instance", "service.x-road-instance"})
   public GetCertificateByNameDracsRegistryDelegate getCertificateByNameDracsRegistryDelegate(
       DracsRemoteService dracsRemoteService) {
@@ -114,7 +112,7 @@ public class ExtensionGeneralConfig {
   }
 
   @Bean(name = IdpExchangeServiceRegistryConnector.DELEGATE_NAME)
-  @ConditionalOnProperty(prefix = "trembita-exchange-gateway.registries.idp-exchange-service-registry",
+  @ConditionalOnProperty(prefix = "trembita.registries.idp-exchange-service-registry",
       value = {"client.x-road-instance", "service.x-road-instance"})
   public IdpExchangeServiceRegistryConnector idpExchangeServiceRegistryConnector(
       IdpExchangeRegistryService idpExchangeRegistryService) {
@@ -175,12 +173,6 @@ public class ExtensionGeneralConfig {
   @ConfigurationProperties(prefix = "external-systems")
   public Map<String, ExternalSystemConfigurationProperties> externalSystemsConfiguration() {
     return new HashMap<>();
-  }
-
-  @Bean(destroyMethod = "close")
-  @ConditionalOnMissingBean
-  public KubernetesClient kubernetesClient() {
-    return new DefaultKubernetesClient();
   }
 
   @Bean

@@ -175,11 +175,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>io.fabric8</groupId>
-      <artifactId>kubernetes-server-mock</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>com.epam.digital.data.platform</groupId>
       <artifactId>ddm-starter-notifications</artifactId>
       <version>${ddm-starter-notifications.version}</version>

@@ -17,6 +17,9 @@
 package com.epam.digital.data.platform.bpms.extension.config.properties;
 
 import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpMethod;
@@ -26,14 +29,16 @@ import org.springframework.http.HttpMethod;
 public class ExternalSystemConfigurationProperties {
 
   private String url;
-  private Map<String, MethodConfiguration> methods;
+  private String type;
+  private String protocol;
+  private Map<String, OperationConfiguration> operations;
   private AuthenticationConfiguration auth;
 
   @Getter
   @Setter
-  public static class MethodConfiguration {
+  public static class OperationConfiguration {
 
-    private String path;
+    private String resourcePath;
     private HttpMethod method;
   }
 
@@ -42,12 +47,51 @@ public class ExternalSystemConfigurationProperties {
   public static class AuthenticationConfiguration {
 
     private AuthenticationType type;
-    private String secretName;
-    private String partnerTokenAuthUrl;
-    private String tokenJsonPath;
+    private Secret secret;
+    private String authUrl;
+    private String accessTokenJsonPath;
 
     public enum AuthenticationType {
-      BASIC, PARTNER_TOKEN
+      NO_AUTH("NO_AUTH"),
+      BASIC("BASIC"),
+      AUTH_TOKEN("AUTH_TOKEN"),
+      AUTH_TOKEN_BEARER("AUTH_TOKEN+BEARER"),
+      BEARER("BEARER");
+
+      private static final Map<String, AuthenticationType> valueMap = Map.of(
+              NO_AUTH.getCode(), NO_AUTH,
+              BASIC.getCode(), BASIC,
+              AUTH_TOKEN.getCode(), AUTH_TOKEN,
+              AUTH_TOKEN_BEARER.getCode(), AUTH_TOKEN_BEARER,
+              BEARER.getCode(), BEARER
+      );
+
+      private final String code;
+
+      AuthenticationType(String code) {
+        this.code = code;
+      }
+
+      @JsonValue
+      public String getCode() {
+        return code;
+      }
+
+      @JsonCreator
+      public static AuthenticationType getValueByCode(String code) {
+        return valueMap.get(code);
+      }
+
+    }
+
+    @Getter
+    @Setter
+    public static class Secret {
+
+      private String username;
+      private String password;
+      private String token;
+
     }
   }
 }
