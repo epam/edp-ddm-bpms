@@ -11,7 +11,10 @@ spring:
           - /app/config/camunda/camunda-global-system-vars.yml
           - /app/config/registry-regulation/officer-roles/officer-roles.yml
           - /app/config/registry-regulation/citizen-roles/citizen-roles.yml
-          - /app/config/registry-regulation/trembita-configuration/trembita-configuration.yml
+          - /app/config/registry-regulation/trembita-registries-configuration/trembita-registries-configuration.yml
+          - /app/config/registry-regulation/diia-configuration/diia-configuration.yml
+          - /app/config/registry-regulation/external-systems-configuration/external-systems-configuration.yml
+          - /app/config/registry-regulation/external-systems-endpoint-configuration/external-systems-endpoint-configuration.yml
       secrets:
         enabled: true
         enable-api: false

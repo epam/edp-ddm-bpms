@@ -58,14 +58,14 @@ public class WireMockConfig {
 
   @Bean(destroyMethod = "stop")
   @Qualifier("trembitaMockServerEdr")
-  public WireMockServer trembitaMockServerEdr(@Value("${trembita-exchange-gateway.registries.edr-registry.trembita-url}") String urlStr)
+  public WireMockServer trembitaMockServerEdr(@Value("${trembita.registries.edr-registry.url}") String urlStr)
       throws MalformedURLException {
     return WireMockUtil.createAndStartMockServerForUrl(urlStr);
   }
 
   @Bean(destroyMethod = "stop")
   @Qualifier("trembitaMockServerDracs")
-  public WireMockServer trembitaMockServerDracs(@Value("${trembita-exchange-gateway.registries.dracs-registry.trembita-url}") String urlStr)
+  public WireMockServer trembitaMockServerDracs(@Value("${trembita.registries.dracs-registry.url}") String urlStr)
       throws MalformedURLException {
     return WireMockUtil.createAndStartMockServerForUrl(urlStr);
   }
@@ -73,7 +73,7 @@ public class WireMockConfig {
   @Bean(destroyMethod = "stop")
   @Qualifier("trembitaMockServerIdpExchangeService")
   public WireMockServer trembitaMockServerIdpExchangeService(
-      @Value("${trembita-exchange-gateway.registries.idp-exchange-service-registry.trembita-url}") String urlStr)
+      @Value("${trembita.registries.idp-exchange-service-registry.url}") String urlStr)
       throws MalformedURLException {
     return WireMockUtil.createAndStartMockServerForUrl(urlStr);
   }

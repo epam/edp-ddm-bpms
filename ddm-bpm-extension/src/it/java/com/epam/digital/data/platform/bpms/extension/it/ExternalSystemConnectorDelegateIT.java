@@ -24,6 +24,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 
+import com.epam.digital.data.platform.bpms.extension.exception.AuthConfigurationException;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import javax.inject.Inject;
 import org.camunda.bpm.engine.test.Deployment;
@@ -47,9 +48,9 @@ public class ExternalSystemConnectorDelegateIT extends BaseIT {
 
   @Test
   @Deployment(resources = "bpmn/connector/testExternalSystemConnectorDelegate.bpmn")
-  public void externalSystemConnectorNoMethodNameDefined() {
+  public void externalSystemConnectorNoOperationNameDefined() {
     var ex = assertThrows(IllegalArgumentException.class, () -> runtimeService
-        .startProcessInstanceByKey("external_system_connector_no_method_name_defined"));
+        .startProcessInstanceByKey("external_system_connector_no_operation_name_defined"));
     assertThat(ex.getMessage()).isEqualTo("Variable methodName not found");
   }
 
@@ -63,23 +64,23 @@ public class ExternalSystemConnectorDelegateIT extends BaseIT {
 
   @Test
   @Deployment(resources = "bpmn/connector/testExternalSystemConnectorDelegate.bpmn")
-  public void externalSystemConnectorWrongMethodNameDefined() {
+  public void externalSystemConnectorWrongOperationNameDefined() {
     var ex = assertThrows(IllegalArgumentException.class, () -> runtimeService
-        .startProcessInstanceByKey("external_system_connector_wrong_method_name_defined"));
+        .startProcessInstanceByKey("external_system_connector_wrong_operation_name_defined"));
     assertThat(ex.getMessage()).isEqualTo(
-        "Method method in external-system system1 not configured");
+        "Operation operation in external-system system1 not configured");
   }
 
   @Test
   @Deployment(resources = "bpmn/connector/testExternalSystemConnectorDelegate.bpmn")
-  public void externalSystemConnectorMethod1() {
+  public void externalSystemConnectorOperation1() {
     externalSystem1.addStubMapping(
         stubFor(get(urlPathEqualTo("/api/get"))
-            .withHeader("Authorization", equalTo("Basic dXNlcjpwYXNz"))
+            .withHeader("Authorization", equalTo("Basic dXNlcjpjR0Z6Y3c="))
             .willReturn(aResponse().withStatus(200))));
 
     var processInstance = runtimeService
-        .startProcessInstanceByKey("external_system_connector_method_1");
+        .startProcessInstanceByKey("external_system_connector_operation_1");
 
     BpmnAwareTests.assertThat(processInstance).isEnded();
   }
@@ -97,6 +98,78 @@ public class ExternalSystemConnectorDelegateIT extends BaseIT {
 
     var processInstance = runtimeService
         .startProcessInstanceByKey("external_system_partner_token_auth");
+
+    BpmnAwareTests.assertThat(processInstance).isEnded();
+  }
+
+  @Test
+  @Deployment(resources = "bpmn/connector/testExternalSystemConnectorDelegate.bpmn")
+  public void externalSystemBearerAuth() {
+    externalSystem1.addStubMapping(
+        stubFor(get(urlPathEqualTo("/api/get-with-bearer"))
+            .withHeader("Authorization", equalTo("Bearer bearer-token"))
+            .willReturn(aResponse().withStatus(200))));
+
+    var processInstance = runtimeService
+        .startProcessInstanceByKey("external_system_bearer_auth");
+
+    BpmnAwareTests.assertThat(processInstance).isEnded();
+  }
+
+  @Test
+  @Deployment(resources = "bpmn/connector/testExternalSystemConnectorDelegate.bpmn")
+  public void externalSystemAuthToken() {
+    externalSystem1.addStubMapping(
+        stubFor(get(urlPathEqualTo("/api/get-with-auth-token"))
+            .withHeader("Authorization", equalTo("Bearer auth-token"))
+            .willReturn(aResponse().withStatus(200))));
+
+    var processInstance = runtimeService
+        .startProcessInstanceByKey("external_system_auth_token");
+
+    BpmnAwareTests.assertThat(processInstance).isEnded();
+  }
+
+  @Test
+  @Deployment(resources = "bpmn/connector/testExternalSystemConnectorDelegateFailedAuthConfig.bpmn")
+  public void externalSystemConnectorBasicWithoutUsername() {
+    var ex = assertThrows(AuthConfigurationException.class, () -> runtimeService
+        .startProcessInstanceByKey("external_system_connector_basic_without_username"));
+    assertThat(ex.getMessage()).isEqualTo(
+        "Authentication configuration for external-system with name system-basic-without-username not configured");
+  }
+
+  @Test
+  @Deployment(resources = "bpmn/connector/testExternalSystemConnectorDelegateFailedAuthConfig.bpmn")
+  public void externalSystemConnectorBearerWithoutSecret() {
+    var ex = assertThrows(AuthConfigurationException.class, () -> runtimeService
+        .startProcessInstanceByKey("external_system_connector_bearer_without_secret"));
+    assertThat(ex.getMessage()).isEqualTo(
+        "Authentication configuration for external-system with name system-bearer-without-secret not configured");
+  }
+
+  @Test
+  @Deployment(resources = "bpmn/connector/testExternalSystemConnectorDelegateFailedAuthConfig.bpmn")
+  public void externalSystemConnectorAuthTokenWithoutToken() {
+    var ex = assertThrows(AuthConfigurationException.class, () -> runtimeService
+        .startProcessInstanceByKey("external_system_connector_auth_token_without_token"));
+    assertThat(ex.getMessage()).isEqualTo(
+        "Authentication configuration for external-system with name system-auth-token-without-token not configured");
+  }
+
+  @Test
+  @Deployment(resources = "bpmn/connector/testExternalSystemConnectorDelegate.bpmn")
+  public void externalSystemPartnerTokenAuthRelativePath() {
+    externalSystem1.addStubMapping(
+        stubFor(get(urlPathEqualTo("/api/auth/partner/token"))
+            .willReturn(aResponse().withStatus(200).withBody("{\"token\":\"bearer-token\"}"))));
+    externalSystem1.addStubMapping(
+        stubFor(get(urlPathEqualTo("/api/get"))
+            .withHeader("Authorization", equalTo("Bearer bearer-token"))
+            .willReturn(aResponse().withStatus(200))));
+
+    var processInstance = runtimeService
+        .startProcessInstanceByKey("external_system_partner_token_auth_relative_path");
 
     BpmnAwareTests.assertThat(processInstance).isEnded();
   }
