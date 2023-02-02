@@ -164,12 +164,34 @@ spec:
             mountPath: {{ .Values.officerConfigMountPath }}
           - name: {{ .Values.citizenConfigMapName }}
             mountPath: {{ .Values.citizenConfigMountPath }}
-          - name: {{ .Values.trembitaConfConfigmapName }}
-            mountPath: {{ .Values.trembitaConfigMountPath }}
           - name: {{ .Chart.Name }}-redis-credentials
             mountPath: {{ .Values.redisSecretsMountPath }}
-          - name: {{ .Values.trembitaRegistriesSecretsName }}
-            mountPath: {{ .Values.trembitaRegistriesSecretsPath }}
+    {{- if .Values.trembita }}
+      {{- if .Values.trembita.registries }}
+{{- $trembitaSecret := (lookup "v1" "Secret" .Values.namespace "trembita-registries-secrets") }}
+{{- if $trembitaSecret }}
+          - name: bpms-{{ .Values.registrySecrets.trembitaRegistriesSecretsName }}
+            mountPath: "{{ .Values.registrySecrets.secretRootPath }}/{{ .Values.registrySecrets.trembitaRegistriesSecretsName }}"
+{{- end }}
+          - name: {{ .Values.registryConfigs.trembitaRegistriesConfigurationName }}
+            mountPath: "{{ .Values.registryConfigs.configRootPath }}/{{ .Values.registryConfigs.trembitaRegistriesConfigurationName }}"
+      {{- end }}
+    {{- end }}
+    {{- if (index .Values "external-systems").diia }}
+          - name: {{ .Values.registryConfigs.diiaConfigurationName }}
+            mountPath: "{{ .Values.registryConfigs.configRootPath }}/{{ .Values.registryConfigs.diiaConfigurationName }}"
+    {{- end }}
+    {{- if (index .Values "external-systems") }}
+          - name: {{ .Values.registryConfigs.externalSystemsConfigurationName }}
+            mountPath: "{{ .Values.registryConfigs.configRootPath }}/{{ .Values.registryConfigs.externalSystemsConfigurationName }}"
+          - name: {{ .Values.registryConfigs.externalSystemsEndpointConfigurationName }}
+            mountPath: "{{ .Values.registryConfigs.configRootPath }}/{{ .Values.registryConfigs.externalSystemsEndpointConfigurationName }}"
+{{- $externalSystemsSecret := (lookup "v1" "Secret" .Values.namespace "external-systems-secrets") }}
+{{- if $externalSystemsSecret }}
+          - name: bpms-{{ .Values.registrySecrets.externalSystemsSecretsName }}
+            mountPath: "{{ .Values.registrySecrets.secretRootPath }}/{{ .Values.registrySecrets.externalSystemsSecretsName }}"
+{{- end }}
+    {{- end }}
       serviceAccountName: {{ .Chart.Name }}
       {{- if .Values.nodeSelector }}
       nodeSelector: {{ toYaml .Values.nodeSelector | nindent 8 }}
@@ -238,9 +260,36 @@ spec:
         - name: {{ .Values.citizenConfigMapName }}
           configMap:
             name: {{ .Values.citizenConfigMapName }}
-        - name: {{ .Values.trembitaConfConfigmapName }}
+{{- if .Values.trembita }}
+        - name: {{ .Values.registryConfigs.trembitaRegistriesConfigurationName }}
           configMap:
-            name: {{ .Values.trembitaConfConfigmapName }}
+            name: {{ .Values.registryConfigs.trembitaRegistriesConfigurationName }}
+{{- $trembitaSecret := (lookup "v1" "Secret" .Values.namespace "trembita-registries-secrets") }}
+{{- if $trembitaSecret }}
+        - name: bpms-{{ .Values.registrySecrets.trembitaRegistriesSecretsName }}
+          secret:
+            secretName: {{ .Values.registrySecrets.trembitaRegistriesSecretsName }}
+{{- end }}
+  {{- end }}
+  {{- if (index .Values "external-systems").diia }}
+        - name: {{ .Values.registryConfigs.diiaConfigurationName }}
+          configMap:
+            name: {{ .Values.registryConfigs.diiaConfigurationName }}
+  {{- end }}
+  {{- if (index .Values "external-systems") }}
+        - name: {{ .Values.registryConfigs.externalSystemsConfigurationName }}
+          configMap:
+            name: {{ .Values.registryConfigs.externalSystemsConfigurationName }}
+        - name: {{ .Values.registryConfigs.externalSystemsEndpointConfigurationName }}
+          configMap:
+            name: {{ .Values.registryConfigs.externalSystemsEndpointConfigurationName }}
+{{- $externalSystemsSecret := (lookup "v1" "Secret" .Values.namespace "external-systems-secrets") }}
+{{- if $externalSystemsSecret }}
+        - name: bpms-{{ .Values.registrySecrets.externalSystemsSecretsName }}
+          secret:
+            secretName: {{ .Values.registrySecrets.externalSystemsSecretsName }}
+{{- end }}
+  {{- end }}
         - name: {{ .Chart.Name }}-redis-credentials
           secret:
             secretName: {{ .Values.redis.secretName }}
@@ -250,9 +299,3 @@ spec:
         - name: update-history-level-configmap
           configMap:
             name: update-history-level-configmap
-        - name: {{ .Values.trembitaRegistriesSecretsName }}
-          secret:
-            secretName: {{ .Values.trembitaRegistriesSecretsName }}
-            items:
-              - key: trembita.registries.edr-registry.auth.secret.token
-                path: trembita-exchange-gateway.registries.edr-registry.authorization-token
