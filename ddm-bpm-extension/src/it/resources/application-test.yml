@@ -54,13 +54,13 @@ keycloak:
     client-id: officer-system-client-id
     client-secret: officer-system-client-secret
 
-trembita-exchange-gateway:
+trembita:
   registries:
     edr-registry:
-      trembita-url: http://localhost:7788/trembita-mock-server
+      url: http://localhost:7788/trembita-mock-server
       user-id: DDM
       protocol-version: 4.0
-      authorization-token: token
+      protocol: "SOAP"
       client:
         x-road-instance: CLIENT-TEST
         member-class: GOV
@@ -71,10 +71,15 @@ trembita-exchange-gateway:
         member-class: GOV
         member-code: 11115888
         subsystem-code: EDR_test
+      auth:
+        type: "AUTH_TOKEN"
+        secret:
+          token: "auth_token"
     dracs-registry:
-      trembita-url: http://localhost:7789/trembita-mock-server
+      url: http://localhost:7789/trembita-mock-server
       user-id: DDM
       protocol-version: 4.0
+      protocol: "SOAP"
       client:
         x-road-instance: CLIENT-TEST
         member-class: GOV
@@ -85,10 +90,13 @@ trembita-exchange-gateway:
         member-class: GOV
         member-code: 11115887
         subsystem-code: DRACS_test
+      auth:
+        type: "NO_AUTH"
     idp-exchange-service-registry:
-      trembita-url: http://localhost:7780/trembita-mock-server
+      url: http://localhost:7780/trembita-mock-server
       user-id: DDM
       protocol-version: 4.0
+      protocol: "SOAP"
       client:
         x-road-instance: CLIENT-TEST
         member-class: GOV
@@ -99,6 +107,8 @@ trembita-exchange-gateway:
         member-class: GOV
         member-code: 11115887
         subsystem-code: IDP_test
+      auth:
+        type: "NO_AUTH"
 
 data-platform:
   kafka:
@@ -122,28 +132,96 @@ external-system:
 external-systems:
   system1:
     url: ${external-system.url}
-    methods:
-      method1:
-        path: /api/get
+    protocol: REST
+    operations:
+      operation1:
+        resource-path: /api/get
         method: GET
-      method2:
-        path: /api/post
+      operation2:
+        resource-path: /api/post
         method: POST
     auth:
       type: BASIC
-      secret-name: secret1
+      secret:
+        username: user
+        password: cGFzcw
   system-with-partner-token-auth:
     url: ${external-system.url}
-    methods:
-      method1:
-        path: /api/get
+    protocol: REST
+    operations:
+      operation1:
+        resource-path: /api/get
         method: GET
     auth:
-      type: PARTNER_TOKEN
-      secret-name: secret2
-      partner-token-auth-url: ${external-system.url}/api/auth/partner
-      token-json-path: $.token
-
-kubernetes:
-  namespace:
-    current: current-namespace
+      type: AUTH_TOKEN+BEARER
+      auth-url: ${external-system.url}/api/auth/partner
+      access-token-json-path: $.token
+      secret:
+        token: token
+  system-with-partner-token-auth-relative-path:
+    url: ${external-system.url}
+    protocol: REST
+    operations:
+      operation1:
+        resource-path: /api/get
+        method: GET
+    auth:
+      type: AUTH_TOKEN+BEARER
+      auth-url: /api/auth/partner
+      access-token-json-path: $.token
+      secret:
+        token: token
+  system-with-bearer-auth:
+    url: ${external-system.url}
+    protocol: REST
+    operations:
+      operation1:
+        resource-path: /api/get-with-bearer
+        method: GET
+    auth:
+      type: BEARER
+      secret:
+        token: bearer-token
+  system-with-auth-token:
+    url: ${external-system.url}
+    protocol: REST
+    operations:
+      operation1:
+        resource-path: /api/get-with-auth-token
+        method: GET
+    auth:
+      type: AUTH_TOKEN
+      secret:
+        token: auth-token
+  system-basic-without-username:
+    url: ${external-system.url}
+    protocol: REST
+    operations:
+      operation1:
+        resource-path: /api/get
+        method: GET
+    auth:
+      type: BASIC
+      secret:
+        username:
+        password: cGFzcw==
+  system-bearer-without-secret:
+    url: ${external-system.url}
+    protocol: REST
+    operations:
+      operation1:
+        resource-path: /api/get
+        method: GET
+    auth:
+      type: BEARER
+  system-auth-token-without-token:
+    url: ${external-system.url}
+    protocol: REST
+    operations:
+      operation1:
+        resource-path: /api/get
+        method: GET
+    auth:
+      type: AUTH_TOKEN
+      secret:
+        token:

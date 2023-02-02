@@ -21,15 +21,15 @@ import com.epam.digital.data.platform.bpms.extension.config.properties.ExternalS
 import com.epam.digital.data.platform.bpms.extension.config.properties.ExternalSystemConfigurationProperties.AuthenticationConfiguration.AuthenticationType;
 import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.dto.RegistryConnectorResponse;
+import com.epam.digital.data.platform.bpms.extension.exception.AuthConfigurationException;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
-import io.fabric8.kubernetes.client.KubernetesClient;
-import java.util.Base64;
+import java.net.URI;
 import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -47,18 +47,12 @@ public class ExternalSystemConnectorDelegate extends BaseRestTemplateConnectorDe
 
   public static final String DELEGATE_NAME = "externalSystemConnectorDelegate";
 
-  private static final String BASIC_SECRET_USERNAME_FIELD = "username";
-  private static final String BASIC_SECRET_PASSWORD_FIELD = "password";
-  private static final String PARTNER_TOKEN_SECRET_TOKEN_FIELD = "token";
-
   private final Map<String, ExternalSystemConfigurationProperties> externalSystemsConfiguration;
-  private final KubernetesClient kubernetesClient;
-  private final String currentNamespace;
 
   @SystemVariable(name = "systemName")
   private NamedVariableAccessor<String> systemNameVariable;
   @SystemVariable(name = "methodName")
-  private NamedVariableAccessor<String> methodNameVariable;
+  private NamedVariableAccessor<String> operationNameVariable;
   @SystemVariable(name = "requestParameters")
   private NamedVariableAccessor<Map<String, String>> requestParametersVariable;
   @SystemVariable(name = "requestHeaders")
@@ -69,13 +63,9 @@ public class ExternalSystemConnectorDelegate extends BaseRestTemplateConnectorDe
   private NamedVariableAccessor<RegistryConnectorResponse> responseVariable;
 
   public ExternalSystemConnectorDelegate(RestTemplate restTemplate,
-      Map<String, ExternalSystemConfigurationProperties> externalSystemsConfiguration,
-      KubernetesClient kubernetesClient,
-      @Value("${kubernetes.namespace.current}") String currentNamespace) {
+                                         Map<String, ExternalSystemConfigurationProperties> externalSystemsConfiguration) {
     super(restTemplate);
     this.externalSystemsConfiguration = externalSystemsConfiguration;
-    this.kubernetesClient = kubernetesClient;
-    this.currentNamespace = currentNamespace;
   }
 
   @Override
@@ -86,28 +76,24 @@ public class ExternalSystemConnectorDelegate extends BaseRestTemplateConnectorDe
   @Override
   protected void executeInternal(DelegateExecution execution) throws Exception {
     var externalSystemName = systemNameVariable.from(execution).getOrThrow();
-    var methodName = methodNameVariable.from(execution).getOrThrow();
+    var operationName = operationNameVariable.from(execution).getOrThrow();
 
     var externalSystemConfiguration = getExternalSystemConfiguration(externalSystemName);
-    var methodConfiguration = getMethodConfiguration(externalSystemName, methodName);
+    var operationConfiguration = getOperationConfiguration(externalSystemName, operationName);
+    var auth = externalSystemConfiguration.getAuth();
+    checkAuthenticationConfig(auth, externalSystemName);
 
     var requestParameters =
-        toMultiValueMapSeparatedByComma(requestParametersVariable.from(execution).get());
+            toMultiValueMapSeparatedByComma(requestParametersVariable.from(execution).get());
     var requestHeaders = new HttpHeaders(toMultiValueMapSeparatedByComma(
-        requestHeadersVariable.from(execution).get()));
+            requestHeadersVariable.from(execution).get()));
     var payload = payloadVariable.from(execution).getOptional().map(Object::toString).orElse(null);
 
-    var auth = externalSystemConfiguration.getAuth();
-    var secretData = kubernetesClient.secrets()
-        .inNamespace(currentNamespace)
-        .withName(auth.getSecretName()).get()
-        .getData();
+    var externalSystemUrl = externalSystemConfiguration.getUrl();
+    authenticate(requestHeaders, auth, externalSystemUrl);
 
-    authenticate(requestHeaders, auth, secretData);
-
-    var uri = buildUri(externalSystemConfiguration.getUrl(), methodConfiguration.getPath(),
-        requestParameters);
-    var method = methodConfiguration.getMethod();
+    var uri = buildUri(externalSystemUrl, operationConfiguration.getResourcePath(), requestParameters);
+    var method = operationConfiguration.getMethod();
     var httpEntity = new HttpEntity<>(payload, requestHeaders);
 
     var responseValue = sendRequest(uri, method, httpEntity);
@@ -115,57 +101,89 @@ public class ExternalSystemConnectorDelegate extends BaseRestTemplateConnectorDe
     responseVariable.on(execution).set(responseValue);
   }
 
+  private void checkAuthenticationConfig(AuthenticationConfiguration auth, String extSysName) {
+    var isAuthConfigDefined = Objects.nonNull(auth);
+
+    if (isAuthConfigDefined && !AuthenticationType.NO_AUTH.equals(auth.getType())) {
+      isAuthConfigDefined = isAuthSecretDefined(auth);
+    }
+
+    if (!isAuthConfigDefined) {
+      throw new AuthConfigurationException(String.format(
+          "Authentication configuration for external-system with name %s not configured", extSysName));
+    }
+  }
+
+  private boolean isAuthSecretDefined(AuthenticationConfiguration auth) {
+    var secret = auth.getSecret();
+    if (Objects.isNull(secret)) {
+      return false;
+    } else if (AuthenticationType.BASIC.equals(auth.getType())) {
+      return StringUtils.isNotBlank(secret.getUsername()) && StringUtils.isNotBlank(secret.getPassword());
+    } else {
+      return StringUtils.isNotBlank(secret.getToken());
+    }
+  }
+
   private ExternalSystemConfigurationProperties getExternalSystemConfiguration(
-      String externalSystemName) {
+          String externalSystemName) {
     var configuration = externalSystemsConfiguration.get(externalSystemName);
     if (Objects.isNull(configuration)) {
       throw new IllegalArgumentException(
-          String.format("External-system with name %s not configured", externalSystemName));
+              String.format("External-system with name %s not configured", externalSystemName));
     }
     return configuration;
   }
 
-  private ExternalSystemConfigurationProperties.MethodConfiguration getMethodConfiguration(
-      String externalSystemName, String methodName) {
+  private ExternalSystemConfigurationProperties.OperationConfiguration getOperationConfiguration(
+          String externalSystemName, String operationName) {
     var externalSystemConfiguration = getExternalSystemConfiguration(externalSystemName);
-    var method = externalSystemConfiguration.getMethods().get(methodName);
-    if (Objects.isNull(method)) {
+    var operation = externalSystemConfiguration.getOperations().get(operationName);
+    if (Objects.isNull(operation)) {
       throw new IllegalArgumentException(
-          String.format("Method %s in external-system %s not configured", methodName,
-              externalSystemName));
+              String.format("Operation %s in external-system %s not configured", operationName,
+                      externalSystemName));
     }
-    return method;
+    return operation;
   }
 
-  private void authenticate(HttpHeaders requestHeaders, AuthenticationConfiguration auth,
-      Map<String, String> secretData) {
-    if (auth.getType().equals(AuthenticationType.BASIC)) {
-      authenticateWithBasic(requestHeaders, secretData);
-    } else if (auth.getType().equals(AuthenticationType.PARTNER_TOKEN)) {
-      authenticateWithPartnerToken(requestHeaders, auth, secretData);
+  private void authenticate(HttpHeaders requestHeaders, AuthenticationConfiguration auth, String externalSystemUrl) {
+    if (AuthenticationType.BASIC.equals(auth.getType())) {
+      authenticateWithBasic(requestHeaders, auth.getSecret());
+    } else if (AuthenticationType.AUTH_TOKEN_BEARER.equals(auth.getType())) {
+      authenticateWithPartnerToken(requestHeaders, auth, externalSystemUrl);
+    } else if (AuthenticationType.BEARER.equals(auth.getType()) || AuthenticationType.AUTH_TOKEN.equals(auth.getType())) {
+      var authToken = auth.getSecret().getToken();
+      requestHeaders.setBearerAuth(authToken);
     }
   }
 
-  private void authenticateWithBasic(HttpHeaders requestHeaders, Map<String, String> secretData) {
-    var username = decodeBase64(secretData.get(BASIC_SECRET_USERNAME_FIELD));
-    var password = decodeBase64(secretData.get(BASIC_SECRET_PASSWORD_FIELD));
+  private void authenticateWithBasic(HttpHeaders requestHeaders, AuthenticationConfiguration.Secret secret) {
+    var username = secret.getUsername();
+    var password = secret.getPassword();
     requestHeaders.setBasicAuth(username, password);
   }
 
   private void authenticateWithPartnerToken(HttpHeaders requestHeaders,
-      AuthenticationConfiguration auth, Map<String, String> secretData) {
-    var partnerToken = decodeBase64(secretData.get(PARTNER_TOKEN_SECRET_TOKEN_FIELD));
+      AuthenticationConfiguration auth, String externalSystemUrl) {
+    var partnerToken = auth.getSecret().getToken();
+    URI concatenatedUrl;
+    var authUrl = auth.getAuthUrl();
 
-    var uri = UriComponentsBuilder.fromUriString(auth.getPartnerTokenAuthUrl())
-        .pathSegment(partnerToken)
-        .build().toUri();
-    var response = sendRequest(uri, HttpMethod.GET, null);
-    var authToken = response.getResponseBody().jsonPath(auth.getTokenJsonPath()).stringValue();
+    if (authUrl.startsWith("/")) {
+      concatenatedUrl = UriComponentsBuilder.fromUriString(externalSystemUrl)
+          .pathSegment(authUrl.split("/"))
+          .pathSegment(partnerToken)
+          .build().toUri();
+    } else {
+      concatenatedUrl = UriComponentsBuilder.fromHttpUrl(authUrl)
+          .pathSegment(partnerToken)
+          .build().toUri();
+    }
+
+    var response = sendRequest(concatenatedUrl, HttpMethod.GET, null);
+    var authToken = response.getResponseBody().jsonPath(auth.getAccessTokenJsonPath()).stringValue();
 
     requestHeaders.setBearerAuth(authToken);
-  }
-
-  private String decodeBase64(String secret) {
-    return new String(Base64.getDecoder().decode(secret));
   }
 }

@@ -67,13 +67,14 @@ keycloak:
     client-id: system-user-client-id
     client-secret: system-user-client-secret
 
-trembita-exchange-gateway:
+trembita:
   registries:
     edr-registry:
-      trembita-url: http://localhost:7788/trembita-mock-server
+      url: http://localhost:7788/trembita-mock-server
       userId: DDM
       protocol-version: 4.0
-      authorization-token: token
+      protocol: "SOAP"
+      type: "platform"
       client:
         x-road-instance: CLIENT-TEST
         member-class: GOV
@@ -84,6 +85,10 @@ trembita-exchange-gateway:
         member-class: GOV
         member-code: 11115888
         subsystem-code: EDR_test
+      auth:
+        type: "AUTH_TOKEN"
+        secret:
+          token: "auth_token"
 
 registry-regulation:
   officer:
