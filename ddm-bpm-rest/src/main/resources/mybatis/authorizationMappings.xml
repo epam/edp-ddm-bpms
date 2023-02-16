@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="handler.authorization">
+
+  <insert id="insertProcessDefinitionAuthorizations" parameterType="java.util.List">
+    INSERT INTO
+    ACT_RU_AUTHORIZATION (ID_, TYPE_, GROUP_ID_, RESOURCE_TYPE_, RESOURCE_ID_, PERMS_, REV_)
+    VALUES
+    <foreach collection="list" item="element" index="index" separator=",">
+      ('${@java.util.UUID@randomUUID().toString()}', 1, #{element.groupId, jdbcType=VARCHAR}, 6,
+      #{element.processDefinitionId ,jdbcType=VARCHAR}, 258, 1)
+    </foreach>
+  </insert>
+
+  <insert id="insertProcessInstanceAuthorizations" parameterType="java.util.List">
+    INSERT INTO
+    ACT_RU_AUTHORIZATION (ID_, TYPE_, GROUP_ID_, RESOURCE_TYPE_, RESOURCE_ID_, PERMS_, REV_)
+    VALUES
+    <foreach collection="list" item="element" index="index" separator=",">
+      ('${@java.util.UUID@randomUUID().toString()}', 1, #{element ,jdbcType=VARCHAR}, 8, '*', 8, 1)
+    </foreach>
+  </insert>
+
+  <delete id="deleteAuthorizations">
+    DELETE
+    FROM ACT_RU_AUTHORIZATION
+    WHERE ID_ IN (
+    SELECT
+    ID_
+    FROM
+    ACT_RU_AUTHORIZATION
+    WHERE (RESOURCE_TYPE_ = 8 AND GROUP_ID_ != 'camunda-admin' AND RESOURCE_ID_= '*' AND PERMS_ = 8)
+    or
+    (RESOURCE_TYPE_ = 6 AND GROUP_ID_ != 'camunda-admin' AND PERMS_ = 258)
+    )
+  </delete>
+
+</mapper>

@@ -16,6 +16,7 @@
 
 package com.epam.digital.data.platform.bpms.rest.config;
 
+import com.epam.digital.data.platform.bpms.rest.controller.ExtendedAuthorizationController;
 import com.epam.digital.data.platform.bpms.rest.controller.ProcessDefinitionController;
 import com.epam.digital.data.platform.bpms.rest.controller.ProcessInstanceController;
 import com.epam.digital.data.platform.bpms.rest.controller.TaskController;
@@ -49,6 +50,7 @@ public class LowcodeJerseyConfig extends CamundaJerseyResourceConfig {
     register(TaskController.class);
     register(ProcessInstanceController.class);
     register(ProcessDefinitionController.class);
+    register(ExtendedAuthorizationController.class);
 
     register(UserDataValidationExceptionMapper.class);
     register(CamundaSystemExceptionMapper.class);

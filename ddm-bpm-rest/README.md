@@ -31,6 +31,8 @@
   extended process instances;
 * `com.epam.digital.data.platform.bpms.rest.controller.TaskController` - for getting extended user
   tasks;
+* `com.epam.digital.data.platform.bpms.rest.controller.ExtendedAuthorizationController` - for
+  managing authorizations;
 
 ### Test execution
 
