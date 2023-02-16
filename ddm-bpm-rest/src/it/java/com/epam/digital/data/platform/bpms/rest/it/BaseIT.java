@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,6 @@ import javax.inject.Inject;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status.Family;
-import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -73,7 +71,7 @@ public abstract class BaseIT {
   @Inject
   protected ObjectMapper objectMapper;
   @Inject
-  private AuthorizationService authorizationService;
+  protected AuthorizationService authorizationService;
 
   @LocalServerPort
   protected int port;
@@ -135,19 +133,6 @@ public abstract class BaseIT {
         .post(Entity.entity(body, MediaType.APPLICATION_JSON))
         .readEntity(String.class);
     return objectMapper.readValue(jsonResponse, targetClass);
-  }
-
-  protected void postForNoContent(String url, String body) {
-    postForNoContent(url, body, validAccessToken);
-  }
-
-  protected void postForNoContent(String url, String body, String token) {
-    var response = jerseyClient.target(String.format("http://localhost:%d/%s", port, url))
-        .request()
-        .header(TOKEN_HEADER, token)
-        .post(Entity.entity(body, MediaType.APPLICATION_JSON));
-
-    Assertions.assertThat(response.getStatusInfo().getFamily()).isEqualTo(Family.SUCCESSFUL);
   }
 
   private void createAuthorizationsIfNotExists(String groupId) {
