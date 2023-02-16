@@ -12,7 +12,7 @@
     <bpmn:serviceTask id="Activity_0rfnos8" name="Auth config BASIC without username" camunda:delegateExpression="${externalSystemConnectorDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="methodName">operation1</camunda:inputParameter>
+          <camunda:inputParameter name="operationName">operation1</camunda:inputParameter>
           <camunda:inputParameter name="systemName">system-basic-without-username</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
@@ -35,7 +35,7 @@
     <bpmn:serviceTask id="Activity_0zoskd2" name="Auth config BEARER without secret" camunda:delegateExpression="${externalSystemConnectorDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="methodName">operation1</camunda:inputParameter>
+          <camunda:inputParameter name="operationName">operation1</camunda:inputParameter>
           <camunda:inputParameter name="systemName">system-bearer-without-secret</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
@@ -55,7 +55,7 @@
     <bpmn:serviceTask id="Activity_10xvy0d" name="Auth config AUTH_TOKEN without token" camunda:delegateExpression="${externalSystemConnectorDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="methodName">operation1</camunda:inputParameter>
+          <camunda:inputParameter name="operationName">operation1</camunda:inputParameter>
           <camunda:inputParameter name="systemName">system-auth-token-without-token</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
