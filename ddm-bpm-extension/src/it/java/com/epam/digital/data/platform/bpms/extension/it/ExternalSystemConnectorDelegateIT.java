@@ -51,7 +51,8 @@ public class ExternalSystemConnectorDelegateIT extends BaseIT {
   public void externalSystemConnectorNoOperationNameDefined() {
     var ex = assertThrows(IllegalArgumentException.class, () -> runtimeService
         .startProcessInstanceByKey("external_system_connector_no_operation_name_defined"));
-    assertThat(ex.getMessage()).isEqualTo("Variable methodName not found");
+    assertThat(ex.getMessage()).isEqualTo(
+        "Variable not found. One of 'operationName' or 'methodName' must be specified.");
   }
 
   @Test
