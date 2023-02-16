@@ -52,6 +52,8 @@ public class ExternalSystemConnectorDelegate extends BaseRestTemplateConnectorDe
   @SystemVariable(name = "systemName")
   private NamedVariableAccessor<String> systemNameVariable;
   @SystemVariable(name = "methodName")
+  private NamedVariableAccessor<String> methodNameVariable;
+  @SystemVariable(name = "operationName")
   private NamedVariableAccessor<String> operationNameVariable;
   @SystemVariable(name = "requestParameters")
   private NamedVariableAccessor<Map<String, String>> requestParametersVariable;
@@ -76,7 +78,7 @@ public class ExternalSystemConnectorDelegate extends BaseRestTemplateConnectorDe
   @Override
   protected void executeInternal(DelegateExecution execution) throws Exception {
     var externalSystemName = systemNameVariable.from(execution).getOrThrow();
-    var operationName = operationNameVariable.from(execution).getOrThrow();
+    var operationName = defineOperationName(execution);
 
     var externalSystemConfiguration = getExternalSystemConfiguration(externalSystemName);
     var operationConfiguration = getOperationConfiguration(externalSystemName, operationName);
@@ -185,5 +187,17 @@ public class ExternalSystemConnectorDelegate extends BaseRestTemplateConnectorDe
     var authToken = response.getResponseBody().jsonPath(auth.getAccessTokenJsonPath()).stringValue();
 
     requestHeaders.setBearerAuth(authToken);
+  }
+
+  private String defineOperationName(DelegateExecution execution) {
+    var operationName = operationNameVariable.from(execution).get();
+    var methodName = methodNameVariable.from(execution).get();
+
+    if (Objects.isNull(operationName) && Objects.isNull(methodName)) {
+      throw new IllegalArgumentException(
+          "Variable not found. One of 'operationName' or 'methodName' must be specified.");
+    } else {
+      return Objects.nonNull(methodName) ? methodName : operationName;
+    }
   }
 }
