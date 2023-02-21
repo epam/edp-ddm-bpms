@@ -90,9 +90,9 @@ keycloak:
     secretName: keycloak-realm-admin-officer-client-secret
   systemUserClient:
     clientName: system-user
-    realm: admin
+    realm: officer-portal
     public: false
-    secretName: keycloak-system-user-admin-client-secret
+    secretName: keycloak-system-user-officer-client-secret
   officerSystemClient:
     clientName: user-attributes-management
     realm: officer-portal
