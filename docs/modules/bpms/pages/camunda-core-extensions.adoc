@@ -37,6 +37,7 @@ LowcodeSpringProcessEngineConfiguration <-- CamundaConfiguration : creates
 - `TransientBpmnParseFactory` - є наслідком `BpmnParseFactory` та потрібен для створення `TransientBpmnParse` у `SpringProcessEngineConfiguration`
 - `LowcodeSpringProcessEngineConfiguration` - є наслідком `SpringProcessEngineConfiguration` та потрібен для визначення параметрів кастомними значеннями (такими як `bpmnParseFactory`)
 - `CamundaConfiguration` - базовий конфігураційний клас який створює та конфігурує екземпляр класу `LowcodeSpringProcessEngineConfiguration`
+- `DefaultSerializationFormatConfiguration` - конфігураційний клас який визначає `application/json` як формат серіалізації об'єктів за замовчуванням для `LowcodeSpringProcessEngineConfiguration`
 
 === Заміщення парсингу input/output параметрів
 
