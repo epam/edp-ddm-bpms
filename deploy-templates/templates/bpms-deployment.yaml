@@ -100,18 +100,13 @@ spec:
           - name: CEPH_BUCKET_HOST
             valueFrom:
               configMapKeyRef:
-                name: {{ .Values.ceph.bucketName }}
+                name: {{ .Values.fileStorage.bucketName }}
                 key: BUCKET_HOST
           - name: CEPH_BUCKET_PORT
             valueFrom:
               configMapKeyRef:
-                name: {{ .Values.ceph.bucketName }}
+                name: {{ .Values.fileStorage.bucketName }}
                 key: BUCKET_PORT
-          - name: CEPH_BUCKET_NAME
-            valueFrom:
-              configMapKeyRef:
-                name: {{ .Values.ceph.bucketName }}
-                key: BUCKET_NAME
           - name: ceph.file-storage-bucket
             valueFrom:
               configMapKeyRef:
@@ -148,8 +143,6 @@ spec:
             mountPath: {{ .Values.appSecretsMountPath }}
           - name: {{ .Chart.Name }}-camunda-global-system-vars
             mountPath: {{ .Values.camundaVarsMountPath }}
-          - name: {{ .Chart.Name }}-ceph-bucket-credentials
-            mountPath: {{ .Values.cephSecretMountPath }}
           - name: {{ .Values.fileStorage.bucketName }}-credentials
             mountPath: {{ .Values.fileStorageSecretMountPath }}
           - name: {{ .Values.keycloak.citizenClient.secretName }}
@@ -211,14 +204,6 @@ spec:
               path: spring.datasource.username
             - key: password
               path: spring.datasource.password
-        - name: {{ .Chart.Name }}-ceph-bucket-credentials
-          secret:
-            secretName: {{ .Values.ceph.bucketName }}
-            items:
-            - key: AWS_ACCESS_KEY_ID
-              path: ceph.access-key
-            - key: AWS_SECRET_ACCESS_KEY
-              path: ceph.secret-key
         - name: {{ .Values.fileStorage.bucketName }}-credentials
           secret:
             secretName: {{ .Values.fileStorage.bucketName }}

@@ -68,7 +68,6 @@ ingress: # expose the service with a route or an ingress depending on platform t
   platform: openshift # openshift or kubernetes
 
 ceph:
-  bucketName: lowcode-form-data-storage
   host: ${CEPH_BUCKET_HOST}
 
 fileStorage:
@@ -116,11 +115,6 @@ storage:
       sentinel:
         master: mymaster
         nodes: ${redis.endpoint}
-    ceph:
-      http-endpoint: ${ceph.http-endpoint}
-      access-key: ${ceph.access-key}
-      secret-key: ${ceph.secret-key}
-      bucket: ${ceph.bucket}
   file-data:
     type: ceph
     backend:
