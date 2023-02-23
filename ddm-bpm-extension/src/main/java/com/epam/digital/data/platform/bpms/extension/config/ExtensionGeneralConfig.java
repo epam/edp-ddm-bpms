@@ -17,23 +17,17 @@
 package com.epam.digital.data.platform.bpms.extension.config;
 
 import com.epam.digital.data.platform.bpms.extension.config.properties.ExternalSystemConfigurationProperties;
-import com.epam.digital.data.platform.bpms.extension.delegate.connector.DataFactoryConnectorBatchCreateDelegate;
-import com.epam.digital.data.platform.bpms.extension.delegate.connector.DataFactoryConnectorBatchReadDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloak.officer.KeycloakSaveOfficerAttributeDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.dracs.GetCertificateByBirthdateDracsRegistryDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.dracs.GetCertificateByNameDracsRegistryDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.edr.SearchSubjectsEdrRegistryConnectorDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.edr.SubjectDetailEdrRegistryConnectorDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.idp.exchangeservice.IdpExchangeServiceRegistryConnector;
-import com.epam.digital.data.platform.bpms.extension.delegate.storage.GetContentFromCephDelegate;
-import com.epam.digital.data.platform.bpms.extension.delegate.storage.PutContentToCephDelegate;
 import com.epam.digital.data.platform.datafactory.excerpt.client.ExcerptFeignClient;
 import com.epam.digital.data.platform.datafactory.factory.client.DataFactoryFeignClient;
 import com.epam.digital.data.platform.datafactory.factory.client.PlatformGatewayFeignClient;
 import com.epam.digital.data.platform.datafactory.settings.client.UserSettingsFeignClient;
 import com.epam.digital.data.platform.dso.client.DigitalSealRestClient;
-import com.epam.digital.data.platform.integration.ceph.service.CephService;
-import com.epam.digital.data.platform.integration.ceph.service.impl.CephServiceS3Impl;
 import com.epam.digital.data.platform.integration.idm.service.IdmService;
 import com.epam.digital.data.platform.starter.trembita.integration.dracs.service.DracsRemoteService;
 import com.epam.digital.data.platform.starter.trembita.integration.edr.service.EdrRemoteService;
@@ -117,24 +111,6 @@ public class ExtensionGeneralConfig {
   public IdpExchangeServiceRegistryConnector idpExchangeServiceRegistryConnector(
       IdpExchangeRegistryService idpExchangeRegistryService) {
     return new IdpExchangeServiceRegistryConnector(idpExchangeRegistryService);
-  }
-
-  /**
-   * For delegates that use ceph service directly: {@link GetContentFromCephDelegate}, {@link
-   * PutContentToCephDelegate}, {@link DataFactoryConnectorBatchCreateDelegate}, {@link
-   * DataFactoryConnectorBatchReadDelegate}
-   */
-  @Bean
-  @ConditionalOnMissingBean(CephService.class)
-  public CephService cephService(
-      @Value("${ceph.http-endpoint}") String cephEndpoint,
-      @Value("${ceph.access-key}") String cephAccessKey,
-      @Value("${ceph.secret-key}") String cephSecretKey) {
-    return CephServiceS3Impl.builder()
-        .cephAccessKey(cephAccessKey)
-        .cephSecretKey(cephSecretKey)
-        .cephEndpoint(cephEndpoint)
-        .build();
   }
 
   @Bean
