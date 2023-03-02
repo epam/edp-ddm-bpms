@@ -1,0 +1,13 @@
+bpm:
+  metrics:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: 'prometheus'
+
+spring:
+  liquibase:
+    enabled: false

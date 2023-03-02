@@ -43,6 +43,7 @@
     <module>ddm-bpm-history-event-handler</module>
     <module>ddm-bpm-storage</module>
     <module>ddm-bpm-integration-tests</module>
+    <module>ddm-bpm-metrics-plugin</module>
   </modules>
 
   <properties>
