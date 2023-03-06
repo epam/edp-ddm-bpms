@@ -20,7 +20,6 @@ import java.util.function.ToDoubleFunction;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.management.Metrics;
 
 @Getter
 @RequiredArgsConstructor
@@ -34,23 +33,26 @@ public enum DdmBpmBusinessProcessMetric implements DdmBpmMetric {
   ACTIVE_USER_TASKS_UNASSIGNED_METRIC("camunda.active.user.tasks.unassigned",
       "The amount of active camunda user tasks that don't have an assignee",
       e -> e.getTaskService().createTaskQuery().active().taskUnassigned().count()),
-  COMPLETED_PROCESS_INSTANCES_METRIC("camunda.completed.process.instances",
+  COMPLETED_ROOT_PROCESS_INSTANCES_METRIC("camunda.root.process.instances.completed",
       "The amount of completed process-instances",
-      e -> e.getHistoryService().createHistoricProcessInstanceQuery().completed().count()),
-  TERMINATED_PROCESS_INSTANCES_METRIC("camunda.terminated.process.instances",
+      e -> e.getHistoryService().createHistoricProcessInstanceQuery().rootProcessInstances()
+          .completed().count()),
+  TERMINATED_ROOT_PROCESS_INSTANCES_METRIC("camunda.root.process.instances.terminated",
       "The amount of externally-terminated process-instances",
-      e -> e.getHistoryService().createHistoricProcessInstanceQuery().externallyTerminated()
-          .count()),
-  SUSPENDED_PROCESS_INSTANCES_METRIC("camunda.suspended.process.instances",
+      e -> e.getHistoryService().createHistoricProcessInstanceQuery().rootProcessInstances()
+          .externallyTerminated().count()),
+  SUSPENDED_ROOT_PROCESS_INSTANCES_METRIC("camunda.root.process.instances.suspended",
       "The amount of suspended process-instances",
-      e -> e.getRuntimeService().createProcessInstanceQuery().suspended().count()),
-  ACTIVE_PROCESS_INSTANCES_METRIC("camunda.active.process.instances",
+      e -> e.getHistoryService().createHistoricProcessInstanceQuery().rootProcessInstances()
+          .suspended().count()),
+  ACTIVE_ROOT_PROCESS_INSTANCES_METRIC("camunda.root.process.instances.active",
       "The amount of active process-instances",
-      e -> e.getRuntimeService().createProcessInstanceQuery().active().count()),
-  PROCESS_INSTANCES_METRIC("camunda.process.instances.total",
+      e -> e.getHistoryService().createHistoricProcessInstanceQuery().rootProcessInstances()
+          .active().count()),
+  ROOT_PROCESS_INSTANCES_METRIC("camunda.root.process.instances",
       "The total amount of all process-instances",
-      e -> e.getManagementService().createMetricsQuery().name(Metrics.ROOT_PROCESS_INSTANCE_START)
-          .sum()),
+      e -> e.getHistoryService().createHistoricProcessInstanceQuery().rootProcessInstances()
+          .count()),
   ACTIVE_INCIDENTS_METRIC("camunda.active.incidents",
       "The amount of active process-instance incidents",
       e -> e.getRuntimeService().createIncidentQuery().count());

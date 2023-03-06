@@ -21,14 +21,14 @@ import static com.epam.digital.data.platform.bpm.metrics.DdmBpmAsyncJobsMetric.E
 import static com.epam.digital.data.platform.bpm.metrics.DdmBpmAsyncJobsMetric.MESSAGE_JOBS_METRIC;
 import static com.epam.digital.data.platform.bpm.metrics.DdmBpmAsyncJobsMetric.TIMER_JOBS_METRIC;
 import static com.epam.digital.data.platform.bpm.metrics.DdmBpmBusinessProcessMetric.ACTIVE_INCIDENTS_METRIC;
-import static com.epam.digital.data.platform.bpm.metrics.DdmBpmBusinessProcessMetric.ACTIVE_PROCESS_INSTANCES_METRIC;
+import static com.epam.digital.data.platform.bpm.metrics.DdmBpmBusinessProcessMetric.ACTIVE_ROOT_PROCESS_INSTANCES_METRIC;
 import static com.epam.digital.data.platform.bpm.metrics.DdmBpmBusinessProcessMetric.ACTIVE_USER_TASKS_ASSIGNED_METRIC;
 import static com.epam.digital.data.platform.bpm.metrics.DdmBpmBusinessProcessMetric.ACTIVE_USER_TASKS_METRIC;
 import static com.epam.digital.data.platform.bpm.metrics.DdmBpmBusinessProcessMetric.ACTIVE_USER_TASKS_UNASSIGNED_METRIC;
-import static com.epam.digital.data.platform.bpm.metrics.DdmBpmBusinessProcessMetric.COMPLETED_PROCESS_INSTANCES_METRIC;
-import static com.epam.digital.data.platform.bpm.metrics.DdmBpmBusinessProcessMetric.PROCESS_INSTANCES_METRIC;
-import static com.epam.digital.data.platform.bpm.metrics.DdmBpmBusinessProcessMetric.SUSPENDED_PROCESS_INSTANCES_METRIC;
-import static com.epam.digital.data.platform.bpm.metrics.DdmBpmBusinessProcessMetric.TERMINATED_PROCESS_INSTANCES_METRIC;
+import static com.epam.digital.data.platform.bpm.metrics.DdmBpmBusinessProcessMetric.COMPLETED_ROOT_PROCESS_INSTANCES_METRIC;
+import static com.epam.digital.data.platform.bpm.metrics.DdmBpmBusinessProcessMetric.ROOT_PROCESS_INSTANCES_METRIC;
+import static com.epam.digital.data.platform.bpm.metrics.DdmBpmBusinessProcessMetric.SUSPENDED_ROOT_PROCESS_INSTANCES_METRIC;
+import static com.epam.digital.data.platform.bpm.metrics.DdmBpmBusinessProcessMetric.TERMINATED_ROOT_PROCESS_INSTANCES_METRIC;
 import static com.epam.digital.data.platform.bpm.metrics.DdmBpmHistoryCleanupMetric.REMOVED_PROCESS_INSTANCES_METRICS;
 import static com.epam.digital.data.platform.bpm.metrics.DdmBpmHistoryCleanupMetric.REMOVED_TASKS_METRICS;
 import static com.epam.digital.data.platform.bpm.metrics.DdmBpmProcessEngineMetric.ACTIVE_PROCESS_DEFINITIONS_METRIC;
@@ -104,11 +104,11 @@ class DdmBpmMetricTest {
         Arguments.of("user-tasks-metrics.sql", ACTIVE_USER_TASKS_METRIC, 9D),
         Arguments.of("user-tasks-metrics.sql", ACTIVE_USER_TASKS_ASSIGNED_METRIC, 5D),
         Arguments.of("user-tasks-metrics.sql", ACTIVE_USER_TASKS_UNASSIGNED_METRIC, 4D),
-        Arguments.of("process-instance-metrics.sql", COMPLETED_PROCESS_INSTANCES_METRIC, 3D),
-        Arguments.of("process-instance-metrics.sql", TERMINATED_PROCESS_INSTANCES_METRIC, 2D),
-        Arguments.of("process-instance-metrics.sql", SUSPENDED_PROCESS_INSTANCES_METRIC, 2D),
-        Arguments.of("process-instance-metrics.sql", ACTIVE_PROCESS_INSTANCES_METRIC, 1D),
-        Arguments.of("process-instance-metrics.sql", PROCESS_INSTANCES_METRIC, 628D),
+        Arguments.of("process-instance-metrics.sql", COMPLETED_ROOT_PROCESS_INSTANCES_METRIC, 3D),
+        Arguments.of("process-instance-metrics.sql", TERMINATED_ROOT_PROCESS_INSTANCES_METRIC, 2D),
+        Arguments.of("process-instance-metrics.sql", SUSPENDED_ROOT_PROCESS_INSTANCES_METRIC, 2D),
+        Arguments.of("process-instance-metrics.sql", ACTIVE_ROOT_PROCESS_INSTANCES_METRIC, 1D),
+        Arguments.of("process-instance-metrics.sql", ROOT_PROCESS_INSTANCES_METRIC, 9D),
         Arguments.of("active-incidents-metric.sql", ACTIVE_INCIDENTS_METRIC, 6D),
         Arguments.of("subscription-metrics.sql", ACTIVE_SIGNAL_EVENT_SUBSCRIPTIONS_METRIC, 1D),
         Arguments.of("subscription-metrics.sql", ACTIVE_CONDITIONAL_EVENT_SUBSCRIPTIONS_METRIC, 2D),
