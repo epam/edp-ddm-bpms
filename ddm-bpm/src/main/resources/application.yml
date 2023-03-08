@@ -112,6 +112,7 @@ logbook:
   obfuscate:
     headers:
       - x-access-token
+      - cookie
 
 decorator:
   datasource:
