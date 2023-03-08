@@ -70,35 +70,35 @@ Create chart name and version as used by the chart label.
 {{- end -}}
 
 {{- define "issuer.officer" -}}
-{{- if .Values.keycloak.customHost }}
-{{- printf "%s-%s" (include "keycloak.customUrlPrefix" .) .Values.keycloak.officerClient.realm -}}
-{{- else }}
 {{- printf "%s-%s" (include "keycloak.urlPrefix" .) .Values.keycloak.officerClient.realm -}}
-{{- end }}
 {{- end -}}
 
 {{- define "issuer.citizen" -}}
-{{- if .Values.keycloak.customHost }}
-{{- printf "%s-%s" (include "keycloak.customUrlPrefix" .) .Values.keycloak.citizenClient.realm -}}
-{{- else }}
 {{- printf "%s-%s" (include "keycloak.urlPrefix" .) .Values.keycloak.citizenClient.realm -}}
-{{- end }}
 {{- end -}}
 
 {{- define "issuer.admin" -}}
-{{- if .Values.keycloak.customHost }}
-{{- printf "%s-%s" (include "keycloak.customUrlPrefix" .) .Values.keycloak.realms.admin -}}
-{{- else }}
 {{- printf "%s-%s" (include "keycloak.urlPrefix" .) .Values.keycloak.realms.admin -}}
-{{- end }}
 {{- end -}}
 
 {{- define "issuer.external" -}}
-{{- if .Values.keycloak.customHost }}
-{{- printf "%s-%s" (include "keycloak.customUrlPrefix" .) .Values.keycloak.realms.external -}}
-{{- else }}
 {{- printf "%s-%s" (include "keycloak.urlPrefix" .) .Values.keycloak.realms.external -}}
-{{- end }}
+{{- end -}}
+
+{{- define "custom-issuer.officer" -}}
+{{- printf "%s-%s" (include "keycloak.customUrlPrefix"  .) .Values.keycloak.officerClient.realm -}}
+{{- end -}}
+
+{{- define "custom-issuer.citizen" -}}
+{{- printf "%s-%s" (include "keycloak.customUrlPrefix" .) .Values.keycloak.citizenClient.realm -}}
+{{- end -}}
+
+{{- define "custom-issuer.admin" -}}
+{{- printf "%s-%s" (include "keycloak.customUrlPrefix" .) .Values.keycloak.realms.admin -}}
+{{- end -}}
+
+{{- define "custom-issuer.external" -}}
+{{- printf "%s-%s" (include "keycloak.customUrlPrefix" .) .Values.keycloak.realms.external -}}
 {{- end -}}
 
 {{- define "jwksUri.officer" -}}
