@@ -109,6 +109,29 @@ trembita:
         subsystem-code: IDP_test
       auth:
         type: "NO_AUTH"
+    test-soap-connector-registry:
+      url: http://localhost:7787/soap-connector-mock-server
+      user-id: DDM
+      protocol-version: 4.0
+      protocol: "SOAP"
+      client:
+        x-road-instance: CLIENT-TEST
+        member-class: GOV
+        member-code: 666777666
+        subsystem-code: GOV_test
+      service:
+        x-road-instance: SOAP-CONNECTOR-TEST
+        member-class: GOV
+        member-code: 11115887
+        subsystem-code: SOAP_CONNECTOR_test
+        service-code: SearchSubjects
+      auth:
+        type: "NO_AUTH"
+    system-without-subsystem-properties:
+      url: http://localhost:7787/soap-connector-mock-server
+      user-id: DDM
+      protocol-version: 4.0
+      protocol: "SOAP"
 
 data-platform:
   kafka:

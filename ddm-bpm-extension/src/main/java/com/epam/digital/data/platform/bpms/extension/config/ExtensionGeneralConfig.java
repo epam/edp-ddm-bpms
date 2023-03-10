@@ -44,6 +44,8 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
+import org.camunda.connect.httpclient.soap.SoapHttpConnector;
+import org.camunda.connect.httpclient.soap.impl.SoapHttpConnectorImpl;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -161,5 +163,10 @@ public class ExtensionGeneralConfig {
   public KeycloakSaveOfficerAttributeDelegate keycloakSaveOfficerAttributeDelegate(
       @Qualifier("officer-system-client-service") IdmService officerSystemUserIdmService) {
     return new KeycloakSaveOfficerAttributeDelegate(officerSystemUserIdmService);
+  }
+
+  @Bean
+  public SoapHttpConnector soapHttpConnector() {
+    return new SoapHttpConnectorImpl();
   }
 }
