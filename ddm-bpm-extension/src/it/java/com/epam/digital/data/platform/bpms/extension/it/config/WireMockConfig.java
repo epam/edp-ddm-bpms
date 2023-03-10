@@ -99,4 +99,11 @@ public class WireMockConfig {
       throws MalformedURLException {
     return WireMockUtil.createAndStartMockServerForUrl(urlStr);
   }
+
+  @Bean(destroyMethod = "stop")
+  @Qualifier("soap-connector")
+  public WireMockServer soapHttpConnectorMockServer(@Value("${trembita.registries.test-soap-connector-registry.url}") String urlStr)
+      throws MalformedURLException {
+    return WireMockUtil.createAndStartMockServerForUrl(urlStr);
+  }
 }

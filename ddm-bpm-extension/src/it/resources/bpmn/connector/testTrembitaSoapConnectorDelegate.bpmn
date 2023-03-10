@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0jghjmj" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.11.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:collaboration id="Collaboration_1d0w9cf">
+    <bpmn:participant id="Participant_19h29ju" name="Test trembita soap connector" processRef="trembita-soap-delegate" />
+    <bpmn:participant id="Participant_1lt5y16" name="Test trembita soap connector no payload defined" processRef="trembita_soap_connector_no_payload_defined" />
+    <bpmn:participant id="Participant_1264v2r" name="Test trembita soap connector no system name defined" processRef="trembita_soap_connector_no_system_name_defined" />
+    <bpmn:participant id="Participant_1asl0ea" name="Test trembita soap connector no operation name defined" processRef="trembita_soap_connector_no_trembita_soap_action_defined" />
+    <bpmn:participant id="Participant_1n7ahic" name="Test trembita soap connector wrong system name defined" processRef="trembita_soap_connector_wrong_system_name_defined" />
+    <bpmn:participant id="Participant_15ge84k" name="Test trembita soap connector no subsystem properties defined" processRef="trembita_soap_connector_no_subsystem_properties_defined" />
+  </bpmn:collaboration>
+  <bpmn:process id="trembita-soap-delegate" name="Test trembita soap connector" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_1uihwfg</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1uihwfg" sourceRef="StartEvent_1" targetRef="Activity_1g55hpt" />
+    <bpmn:sequenceFlow id="Flow_0qvynne" sourceRef="Activity_1i86i1u" targetRef="Activity_1qijvcv" />
+    <bpmn:serviceTask id="Activity_1i86i1u" name="Trembita Soap Connector Delegate" camunda:delegateExpression="${trembitaSoapConnectorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="systemName">test-soap-connector-registry</camunda:inputParameter>
+          <camunda:inputParameter name="payload">${payload}</camunda:inputParameter>
+          <camunda:inputParameter name="trembitaSoapAction">action</camunda:inputParameter>
+          <camunda:inputParameter name="contentType">text/xml;charset=UTF-8;</camunda:inputParameter>
+          <camunda:outputParameter name="soapResponse">${response}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_11avfqb</bpmn:incoming>
+      <bpmn:outgoing>Flow_0qvynne</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_11avfqb" sourceRef="Activity_1g55hpt" targetRef="Activity_1i86i1u" />
+    <bpmn:scriptTask id="Activity_1g55hpt" name="Prepare payload" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1uihwfg</bpmn:incoming>
+      <bpmn:outgoing>Flow_11avfqb</bpmn:outgoing>
+      <bpmn:script>def requestPayload = '''
+        &lt;SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"&gt;
+        &lt;SOAP-ENV:Body&gt;
+        &lt;ns2:SearchSubjects xmlns:ns2="http://nais.gov.ua/api/sevdeir/EDR"
+        xmlns:ns3="http://x-road.eu/xsd/xroad.xsd" xmlns:ns4="http://x-road.eu/xsd/identifiers"&gt;
+        &lt;ns2:code&gt;2222&lt;/ns2:code&gt;
+        &lt;/ns2:SearchSubjects&gt;
+        &lt;/SOAP-ENV:Body&gt;
+        &lt;/SOAP-ENV:Envelope&gt;
+        '''
+        set_transient_variable('payload', requestPayload)</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="Event_11hnljx">
+      <bpmn:incoming>Flow_1pehiyd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1pehiyd" sourceRef="Activity_1qijvcv" targetRef="Event_11hnljx" />
+    <bpmn:scriptTask id="Activity_1qijvcv" name="Assert" scriptFormat="groovy">
+      <bpmn:incoming>Flow_0qvynne</bpmn:incoming>
+      <bpmn:outgoing>Flow_1pehiyd</bpmn:outgoing>
+      <bpmn:script>def state = getValueByPropertyName("state")
+        def name = getValueByPropertyName("name")
+        def code = getValueByPropertyName("code")
+
+
+        assert state.equals('1')
+        assert name.equals('TEST NAME TREMBITA SOAP')
+        assert code.equals('11111118')
+
+
+        def getValueByPropertyName(String propName) {
+        return soapResponse.childElement("Body")
+        .childElement("http://nais.gov.ua/api/sevdeir/EDR", "SearchSubjectsResponse")
+        .childElement("SubjectList")
+        .childElement("SubjectInfo")
+        .childElement(propName)
+        .textContent()
+        }</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmn:process id="trembita_soap_connector_no_payload_defined" name="Test trembita soap connector no payload defined" isExecutable="true">
+    <bpmn:startEvent id="Event_0hfwtpn">
+      <bpmn:outgoing>Flow_0zvmjfe</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1bfled4" sourceRef="Activity_1c7sgou" targetRef="Event_1vz6tux" />
+    <bpmn:sequenceFlow id="Flow_0zvmjfe" sourceRef="Event_0hfwtpn" targetRef="Activity_1c7sgou" />
+    <bpmn:serviceTask id="Activity_1c7sgou" name="Trembita Soap Connector Delegate" camunda:delegateExpression="${trembitaSoapConnectorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="systemName">test-soap-connector-registry</camunda:inputParameter>
+          <camunda:inputParameter name="trembitaSoapAction">action</camunda:inputParameter>
+          <camunda:inputParameter name="contentType">text/xml;charset=UTF-8;</camunda:inputParameter>
+          <camunda:outputParameter name="soapResponse">${response}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0zvmjfe</bpmn:incoming>
+      <bpmn:outgoing>Flow_1bfled4</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_1vz6tux">
+      <bpmn:incoming>Flow_1bfled4</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmn:process id="trembita_soap_connector_no_system_name_defined" name="Test trembita soap connector no system name defined" isExecutable="true">
+    <bpmn:startEvent id="Event_0gm9zic">
+      <bpmn:outgoing>Flow_1k0tk66</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_02fmg4h" name="Trembita Soap Connector Delegate" camunda:delegateExpression="${trembitaSoapConnectorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="payload">${payload}</camunda:inputParameter>
+          <camunda:inputParameter name="trembitaSoapAction">action</camunda:inputParameter>
+          <camunda:inputParameter name="contentType">text/xml;charset=UTF-8;</camunda:inputParameter>
+          <camunda:outputParameter name="soapResponse">${response}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0pa413q</bpmn:incoming>
+      <bpmn:outgoing>Flow_1e6ytjo</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Activity_0zlx2kd" name="Prepare payload" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1k0tk66</bpmn:incoming>
+      <bpmn:outgoing>Flow_0pa413q</bpmn:outgoing>
+      <bpmn:script>def requestPayload = '''
+        &lt;SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"&gt;
+        &lt;SOAP-ENV:Body&gt;
+        &lt;ns2:SearchSubjects xmlns:ns2="http://nais.gov.ua/api/sevdeir/EDR"
+        xmlns:ns3="http://x-road.eu/xsd/xroad.xsd" xmlns:ns4="http://x-road.eu/xsd/identifiers"&gt;
+        &lt;ns2:code&gt;2222&lt;/ns2:code&gt;
+        &lt;/ns2:SearchSubjects&gt;
+        &lt;/SOAP-ENV:Body&gt;
+        &lt;/SOAP-ENV:Envelope&gt;
+        '''
+        set_transient_variable('payload', requestPayload)</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="Event_1q5gjhj">
+      <bpmn:incoming>Flow_1e6ytjo</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0pa413q" sourceRef="Activity_0zlx2kd" targetRef="Activity_02fmg4h" />
+    <bpmn:sequenceFlow id="Flow_1e6ytjo" sourceRef="Activity_02fmg4h" targetRef="Event_1q5gjhj" />
+    <bpmn:sequenceFlow id="Flow_1k0tk66" sourceRef="Event_0gm9zic" targetRef="Activity_0zlx2kd" />
+  </bpmn:process>
+  <bpmn:process id="trembita_soap_connector_no_trembita_soap_action_defined" name="Test trembita soap connector no operation name defined" isExecutable="true">
+    <bpmn:startEvent id="Event_0fehofw">
+      <bpmn:outgoing>Flow_04txhin</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_0jci9m9" name="Trembita Soap Connector Delegate" camunda:delegateExpression="${trembitaSoapConnectorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="payload">${payload}</camunda:inputParameter>
+          <camunda:inputParameter name="systemName">test-soap-connector-registry</camunda:inputParameter>
+          <camunda:inputParameter name="contentType">text/xml;charset=UTF-8;</camunda:inputParameter>
+          <camunda:outputParameter name="soapResponse">${response}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1dy2jsn</bpmn:incoming>
+      <bpmn:outgoing>Flow_0wtuikp</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Activity_06di2r0" name="Prepare payload" scriptFormat="groovy">
+      <bpmn:incoming>Flow_04txhin</bpmn:incoming>
+      <bpmn:outgoing>Flow_1dy2jsn</bpmn:outgoing>
+      <bpmn:script>def requestPayload = '''
+        &lt;SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"&gt;
+        &lt;SOAP-ENV:Body&gt;
+        &lt;ns2:SearchSubjects xmlns:ns2="http://nais.gov.ua/api/sevdeir/EDR"
+        xmlns:ns3="http://x-road.eu/xsd/xroad.xsd" xmlns:ns4="http://x-road.eu/xsd/identifiers"&gt;
+        &lt;ns2:code&gt;2222&lt;/ns2:code&gt;
+        &lt;/ns2:SearchSubjects&gt;
+        &lt;/SOAP-ENV:Body&gt;
+        &lt;/SOAP-ENV:Envelope&gt;
+        '''
+        set_transient_variable('payload', requestPayload)</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="Event_008yach">
+      <bpmn:incoming>Flow_0wtuikp</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1dy2jsn" sourceRef="Activity_06di2r0" targetRef="Activity_0jci9m9" />
+    <bpmn:sequenceFlow id="Flow_0wtuikp" sourceRef="Activity_0jci9m9" targetRef="Event_008yach" />
+    <bpmn:sequenceFlow id="Flow_04txhin" sourceRef="Event_0fehofw" targetRef="Activity_06di2r0" />
+  </bpmn:process>
+  <bpmn:process id="trembita_soap_connector_wrong_system_name_defined" name="Test trembita soap connector wrong system name defined" isExecutable="true">
+    <bpmn:startEvent id="Event_1lzop3i">
+      <bpmn:outgoing>Flow_1bb31ct</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_1sde9wh" name="Trembita Soap Connector Delegate" camunda:delegateExpression="${trembitaSoapConnectorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="systemName">system</camunda:inputParameter>
+          <camunda:inputParameter name="payload">${payload}</camunda:inputParameter>
+          <camunda:inputParameter name="trembitaSoapAction">action</camunda:inputParameter>
+          <camunda:inputParameter name="contentType">text/xml;charset=UTF-8;</camunda:inputParameter>
+          <camunda:outputParameter name="soapResponse">${response}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1ddfacy</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ykqxez</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Activity_0ypjrap" name="Prepare payload" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1bb31ct</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ddfacy</bpmn:outgoing>
+      <bpmn:script>def requestPayload = '''
+        &lt;SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"&gt;
+        &lt;SOAP-ENV:Body&gt;
+        &lt;ns2:SearchSubjects xmlns:ns2="http://nais.gov.ua/api/sevdeir/EDR"
+        xmlns:ns3="http://x-road.eu/xsd/xroad.xsd" xmlns:ns4="http://x-road.eu/xsd/identifiers"&gt;
+        &lt;ns2:code&gt;2222&lt;/ns2:code&gt;
+        &lt;/ns2:SearchSubjects&gt;
+        &lt;/SOAP-ENV:Body&gt;
+        &lt;/SOAP-ENV:Envelope&gt;
+        '''
+        set_transient_variable('payload', requestPayload)</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_1ddfacy" sourceRef="Activity_0ypjrap" targetRef="Activity_1sde9wh" />
+    <bpmn:sequenceFlow id="Flow_1ykqxez" sourceRef="Activity_1sde9wh" targetRef="Event_0mq9gkk" />
+    <bpmn:sequenceFlow id="Flow_1bb31ct" sourceRef="Event_1lzop3i" targetRef="Activity_0ypjrap" />
+    <bpmn:endEvent id="Event_0mq9gkk">
+      <bpmn:incoming>Flow_1ykqxez</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmn:process id="trembita_soap_connector_no_subsystem_properties_defined" name="Test trembita soap connector no subsystem properties defined" isExecutable="true">
+    <bpmn:startEvent id="Event_0458cov">
+      <bpmn:outgoing>Flow_1i8kgj5</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_1k2aerv" name="Trembita Soap Connector Delegate" camunda:delegateExpression="${trembitaSoapConnectorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="systemName">system-without-subsystem-properties</camunda:inputParameter>
+          <camunda:inputParameter name="payload">${payload}</camunda:inputParameter>
+          <camunda:inputParameter name="trembitaSoapAction">action</camunda:inputParameter>
+          <camunda:inputParameter name="contentType">text/xml;charset=UTF-8;</camunda:inputParameter>
+          <camunda:outputParameter name="soapResponse">${response}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1nexft7</bpmn:incoming>
+      <bpmn:outgoing>Flow_0dsy2y2</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Activity_0ckfyji" name="Prepare payload" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1i8kgj5</bpmn:incoming>
+      <bpmn:outgoing>Flow_1nexft7</bpmn:outgoing>
+      <bpmn:script>def requestPayload = '''
+        &lt;SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"&gt;
+        &lt;SOAP-ENV:Body&gt;
+        &lt;ns2:SearchSubjects xmlns:ns2="http://nais.gov.ua/api/sevdeir/EDR"
+        xmlns:ns3="http://x-road.eu/xsd/xroad.xsd" xmlns:ns4="http://x-road.eu/xsd/identifiers"&gt;
+        &lt;ns2:code&gt;2222&lt;/ns2:code&gt;
+        &lt;/ns2:SearchSubjects&gt;
+        &lt;/SOAP-ENV:Body&gt;
+        &lt;/SOAP-ENV:Envelope&gt;
+        '''
+        set_transient_variable('payload', requestPayload)</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="Event_0n4d15d">
+      <bpmn:incoming>Flow_0dsy2y2</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1i8kgj5" sourceRef="Event_0458cov" targetRef="Activity_0ckfyji" />
+    <bpmn:sequenceFlow id="Flow_0dsy2y2" sourceRef="Activity_1k2aerv" targetRef="Event_0n4d15d" />
+    <bpmn:sequenceFlow id="Flow_1nexft7" sourceRef="Activity_0ckfyji" targetRef="Activity_1k2aerv" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1d0w9cf">
+      <bpmndi:BPMNShape id="Participant_19h29ju_di" bpmnElement="Participant_19h29ju" isHorizontal="true">
+        <dc:Bounds x="129" y="70" width="621" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1pehiyd_di" bpmnElement="Flow_1pehiyd">
+        <di:waypoint x="650" y="170" />
+        <di:waypoint x="682" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11avfqb_di" bpmnElement="Flow_11avfqb">
+        <di:waypoint x="360" y="170" />
+        <di:waypoint x="410" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qvynne_di" bpmnElement="Flow_0qvynne">
+        <di:waypoint x="510" y="170" />
+        <di:waypoint x="550" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1uihwfg_di" bpmnElement="Flow_1uihwfg">
+        <di:waypoint x="215" y="170" />
+        <di:waypoint x="260" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="152" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1lfg5hl_di" bpmnElement="Activity_1i86i1u">
+        <dc:Bounds x="410" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0nf09ps_di" bpmnElement="Activity_1g55hpt">
+        <dc:Bounds x="260" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_11hnljx_di" bpmnElement="Event_11hnljx">
+        <dc:Bounds x="682" y="152" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_13c9mz1_di" bpmnElement="Activity_1qijvcv">
+        <dc:Bounds x="550" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_1lt5y16_di" bpmnElement="Participant_1lt5y16" isHorizontal="true">
+        <dc:Bounds x="129" y="290" width="341" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0zvmjfe_di" bpmnElement="Flow_0zvmjfe">
+        <di:waypoint x="215" y="390" />
+        <di:waypoint x="260" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1bfled4_di" bpmnElement="Flow_1bfled4">
+        <di:waypoint x="360" y="390" />
+        <di:waypoint x="402" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0hfwtpn_di" bpmnElement="Event_0hfwtpn">
+        <dc:Bounds x="179" y="372" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1c7sgou_di" bpmnElement="Activity_1c7sgou">
+        <dc:Bounds x="260" y="350" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1vz6tux_di" bpmnElement="Event_1vz6tux">
+        <dc:Bounds x="402" y="372" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_1264v2r_di" bpmnElement="Participant_1264v2r" isHorizontal="true">
+        <dc:Bounds x="129" y="510" width="501" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1k0tk66_di" bpmnElement="Flow_1k0tk66">
+        <di:waypoint x="215" y="610" />
+        <di:waypoint x="260" y="610" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1e6ytjo_di" bpmnElement="Flow_1e6ytjo">
+        <di:waypoint x="510" y="610" />
+        <di:waypoint x="552" y="610" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0pa413q_di" bpmnElement="Flow_0pa413q">
+        <di:waypoint x="360" y="610" />
+        <di:waypoint x="410" y="610" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0gm9zic_di" bpmnElement="Event_0gm9zic">
+        <dc:Bounds x="179" y="592" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_02fmg4h_di" bpmnElement="Activity_02fmg4h">
+        <dc:Bounds x="410" y="570" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0zlx2kd_di" bpmnElement="Activity_0zlx2kd">
+        <dc:Bounds x="260" y="570" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1q5gjhj_di" bpmnElement="Event_1q5gjhj">
+        <dc:Bounds x="552" y="592" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_1asl0ea_di" bpmnElement="Participant_1asl0ea" isHorizontal="true">
+        <dc:Bounds x="129" y="740" width="501" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_04txhin_di" bpmnElement="Flow_04txhin">
+        <di:waypoint x="215" y="840" />
+        <di:waypoint x="260" y="840" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0wtuikp_di" bpmnElement="Flow_0wtuikp">
+        <di:waypoint x="510" y="840" />
+        <di:waypoint x="552" y="840" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1dy2jsn_di" bpmnElement="Flow_1dy2jsn">
+        <di:waypoint x="360" y="840" />
+        <di:waypoint x="410" y="840" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0fehofw_di" bpmnElement="Event_0fehofw">
+        <dc:Bounds x="179" y="822" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0jci9m9_di" bpmnElement="Activity_0jci9m9">
+        <dc:Bounds x="410" y="800" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_06di2r0_di" bpmnElement="Activity_06di2r0">
+        <dc:Bounds x="260" y="800" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_008yach_di" bpmnElement="Event_008yach">
+        <dc:Bounds x="552" y="822" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_1n7ahic_di" bpmnElement="Participant_1n7ahic" isHorizontal="true">
+        <dc:Bounds x="129" y="960" width="501" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1bb31ct_di" bpmnElement="Flow_1bb31ct">
+        <di:waypoint x="215" y="1060" />
+        <di:waypoint x="260" y="1060" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ykqxez_di" bpmnElement="Flow_1ykqxez">
+        <di:waypoint x="510" y="1060" />
+        <di:waypoint x="552" y="1060" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ddfacy_di" bpmnElement="Flow_1ddfacy">
+        <di:waypoint x="360" y="1060" />
+        <di:waypoint x="410" y="1060" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1lzop3i_di" bpmnElement="Event_1lzop3i">
+        <dc:Bounds x="179" y="1042" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1sde9wh_di" bpmnElement="Activity_1sde9wh">
+        <dc:Bounds x="410" y="1020" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ypjrap_di" bpmnElement="Activity_0ypjrap">
+        <dc:Bounds x="260" y="1020" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0mq9gkk_di" bpmnElement="Event_0mq9gkk">
+        <dc:Bounds x="552" y="1042" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_15ge84k_di" bpmnElement="Participant_15ge84k" isHorizontal="true">
+        <dc:Bounds x="129" y="1190" width="501" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1i8kgj5_di" bpmnElement="Flow_1i8kgj5">
+        <di:waypoint x="215" y="1290" />
+        <di:waypoint x="260" y="1290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0dsy2y2_di" bpmnElement="Flow_0dsy2y2">
+        <di:waypoint x="510" y="1290" />
+        <di:waypoint x="552" y="1290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1nexft7_di" bpmnElement="Flow_1nexft7">
+        <di:waypoint x="360" y="1290" />
+        <di:waypoint x="410" y="1290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0458cov_di" bpmnElement="Event_0458cov">
+        <dc:Bounds x="179" y="1272" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1k2aerv_di" bpmnElement="Activity_1k2aerv">
+        <dc:Bounds x="410" y="1250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ckfyji_di" bpmnElement="Activity_0ckfyji">
+        <dc:Bounds x="260" y="1250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0n4d15d_di" bpmnElement="Event_0n4d15d">
+        <dc:Bounds x="552" y="1272" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
