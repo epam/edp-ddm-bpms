@@ -27,6 +27,7 @@ import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import java.net.URI;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -140,13 +141,12 @@ public class ExternalSystemConnectorDelegate extends BaseRestTemplateConnectorDe
   private ExternalSystemConfigurationProperties.OperationConfiguration getOperationConfiguration(
           String externalSystemName, String operationName) {
     var externalSystemConfiguration = getExternalSystemConfiguration(externalSystemName);
-    var operation = externalSystemConfiguration.getOperations().get(operationName);
-    if (Objects.isNull(operation)) {
-      throw new IllegalArgumentException(
-              String.format("Operation %s in external-system %s not configured", operationName,
-                      externalSystemName));
-    }
-    return operation;
+
+    return Optional.ofNullable(externalSystemConfiguration.getOperations())
+        .map(operations -> operations.get(operationName))
+        .orElseThrow(() -> new IllegalArgumentException(
+            String.format("Operation %s in external-system %s not configured", operationName,
+                externalSystemName)));
   }
 
   private void authenticate(HttpHeaders requestHeaders, AuthenticationConfiguration auth, String externalSystemUrl) {

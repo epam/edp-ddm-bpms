@@ -225,3 +225,8 @@ external-systems:
       type: AUTH_TOKEN
       secret:
         token:
+  system-without-operations:
+    url: ${external-system.url}
+    protocol: REST
+    auth:
+      type: BEARER
