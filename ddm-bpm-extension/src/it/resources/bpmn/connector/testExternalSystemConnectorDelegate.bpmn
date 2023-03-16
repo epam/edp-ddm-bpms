@@ -10,6 +10,7 @@
     <bpmn:participant id="Participant_1ctwckn" name="external system bearer-auth" processRef="external_system_bearer_auth" />
     <bpmn:participant id="Participant_0rntwyz" name="external system auth-token" processRef="external_system_auth_token" />
     <bpmn:participant id="Participant_1nitpb7" name="external system partner-token-auth relative path" processRef="external_system_partner_token_auth_relative_path" />
+    <bpmn:participant id="Participant_08hpqw7" name="external system without operations" processRef="external_system_without_operations" />
   </bpmn:collaboration>
   <bpmn:process id="external_system_connector_no_system_name_defined" name="external_system_connector_no_system_name_defined" isExecutable="true">
     <bpmn:startEvent id="StartEvent_1" name="start">
@@ -183,6 +184,26 @@
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_1ccs52l" sourceRef="Event_13scxa2" targetRef="Activity_0bluz6p" />
     <bpmn:sequenceFlow id="Flow_1e30emz" sourceRef="Activity_0bluz6p" targetRef="Event_08qx3xt" />
+  </bpmn:process>
+  <bpmn:process id="external_system_without_operations" name="external system without operations" isExecutable="true">
+    <bpmn:startEvent id="Event_0f14zx8" name="start">
+      <bpmn:outgoing>Flow_09r2edv</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_0gb0xnp" name="external system without operations" camunda:delegateExpression="${externalSystemConnectorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="methodName">operation1</camunda:inputParameter>
+          <camunda:inputParameter name="systemName">system-without-operations</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_09r2edv</bpmn:incoming>
+      <bpmn:outgoing>Flow_0cvalyy</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_01wduut" name="end">
+      <bpmn:incoming>Flow_0cvalyy</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0cvalyy" sourceRef="Activity_0gb0xnp" targetRef="Event_01wduut" />
+    <bpmn:sequenceFlow id="Flow_09r2edv" sourceRef="Event_0f14zx8" targetRef="Activity_0gb0xnp" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0k3s04s">
@@ -418,6 +439,32 @@
         <dc:Bounds x="432" y="1269" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="441" y="1312" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_08hpqw7_di" bpmnElement="Participant_08hpqw7" isHorizontal="true">
+        <dc:Bounds x="129" y="1370" width="361" height="130" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0cvalyy_di" bpmnElement="Flow_0cvalyy">
+        <di:waypoint x="370" y="1437" />
+        <di:waypoint x="432" y="1437" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_09r2edv_di" bpmnElement="Flow_09r2edv">
+        <di:waypoint x="215" y="1437" />
+        <di:waypoint x="270" y="1437" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0f14zx8_di" bpmnElement="Event_0f14zx8">
+        <dc:Bounds x="179" y="1419" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="1462" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0gb0xnp_di" bpmnElement="Activity_0gb0xnp">
+        <dc:Bounds x="270" y="1397" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_01wduut_di" bpmnElement="Event_01wduut">
+        <dc:Bounds x="432" y="1419" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="441" y="1462" width="19" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>

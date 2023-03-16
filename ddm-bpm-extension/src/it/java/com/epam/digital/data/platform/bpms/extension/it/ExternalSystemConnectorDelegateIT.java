@@ -174,4 +174,13 @@ public class ExternalSystemConnectorDelegateIT extends BaseIT {
 
     BpmnAwareTests.assertThat(processInstance).isEnded();
   }
+
+  @Test
+  @Deployment(resources = "bpmn/connector/testExternalSystemConnectorDelegate.bpmn")
+  public void externalSystemWithoutOperations() {
+    var ex = assertThrows(IllegalArgumentException.class, () -> runtimeService
+        .startProcessInstanceByKey("external_system_without_operations"));
+    assertThat(ex.getMessage()).isEqualTo(
+        "Operation operation1 in external-system system-without-operations not configured");
+  }
 }
