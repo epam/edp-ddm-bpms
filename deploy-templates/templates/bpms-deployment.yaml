@@ -29,6 +29,7 @@ spec:
       {{- end }}
       labels:
         app: {{ .Chart.Name }}
+        collect.logs: "json"
     spec:
       initContainers:
       - command:
