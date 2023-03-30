@@ -62,6 +62,10 @@ spring:
       minimum-idle: 5
       maximum-pool-size: 20
       max-lifetime: 600000
+  cache:
+    type: caffeine
+    caffeine:
+      spec: expireAfterAccess=2h
 
 # Configuration => prometheus.yml:
 #   scrape_configs:

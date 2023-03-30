@@ -3,6 +3,10 @@ spring:
     name: ddm-bpm-extension
   rest-template:
     ssl-checking-enabled: false
+  cache:
+    type: caffeine
+    caffeine:
+      spec: expireAfterAccess=2h
 
 registry-rest-api:
   url: http://localhost:8877/mock-server
