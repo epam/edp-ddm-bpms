@@ -9,6 +9,8 @@ camunda:
     admin-user:
       id: ${camunda.admin-user-id}
       password: camunda
+    history-level: AUDIT
+    database-history-level: ACTIVITY
 
 data-platform:
   kafka:
@@ -48,13 +50,14 @@ s3:
 
 storage:
   form-data:
-    type: ceph
-    backend:
-      ceph:
-        http-endpoint: ${ceph.http-endpoint}
-        access-key: access-key
-        secret-key: secret-key
-        bucket: bucket
+    type: redis
+  message-payload:
+    type: redis
+  backend:
+    redis:
+      sentinel:
+        master: mymaster
+        nodes: 127.0.0.1:26379
   file-data:
     type: ceph
     backend:
@@ -78,3 +81,6 @@ keycloak:
     realm: systemUserRealm
     client-id: systemUserClientId
     client-secret: systemUserClientSecret
+
+digital-document-service:
+  url: http://localhost:8082

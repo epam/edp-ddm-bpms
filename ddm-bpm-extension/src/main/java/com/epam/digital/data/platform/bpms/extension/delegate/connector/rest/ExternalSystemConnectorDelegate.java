@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import com.epam.digital.data.platform.bpms.extension.config.properties.ExternalS
 import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.dto.RegistryConnectorResponse;
 import com.epam.digital.data.platform.bpms.extension.exception.AuthConfigurationException;
+import com.epam.digital.data.platform.bpms.extension.service.TokenCacheService;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import java.net.URI;
@@ -49,6 +50,7 @@ public class ExternalSystemConnectorDelegate extends BaseRestTemplateConnectorDe
   public static final String DELEGATE_NAME = "externalSystemConnectorDelegate";
 
   private final Map<String, ExternalSystemConfigurationProperties> externalSystemsConfiguration;
+  private final TokenCacheService tokenCacheService;
 
   @SystemVariable(name = "systemName")
   private NamedVariableAccessor<String> systemNameVariable;
@@ -66,9 +68,11 @@ public class ExternalSystemConnectorDelegate extends BaseRestTemplateConnectorDe
   private NamedVariableAccessor<RegistryConnectorResponse> responseVariable;
 
   public ExternalSystemConnectorDelegate(RestTemplate restTemplate,
-                                         Map<String, ExternalSystemConfigurationProperties> externalSystemsConfiguration) {
+      Map<String, ExternalSystemConfigurationProperties> externalSystemsConfiguration,
+      TokenCacheService tokenCacheService) {
     super(restTemplate);
     this.externalSystemsConfiguration = externalSystemsConfiguration;
+    this.tokenCacheService = tokenCacheService;
   }
 
   @Override
@@ -87,15 +91,16 @@ public class ExternalSystemConnectorDelegate extends BaseRestTemplateConnectorDe
     checkAuthenticationConfig(auth, externalSystemName);
 
     var requestParameters =
-            toMultiValueMapSeparatedByComma(requestParametersVariable.from(execution).get());
+        toMultiValueMapSeparatedByComma(requestParametersVariable.from(execution).get());
     var requestHeaders = new HttpHeaders(toMultiValueMapSeparatedByComma(
-            requestHeadersVariable.from(execution).get()));
+        requestHeadersVariable.from(execution).get()));
     var payload = payloadVariable.from(execution).getOptional().map(Object::toString).orElse(null);
 
     var externalSystemUrl = externalSystemConfiguration.getUrl();
     authenticate(requestHeaders, auth, externalSystemUrl);
 
-    var uri = buildUri(externalSystemUrl, operationConfiguration.getResourcePath(), requestParameters);
+    var uri = buildUri(externalSystemUrl, operationConfiguration.getResourcePath(),
+        requestParameters);
     var method = operationConfiguration.getMethod();
     var httpEntity = new HttpEntity<>(payload, requestHeaders);
 
@@ -113,7 +118,8 @@ public class ExternalSystemConnectorDelegate extends BaseRestTemplateConnectorDe
 
     if (!isAuthConfigDefined) {
       throw new AuthConfigurationException(String.format(
-          "Authentication configuration for external-system with name %s not configured", extSysName));
+          "Authentication configuration for external-system with name %s not configured",
+          extSysName));
     }
   }
 
@@ -122,24 +128,25 @@ public class ExternalSystemConnectorDelegate extends BaseRestTemplateConnectorDe
     if (Objects.isNull(secret)) {
       return false;
     } else if (AuthenticationType.BASIC.equals(auth.getType())) {
-      return StringUtils.isNotBlank(secret.getUsername()) && StringUtils.isNotBlank(secret.getPassword());
+      return StringUtils.isNotBlank(secret.getUsername()) && StringUtils.isNotBlank(
+          secret.getPassword());
     } else {
       return StringUtils.isNotBlank(secret.getToken());
     }
   }
 
   private ExternalSystemConfigurationProperties getExternalSystemConfiguration(
-          String externalSystemName) {
+      String externalSystemName) {
     var configuration = externalSystemsConfiguration.get(externalSystemName);
     if (Objects.isNull(configuration)) {
       throw new IllegalArgumentException(
-              String.format("External-system with name %s not configured", externalSystemName));
+          String.format("External-system with name %s not configured", externalSystemName));
     }
     return configuration;
   }
 
   private ExternalSystemConfigurationProperties.OperationConfiguration getOperationConfiguration(
-          String externalSystemName, String operationName) {
+      String externalSystemName, String operationName) {
     var externalSystemConfiguration = getExternalSystemConfiguration(externalSystemName);
 
     return Optional.ofNullable(externalSystemConfiguration.getOperations())
@@ -149,18 +156,21 @@ public class ExternalSystemConnectorDelegate extends BaseRestTemplateConnectorDe
                 externalSystemName)));
   }
 
-  private void authenticate(HttpHeaders requestHeaders, AuthenticationConfiguration auth, String externalSystemUrl) {
+  private void authenticate(HttpHeaders requestHeaders, AuthenticationConfiguration auth,
+      String externalSystemUrl) {
     if (AuthenticationType.BASIC.equals(auth.getType())) {
       authenticateWithBasic(requestHeaders, auth.getSecret());
     } else if (AuthenticationType.AUTH_TOKEN_BEARER.equals(auth.getType())) {
       authenticateWithPartnerToken(requestHeaders, auth, externalSystemUrl);
-    } else if (AuthenticationType.BEARER.equals(auth.getType()) || AuthenticationType.AUTH_TOKEN.equals(auth.getType())) {
+    } else if (AuthenticationType.BEARER.equals(auth.getType())
+        || AuthenticationType.AUTH_TOKEN.equals(auth.getType())) {
       var authToken = auth.getSecret().getToken();
       requestHeaders.setBearerAuth(authToken);
     }
   }
 
-  private void authenticateWithBasic(HttpHeaders requestHeaders, AuthenticationConfiguration.Secret secret) {
+  private void authenticateWithBasic(HttpHeaders requestHeaders,
+      AuthenticationConfiguration.Secret secret) {
     var username = secret.getUsername();
     var password = secret.getPassword();
     requestHeaders.setBasicAuth(username, password);
@@ -168,6 +178,15 @@ public class ExternalSystemConnectorDelegate extends BaseRestTemplateConnectorDe
 
   private void authenticateWithPartnerToken(HttpHeaders requestHeaders,
       AuthenticationConfiguration auth, String externalSystemUrl) {
+    var cacheName = AuthenticationType.AUTH_TOKEN_BEARER.getCode();
+    var authToken = tokenCacheService.getCachedTokenOrElse(cacheName, externalSystemUrl,
+        () -> getTokenFromExternalSystem(auth, externalSystemUrl));
+
+    requestHeaders.setBearerAuth(Objects.requireNonNull(authToken));
+  }
+
+  private String getTokenFromExternalSystem(AuthenticationConfiguration auth,
+      String externalSystemUrl) {
     var partnerToken = auth.getSecret().getToken();
     URI concatenatedUrl;
     var authUrl = auth.getAuthUrl();
@@ -184,9 +203,7 @@ public class ExternalSystemConnectorDelegate extends BaseRestTemplateConnectorDe
     }
 
     var response = sendRequest(concatenatedUrl, HttpMethod.GET, null);
-    var authToken = response.getResponseBody().jsonPath(auth.getAccessTokenJsonPath()).stringValue();
-
-    requestHeaders.setBearerAuth(authToken);
+    return response.getResponseBody().jsonPath(auth.getAccessTokenJsonPath()).stringValue();
   }
 
   private String defineOperationName(DelegateExecution execution) {
