@@ -1,0 +1,74 @@
+[
+  {
+    "id": "62046857-0736-4319-b85e-785aaf1dc73f",
+    "name": "entrepreneur",
+    "description": "",
+    "composite": false,
+    "clientRole": false,
+    "containerId": "fa96e275-f642-4da1-b812-a925c37ad93c"
+  },
+  {
+    "id": "0efc7908-c3a7-4b2f-be9e-bec60dbc5554",
+    "name": "test_role1",
+    "description": "test role",
+    "composite": false,
+    "clientRole": false,
+    "containerId": "fa96e275-f642-4da1-b812-a925c37ad93c"
+  },
+  {
+    "id": "426e86cf-4ec9-486a-8de3-d184dc642f3e",
+    "name": "legal",
+    "description": "",
+    "composite": false,
+    "clientRole": false,
+    "containerId": "fa96e275-f642-4da1-b812-a925c37ad93c"
+  },
+  {
+    "id": "3d2959b2-24fb-43df-9366-5a99109735e6",
+    "name": "test_role2",
+    "description": "test role",
+    "composite": false,
+    "clientRole": false,
+    "containerId": "fa96e275-f642-4da1-b812-a925c37ad93c"
+  },
+  {
+    "id": "4d2959b2-24fb-43df-9366-5a99109735e6",
+    "name": "test_role3",
+    "description": "test role",
+    "composite": false,
+    "clientRole": false,
+    "containerId": "fa96e275-f642-4da1-b812-a925c37ad94c"
+  },
+  {
+    "id": "effd5f1d-8120-450b-9aee-0ae1b1345593",
+    "name": "unregistered-individual",
+    "description": "",
+    "composite": false,
+    "clientRole": false,
+    "containerId": "fa96e275-f642-4da1-b812-a925c37ad93c"
+  },
+  {
+    "id": "2875b21b-5d48-4bb2-8738-6b5b9da00274",
+    "name": "unregistered-entrepreneur",
+    "description": "",
+    "composite": false,
+    "clientRole": false,
+    "containerId": "fa96e275-f642-4da1-b812-a925c37ad93c"
+  },
+  {
+    "id": "fcfaed0d-1097-4416-8a38-0a34ead7035f",
+    "name": "individual",
+    "description": "",
+    "composite": false,
+    "clientRole": false,
+    "containerId": "fa96e275-f642-4da1-b812-a925c37ad93c"
+  },
+  {
+    "id": "7d7810ec-d793-49fc-9462-17cfef18b836",
+    "name": "unregistered-legal",
+    "description": "",
+    "composite": false,
+    "clientRole": false,
+    "containerId": "fa96e275-f642-4da1-b812-a925c37ad93c"
+  }
+]
