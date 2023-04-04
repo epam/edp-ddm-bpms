@@ -1,0 +1,24 @@
+[
+  {
+    "id": "0efc7908-c3a7-4b2f-be9e-bec60dbc5554",
+    "name": "test_role1",
+    "description": "test role",
+    "scopeParamRequired": null,
+    "composite": false,
+    "composites": null,
+    "clientRole": false,
+    "containerId": "fa96e275-f642-4da1-b812-a925c37ad93c",
+    "attributes": null
+  },
+  {
+    "id": "3d2959b2-24fb-43df-9366-5a99109735e6",
+    "name": "test_role2",
+    "description": "test role",
+    "scopeParamRequired": null,
+    "composite": false,
+    "composites": null,
+    "clientRole": false,
+    "containerId": "fa96e275-f642-4da1-b812-a925c37ad93c",
+    "attributes": null
+  }
+]
