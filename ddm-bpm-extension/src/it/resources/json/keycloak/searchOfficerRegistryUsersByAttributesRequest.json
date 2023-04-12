@@ -1,0 +1,32 @@
+{
+  "attributesEquals": {
+    "hierarchyCodeEquals": [
+      "100",
+      "100.200"
+    ],
+    "testAttributeEquals": [
+      "attr1"
+    ]
+  },
+  "attributesStartsWith": {
+    "hierarchyCodeStartsWith": [
+      "100"
+    ],
+    "testAttributeStartsWith": [
+      "a"
+    ]
+  },
+  "attributesThatAreStartFor": {
+    "hierarchyCodeInverseStartsWith": [
+      "100.200.300.400",
+      "100.200.300.500"
+    ],
+    "testAttributeInverseStartsWith": [
+      "attr10101"
+    ]
+  },
+  "pagination": {
+    "limit": null,
+    "continueToken": null
+  }
+}

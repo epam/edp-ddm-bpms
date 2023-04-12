@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloak.officer;
 
 import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
+import com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloak.SearchRegistryUsersByAttributesDelegate;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.integration.idm.model.IdmUser;
@@ -30,8 +31,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
+/**
+ * @deprecated use {@link SearchRegistryUsersByAttributesDelegate} instead
+ */
 @RequiredArgsConstructor
 @Component(KeycloakGetExtendedOfficerUsersByAttributesConnectorDelegate.DELEGATE_NAME)
+@Deprecated(forRemoval = true)
 public class KeycloakGetExtendedOfficerUsersByAttributesConnectorDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "keycloakGetExtendedOfficerUsersByAttributesConnectorDelegate";
