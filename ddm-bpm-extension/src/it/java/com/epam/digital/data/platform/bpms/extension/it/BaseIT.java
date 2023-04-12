@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -277,7 +277,8 @@ public abstract class BaseIT {
             .willReturn(aResponse().withStatus(200))));
   }
 
-  protected void mockKeycloakGetUsersByAttributes(String realm, String requestBody, String responseBody) {
+  protected void mockKeycloakGetUsersByAttributes(String realm, String requestBody,
+      String responseBody) {
     keycloakMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo(String.format("/auth/realms/%s/users/search", realm)))
             .withRequestBody(equalToJson(requestBody))
@@ -286,12 +287,25 @@ public abstract class BaseIT {
                 .withBody(convertJsonToString(responseBody)))));
   }
 
-  protected void mockKeycloakSearchUsersByAttributes(String realm, String requestBody, String responseBody) {
+  protected void mockKeycloakSearchUsersByAttributesV2(String realm, String requestBody,
+      String responseBody) {
     keycloakMockServer.addStubMapping(
-        stubFor(post(urlPathEqualTo(String.format("/auth/realms/%s/users/search-by-attributes", realm)))
-            .withRequestBody(equalToJson(requestBody))
+        stubFor(post(
+            urlPathEqualTo(String.format("/auth/realms/%s/users/v2/search-by-attributes", realm)))
+            .withRequestBody(equalToJson(convertJsonToString(requestBody)))
             .willReturn(aResponse().withStatus(200)
                 .withHeader("Content-type", "application/json")
                 .withBody(convertJsonToString(responseBody)))));
+  }
+
+  protected void mockKeycloakSearchUsersByAttributes(String realm, String requestBody,
+      String responseBody) {
+    keycloakMockServer.addStubMapping(
+        stubFor(
+            post(urlPathEqualTo(String.format("/auth/realms/%s/users/search-by-attributes", realm)))
+                .withRequestBody(equalToJson(requestBody))
+                .willReturn(aResponse().withStatus(200)
+                    .withHeader("Content-type", "application/json")
+                    .withBody(convertJsonToString(responseBody)))));
   }
 }
