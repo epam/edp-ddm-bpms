@@ -1,0 +1,18 @@
+[
+    {
+        "id": "ee3161f8-ec06-4735-b1c7-2090b0914eaa",
+        "name": "death-officer",
+        "description": "Role for RBAC validation",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "fa96e275-f642-4da1-b812-a925c37ad93c"
+    },
+    {
+        "id": "e030e169-5694-4cb0-bc53-4a5c0c76713f",
+        "name": "unregistered-officer",
+        "description": "${role_default-roles}",
+        "composite": true,
+        "clientRole": false,
+        "containerId": "fa96e275-f642-4da1-b812-a925c37ad93c"
+    }
+]

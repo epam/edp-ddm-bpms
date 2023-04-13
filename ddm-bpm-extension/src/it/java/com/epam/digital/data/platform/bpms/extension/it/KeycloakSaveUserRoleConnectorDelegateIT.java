@@ -34,11 +34,11 @@ import org.junit.Test;
 
 public class KeycloakSaveUserRoleConnectorDelegateIT extends BaseIT {
 
-  private static final String RESPONSE_BODY_ROLES = "/json/keycloak/general/keycloakRolesResponse.json";
-  private static final String REQUEST_BODY_ROLES_TO_ADD = "/json/keycloak/general/keycloakRequestBodyRolesToAdd.json";
-  private static final String REQUEST_EMPTY_BODY_ROLES = "/json/keycloak/general/keycloakEmptyRequestBodyRoles.json";
-  private static final String REQUEST_BODY_ROLES = "/json/keycloak/general/keycloakRequestBodyRoles.json";
-  private static final String RESPONSE_BODY_USER = "/json/keycloak/general/keycloakUserResponse.json";
+  private static final String RESPONSE_BODY_ROLES = "/json/keycloak/keycloakSaveUserRoleRolesResponse.json";
+  private static final String REQUEST_BODY_ROLES_TO_ADD = "/json/keycloak/keycloakRequestBodyRolesToAdd.json";
+  private static final String REQUEST_EMPTY_BODY_ROLES = "/json/keycloak/keycloakEmptyRequestBodyRoles.json";
+  private static final String REQUEST_BODY_ROLES = "/json/keycloak/keycloakSaveUserRoleRequestBodyRoles.json";
+  private static final String RESPONSE_BODY_USER = "/json/keycloak/keycloakUserResponse.json";
 
   @Test
   @Deployment(resources = {"bpmn/connector/testKeycloakSaveRoles.bpmn"})
