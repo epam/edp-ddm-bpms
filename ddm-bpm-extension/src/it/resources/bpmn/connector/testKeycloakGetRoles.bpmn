@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0zx8zrl" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.12.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:collaboration id="Collaboration_0v7pc0a">
+    <bpmn:participant id="Participant_1clj9ur" name="Get user roles" processRef="get-user-roles-test" />
+    <bpmn:participant id="Participant_1iorbd2" name="Get user roles (empty username)" processRef="get-user-roles-empty-username-test" />
+    <bpmn:participant id="Participant_0dnke6v" name="Get user roles (roles not match)" processRef="get-user-roles-empty-user-roles-test" />
+  </bpmn:collaboration>
+  <bpmn:process id="get-user-roles-test" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="Start">
+      <bpmn:outgoing>Flow_07du014</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_07du014" sourceRef="StartEvent_1" targetRef="Activity_1dvuqel" />
+    <bpmn:serviceTask id="Activity_1dvuqel" name="Get keycloak roles from user" camunda:modelerTemplate="keycloakGetUserRolesDelegate" camunda:delegateExpression="${keycloakGetUserRoleConnectorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="roleType">REGISTRY ROLES</camunda:inputParameter>
+          <camunda:inputParameter name="username">testuser</camunda:inputParameter>
+          <camunda:inputParameter name="realm">OFFICER</camunda:inputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_07du014</bpmn:incoming>
+      <bpmn:outgoing>Flow_1to4rid</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1to4rid" sourceRef="Activity_1dvuqel" targetRef="Activity_0cly6mc" />
+    <bpmn:scriptTask id="Activity_0cly6mc" name="Assert" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1to4rid</bpmn:incoming>
+      <bpmn:outgoing>Flow_0s3z8gi</bpmn:outgoing>
+      <bpmn:script>assert response.get(0).equals('death-officer')</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="Event_1q87mt1" name="End">
+      <bpmn:incoming>Flow_0s3z8gi</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0s3z8gi" sourceRef="Activity_0cly6mc" targetRef="Event_1q87mt1" />
+  </bpmn:process>
+  <bpmn:process id="get-user-roles-empty-username-test" isExecutable="true">
+    <bpmn:startEvent id="Event_0u7pp32" name="Start">
+      <bpmn:outgoing>Flow_1316p6u</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1316p6u" sourceRef="Event_0u7pp32" targetRef="Activity_167xcdl" />
+    <bpmn:endEvent id="Event_1mn7j46" name="End">
+      <bpmn:incoming>Flow_00k7vn6</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_00k7vn6" sourceRef="Activity_167xcdl" targetRef="Event_1mn7j46" />
+    <bpmn:serviceTask id="Activity_167xcdl" name="Get keycloak roles from user" camunda:modelerTemplate="keycloakGetUserRolesDelegate" camunda:delegateExpression="${keycloakGetUserRoleConnectorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="username" />
+          <camunda:inputParameter name="realm">OFFICER</camunda:inputParameter>
+          <camunda:inputParameter name="roleType">REGISTRY ROLES</camunda:inputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1316p6u</bpmn:incoming>
+      <bpmn:outgoing>Flow_00k7vn6</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmn:process id="get-user-roles-empty-user-roles-test" isExecutable="true">
+    <bpmn:startEvent id="Event_1mjvyhu" name="Start">
+      <bpmn:outgoing>Flow_04gc9rh</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_04gc9rh" sourceRef="Event_1mjvyhu" targetRef="Activity_159tnr6" />
+    <bpmn:endEvent id="Event_10wx1e0" name="End">
+      <bpmn:incoming>Flow_0hcugrq</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0hcugrq" sourceRef="Activity_159tnr6" targetRef="Event_10wx1e0" />
+    <bpmn:serviceTask id="Activity_159tnr6" name="Get keycloak roles" camunda:modelerTemplate="keycloakGetUserRolesDelegate" camunda:delegateExpression="${keycloakGetUserRoleConnectorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="realm">OFFICER</camunda:inputParameter>
+          <camunda:inputParameter name="username">testuser</camunda:inputParameter>
+          <camunda:inputParameter name="roleType">PLATFORM ROLES</camunda:inputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_04gc9rh</bpmn:incoming>
+      <bpmn:outgoing>Flow_0hcugrq</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0v7pc0a">
+      <bpmndi:BPMNShape id="Participant_1clj9ur_di" bpmnElement="Participant_1clj9ur" isHorizontal="true">
+        <dc:Bounds x="160" y="100" width="568" height="250" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0s3z8gi_di" bpmnElement="Flow_0s3z8gi">
+        <di:waypoint x="540" y="230" />
+        <di:waypoint x="592" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1to4rid_di" bpmnElement="Flow_1to4rid">
+        <di:waypoint x="390" y="230" />
+        <di:waypoint x="440" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07du014_di" bpmnElement="Flow_07du014">
+        <di:waypoint x="246" y="230" />
+        <di:waypoint x="290" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="210" y="212" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="216" y="255" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_09738d6_di" bpmnElement="Activity_1dvuqel">
+        <dc:Bounds x="290" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1v541pr_di" bpmnElement="Activity_0cly6mc">
+        <dc:Bounds x="440" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1q87mt1_di" bpmnElement="Event_1q87mt1">
+        <dc:Bounds x="592" y="212" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="600" y="255" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_1iorbd2_di" bpmnElement="Participant_1iorbd2" isHorizontal="true">
+        <dc:Bounds x="160" y="380" width="600" height="250" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1316p6u_di" bpmnElement="Flow_1316p6u">
+        <di:waypoint x="248" y="500" />
+        <di:waypoint x="300" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_00k7vn6_di" bpmnElement="Flow_00k7vn6">
+        <di:waypoint x="400" y="500" />
+        <di:waypoint x="452" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0u7pp32_di" bpmnElement="Event_0u7pp32">
+        <dc:Bounds x="212" y="482" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="218" y="525" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1mn7j46_di" bpmnElement="Event_1mn7j46">
+        <dc:Bounds x="452" y="482" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="460" y="525" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1d0m7ia_di" bpmnElement="Activity_167xcdl">
+        <dc:Bounds x="300" y="460" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_0dnke6v_di" bpmnElement="Participant_0dnke6v" isHorizontal="true">
+        <dc:Bounds x="160" y="650" width="600" height="250" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_04gc9rh_di" bpmnElement="Flow_04gc9rh">
+        <di:waypoint x="248" y="760" />
+        <di:waypoint x="300" y="760" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0hcugrq_di" bpmnElement="Flow_0hcugrq">
+        <di:waypoint x="400" y="760" />
+        <di:waypoint x="452" y="760" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1mjvyhu_di" bpmnElement="Event_1mjvyhu">
+        <dc:Bounds x="212" y="742" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="218" y="785" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_10wx1e0_di" bpmnElement="Event_10wx1e0">
+        <dc:Bounds x="452" y="742" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="460" y="785" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1jjmdog_di" bpmnElement="Activity_159tnr6">
+        <dc:Bounds x="300" y="720" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -17,6 +17,7 @@
 package com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloak.citizen;
 
 import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
+import com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloak.KeycloakGetRolesByRealmConnectorDelegate;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.integration.idm.model.IdmRole;
@@ -35,7 +36,9 @@ import org.springframework.stereotype.Component;
 /**
  * The class represents an implementation of {@link JavaDelegate} that is used to get the list of
  * regulations roles from keycloak.
+ * @deprecated - use {@link KeycloakGetRolesByRealmConnectorDelegate} instead
  */
+@Deprecated
 @Slf4j
 @RequiredArgsConstructor
 @Component(KeycloakGetCitizenRolesConnectorDelegate.DELEGATE_NAME)

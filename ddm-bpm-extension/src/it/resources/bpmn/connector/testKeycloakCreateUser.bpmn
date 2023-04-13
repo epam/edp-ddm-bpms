@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0m2lfxt" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.17.0">
+  <bpmn:collaboration id="Collaboration_1igrk9j">
+    <bpmn:participant id="Participant_1gtyur4" name="Test create keycloak user" processRef="test-create-keycloak-user" />
+    <bpmn:participant id="Participant_13d4yuq" name="Test create keycloak user (edrpou duplicated)" processRef="test-create-keycloak-user-edrpou-duplicated" />
+    <bpmn:participant id="Participant_0bard6r" name="Test create keycloak user (invalid custom attributes)" processRef="test-create-keycloak-user-invalid-custom-attributes" />
+    <bpmn:participant id="Participant_0bvdzp3" name="Test create keycloak user (invalid drfo)" processRef="test-create-keycloak-user-invalid-drfo-value" />
+    <bpmn:participant id="Participant_0zf1ljw" name="Test create keycloak user (invalid edrpou)" processRef="test-create-keycloak-user-invalid-edrpou-value" />
+    <bpmn:participant id="Participant_0lz0bcl" name="Test create keycloak user (invalid fullName)" processRef="test-create-keycloak-user-invalid-full-name-value" />
+    <bpmn:participant id="Participant_1szkswl" name="Test create keycloak user (edrpou not defined)" processRef="test-create-keycloak-user-edrpou-not-defined" />
+    <bpmn:participant id="Participant_1n9f5ve" name="Test create keycloak user (drfo not defined)" processRef="test-create-keycloak-user-drfo-not-defined" />
+    <bpmn:participant id="Participant_0zyyafv" name="Test create keycloak user (full name not defined)" processRef="test-create-keycloak-user-full-name-not-defined" />
+  </bpmn:collaboration>
+  <bpmn:process id="test-create-keycloak-user" name="Test create keycloak user" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="Start">
+      <bpmn:outgoing>Flow_0ubjh16</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0ubjh16" sourceRef="StartEvent_1" targetRef="Activity_1vtoxk4" />
+    <bpmn:sequenceFlow id="Flow_1s568w6" sourceRef="Activity_1vtoxk4" targetRef="Activity_0rvywem" />
+    <bpmn:endEvent id="Event_1mt5xib" name="End">
+      <bpmn:incoming>Flow_1tl9kme</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1tl9kme" sourceRef="Activity_0rvywem" targetRef="Event_1mt5xib" />
+    <bpmn:serviceTask id="Activity_1vtoxk4" name="Create keycloak user" camunda:modelerTemplate="keycloakCreateOfficerUserConnectorDelegate" camunda:delegateExpression="${keycloakCreateOfficerUserDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="attributes" />
+          <camunda:inputParameter name="drfo">1234567890</camunda:inputParameter>
+          <camunda:inputParameter name="edrpou">12345678</camunda:inputParameter>
+          <camunda:inputParameter name="fullName">Іванов Іван Іванович</camunda:inputParameter>
+          <camunda:outputParameter name="keycloakUserName">${ userNameResponse }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0ubjh16</bpmn:incoming>
+      <bpmn:outgoing>Flow_1s568w6</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Activity_0rvywem" name="Assert" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1s568w6</bpmn:incoming>
+      <bpmn:outgoing>Flow_1tl9kme</bpmn:outgoing>
+      <bpmn:script>assert keycloakUserName.equals('5be6da054720ed166f4d65bb4f04299d7b60a3d3b1fd2485f32320b86562e135')</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmn:process id="test-create-keycloak-user-edrpou-duplicated" name="Test create keycloak user (edrpou duplicated)" isExecutable="true">
+    <bpmn:startEvent id="Event_1c74nvg" name="Start">
+      <bpmn:outgoing>Flow_0g99ehr</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_1osbwbn" name="Create keycloak user" camunda:modelerTemplate="keycloakCreateOfficerUserConnectorDelegate" camunda:delegateExpression="${keycloakCreateOfficerUserDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="attributes">
+            <camunda:map>
+              <camunda:entry key="edrpou">12345678</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="drfo">1234567890</camunda:inputParameter>
+          <camunda:inputParameter name="edrpou">12345678</camunda:inputParameter>
+          <camunda:inputParameter name="fullName">Іванов Іван Іванович</camunda:inputParameter>
+          <camunda:outputParameter name="keycloakUserName">${ userNameResponse }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0g99ehr</bpmn:incoming>
+      <bpmn:outgoing>Flow_10b1xln</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_1obo44e" name="End">
+      <bpmn:incoming>Flow_10b1xln</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_10b1xln" sourceRef="Activity_1osbwbn" targetRef="Event_1obo44e" />
+    <bpmn:sequenceFlow id="Flow_0g99ehr" sourceRef="Event_1c74nvg" targetRef="Activity_1osbwbn" />
+  </bpmn:process>
+  <bpmn:process id="test-create-keycloak-user-invalid-custom-attributes" name="Test create keycloak user (invalid custom attributes)" isExecutable="true">
+    <bpmn:startEvent id="Event_1dxnp82" name="Start">
+      <bpmn:outgoing>Flow_16smx0z</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_11xiety" name="Create keycloak user" camunda:modelerTemplate="keycloakCreateOfficerUserConnectorDelegate" camunda:delegateExpression="${keycloakCreateOfficerUserDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="attributes">
+            <camunda:map>
+              <camunda:entry key="name">te][t</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="drfo">1234567890</camunda:inputParameter>
+          <camunda:inputParameter name="edrpou">12345678</camunda:inputParameter>
+          <camunda:inputParameter name="fullName">Іванов Іван Іванович</camunda:inputParameter>
+          <camunda:outputParameter name="keycloakUserName">${ userNameResponse }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_16smx0z</bpmn:incoming>
+      <bpmn:outgoing>Flow_1qu69jf</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_0rcotd6" name="End">
+      <bpmn:incoming>Flow_1qu69jf</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1qu69jf" sourceRef="Activity_11xiety" targetRef="Event_0rcotd6" />
+    <bpmn:sequenceFlow id="Flow_16smx0z" sourceRef="Event_1dxnp82" targetRef="Activity_11xiety" />
+  </bpmn:process>
+  <bpmn:process id="test-create-keycloak-user-invalid-drfo-value" name="Test create keycloak user (invalid drfo)" isExecutable="true">
+    <bpmn:startEvent id="Event_1l3xyzd" name="Start">
+      <bpmn:outgoing>Flow_09tz4es</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_1u6gu1e" name="Create keycloak user" camunda:modelerTemplate="keycloakCreateOfficerUserConnectorDelegate" camunda:delegateExpression="${keycloakCreateOfficerUserDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="attributes" />
+          <camunda:inputParameter name="edrpou">12345678</camunda:inputParameter>
+          <camunda:inputParameter name="fullName">Іванов Іван Іванович</camunda:inputParameter>
+          <camunda:inputParameter name="drfo">123.</camunda:inputParameter>
+          <camunda:outputParameter name="keycloakUserName">${ userNameResponse }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_09tz4es</bpmn:incoming>
+      <bpmn:outgoing>Flow_01ftesf</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_0xq4qpt" name="End">
+      <bpmn:incoming>Flow_01ftesf</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_01ftesf" sourceRef="Activity_1u6gu1e" targetRef="Event_0xq4qpt" />
+    <bpmn:sequenceFlow id="Flow_09tz4es" sourceRef="Event_1l3xyzd" targetRef="Activity_1u6gu1e" />
+  </bpmn:process>
+  <bpmn:process id="test-create-keycloak-user-invalid-edrpou-value" name="Test create keycloak user (invalid edrpou)" isExecutable="true">
+    <bpmn:startEvent id="Event_0vj6bs7" name="Start">
+      <bpmn:outgoing>Flow_0lo0qae</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_056dbz1" name="Create keycloak user" camunda:modelerTemplate="keycloakCreateOfficerUserConnectorDelegate" camunda:delegateExpression="${keycloakCreateOfficerUserDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="attributes" />
+          <camunda:inputParameter name="drfo">1234567890</camunda:inputParameter>
+          <camunda:inputParameter name="fullName">Іванов Іван Іванович</camunda:inputParameter>
+          <camunda:inputParameter name="edrpou">123-5678</camunda:inputParameter>
+          <camunda:outputParameter name="keycloakUserName">${ userNameResponse }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0lo0qae</bpmn:incoming>
+      <bpmn:outgoing>Flow_0qxmzan</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_1x9c10x" name="End">
+      <bpmn:incoming>Flow_0qxmzan</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0qxmzan" sourceRef="Activity_056dbz1" targetRef="Event_1x9c10x" />
+    <bpmn:sequenceFlow id="Flow_0lo0qae" sourceRef="Event_0vj6bs7" targetRef="Activity_056dbz1" />
+  </bpmn:process>
+  <bpmn:process id="test-create-keycloak-user-invalid-full-name-value" name="Test create keycloak user (invalid fullName)" isExecutable="true">
+    <bpmn:startEvent id="Event_0ip16yh" name="Start">
+      <bpmn:outgoing>Flow_1pr2pzn</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_0mkzmad" name="Create keycloak user" camunda:modelerTemplate="keycloakCreateOfficerUserConnectorDelegate" camunda:delegateExpression="${keycloakCreateOfficerUserDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="attributes" />
+          <camunda:inputParameter name="drfo">1234567890</camunda:inputParameter>
+          <camunda:inputParameter name="edrpou">12345678</camunda:inputParameter>
+          <camunda:inputParameter name="fullName">Іванов Іван &amp; Іванович</camunda:inputParameter>
+          <camunda:outputParameter name="keycloakUserName">${ userNameResponse }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1pr2pzn</bpmn:incoming>
+      <bpmn:outgoing>Flow_0goxn4e</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_1uuocv7" name="End">
+      <bpmn:incoming>Flow_0goxn4e</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0goxn4e" sourceRef="Activity_0mkzmad" targetRef="Event_1uuocv7" />
+    <bpmn:sequenceFlow id="Flow_1pr2pzn" sourceRef="Event_0ip16yh" targetRef="Activity_0mkzmad" />
+  </bpmn:process>
+  <bpmn:process id="test-create-keycloak-user-edrpou-not-defined" name="Test create keycloak user (edrpou not defined)" isExecutable="true">
+    <bpmn:startEvent id="Event_0bm0lyo" name="Start">
+      <bpmn:outgoing>Flow_1ynrws7</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_0efr3p3" name="End">
+      <bpmn:incoming>Flow_12026bb</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1ynrws7" sourceRef="Event_0bm0lyo" targetRef="Activity_1wro5qt" />
+    <bpmn:sequenceFlow id="Flow_12026bb" sourceRef="Activity_1wro5qt" targetRef="Event_0efr3p3" />
+    <bpmn:serviceTask id="Activity_1wro5qt" name="Create keycloak user" camunda:modelerTemplate="keycloakCreateOfficerUserConnectorDelegate" camunda:delegateExpression="${keycloakCreateOfficerUserDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="edrpou" />
+          <camunda:inputParameter name="attributes" />
+          <camunda:inputParameter name="fullName">Іванов Іван Іванович</camunda:inputParameter>
+          <camunda:inputParameter name="drfo">1234567890</camunda:inputParameter>
+          <camunda:outputParameter name="keycloakUserName">${ userNameResponse }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1ynrws7</bpmn:incoming>
+      <bpmn:outgoing>Flow_12026bb</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmn:process id="test-create-keycloak-user-drfo-not-defined" name="Test create keycloak user (drfo not defined)" isExecutable="true">
+    <bpmn:startEvent id="Event_0w9odze" name="Start">
+      <bpmn:outgoing>Flow_19pzzj6</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_183lssr" name="End">
+      <bpmn:incoming>Flow_1mgq858</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_19pzzj6" sourceRef="Event_0w9odze" targetRef="Activity_0kz8nlm" />
+    <bpmn:sequenceFlow id="Flow_1mgq858" sourceRef="Activity_0kz8nlm" targetRef="Event_183lssr" />
+    <bpmn:serviceTask id="Activity_0kz8nlm" name="Create keycloak user" camunda:modelerTemplate="keycloakCreateOfficerUserConnectorDelegate" camunda:delegateExpression="${keycloakCreateOfficerUserDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="drfo" />
+          <camunda:inputParameter name="attributes" />
+          <camunda:inputParameter name="fullName">Іванов Іван Іванович</camunda:inputParameter>
+          <camunda:inputParameter name="edrpou">12345678</camunda:inputParameter>
+          <camunda:outputParameter name="keycloakUserName">${ userNameResponse }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_19pzzj6</bpmn:incoming>
+      <bpmn:outgoing>Flow_1mgq858</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmn:process id="test-create-keycloak-user-full-name-not-defined" name="Test create keycloak user (full name not defined)" isExecutable="true">
+    <bpmn:startEvent id="Event_1qn00rd" name="Start">
+      <bpmn:outgoing>Flow_1inll9g</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_015cgp1" name="End">
+      <bpmn:incoming>Flow_0082i2x</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1inll9g" sourceRef="Event_1qn00rd" targetRef="Activity_07mbkwb" />
+    <bpmn:sequenceFlow id="Flow_0082i2x" sourceRef="Activity_07mbkwb" targetRef="Event_015cgp1" />
+    <bpmn:serviceTask id="Activity_07mbkwb" name="Create keycloak user" camunda:modelerTemplate="keycloakCreateOfficerUserConnectorDelegate" camunda:delegateExpression="${keycloakCreateOfficerUserDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="fullName" />
+          <camunda:inputParameter name="attributes" />
+          <camunda:inputParameter name="drfo">1234567890</camunda:inputParameter>
+          <camunda:inputParameter name="edrpou">12345678</camunda:inputParameter>
+          <camunda:outputParameter name="keycloakUserName">${ userNameResponse }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1inll9g</bpmn:incoming>
+      <bpmn:outgoing>Flow_0082i2x</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1igrk9j">
+      <bpmndi:BPMNShape id="Participant_1gtyur4_di" bpmnElement="Participant_1gtyur4" isHorizontal="true">
+        <dc:Bounds x="129" y="52" width="551" height="250" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1tl9kme_di" bpmnElement="Flow_1tl9kme">
+        <di:waypoint x="530" y="177" />
+        <di:waypoint x="592" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1s568w6_di" bpmnElement="Flow_1s568w6">
+        <di:waypoint x="370" y="177" />
+        <di:waypoint x="430" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ubjh16_di" bpmnElement="Flow_0ubjh16">
+        <di:waypoint x="215" y="177" />
+        <di:waypoint x="270" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="159" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="185" y="202" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1mt5xib_di" bpmnElement="Event_1mt5xib">
+        <dc:Bounds x="592" y="159" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="600" y="202" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0pj3xfr_di" bpmnElement="Activity_1vtoxk4">
+        <dc:Bounds x="270" y="137" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1tbmfws_di" bpmnElement="Activity_0rvywem">
+        <dc:Bounds x="430" y="137" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1xlvhyr" bpmnElement="Participant_13d4yuq" isHorizontal="true">
+        <dc:Bounds x="129" y="330" width="361" height="200" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_1uiyrd0" bpmnElement="Flow_10b1xln">
+        <di:waypoint x="370" y="425" />
+        <di:waypoint x="412" y="425" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_1rtd1pr" bpmnElement="Flow_0g99ehr">
+        <di:waypoint x="215" y="425" />
+        <di:waypoint x="270" y="425" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_1lpdyv1" bpmnElement="Event_1c74nvg">
+        <dc:Bounds x="179" y="407" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="185" y="450" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1k3b8tc" bpmnElement="Activity_1osbwbn">
+        <dc:Bounds x="270" y="385" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1w61y23" bpmnElement="Event_1obo44e">
+        <dc:Bounds x="412" y="407" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="420" y="450" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1bfl3q8" bpmnElement="Participant_0bard6r" isHorizontal="true">
+        <dc:Bounds x="129" y="550" width="361" height="200" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_0ffj3vn" bpmnElement="Flow_1qu69jf">
+        <di:waypoint x="370" y="645" />
+        <di:waypoint x="412" y="645" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_0gk9i51" bpmnElement="Flow_16smx0z">
+        <di:waypoint x="215" y="645" />
+        <di:waypoint x="270" y="645" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_1k5qui7" bpmnElement="Event_1dxnp82">
+        <dc:Bounds x="179" y="627" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="185" y="670" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0dqh52k" bpmnElement="Activity_11xiety">
+        <dc:Bounds x="270" y="605" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0g5ksng" bpmnElement="Event_0rcotd6">
+        <dc:Bounds x="412" y="627" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="420" y="670" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1n2vpn3" bpmnElement="Participant_0bvdzp3" isHorizontal="true">
+        <dc:Bounds x="129" y="780" width="361" height="200" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_02wj5xu" bpmnElement="Flow_01ftesf">
+        <di:waypoint x="370" y="875" />
+        <di:waypoint x="412" y="875" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_11fwmn8" bpmnElement="Flow_09tz4es">
+        <di:waypoint x="215" y="875" />
+        <di:waypoint x="270" y="875" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_1fyq02d" bpmnElement="Event_1l3xyzd">
+        <dc:Bounds x="179" y="857" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="185" y="900" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0aje7q1" bpmnElement="Activity_1u6gu1e">
+        <dc:Bounds x="270" y="835" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1vm8gnh" bpmnElement="Event_0xq4qpt">
+        <dc:Bounds x="412" y="857" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="420" y="900" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0dqol7r" bpmnElement="Participant_0zf1ljw" isHorizontal="true">
+        <dc:Bounds x="129" y="1010" width="361" height="200" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_0p0q4iv" bpmnElement="Flow_0qxmzan">
+        <di:waypoint x="370" y="1105" />
+        <di:waypoint x="412" y="1105" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_0x9j8ln" bpmnElement="Flow_0lo0qae">
+        <di:waypoint x="215" y="1105" />
+        <di:waypoint x="270" y="1105" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_099zj6l" bpmnElement="Event_0vj6bs7">
+        <dc:Bounds x="179" y="1087" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="185" y="1130" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1vbhhaa" bpmnElement="Activity_056dbz1">
+        <dc:Bounds x="270" y="1065" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0z3a04z" bpmnElement="Event_1x9c10x">
+        <dc:Bounds x="412" y="1087" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="420" y="1130" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1j8fw95" bpmnElement="Participant_0lz0bcl" isHorizontal="true">
+        <dc:Bounds x="129" y="1230" width="361" height="200" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_13f97zx" bpmnElement="Flow_0goxn4e">
+        <di:waypoint x="370" y="1325" />
+        <di:waypoint x="412" y="1325" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_1diyo41" bpmnElement="Flow_1pr2pzn">
+        <di:waypoint x="215" y="1325" />
+        <di:waypoint x="270" y="1325" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_0bvf0ju" bpmnElement="Event_0ip16yh">
+        <dc:Bounds x="179" y="1307" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="185" y="1350" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0jqewxd" bpmnElement="Activity_0mkzmad">
+        <dc:Bounds x="270" y="1285" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_116tvw6" bpmnElement="Event_1uuocv7">
+        <dc:Bounds x="412" y="1307" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="420" y="1350" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0nr7o6l" bpmnElement="Participant_1szkswl" isHorizontal="true">
+        <dc:Bounds x="129" y="1460" width="361" height="200" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_02n6ktc" bpmnElement="Flow_1ynrws7">
+        <di:waypoint x="215" y="1555" />
+        <di:waypoint x="260" y="1555" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12026bb_di" bpmnElement="Flow_12026bb">
+        <di:waypoint x="360" y="1555" />
+        <di:waypoint x="412" y="1555" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_1jfpaso" bpmnElement="Event_0bm0lyo">
+        <dc:Bounds x="179" y="1537" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="185" y="1580" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_08ok2o1" bpmnElement="Event_0efr3p3">
+        <dc:Bounds x="412" y="1537" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="420" y="1580" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1g40ap2_di" bpmnElement="Activity_1wro5qt">
+        <dc:Bounds x="260" y="1515" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0jwj3a1" bpmnElement="Participant_1n9f5ve" isHorizontal="true">
+        <dc:Bounds x="129" y="1690" width="361" height="200" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_1ahkg9z" bpmnElement="Flow_19pzzj6">
+        <di:waypoint x="215" y="1785" />
+        <di:waypoint x="260" y="1785" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1mgq858_di" bpmnElement="Flow_1mgq858">
+        <di:waypoint x="360" y="1785" />
+        <di:waypoint x="412" y="1785" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_08lcehc" bpmnElement="Event_0w9odze">
+        <dc:Bounds x="179" y="1767" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="185" y="1810" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0cfvmzq" bpmnElement="Event_183lssr">
+        <dc:Bounds x="412" y="1767" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="420" y="1810" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0fw3eo3_di" bpmnElement="Activity_0kz8nlm">
+        <dc:Bounds x="260" y="1745" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1wz78vp" bpmnElement="Participant_0zyyafv" isHorizontal="true">
+        <dc:Bounds x="129" y="1910" width="361" height="200" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_13apjni" bpmnElement="Flow_1inll9g">
+        <di:waypoint x="215" y="2005" />
+        <di:waypoint x="260" y="2005" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0082i2x_di" bpmnElement="Flow_0082i2x">
+        <di:waypoint x="360" y="2005" />
+        <di:waypoint x="412" y="2005" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_00xzqsy" bpmnElement="Event_1qn00rd">
+        <dc:Bounds x="179" y="1987" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="185" y="2030" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0jckfdf" bpmnElement="Event_015cgp1">
+        <dc:Bounds x="412" y="1987" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="420" y="2030" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0wajeqk_di" bpmnElement="Activity_07mbkwb">
+        <dc:Bounds x="260" y="1965" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

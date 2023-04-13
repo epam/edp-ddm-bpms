@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,10 @@ import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+/**
+ * @deprecated use {@link KeycloakSaveOfficerUserAttributesDelegate} instead
+ */
+@Deprecated(forRemoval = true)
 @RequiredArgsConstructor
 public class KeycloakSaveOfficerAttributeDelegate extends BaseJavaDelegate {
 

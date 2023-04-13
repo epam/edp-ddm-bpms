@@ -1,0 +1,42 @@
+[
+  {
+    "self": null,
+    "id": "9004ebde-68cf-4e25-bb76-b1642a3814e5",
+    "origin": null,
+    "createdTimestamp": null,
+    "username": "11af70ae909d25146f915f25ffaf4e04dae0452f7a62af4ba81c743cabd627e9",
+    "enabled": true,
+    "totp": null,
+    "emailVerified": null,
+    "firstName": "Василь Леонідович",
+    "lastName": "Сидоренко",
+    "email": null,
+    "federationLink": null,
+    "serviceAccountClientId": null,
+    "attributes": {
+      "edrpou": [
+        "15250623"
+      ],
+      "drfo": [
+        "1525062300"
+      ],
+      "fullName": [
+        "Сидоренко Василь Леонідович"
+      ]
+    },
+    "credentials": null,
+    "disableableCredentialTypes": null,
+    "requiredActions": null,
+    "federatedIdentities": null,
+    "realmRoles": [
+      "officer"
+    ],
+    "clientRoles": null,
+    "clientConsents": null,
+    "notBefore": null,
+    "applicationRoles": null,
+    "socialLinks": null,
+    "groups": null,
+    "access": null
+  }
+]
