@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloak.general;
+package com.epam.digital.data.platform.bpms.extension.delegate.connector.keycloak;
 
 import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
-import com.epam.digital.data.platform.integration.idm.service.IdmService;
-import com.epam.digital.data.platform.starter.security.dto.enums.KeycloakPlatformRole;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.keycloak.representations.idm.RoleRepresentation;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,30 +35,16 @@ import org.springframework.stereotype.Component;
 public class KeycloakSaveUserRoleConnectorDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "keycloakSaveUserRoleConnectorDelegate";
-  private static final Map<String, UnaryOperator<List<RoleRepresentation>>> ROLES_BY_TYPE =
-      Map.of(
-          "REGISTRY ROLES", registryRoles -> registryRoles.stream()
-              .filter(Predicate.not(KeycloakSaveUserRoleConnectorDelegate::isPlatformRole))
-              .collect(Collectors.toList()),
-          "PLATFORM ROLES", platformRoles -> platformRoles.stream()
-              .filter(KeycloakSaveUserRoleConnectorDelegate::isPlatformRole)
-              .collect(Collectors.toList()),
-          "ALL ROLES", roles -> roles
-      );
 
-  @Qualifier("officer-keycloak-client-service")
-  private final IdmService officerIdmService;
-  @Qualifier("citizen-keycloak-client-service")
-  private final IdmService citizenIdmService;
-
+  private final IdmServiceProvider provider;
   @SystemVariable(name = "realm")
-  protected NamedVariableAccessor<String> realmVariable;
+  private NamedVariableAccessor<String> realmVariable;
   @SystemVariable(name = "roleType")
-  protected NamedVariableAccessor<String> roleTypeVariable;
+  private NamedVariableAccessor<String> roleTypeVariable;
   @SystemVariable(name = "username")
-  protected NamedVariableAccessor<String> userNameVariable;
+  private NamedVariableAccessor<String> userNameVariable;
   @SystemVariable(name = "roles")
-  protected NamedVariableAccessor<List<String>> rolesVariable;
+  private NamedVariableAccessor<List<String>> rolesVariable;
 
   @Override
   public String getDelegateName() {
@@ -78,11 +58,11 @@ public class KeycloakSaveUserRoleConnectorDelegate extends BaseJavaDelegate {
     var userName = userNameVariable.from(execution).getOrThrow();
     var inputRoles = rolesVariable.from(execution).getOrThrow();
 
-    var client = "CITIZEN".equals(realm) ? citizenIdmService : officerIdmService;
+    var client = provider.getIdmService(realm);
 
     var keycloakRoles = client.getRoleRepresentations();
 
-    var keycloakRolesByType = ROLES_BY_TYPE.get(roleType).apply(keycloakRoles);
+    var keycloakRolesByType = UserRoleDelegateUtils.ROLES_BY_TYPE.get(roleType).apply(keycloakRoles);
     checkRoleMatching(keycloakRolesByType, inputRoles, roleType);
     client.removeRoles(userName, keycloakRolesByType);
 
@@ -100,10 +80,6 @@ public class KeycloakSaveUserRoleConnectorDelegate extends BaseJavaDelegate {
           String.format("Input roles: %s do not match the selected type: [%s]", rolesCandidateToAdd,
               roleType));
     }
-  }
-
-  private static boolean isPlatformRole(RoleRepresentation role) {
-    return KeycloakPlatformRole.containsRole(role.getName());
   }
 
   private List<RoleRepresentation> getRoleRepresentationsToAdd(

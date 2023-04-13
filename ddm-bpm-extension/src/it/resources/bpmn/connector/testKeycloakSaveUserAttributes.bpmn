@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1a760qe" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.17.0">
+  <bpmn:collaboration id="Collaboration_0tgszzy">
+    <bpmn:participant id="Participant_1tpah9b" name="Test save keycloak user attributes" processRef="test-save-keycloak-user-attributes" />
+    <bpmn:participant id="Participant_0t7j2yl" name="Test save keycloak user attributes (drfo duplicated)" processRef="test-save-keycloak-user-attributes-drfo-duplicated" />
+    <bpmn:participant id="Participant_0h37ekm" name="Test save keycloak user attributes (invalid custom attributes)" processRef="test-save-keycloak-user-attributes-invalid-custom-attributes" />
+    <bpmn:participant id="Participant_08570gi" name="Test save keycloak user attributes (invalid drfo value)" processRef="test-save-keycloak-user-attributes-invalid-drfo-value" />
+    <bpmn:participant id="Participant_0bxh4k0" name="Test save keycloak user attributes (invalid edrpou value)" processRef="test-save-keycloak-user-attributes-invalid-edrpou-value" />
+    <bpmn:participant id="Participant_0ep0555" name="Test save keycloak user attributes (invalid full name value)" processRef="test-save-keycloak-user-attributes-invalid-full-name-value" />
+    <bpmn:participant id="Participant_0344xc3" name="Test save keycloak user attributes (user duplicated)" processRef="test-save-keycloak-user-attributes-duplicated-user" />
+    <bpmn:participant id="Participant_0fwikgj" name="Test save keycloak user attributes (empty attributes)" processRef="test-save-keycloak-user-attributes-empty-attributes" />
+  </bpmn:collaboration>
+  <bpmn:process id="test-save-keycloak-user-attributes" name="Test save keycloak user attributes" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_03isxgz</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_03isxgz" sourceRef="StartEvent_1" targetRef="Activity_1ce9cpb" />
+    <bpmn:endEvent id="Event_0inmxvd">
+      <bpmn:incoming>Flow_0szagfr</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0szagfr" sourceRef="Activity_1ce9cpb" targetRef="Event_0inmxvd" />
+    <bpmn:serviceTask id="Activity_1ce9cpb" name="Save keycloak user attributes" camunda:modelerTemplate="keycloakSaveOfficerUserAttributesDelegate" camunda:delegateExpression="${keycloakSaveOfficerUserAttributesDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="attributes">
+            <camunda:map>
+              <camunda:entry key="age">22</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="username">testuser</camunda:inputParameter>
+          <camunda:inputParameter name="fullName">Сидоренко Василь Леонідович</camunda:inputParameter>
+          <camunda:inputParameter name="drfo">1525062300</camunda:inputParameter>
+          <camunda:inputParameter name="edrpou">15250623</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_03isxgz</bpmn:incoming>
+      <bpmn:outgoing>Flow_0szagfr</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmn:process id="test-save-keycloak-user-attributes-drfo-duplicated" name="Test save keycloak user attributes (drfo duplicated)" isExecutable="true">
+    <bpmn:startEvent id="Event_00xm7ib">
+      <bpmn:outgoing>Flow_00za0kv</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_1jqhomw">
+      <bpmn:incoming>Flow_0ne5szs</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Activity_0sjy32m" name="Save keycloak user attributes" camunda:modelerTemplate="keycloakSaveOfficerUserAttributesDelegate" camunda:delegateExpression="${keycloakSaveOfficerUserAttributesDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="attributes">
+            <camunda:map>
+              <camunda:entry key="age">22</camunda:entry>
+              <camunda:entry key="drfo">1525062222</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="username">testuser</camunda:inputParameter>
+          <camunda:inputParameter name="fullName">Сидоренко Василь Леонідович</camunda:inputParameter>
+          <camunda:inputParameter name="drfo">1525062300</camunda:inputParameter>
+          <camunda:inputParameter name="edrpou">15250623</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_00za0kv</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ne5szs</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_00za0kv" sourceRef="Event_00xm7ib" targetRef="Activity_0sjy32m" />
+    <bpmn:sequenceFlow id="Flow_0ne5szs" sourceRef="Activity_0sjy32m" targetRef="Event_1jqhomw" />
+  </bpmn:process>
+  <bpmn:process id="test-save-keycloak-user-attributes-invalid-custom-attributes" name="Test save keycloak user attributes (invalid custom attributes)" isExecutable="true">
+    <bpmn:startEvent id="Event_123ndz1">
+      <bpmn:outgoing>Flow_1c1ahu6</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_0h65alg">
+      <bpmn:incoming>Flow_0l72sq9</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Activity_0h070cg" name="Save keycloak user attributes" camunda:modelerTemplate="keycloakSaveOfficerUserAttributesDelegate" camunda:delegateExpression="${keycloakSaveOfficerUserAttributesDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="attributes">
+            <camunda:map>
+              <camunda:entry key="age">{22}</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="username">testuser</camunda:inputParameter>
+          <camunda:inputParameter name="fullName">Сидоренко Василь Леонідович</camunda:inputParameter>
+          <camunda:inputParameter name="drfo">1525062300</camunda:inputParameter>
+          <camunda:inputParameter name="edrpou">15250623</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1c1ahu6</bpmn:incoming>
+      <bpmn:outgoing>Flow_0l72sq9</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1c1ahu6" sourceRef="Event_123ndz1" targetRef="Activity_0h070cg" />
+    <bpmn:sequenceFlow id="Flow_0l72sq9" sourceRef="Activity_0h070cg" targetRef="Event_0h65alg" />
+  </bpmn:process>
+  <bpmn:process id="test-save-keycloak-user-attributes-invalid-drfo-value" name="Test save keycloak user attributes (invalid drfo value)" isExecutable="true">
+    <bpmn:startEvent id="Event_03agjvh">
+      <bpmn:outgoing>Flow_0llc7xa</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_0nku6i4">
+      <bpmn:incoming>Flow_1bl9a0c</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Activity_0xwt9oj" name="Save keycloak user attributes" camunda:modelerTemplate="keycloakSaveOfficerUserAttributesDelegate" camunda:delegateExpression="${keycloakSaveOfficerUserAttributesDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="attributes">
+            <camunda:map>
+              <camunda:entry key="age">22</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="username">testuser</camunda:inputParameter>
+          <camunda:inputParameter name="fullName">Сидоренко Василь Леонідович</camunda:inputParameter>
+          <camunda:inputParameter name="edrpou">15250623</camunda:inputParameter>
+          <camunda:inputParameter name="drfo">15-25</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0llc7xa</bpmn:incoming>
+      <bpmn:outgoing>Flow_1bl9a0c</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0llc7xa" sourceRef="Event_03agjvh" targetRef="Activity_0xwt9oj" />
+    <bpmn:sequenceFlow id="Flow_1bl9a0c" sourceRef="Activity_0xwt9oj" targetRef="Event_0nku6i4" />
+  </bpmn:process>
+  <bpmn:process id="test-save-keycloak-user-attributes-invalid-edrpou-value" name="Test save keycloak user attributes (invalid edrpou value)" isExecutable="true">
+    <bpmn:startEvent id="Event_0ej61l0">
+      <bpmn:outgoing>Flow_0w7hbty</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_1np7dqf">
+      <bpmn:incoming>Flow_0hlo81w</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Activity_0l800mv" name="Save keycloak user attributes" camunda:modelerTemplate="keycloakSaveOfficerUserAttributesDelegate" camunda:delegateExpression="${keycloakSaveOfficerUserAttributesDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="attributes">
+            <camunda:map>
+              <camunda:entry key="age">22</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="username">testuser</camunda:inputParameter>
+          <camunda:inputParameter name="fullName">Сидоренко Василь Леонідович</camunda:inputParameter>
+          <camunda:inputParameter name="drfo">1525062300</camunda:inputParameter>
+          <camunda:inputParameter name="edrpou">152506239</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0w7hbty</bpmn:incoming>
+      <bpmn:outgoing>Flow_0hlo81w</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0w7hbty" sourceRef="Event_0ej61l0" targetRef="Activity_0l800mv" />
+    <bpmn:sequenceFlow id="Flow_0hlo81w" sourceRef="Activity_0l800mv" targetRef="Event_1np7dqf" />
+  </bpmn:process>
+  <bpmn:process id="test-save-keycloak-user-attributes-invalid-full-name-value" name="Test save keycloak user attributes (invalid full name value)" isExecutable="true">
+    <bpmn:startEvent id="Event_03zq53x">
+      <bpmn:outgoing>Flow_0gi6awv</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_13oku8i">
+      <bpmn:incoming>Flow_0vwj0r6</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Activity_14untzb" name="Save keycloak user attributes" camunda:modelerTemplate="keycloakSaveOfficerUserAttributesDelegate" camunda:delegateExpression="${keycloakSaveOfficerUserAttributesDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="attributes">
+            <camunda:map>
+              <camunda:entry key="age">22</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="username">testuser</camunda:inputParameter>
+          <camunda:inputParameter name="drfo">1525062300</camunda:inputParameter>
+          <camunda:inputParameter name="edrpou">15250623</camunda:inputParameter>
+          <camunda:inputParameter name="fullName">Сидоренко Василь? Леонідович</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0gi6awv</bpmn:incoming>
+      <bpmn:outgoing>Flow_0vwj0r6</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0gi6awv" sourceRef="Event_03zq53x" targetRef="Activity_14untzb" />
+    <bpmn:sequenceFlow id="Flow_0vwj0r6" sourceRef="Activity_14untzb" targetRef="Event_13oku8i" />
+  </bpmn:process>
+  <bpmn:process id="test-save-keycloak-user-attributes-duplicated-user" name="Test save keycloak user attributes (user duplicated)" isExecutable="true">
+    <bpmn:startEvent id="Event_1o1y3my">
+      <bpmn:outgoing>Flow_0mfs58x</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_10oag60">
+      <bpmn:incoming>Flow_09epzl6</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0mfs58x" sourceRef="Event_1o1y3my" targetRef="Activity_19fmaes" />
+    <bpmn:sequenceFlow id="Flow_09epzl6" sourceRef="Activity_19fmaes" targetRef="Event_10oag60" />
+    <bpmn:serviceTask id="Activity_19fmaes" name="Save keycloak user attributes" camunda:modelerTemplate="keycloakSaveOfficerUserAttributesDelegate" camunda:delegateExpression="${keycloakSaveOfficerUserAttributesDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="fullName" />
+          <camunda:inputParameter name="drfo" />
+          <camunda:inputParameter name="attributes" />
+          <camunda:inputParameter name="username">testuser</camunda:inputParameter>
+          <camunda:inputParameter name="edrpou">15250623</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0mfs58x</bpmn:incoming>
+      <bpmn:outgoing>Flow_09epzl6</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmn:process id="test-save-keycloak-user-attributes-empty-attributes" name="Test save keycloak user attributes (empty attributes)" isExecutable="true">
+    <bpmn:startEvent id="Event_1no3m0p">
+      <bpmn:outgoing>Flow_1ylnlan</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_0mjzgyg">
+      <bpmn:incoming>Flow_0tonogp</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1ylnlan" sourceRef="Event_1no3m0p" targetRef="Activity_18u870s" />
+    <bpmn:sequenceFlow id="Flow_0tonogp" sourceRef="Activity_18u870s" targetRef="Event_0mjzgyg" />
+    <bpmn:serviceTask id="Activity_18u870s" name="Save keycloak user attributes" camunda:modelerTemplate="keycloakSaveOfficerUserAttributesDelegate" camunda:delegateExpression="${keycloakSaveOfficerUserAttributesDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="fullName" />
+          <camunda:inputParameter name="drfo" />
+          <camunda:inputParameter name="edrpou" />
+          <camunda:inputParameter name="attributes" />
+          <camunda:inputParameter name="username">testuser</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1ylnlan</bpmn:incoming>
+      <bpmn:outgoing>Flow_0tonogp</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0tgszzy">
+      <bpmndi:BPMNShape id="Participant_1tpah9b_di" bpmnElement="Participant_1tpah9b" isHorizontal="true">
+        <dc:Bounds x="129" y="60" width="371" height="230" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0szagfr_di" bpmnElement="Flow_0szagfr">
+        <di:waypoint x="370" y="177" />
+        <di:waypoint x="432" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03isxgz_di" bpmnElement="Flow_03isxgz">
+        <di:waypoint x="215" y="177" />
+        <di:waypoint x="270" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="159" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0inmxvd_di" bpmnElement="Event_0inmxvd">
+        <dc:Bounds x="432" y="159" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0q1e8mn_di" bpmnElement="Activity_1ce9cpb">
+        <dc:Bounds x="270" y="137" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0odpk0h" bpmnElement="Participant_0t7j2yl" isHorizontal="true">
+        <dc:Bounds x="129" y="310" width="371" height="230" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_0nz4owx" bpmnElement="Flow_0ne5szs">
+        <di:waypoint x="370" y="427" />
+        <di:waypoint x="432" y="427" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_1g4g65d" bpmnElement="Flow_00za0kv">
+        <di:waypoint x="215" y="427" />
+        <di:waypoint x="270" y="427" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_1kc4ghg" bpmnElement="Event_00xm7ib">
+        <dc:Bounds x="179" y="409" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0m34xdx" bpmnElement="Event_1jqhomw">
+        <dc:Bounds x="432" y="409" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1ts0brq" bpmnElement="Activity_0sjy32m">
+        <dc:Bounds x="270" y="387" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1r7asl0" bpmnElement="Participant_0h37ekm" isHorizontal="true">
+        <dc:Bounds x="129" y="560" width="371" height="230" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_0yrfodc" bpmnElement="Flow_0l72sq9">
+        <di:waypoint x="370" y="677" />
+        <di:waypoint x="432" y="677" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_0mcukoe" bpmnElement="Flow_1c1ahu6">
+        <di:waypoint x="215" y="677" />
+        <di:waypoint x="270" y="677" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_0o3eunx" bpmnElement="Event_123ndz1">
+        <dc:Bounds x="179" y="659" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1ybi7l8" bpmnElement="Event_0h65alg">
+        <dc:Bounds x="432" y="659" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0oxpr6p" bpmnElement="Activity_0h070cg">
+        <dc:Bounds x="270" y="637" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0b83s2f" bpmnElement="Participant_08570gi" isHorizontal="true">
+        <dc:Bounds x="129" y="820" width="371" height="230" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_0p4mq1g" bpmnElement="Flow_1bl9a0c">
+        <di:waypoint x="370" y="937" />
+        <di:waypoint x="432" y="937" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_1luupf5" bpmnElement="Flow_0llc7xa">
+        <di:waypoint x="215" y="937" />
+        <di:waypoint x="270" y="937" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_1au3q7t" bpmnElement="Event_03agjvh">
+        <dc:Bounds x="179" y="919" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1cru9u7" bpmnElement="Event_0nku6i4">
+        <dc:Bounds x="432" y="919" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0eo67er" bpmnElement="Activity_0xwt9oj">
+        <dc:Bounds x="270" y="897" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_12dcjs5" bpmnElement="Participant_0bxh4k0" isHorizontal="true">
+        <dc:Bounds x="129" y="1080" width="371" height="230" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_1bvhzdc" bpmnElement="Flow_0hlo81w">
+        <di:waypoint x="370" y="1197" />
+        <di:waypoint x="432" y="1197" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_1708npy" bpmnElement="Flow_0w7hbty">
+        <di:waypoint x="215" y="1197" />
+        <di:waypoint x="270" y="1197" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_0qoa38v" bpmnElement="Event_0ej61l0">
+        <dc:Bounds x="179" y="1179" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0aymy4f" bpmnElement="Event_1np7dqf">
+        <dc:Bounds x="432" y="1179" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_09iot1s" bpmnElement="Activity_0l800mv">
+        <dc:Bounds x="270" y="1157" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_06aaxso" bpmnElement="Participant_0ep0555" isHorizontal="true">
+        <dc:Bounds x="129" y="1340" width="371" height="230" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_1vueos4" bpmnElement="Flow_0vwj0r6">
+        <di:waypoint x="370" y="1457" />
+        <di:waypoint x="432" y="1457" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_1l6up7o" bpmnElement="Flow_0gi6awv">
+        <di:waypoint x="215" y="1457" />
+        <di:waypoint x="270" y="1457" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_0lgm2zs" bpmnElement="Event_03zq53x">
+        <dc:Bounds x="179" y="1439" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0vtdh72" bpmnElement="Event_13oku8i">
+        <dc:Bounds x="432" y="1439" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1k4knwz" bpmnElement="Activity_14untzb">
+        <dc:Bounds x="270" y="1417" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_006joeo" bpmnElement="Participant_0344xc3" isHorizontal="true">
+        <dc:Bounds x="129" y="1600" width="371" height="230" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_09epzl6_di" bpmnElement="Flow_09epzl6">
+        <di:waypoint x="370" y="1717" />
+        <di:waypoint x="432" y="1717" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_1q6wyw4" bpmnElement="Flow_0mfs58x">
+        <di:waypoint x="215" y="1717" />
+        <di:waypoint x="270" y="1717" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_113nx8c" bpmnElement="Event_1o1y3my">
+        <dc:Bounds x="179" y="1699" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0psycwy" bpmnElement="Event_10oag60">
+        <dc:Bounds x="432" y="1699" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_14jfbj9_di" bpmnElement="Activity_19fmaes">
+        <dc:Bounds x="270" y="1677" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1ia96hk" bpmnElement="Participant_0fwikgj" isHorizontal="true">
+        <dc:Bounds x="129" y="1860" width="371" height="230" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_1vtmbmh" bpmnElement="Flow_1ylnlan">
+        <di:waypoint x="215" y="1977" />
+        <di:waypoint x="270" y="1977" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0tonogp_di" bpmnElement="Flow_0tonogp">
+        <di:waypoint x="370" y="1977" />
+        <di:waypoint x="432" y="1977" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_00xsxa2" bpmnElement="Event_1no3m0p">
+        <dc:Bounds x="179" y="1959" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_02grwaq" bpmnElement="Event_0mjzgyg">
+        <dc:Bounds x="432" y="1959" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0fu420w_di" bpmnElement="Activity_18u870s">
+        <dc:Bounds x="270" y="1937" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

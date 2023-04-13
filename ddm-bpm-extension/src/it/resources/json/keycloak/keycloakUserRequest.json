@@ -1,0 +1,52 @@
+{
+  "self": null,
+  "id": "7004ebde-68cf-4e25-bb76-b1642a3814e5",
+  "origin": null,
+  "createdTimestamp": 1618315392481,
+  "username": "testuser",
+  "enabled": true,
+  "totp": false,
+  "emailVerified": false,
+  "firstName": "Василь Леонідович",
+  "lastName": "Сидоренко",
+  "email": "testuser@testuser.com",
+  "federationLink": null,
+  "serviceAccountClientId": null,
+  "attributes": {
+    "edrpou": [
+      "15250623"
+    ],
+    "KATOTTG": [
+      "UA03020010010112345"
+    ],
+    "drfo": [
+      "1525062300"
+    ],
+    "fullName": [
+      "Сидоренко Василь Леонідович"
+    ],
+    "age": [
+      "22"
+    ]
+  },
+  "credentials": null,
+  "disableableCredentialTypes": [],
+  "requiredActions": [
+    "UPDATE_PASSWORD"
+  ],
+  "federatedIdentities": null,
+  "realmRoles": null,
+  "clientRoles": null,
+  "clientConsents": null,
+  "notBefore": 0,
+  "applicationRoles": null,
+  "socialLinks": null,
+  "groups": null,
+  "access": {
+    "manageGroupMembership": true,
+    "view": true,
+    "mapRoles": true,
+    "impersonate": true,
+    "manage": true
+  }
+}

@@ -1,0 +1,13 @@
+[
+  {
+    "id": "0efc7908-c3a7-4b2f-be9e-bec60dbc5554",
+    "name": "officer",
+    "description": "Officer role",
+    "scopeParamRequired": null,
+    "composite": false,
+    "composites": null,
+    "clientRole": false,
+    "containerId": "fa96e275-f642-4da1-b812-a925c37ad93c",
+    "attributes": null
+  }
+]
