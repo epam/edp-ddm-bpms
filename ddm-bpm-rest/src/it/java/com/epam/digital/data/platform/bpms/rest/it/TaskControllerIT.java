@@ -52,7 +52,7 @@ class TaskControllerIT extends BaseIT {
   @Test
   @Deployment(resources = {"bpmn/testParent.bpmn", "bpmn/testSubprocess1.bpmn",
       "bpmn/testSubprocess2.bpmn"})
-  public void shouldGetChildTaskWithParentProcessDefinitionName() throws JsonProcessingException {
+  void shouldGetChildTaskWithParentProcessDefinitionName() throws JsonProcessingException {
     var startResult = postForObject("api/process-definition/key/parent/start",
         "{\"businessKey\":\"parent\"}", Map.class);
     var processId = (String) startResult.get("id");
@@ -83,6 +83,26 @@ class TaskControllerIT extends BaseIT {
     assertThat(result.length).isOne();
     assertThat(result[0].getId()).isNotEmpty();
     assertThat(result[0].getAssignee()).isEqualTo("testuser");
+  }
+
+  @Test
+  @Deployment(resources = {"bpmn/testParentMultiInstance.bpmn", "bpmn/testMultiInstanceCall.bpmn",
+      "bpmn/testSubprocess2.bpmn"})
+  void shouldGetLightweightTasksWithMultiInstanceCallActivity()
+      throws JsonProcessingException {
+    var startResult = postForObject("api/process-definition/key/parent_multi_instance/start",
+        "{\"businessKey\":\"parent\"}", Map.class);
+    var processId = (String) startResult.get("id");
+
+    var result = postForObject("api/extended/task/lightweight",
+        "{\"rootProcessInstanceId\": \"" + processId + "\"}",
+        DdmTaskDto[].class);
+
+    assertThat(result).isNotNull().hasSize(2);
+    assertThat(result[0].getId()).isNotEmpty();
+    assertThat(result[0].getAssignee()).isEqualTo("testuser");
+    assertThat(result[1].getId()).isNotEmpty();
+    assertThat(result[1].getAssignee()).isEqualTo("testuser");
   }
 
   @Test
