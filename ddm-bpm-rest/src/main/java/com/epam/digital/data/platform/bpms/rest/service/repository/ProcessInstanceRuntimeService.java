@@ -1,3 +1,19 @@
+/*
+ * Copyright 2023 EPAM Systems.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.epam.digital.data.platform.bpms.rest.service.repository;
 
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
@@ -15,8 +31,8 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.springframework.stereotype.Service;
 
 /**
- * Runtime service that is used for creating process instance queries to Camunda {@link
- * ProcessEngine}
+ * Runtime service that is used for creating process instance queries to Camunda
+ * {@link ProcessEngine}
  */
 @Slf4j
 @Service
@@ -108,31 +124,30 @@ public class ProcessInstanceRuntimeService {
    * processes for provided root process instance id
    */
   public List<ProcessInstance> getCallActivityProcessInstances(String rootProcessInstanceId) {
-    return this.getCallActivityProcessInstances(rootProcessInstanceId, Lists.newArrayList());
+    return this.getCallActivityProcessInstances(rootProcessInstanceId, Lists.newArrayList(), 0);
   }
 
   private List<ProcessInstance> getCallActivityProcessInstances(String rootProcessInstanceId,
-      List<ProcessInstance> processInstanceList) {
-    if (processInstanceList.size() < MAX_NUMBER_OF_NESTED_SUB_PROCESSES) {
-      var callActivityProcessInstance = getCallActivityProcessInstance(rootProcessInstanceId);
-      if (callActivityProcessInstance.isEmpty()) {
+      List<ProcessInstance> processInstanceList, int currentSubProcessLevel) {
+    if (currentSubProcessLevel < MAX_NUMBER_OF_NESTED_SUB_PROCESSES) {
+      var callActivityProcessInstances = getInstancesBySuperProcessInstanceId(
+          rootProcessInstanceId);
+      if (callActivityProcessInstances.isEmpty()) {
         return processInstanceList;
       }
-      processInstanceList.add(callActivityProcessInstance.get());
+      processInstanceList.addAll(callActivityProcessInstances);
 
-      return this.getCallActivityProcessInstances(callActivityProcessInstance.get().getId(),
-          processInstanceList);
+      var increasedCurrentSubProcessLevel = ++currentSubProcessLevel;
+      callActivityProcessInstances.forEach(
+          processInstance -> this.getCallActivityProcessInstances(processInstance.getId(),
+              processInstanceList, increasedCurrentSubProcessLevel));
     }
     return processInstanceList;
   }
 
-  private Optional<ProcessInstance> getCallActivityProcessInstance(String processInstanceId) {
+  private List<ProcessInstance> getInstancesBySuperProcessInstanceId(String processInstanceId) {
     return runtimeService.createProcessInstanceQuery()
-        .superProcessInstanceId(processInstanceId).list().stream()
-        .reduce((instance1, instance2) -> {
-          throw new IllegalStateException(
-              "Found more than one call activity process instances by id");
-        });
+        .superProcessInstanceId(processInstanceId)
+        .list();
   }
-
 }

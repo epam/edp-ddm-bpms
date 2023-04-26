@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.epam.digital.data.platform.bpms.api.dto.DdmTaskQueryDto;
 import com.epam.digital.data.platform.bpms.api.dto.DdmVariableValueDto;
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
 import com.epam.digital.data.platform.bpms.rest.mapper.LocalDateTimeMapper;
@@ -49,7 +50,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
-import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
@@ -311,5 +311,35 @@ class UserTaskServiceTest {
     assertThat(restException).isNotNull()
         .hasMessage("Cannot complete task id: Engine error")
         .hasFieldOrPropertyWithValue("status", Status.INTERNAL_SERVER_ERROR);
+  }
+
+  @Test
+  void getLightweightTasksByParam() {
+    var rootProcessInstanceId = "rootProcessInstanceId";
+    var taskAssignee = "test";
+    var taskId = "id";
+    var ddmTaskQueryDto = DdmTaskQueryDto.builder()
+        .rootProcessInstanceId(rootProcessInstanceId)
+        .build();
+    var paginationQueryDto = PaginationQueryDto.builder().build();
+    var task = new TaskEntity();
+    task.setId(taskId);
+    task.setAssignee(taskAssignee);
+    var taskDto = TaskDto.fromEntity(task);
+    var processInstance = new ExecutionEntity();
+    processInstance.setId("processInstanceId");
+
+    when(processInstanceRuntimeService.getCallActivityProcessInstances(rootProcessInstanceId))
+        .thenReturn(List.of(processInstance));
+    when(taskRuntimeService.getTasksByParams(any(), eq(paginationQueryDto)))
+        .thenReturn(List.of(taskDto));
+
+    var result = service.getLightweightTasksByParam(ddmTaskQueryDto, paginationQueryDto);
+    assertThat(result).hasSize(1).element(0)
+        .hasFieldOrPropertyWithValue("id", taskId)
+        .hasFieldOrPropertyWithValue("assignee", taskAssignee);
+    verify(taskRuntimeService).getTasksByParams(any(), eq(paginationQueryDto));
+    verify(camundaAdminImpersonation).execute(any());
+    verify(processInstanceRuntimeService).getCallActivityProcessInstances(rootProcessInstanceId);
   }
 }

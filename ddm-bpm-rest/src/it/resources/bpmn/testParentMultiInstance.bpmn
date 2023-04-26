@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1n2ymxw" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:collaboration id="Collaboration_00q5do6">
+    <bpmn:participant id="Participant_0lg0k72" name="Parent multi instance call activity" processRef="parent_multi_instance" />
+  </bpmn:collaboration>
+  <bpmn:process id="parent_multi_instance" name="Parent multi instance call activity" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" camunda:initiator="initiator">
+      <bpmn:outgoing>Flow_11f2bet</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_0hvohyh">
+      <bpmn:incoming>Flow_1irwzji</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:callActivity id="call-sub-process" name="Call multi instance call activity" calledElement="test_multi_instance_call">
+      <bpmn:incoming>Flow_11f2bet</bpmn:incoming>
+      <bpmn:outgoing>Flow_1irwzji</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:sequenceFlow id="Flow_1irwzji" sourceRef="call-sub-process" targetRef="Event_0hvohyh" />
+    <bpmn:sequenceFlow id="Flow_11f2bet" sourceRef="StartEvent_1" targetRef="call-sub-process" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_00q5do6">
+      <bpmndi:BPMNShape id="Participant_0lg0k72_di" bpmnElement="Participant_0lg0k72" isHorizontal="true">
+        <dc:Bounds x="120" y="82" width="370" height="250" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_11f2bet_di" bpmnElement="Flow_11f2bet">
+        <di:waypoint x="215" y="207" />
+        <di:waypoint x="270" y="207" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1irwzji_di" bpmnElement="Flow_1irwzji">
+        <di:waypoint x="370" y="207" />
+        <di:waypoint x="432" y="207" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="189" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0hvohyh_di" bpmnElement="Event_0hvohyh">
+        <dc:Bounds x="432" y="189" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1d573r7_di" bpmnElement="call-sub-process">
+        <dc:Bounds x="270" y="167" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
