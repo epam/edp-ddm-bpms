@@ -21,8 +21,6 @@ import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessInstan
 import com.epam.digital.data.platform.bpms.rest.service.repository.TaskRuntimeService;
 import com.epam.digital.data.platform.bpms.rest.service.repository.VariableInstanceRuntimeService;
 import com.epam.digital.data.platform.bpms.security.CamundaImpersonation;
-
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;

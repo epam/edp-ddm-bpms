@@ -1,3 +1,19 @@
+/*
+ * Copyright 2023 EPAM Systems.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.epam.digital.data.platform.bpms.rest.service.repository;
 
 import com.epam.digital.data.platform.bpms.rest.dto.PaginationQueryDto;
@@ -18,7 +34,6 @@ import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperties;
@@ -26,8 +41,8 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperty;
 import org.springframework.stereotype.Service;
 
 /**
- * Runtime service that is used for creating task queries to Camunda {@link TaskService} and {@link
- * ProcessEngine}
+ * Runtime service that is used for creating task queries to Camunda {@link TaskService} and
+ * {@link ProcessEngine}
  */
 @Slf4j
 @Service
@@ -57,36 +72,6 @@ public class TaskRuntimeService {
         .map(TaskDto::fromEntity)
         .collect(Collectors.toList());
 
-    log.debug("Found {} tasks", result.size());
-    return result;
-  }
-
-  /**
-   * Get task list by given parameters including tasks from call activities.
-   *
-   * @param queryDto              the parameter query dto
-   * @param rootProcessInstanceId specified root process instace id
-   * @param paginationQueryDto    query dto with pagination parameters
-   * @return list of {@link TaskDto task object} that matches given params
-   */
-  public List<TaskDto> getTasksByParamsIncludeCallActivities(TaskQueryDto queryDto,
-      String rootProcessInstanceId, PaginationQueryDto paginationQueryDto) {
-
-    var callActivityProcessInstances = processInstanceRuntimeService.getCallActivityProcessInstances(
-        rootProcessInstanceId);
-    log.debug("Selected {} call activities process instances", callActivityProcessInstances.size());
-
-    var processInstanceIdIn = callActivityProcessInstances.stream().map(
-        ProcessInstance::getId).collect(Collectors.toList());
-    processInstanceIdIn.add(rootProcessInstanceId);
-
-    log.debug("Selecting tasks...");
-    var result = queryDto.toQuery(processEngine)
-        .processInstanceIdIn(processInstanceIdIn.toArray(String[]::new))
-        .listPage(paginationQueryDto.getFirstResult(), paginationQueryDto.getMaxResults())
-        .stream()
-        .map(TaskDto::fromEntity)
-        .collect(Collectors.toList());
     log.debug("Found {} tasks", result.size());
     return result;
   }

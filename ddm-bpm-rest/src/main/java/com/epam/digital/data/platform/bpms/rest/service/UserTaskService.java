@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,7 +119,7 @@ public class UserTaskService {
       PaginationQueryDto paginationQueryDto) {
     log.info("Getting lightweight user tasks");
 
-    var taskDtos = getTasksByParams(ddmTaskQueryDto, paginationQueryDto);
+    var taskDtos = getTasksByParamsIncludeCallActivities(ddmTaskQueryDto, paginationQueryDto);
     log.trace("Found {} tasks", taskDtos.size());
 
     if (taskDtos.isEmpty()) {
@@ -133,13 +133,18 @@ public class UserTaskService {
     return result;
   }
 
-  private List<TaskDto> getTasksByParams(DdmTaskQueryDto ddmTaskQueryDto,
+  private List<TaskDto> getTasksByParamsIncludeCallActivities(DdmTaskQueryDto ddmTaskQueryDto,
       PaginationQueryDto paginationQueryDto) {
-    var taskQueryDto = taskMapper.toTaskQueryDto(ddmTaskQueryDto);
-    if (Objects.nonNull(ddmTaskQueryDto.getRootProcessInstanceId())) {
-      return taskRuntimeService.getTasksByParamsIncludeCallActivities(taskQueryDto,
-          ddmTaskQueryDto.getRootProcessInstanceId(), paginationQueryDto);
+    var rootProcessInstanceId = ddmTaskQueryDto.getRootProcessInstanceId();
+    if (Objects.nonNull(rootProcessInstanceId)) {
+      var callActivityProcessInstances = getCallActivityProcessInstances(rootProcessInstanceId);
+      var processInstanceIds = callActivityProcessInstances.stream()
+          .map(ProcessInstance::getId)
+          .collect(Collectors.toList());
+      processInstanceIds.add(rootProcessInstanceId);
+      ddmTaskQueryDto.setProcessInstanceIdIn(processInstanceIds);
     }
+    var taskQueryDto = taskMapper.toTaskQueryDto(ddmTaskQueryDto);
     return taskRuntimeService.getTasksByParams(taskQueryDto, paginationQueryDto);
   }
 
@@ -217,6 +222,11 @@ public class UserTaskService {
   private Optional<ProcessInstance> getProcessInstance(String processInstanceId) {
     return camundaAdminImpersonation.execute(
         () -> processInstanceRuntimeService.getProcessInstance(processInstanceId));
+  }
+
+  private List<ProcessInstance> getCallActivityProcessInstances(String rootProcessInstanceId) {
+    return camundaAdminImpersonation.execute(
+        () -> processInstanceRuntimeService.getCallActivityProcessInstances(rootProcessInstanceId));
   }
 
   private Map<String, VariableValueDto> completeRuntimeTask(String id, CompleteTaskDto dto) {
