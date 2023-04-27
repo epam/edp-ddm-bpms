@@ -33,8 +33,8 @@
     FROM
     ACT_RU_AUTHORIZATION
     WHERE (RESOURCE_TYPE_ = 8 AND GROUP_ID_ != 'camunda-admin' AND RESOURCE_ID_= '*' AND PERMS_ = 8)
-    or
-    (RESOURCE_TYPE_ = 6 AND GROUP_ID_ != 'camunda-admin' AND PERMS_ = 258)
+    OR
+    (RESOURCE_TYPE_ = 6 AND (GROUP_ID_ != 'camunda-admin' OR GROUP_ID_ IS NULL))
     )
   </delete>
 
