@@ -1,0 +1,63 @@
+{
+  "users": [
+    {
+      "id": "123",
+      "createdTimestamp": 1618403768879,
+      "username": "jane_doe",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": false,
+      "firstName": "Jane",
+      "lastName": "Doe",
+      "email": "jane_doe@test.com",
+      "attributes": {
+        "edrpou": [
+          "12345678"
+        ],
+        "drfo": [
+          "1234567890"
+        ],
+        "fullName": [
+          "Jane Doe"
+        ],
+        "hierarchyCodeEquals": [
+          "100"
+        ]
+      },
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "notBefore": 0
+    },
+    {
+      "id": "1234",
+      "createdTimestamp": 1618403768879,
+      "username": "johnDoe",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": false,
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john_doe@test.com",
+      "attributes": {
+        "edrpou": [
+          "12345678"
+        ],
+        "drfo": [
+          "1234567891"
+        ],
+        "fullName": [
+          "John Doe"
+        ],
+        "hierarchyCodeEquals": [
+          "100.200"
+        ]
+      },
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "notBefore": 0
+    }
+  ],
+  "pagination": {
+    "continueToken": -1
+  }
+}
