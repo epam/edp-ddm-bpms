@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2023 EPAM Systems.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~    https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:rrm="http://registry-regulation-management" id="Definitions_1rbswid" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.10.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:collaboration id="Collaboration_0x3mrlu">
+    <bpmn:participant id="Participant_1gzqhon" name="Пошук чиновників за атрибутами searchRegistryUsersByAttributes" processRef="feature-search-registry-users-by-attributes" />
+  </bpmn:collaboration>
+  <bpmn:process id="feature-search-registry-users-by-attributes" name="Пошук чиновників в KeyCloak" isExecutable="true">
+    <bpmn:startEvent id="Event_0aqwh51" name="Start" camunda:initiator="initiator">
+      <bpmn:outgoing>Flow_0vgxzrx</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:scriptTask id="Activity_173t9z4" name="Підготувати дані для пошуку користувача за атрибутами" scriptFormat="groovy">
+      <bpmn:incoming>Flow_0vgxzrx</bpmn:incoming>
+      <bpmn:outgoing>Flow_00vigsn</bpmn:outgoing>
+      <bpmn:script>def attributesEquals = [:]
+        def attributesStartsWith = [:]
+        def attributesInverseStartsWith = [:]
+
+        if (
+        get_variable('hierarchyCodeEquals') != null
+        ) {
+        def listHierarchyCodeEquals = []
+        listHierarchyCodeEquals.addAll(hierarchyCodeEquals.split(","))
+        attributesEquals['hierarchyCodeEquals'] = listHierarchyCodeEquals
+        }
+
+        if (
+        get_variable('testAttributeEquals') != null
+        ) {
+        def listTestAttributeEquals = []
+        listTestAttributeEquals.addAll(testAttributeEquals.split(","))
+        attributesEquals['testAttributeEquals'] = listTestAttributeEquals
+        }
+
+        if (
+        get_variable('hierarchyCodeStartsWith') != null
+        ) {
+        def listHierarchyCodeStartsWith = []
+        listHierarchyCodeStartsWith.addAll(hierarchyCodeStartsWith.split(","))
+        attributesStartsWith['hierarchyCodeStartsWith'] = listHierarchyCodeStartsWith
+        }
+
+        if (
+        get_variable('testAttributeStartsWith') != null
+        ) {
+        def listTestAttributeStartsWith = []
+        listTestAttributeStartsWith.addAll(testAttributeStartsWith.split(","))
+        attributesStartsWith['testAttributeStartsWith'] = listTestAttributeStartsWith
+        }
+
+        if (
+        get_variable('hierarchyCodeInverseStartsWith') != null
+        ) {
+        def listHierarchyCodeInverseStartsWith = []
+        listHierarchyCodeInverseStartsWith.addAll(hierarchyCodeInverseStartsWith.split(","))
+        attributesInverseStartsWith['hierarchyCodeInverseStartsWith'] = listHierarchyCodeInverseStartsWith
+        }
+
+        if (
+        get_variable('testAttributeInverseStartsWith') != null
+        ) {
+        def listTestAttributeInverseStartsWith = []
+        listTestAttributeInverseStartsWith.addAll(testAttributeInverseStartsWith.split(","))
+        attributesInverseStartsWith['testAttributeInverseStartsWith'] = listTestAttributeInverseStartsWith
+        }
+
+        execution.setVariable('attributesEquals', attributesEquals)
+        execution.setVariable('attributesStartsWith', attributesStartsWith)
+        execution.setVariable('attributesInverseStartsWith', attributesInverseStartsWith)</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:scriptTask id="Activity_08bdhqu" name="Підготувати дані для відображення" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1njgeyk</bpmn:incoming>
+      <bpmn:outgoing>Flow_0x7dmev</bpmn:outgoing>
+      <bpmn:script>println  "usersByAttributes " +  usersResponse
+
+        def users = usersResponse.users.stream().map(o -&gt; ['fullName': o.fullName, 'edrpou': o.attributes['edrpou'], 'drfo': o.attributes['drfo']]).collect()
+
+        def formData = [
+        'users': users
+        ]
+
+        set_variable('usersFormData', formData)</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="Event_1omyois" name="end">
+      <bpmn:incoming>Flow_0x7dmev</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="Gateway_1b4zwse">
+      <bpmn:incoming>Flow_00vigsn</bpmn:incoming>
+      <bpmn:outgoing>Flow_05lvq69</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0k53vew</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="Gateway_1cvdekx">
+      <bpmn:incoming>Flow_0eoon71</bpmn:incoming>
+      <bpmn:incoming>Flow_0dlsjqn</bpmn:incoming>
+      <bpmn:outgoing>Flow_1njgeyk</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Activity_0estusy" name="Пошук громадян за введеними атрибутами" camunda:modelerTemplate="searchRegistryUsersByAttributes" camunda:delegateExpression="${searchRegistryUsersByAttributes}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="attributesEquals">${attributesEquals}</camunda:inputParameter>
+          <camunda:inputParameter name="attributesStartWith">${attributesStartsWith}</camunda:inputParameter>
+          <camunda:inputParameter name="attributesThatAreStartFor">${attributesInverseStartsWith}</camunda:inputParameter>
+          <camunda:inputParameter name="limit" />
+          <camunda:inputParameter name="continueToken" />
+          <camunda:inputParameter name="realm">citizen</camunda:inputParameter>
+          <camunda:outputParameter name="usersResponse">${ usersResponse }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0k53vew</bpmn:incoming>
+      <bpmn:outgoing>Flow_0dlsjqn</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_0skctju" name="Пошук чиновників за введеними атрибутами" camunda:delegateExpression="${searchRegistryUsersByAttributes}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="attributesEquals">${attributesEquals}</camunda:inputParameter>
+          <camunda:inputParameter name="attributesStartWith">${attributesStartsWith}</camunda:inputParameter>
+          <camunda:inputParameter name="attributesThatAreStartFor">${attributesInverseStartsWith}</camunda:inputParameter>
+          <camunda:inputParameter name="limit" />
+          <camunda:inputParameter name="continueToken" />
+          <camunda:inputParameter name="realm">officer</camunda:inputParameter>
+          <camunda:outputParameter name="usersResponse">${ usersResponse }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_05lvq69</bpmn:incoming>
+      <bpmn:outgoing>Flow_0eoon71</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0vgxzrx" sourceRef="Event_0aqwh51" targetRef="Activity_173t9z4" />
+    <bpmn:sequenceFlow id="Flow_00vigsn" sourceRef="Activity_173t9z4" targetRef="Gateway_1b4zwse" />
+    <bpmn:sequenceFlow id="Flow_1njgeyk" sourceRef="Gateway_1cvdekx" targetRef="Activity_08bdhqu" />
+    <bpmn:sequenceFlow id="Flow_0x7dmev" sourceRef="Activity_08bdhqu" targetRef="Event_1omyois" />
+    <bpmn:sequenceFlow id="Flow_05lvq69" sourceRef="Gateway_1b4zwse" targetRef="Activity_0skctju">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isOfficer}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0k53vew" sourceRef="Gateway_1b4zwse" targetRef="Activity_0estusy">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!isOfficer}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0eoon71" sourceRef="Activity_0skctju" targetRef="Gateway_1cvdekx" />
+    <bpmn:sequenceFlow id="Flow_0dlsjqn" sourceRef="Activity_0estusy" targetRef="Gateway_1cvdekx" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0x3mrlu">
+      <bpmndi:BPMNShape id="Participant_1gzqhon_di" bpmnElement="Participant_1gzqhon" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="1020" height="230" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0aqwh51_di" bpmnElement="Event_0aqwh51">
+        <dc:Bounds x="222" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="229" y="225" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1s3hy89_di" bpmnElement="Activity_173t9z4">
+        <dc:Bounds x="320" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_08bdhqu_di" bpmnElement="Activity_08bdhqu">
+        <dc:Bounds x="920" y="160" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1omyois_di" bpmnElement="Event_1omyois">
+        <dc:Bounds x="1102" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1111" y="225" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1b4zwse_di" bpmnElement="Gateway_1b4zwse" isMarkerVisible="true">
+        <dc:Bounds x="485" y="175" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1cvdekx_di" bpmnElement="Gateway_1cvdekx" isMarkerVisible="true">
+        <dc:Bounds x="795" y="175" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1i1fpl9" bpmnElement="Activity_0estusy" bioc:stroke="#000000" bioc:fill="#ffffff" color:background-color="#ffffff" color:border-color="#000000">
+        <dc:Bounds x="620" y="210" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0skctju_di" bpmnElement="Activity_0skctju" bioc:stroke="#000000" bioc:fill="#ffffff" color:background-color="#ffffff" color:border-color="#000000">
+        <dc:Bounds x="620" y="110" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0vgxzrx_di" bpmnElement="Flow_0vgxzrx">
+        <di:waypoint x="258" y="200" />
+        <di:waypoint x="320" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_00vigsn_di" bpmnElement="Flow_00vigsn">
+        <di:waypoint x="420" y="200" />
+        <di:waypoint x="485" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1njgeyk_di" bpmnElement="Flow_1njgeyk">
+        <di:waypoint x="845" y="200" />
+        <di:waypoint x="920" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0x7dmev_di" bpmnElement="Flow_0x7dmev">
+        <di:waypoint x="1020" y="200" />
+        <di:waypoint x="1102" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_05lvq69_di" bpmnElement="Flow_05lvq69">
+        <di:waypoint x="510" y="175" />
+        <di:waypoint x="510" y="150" />
+        <di:waypoint x="620" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0k53vew_di" bpmnElement="Flow_0k53vew">
+        <di:waypoint x="510" y="225" />
+        <di:waypoint x="510" y="250" />
+        <di:waypoint x="620" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0eoon71_di" bpmnElement="Flow_0eoon71">
+        <di:waypoint x="720" y="150" />
+        <di:waypoint x="820" y="150" />
+        <di:waypoint x="820" y="175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0dlsjqn_di" bpmnElement="Flow_0dlsjqn">
+        <di:waypoint x="720" y="250" />
+        <di:waypoint x="820" y="250" />
+        <di:waypoint x="820" y="225" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
