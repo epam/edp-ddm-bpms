@@ -111,6 +111,7 @@ storage:
     type: redis
   backend:
     redis:
+      scan-count: 100
       password: ${REDIS_PASSWORD}
       sentinel:
         master: mymaster
