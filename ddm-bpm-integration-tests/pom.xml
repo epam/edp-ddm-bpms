@@ -51,6 +51,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>${commons-io.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.camunda.bpm.assert</groupId>
       <artifactId>camunda-bpm-assert</artifactId>
       <version>${camunda.bpm.assert.version}</version>

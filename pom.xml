@@ -50,13 +50,13 @@
     <groovy.version>3.0.6</groovy.version>
     <ddm-starter-actuator.version>1.6.0.1</ddm-starter-actuator.version>
     <ddm-starter-error-handler.version>1.6.0.6</ddm-starter-error-handler.version>
-    <ddm-starter-juel-function.version>1.9.4.6</ddm-starter-juel-function.version>
+    <ddm-starter-juel-function.version>1.9.4.7</ddm-starter-juel-function.version>
     <ddm-starter-localization.version>1.6.0.1</ddm-starter-localization.version>
     <ddm-starter-logging.version>1.6.0.1</ddm-starter-logging.version>
     <ddm-starter-security.version>1.6.0.13</ddm-starter-security.version>
     <ddm-starter-trembita-integration.version>1.9.0.4</ddm-starter-trembita-integration.version>
     <ddm-idm-client.version>1.9.5.1</ddm-idm-client.version>
-    <ddm-digital-document-client.version>1.9.0.3</ddm-digital-document-client.version>
+    <ddm-digital-document-client.version>1.9.0.5</ddm-digital-document-client.version>
     <excerpt-model.version>1.6.0.1</excerpt-model.version>
     <process-history-model.version>1.6.0.1</process-history-model.version>
     <ddm-starter-kafka.version>1.6.0.2</ddm-starter-kafka.version>
@@ -68,6 +68,7 @@
     <embedded.database.spring-test.version>2.2.0</embedded.database.spring-test.version>
     <ddm-starter-notifications.version>1.6.0.4</ddm-starter-notifications.version>
     <ddm-notification-service-api.version>1.8.0.3</ddm-notification-service-api.version>
+    <commons-io.version>2.11.0</commons-io.version>
     <embedded-redis.version>0.7.1</embedded-redis.version>
     <deployable.module>ddm-bpm</deployable.module>
 
@@ -142,6 +143,9 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skipAfterFailureCount>1</skipAfterFailureCount>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
