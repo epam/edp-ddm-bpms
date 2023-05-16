@@ -128,3 +128,8 @@ decorator:
 
 # Reducing logging level of TraceListenerStrategy because of "TODO" logs
 logging.level.org.springframework.cloud.sleuth.instrument.jdbc.TraceListenerStrategy: WARN
+
+storage:
+  backend:
+    redis:
+      scan-count: 100
