@@ -93,14 +93,18 @@ public class UserTaskService {
     }
 
     var processInstances = getProcessInstances(taskDtos);
+    var tasksByActiveProcesses = taskDtos.stream()
+        .filter(task -> Objects.nonNull(processInstances.get(task.getProcessInstanceId())))
+        .collect(Collectors.toList());
 
-    var processDefinitionNames = getProcessDefinitionNames(taskDtos, processInstances);
+    var processDefinitionNames = getProcessDefinitionNames(tasksByActiveProcesses,
+        processInstances);
     log.trace("Found process definition names - {}", processDefinitionNames.values());
 
     var processBusinessKeys = getProcessBusinessKeys(processInstances.values());
     log.trace("Found {} process business keys", processBusinessKeys.size());
 
-    var result = taskMapper.toDdmTaskDtos(taskDtos, processDefinitionNames,
+    var result = taskMapper.toDdmTaskDtos(tasksByActiveProcesses, processDefinitionNames,
         processBusinessKeys);
     log.trace("Found user task list - {}", result);
 
