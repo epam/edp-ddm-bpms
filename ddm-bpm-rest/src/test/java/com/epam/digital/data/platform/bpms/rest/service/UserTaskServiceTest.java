@@ -222,6 +222,56 @@ class UserTaskServiceTest {
   }
 
   @Test
+  void getTasksByParamsWhenOneTaskWasCompletedBeforeGettingProcessInstances() {
+    var taskQueryDto = mock(TaskQueryDto.class);
+    var paginationQueryDto = PaginationQueryDto.builder().firstResult(1).maxResults(2).build();
+    var testUserTask = new TaskEntity();
+    testUserTask.setId("testUserTaskId");
+    testUserTask.setProcessInstanceId("firstProcessInstanceId");
+    testUserTask.setProcessDefinitionId("firstProcessDefinitionId");
+    var testUserTaskDto = TaskDto.fromEntity(testUserTask);
+    var testSignUserTask = new TaskEntity();
+    testSignUserTask.setId("testSignUserTaskId");
+    testSignUserTask.setProcessInstanceId("secondProcessInstanceId");
+    testSignUserTask.setProcessDefinitionId("secondProcessDefinitionId");
+    var testSignUserTaskDto = TaskDto.fromEntity(testSignUserTask);
+    var processInstance = new ExecutionEntity();
+    processInstance.setId("firstProcessInstanceId");
+    processInstance.setBusinessKey("businessKey");
+    processInstance.setRootProcessInstanceId("firstProcessInstanceId");
+    processInstance.setProcessDefinitionId("firstProcessDefinitionId");
+    var processInstanceQueryDto = new ProcessInstanceQueryDto();
+    processInstanceQueryDto.setProcessInstanceIds(
+        Set.of("firstProcessInstanceId", "secondProcessInstanceId"));
+
+    when(taskRuntimeService.getTasksByParams(taskQueryDto, paginationQueryDto))
+        .thenReturn(List.of(testUserTaskDto, testSignUserTaskDto)).thenReturn(List.of());
+    when(processInstanceRuntimeService.getProcessInstances(refEq(processInstanceQueryDto),
+        eq(PaginationQueryDto.builder().build()))).thenReturn(List.of(processInstance));
+    when(processInstanceRuntimeService.getRootProcessInstance(processInstance)).thenReturn(
+        processInstance);
+    when(processDefinitionRepositoryService.getProcessDefinitionsNames("firstProcessDefinitionId"))
+        .thenReturn(Map.of("firstProcessDefinitionId", "firstProcessDefinitionName"));
+
+    var result = service.getTasksByParams(taskQueryDto, paginationQueryDto);
+
+    assertThat(result).hasSize(1).element(0)
+        .hasFieldOrPropertyWithValue("id", "testUserTaskId")
+        .hasFieldOrPropertyWithValue("processDefinitionId", "firstProcessDefinitionId")
+        .hasFieldOrPropertyWithValue("processDefinitionName", "firstProcessDefinitionName")
+        .hasFieldOrPropertyWithValue("businessKey", "businessKey");
+
+    assertThat(service.getTasksByParams(taskQueryDto, paginationQueryDto)).isEmpty();
+
+    verify(taskRuntimeService, times(2)).getTasksByParams(taskQueryDto, paginationQueryDto);
+    verify(camundaAdminImpersonation, times(3)).execute(any());
+    verify(processDefinitionRepositoryService).getProcessDefinitionsNames(
+        "firstProcessDefinitionId");
+    verify(processInstanceRuntimeService).getProcessInstances(refEq(processInstanceQueryDto),
+        eq(PaginationQueryDto.builder().build()));
+  }
+
+  @Test
   void completeTask() {
     var task = new TaskEntity();
     task.setId("id");
