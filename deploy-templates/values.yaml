@@ -107,6 +107,7 @@ deployProfile: prod
 storage:
   form-data:
     type: redis
+    cleaningEndEventEnabled: true
   message-payload:
     type: redis
   backend:

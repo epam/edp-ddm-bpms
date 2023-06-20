@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.util.xml.Element;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -43,6 +44,8 @@ public class StorageBpmnParseListener extends AbstractBpmnParseListener {
   private final FileCleanerEndEventListener fileCleanerEndEventListener;
   private final FormDataCleanerEndEventListener formDataCleanerEndEventListener;
   private final MessagePayloadCleanerEndEventListener messagePayloadCleanerEndEventListener;
+  @Value("${storage.form-data.cleaningEndEventEnabled:true}")
+  private final boolean isEnabledFormDataCleaningEndEvent;
 
   @Override
   public void parseUserTask(Element userTaskElement, ScopeImpl scope, ActivityImpl activity) {
@@ -55,8 +58,10 @@ public class StorageBpmnParseListener extends AbstractBpmnParseListener {
   public void parseEndEvent(Element endEventElement, ScopeImpl scope, ActivityImpl endActivity) {
     if (scope instanceof ProcessDefinitionImpl) {
       endActivity.addBuiltInListener(ExecutionListener.EVENTNAME_END, fileCleanerEndEventListener);
-      endActivity.addBuiltInListener(ExecutionListener.EVENTNAME_END,
-          formDataCleanerEndEventListener);
+      if (isEnabledFormDataCleaningEndEvent) {
+        endActivity.addBuiltInListener(ExecutionListener.EVENTNAME_END,
+                formDataCleanerEndEventListener);
+      }
       endActivity.addBuiltInListener(ExecutionListener.EVENTNAME_END,
           messagePayloadCleanerEndEventListener);
     }
