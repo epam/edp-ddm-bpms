@@ -199,6 +199,12 @@
       <groupId>com.epam.digital.data.platform</groupId>
       <artifactId>ddm-notification-service-api</artifactId>
       <version>${ddm-notification-service-api.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.epam.digital.data.platform</groupId>
+          <artifactId>ddm-starter-audit</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
