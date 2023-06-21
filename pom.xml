@@ -67,7 +67,7 @@
     <zonky.embedded.postgres.version>2.0.2</zonky.embedded.postgres.version>
     <embedded.database.spring-test.version>2.2.0</embedded.database.spring-test.version>
     <ddm-starter-notifications.version>1.6.0.4</ddm-starter-notifications.version>
-    <ddm-notification-service-api.version>1.8.0.3</ddm-notification-service-api.version>
+    <ddm-notification-service-api.version>1.9.6.1</ddm-notification-service-api.version>
     <commons-io.version>2.11.0</commons-io.version>
     <embedded-redis.version>0.7.1</embedded-redis.version>
     <deployable.module>ddm-bpm</deployable.module>

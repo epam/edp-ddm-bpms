@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.epam.digital.data.platform.bpms.extension.it;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
+import com.epam.digital.data.platform.notification.dto.Recipient.RecipientRealm;
 import com.epam.digital.data.platform.notification.dto.UserNotificationMessageDto;
 import com.epam.digital.data.platform.starter.notifications.facade.UserNotificationFacade;
 import java.util.Map;
@@ -46,6 +47,7 @@ public class SendUserNotificationDelegateIT extends BaseIT {
     var actual = notificationRecordCaptor.getValue();
     assertThat(actual.getRecipients().get(0).getParameters()).isEqualTo(Map.of("name", "John"));
     assertThat(actual.getRecipients().get(0).getId()).isEqualTo("testuser");
+    assertThat(actual.getRecipients().get(0).getRealm()).isEqualTo(RecipientRealm.CITIZEN);
     assertThat(actual.getContext().getSystem()).isEqualTo("Low-code Platform");
     assertThat(actual.getContext().getBusinessActivity()).isEqualTo("send_exerpt_notification");
     assertThat(actual.getContext().getBusinessProcessInstanceId()).isEqualTo(

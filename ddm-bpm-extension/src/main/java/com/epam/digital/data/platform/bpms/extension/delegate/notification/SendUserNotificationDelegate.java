@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,15 @@ import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.notification.dto.NotificationContextDto;
 import com.epam.digital.data.platform.notification.dto.Recipient;
+import com.epam.digital.data.platform.notification.dto.Recipient.RecipientRealm;
 import com.epam.digital.data.platform.notification.dto.UserNotificationDto;
 import com.epam.digital.data.platform.notification.dto.UserNotificationMessageDto;
 import com.epam.digital.data.platform.starter.notifications.facade.UserNotificationFacade;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -46,6 +49,8 @@ public class SendUserNotificationDelegate extends BaseJavaDelegate {
   protected NamedVariableAccessor<String> notificationTemplateVariable;
   @SystemVariable(name = "notificationTemplateModel", isTransient = true)
   protected NamedVariableAccessor<SpinJsonNode> notificationTemplateModelVariable;
+  @SystemVariable(name = "notificationRecipientRealm", isTransient = true)
+  protected NamedVariableAccessor<String> notificationRecipientRealmVariable;
   @Value("${spring.application.name}")
   private String springAppName;
 
@@ -53,6 +58,13 @@ public class SendUserNotificationDelegate extends BaseJavaDelegate {
   @SuppressWarnings("unchecked")
   protected void executeInternal(DelegateExecution execution) throws Exception {
     var notificationRecipient = notificationRecipientVariable.from(execution).get();
+    var notificationRecipientRealmFromTemplate = notificationRecipientRealmVariable.from(execution)
+        .get();
+    var notificationRecipientRealm =
+        RecipientRealm.OFFICER.getName().equalsIgnoreCase(notificationRecipientRealmFromTemplate)
+            ? RecipientRealm.OFFICER
+            : RecipientRealm.CITIZEN;
+
     var notificationSubject = notificationSubjectVariable.from(execution).get();
     var notificationTemplate = notificationTemplateVariable.from(execution).get();
     var notificationTemplateModel = (Map<String, Object>) Objects.requireNonNull(
@@ -62,6 +74,7 @@ public class SendUserNotificationDelegate extends BaseJavaDelegate {
         .recipients(List.of(Recipient.builder()
             .parameters(notificationTemplateModel)
             .id(notificationRecipient)
+            .realm(notificationRecipientRealm)
             .build()))
         .context(NotificationContextDto.builder()
             .system("Low-code Platform")

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableReadAccessor;
 import com.epam.digital.data.platform.notification.dto.NotificationContextDto;
 import com.epam.digital.data.platform.notification.dto.Recipient;
+import com.epam.digital.data.platform.notification.dto.Recipient.RecipientRealm;
 import com.epam.digital.data.platform.notification.dto.UserNotificationDto;
 import com.epam.digital.data.platform.notification.dto.UserNotificationMessageDto;
 import com.epam.digital.data.platform.starter.notifications.facade.UserNotificationFacade;
@@ -68,6 +69,10 @@ class SendUserNotificationDelegateTest {
   private NamedVariableAccessor<SpinJsonNode> templateModelVariableAccessor;
   @Mock
   private NamedVariableReadAccessor<SpinJsonNode> templateModelVariableReadAccessor;
+  @Mock
+  private NamedVariableAccessor<String> realmVariableAccessor;
+  @Mock
+  private NamedVariableReadAccessor<String> realmVariableReadAccessor;
 
   @Mock
   private UserNotificationFacade notificationFacade;
@@ -85,16 +90,20 @@ class SendUserNotificationDelegateTest {
         templateVariableAccessor);
     ReflectionTestUtils.setField(sendUserNotificationDelegate, "notificationTemplateModelVariable",
         templateModelVariableAccessor);
+    ReflectionTestUtils.setField(sendUserNotificationDelegate, "notificationRecipientRealmVariable",
+        realmVariableAccessor);
 
     when(recipientVariableAccessor.from(execution)).thenReturn(recipientVariableReadAccessor);
     when(subjectVariableAccessor.from(execution)).thenReturn(subjectVariableReadAccessor);
     when(templateVariableAccessor.from(execution)).thenReturn(templateVariableReadAccessor);
     when(templateModelVariableAccessor.from(execution)).thenReturn(
         templateModelVariableReadAccessor);
+    when(realmVariableAccessor.from(execution)).thenReturn(
+        realmVariableReadAccessor);
   }
 
   @Test
-  void shouldSendNotification() throws Exception {
+  void shouldSendCitizenNotification() throws Exception {
     when(recipientVariableReadAccessor.get()).thenReturn("recipient");
     when(subjectVariableReadAccessor.get()).thenReturn("subject");
     when(templateVariableReadAccessor.get()).thenReturn("template");
@@ -107,6 +116,7 @@ class SendUserNotificationDelegateTest {
     when(execution.getActivityInstanceId()).thenReturn("e2503352-bcb2-11ec-b217-0a580a831053");
     when(execution.getProcessInstanceId()).thenReturn("e2503352-bcb2-11ec-b217-0a580a831054");
     when(execution.getProcessDefinitionId()).thenReturn("add-lab:5:ac2dfa60-bbe2-11ec-8421-0a58");
+    when(realmVariableReadAccessor.get()).thenReturn("citizen");
 
     sendUserNotificationDelegate.execute(execution);
 
@@ -114,6 +124,49 @@ class SendUserNotificationDelegateTest {
         .recipients(List.of(Recipient.builder()
             .parameters(Map.of("key", "value"))
             .id("recipient")
+            .realm(RecipientRealm.CITIZEN)
+            .build()))
+        .context(NotificationContextDto.builder()
+            .system("Low-code Platform")
+            .businessActivity("Activity_1")
+            .businessActivityInstanceId("e2503352-bcb2-11ec-b217-0a580a831053")
+            .businessProcessInstanceId("e2503352-bcb2-11ec-b217-0a580a831054")
+            .businessProcess("add-lab")
+            .businessProcessDefinitionId("add-lab:5:ac2dfa60-bbe2-11ec-8421-0a58")
+            .build())
+        .notification(UserNotificationDto.builder()
+            .ignoreChannelPreferences(false)
+            .templateName("template")
+            .title("subject")
+            .build())
+        .build();
+
+    verify(notificationFacade).sendNotification(notificationRecordDto);
+  }
+
+  @Test
+  void shouldSendOfficerNotification() throws Exception {
+    when(recipientVariableReadAccessor.get()).thenReturn("recipient");
+    when(subjectVariableReadAccessor.get()).thenReturn("subject");
+    when(templateVariableReadAccessor.get()).thenReturn("template");
+    when(templateModelVariableReadAccessor.get()).thenReturn(
+        SpinJsonNode.S("{\"key\": \"value\"}"));
+
+    when(execution.getProcessDefinition()).thenReturn(processDefinitionEntity);
+    when(processDefinitionEntity.getKey()).thenReturn("add-lab");
+    when(execution.getCurrentActivityId()).thenReturn("Activity_1");
+    when(execution.getActivityInstanceId()).thenReturn("e2503352-bcb2-11ec-b217-0a580a831053");
+    when(execution.getProcessInstanceId()).thenReturn("e2503352-bcb2-11ec-b217-0a580a831054");
+    when(execution.getProcessDefinitionId()).thenReturn("add-lab:5:ac2dfa60-bbe2-11ec-8421-0a58");
+    when(realmVariableReadAccessor.get()).thenReturn("officer");
+
+    sendUserNotificationDelegate.execute(execution);
+
+    var notificationRecordDto = UserNotificationMessageDto.builder()
+        .recipients(List.of(Recipient.builder()
+            .parameters(Map.of("key", "value"))
+            .id("recipient")
+            .realm(RecipientRealm.OFFICER)
             .build()))
         .context(NotificationContextDto.builder()
             .system("Low-code Platform")
