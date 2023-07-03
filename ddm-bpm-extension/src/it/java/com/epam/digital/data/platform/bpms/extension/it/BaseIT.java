@@ -62,6 +62,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.http.HttpMethod;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -70,6 +71,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RunWith(SpringRunner.class)
 @EnableFeignClients
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@EmbeddedKafka(count = 3)
 public abstract class BaseIT {
 
   protected static final String EXCERPT_SERVICE_MOCK_SERVER = "/excerpt-mock-service";
