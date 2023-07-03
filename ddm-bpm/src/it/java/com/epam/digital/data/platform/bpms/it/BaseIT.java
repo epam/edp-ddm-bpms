@@ -59,8 +59,7 @@ import org.springframework.util.CollectionUtils;
 @ActiveProfiles("test")
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092",
-    "port=9092"})
+@EmbeddedKafka(count = 3)
 public abstract class BaseIT {
 
   protected final String TOKEN_HEADER = "x-access-token";

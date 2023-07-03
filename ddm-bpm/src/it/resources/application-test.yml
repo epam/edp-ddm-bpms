@@ -24,7 +24,36 @@ camunda:
 
 data-platform:
   kafka:
-    enabled: false
+    bootstrap: ${spring.embedded.kafka.brokers}
+    consumer:
+      enabled: true
+      group-id: process-history-api
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      trusted-packages:
+        - com.epam.digital.data.platform.bphistory.model
+      custom-config:
+        "[spring.deserializer.key.delegate.class]": org.apache.kafka.common.serialization.StringDeserializer
+        "[spring.deserializer.value.delegate.class]": org.springframework.kafka.support.serializer.JsonDeserializer
+        "[isolation.level]": read_committed
+        "[enable.auto.commit]": false
+    producer:
+      enabled: true
+      custom-config:
+        "[transactional.id]": tx-${random.uuid}
+        "[enable.idempotence]": true
+    topic-properties:
+      creation:
+        enabled: false
+        num-partitions: 2
+        replication-factor: 1
+    topics:
+      history-process-instance-topic: bpm-history-process
+      history-task-topic: bpm-history-task
+    error-handler:
+      initial-interval: 1500
+      max-elapsed-time: 6000
+      multiplier: 2
 
 dso:
   url: http://localhost:8081
