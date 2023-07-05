@@ -31,7 +31,7 @@ public class DataLoadListener {
   private Map<String, Message<AsyncDataLoadRequest>> storage;
 
   @KafkaListener(
-      topics = "#{kafkaProperties.topics.get('data-load-csv-topic')}",
+      topics = "#{kafkaProperties.topics.get('data-load-csv-topic-inbound')}",
       groupId = "#{kafkaProperties.consumer.groupId}",
       containerFactory = "concurrentKafkaListenerContainerFactory", autoStartup = "true")
   public void receive(Message<AsyncDataLoadRequest> input) {

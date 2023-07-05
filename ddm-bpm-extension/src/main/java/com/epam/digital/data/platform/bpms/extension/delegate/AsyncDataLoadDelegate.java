@@ -115,7 +115,7 @@ public class AsyncDataLoadDelegate extends BaseJavaDelegate {
     headers.put(ENTITY_NAME_HEADER, entityVariable.from(execution).get());
     headers.put(RESULT_VARIABLE_HEADER, responseVariable.from(execution).get());
 
-    var topicName = kafkaProperties.getTopics().get("data-load-csv-topic");
+    var topicName = kafkaProperties.getTopics().get("data-load-csv-topic-inbound");
     headers.put(KafkaHeaders.TOPIC, topicName);
 
     return headers;
