@@ -142,7 +142,7 @@ data-platform:
     bootstrap: ${spring.embedded.kafka.brokers}
     consumer:
       enabled: true
-      group-id: data-load
+      group-id: registry-kafka-api
       key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       trusted-packages:
@@ -167,7 +167,8 @@ data-platform:
         replication-factor: 1
     topics:
       user-notifications: user-notifications
-      data-load-csv-topic: data-load.csv.inbound
+      data-load-csv-topic-inbound: data-load.csv.inbound
+      data-load-csv-topic-outbound: data-load.csv.outbound
     error-handler:
       initial-interval: 1500
       max-elapsed-time: 6000
