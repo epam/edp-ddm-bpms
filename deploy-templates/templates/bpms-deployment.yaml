@@ -2,6 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Chart.Name }}
+  annotations:
+    secret.reloader.stakater.com/reload: "trembita-registries-secrets,external-systems-secrets"
+    configmap.reloader.stakater.com/reload: "trembita-registries-configuration,external-systems-configuration,diia-configuration"
   labels:
     app: {{ .Chart.Name }}
 spec:
