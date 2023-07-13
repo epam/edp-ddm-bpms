@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package com.epam.digital.data.platform.bpms.extension.it;
 
+import static com.epam.digital.data.platform.bpms.extension.delegate.UserDataValidationUtils.VALIDATION_ERROR_MSG_PATTERN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 
-import com.epam.digital.data.platform.bpms.extension.delegate.UserDataValidationErrorDelegate;
 import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import java.util.HashMap;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -40,7 +40,7 @@ public class UserDataValidationErrorDelegateIT extends BaseIT {
     var ex = assertThrows(ValidationException.class, () -> taskService.complete(taskId));
 
     var expectedExceptionMsg = String.format(
-        UserDataValidationErrorDelegate.VALIDATION_ERROR_MSG_PATTERN, pdKey, process.getId(),
+        VALIDATION_ERROR_MSG_PATTERN, pdKey, process.getId(),
         "well-readable-activity-id");
     assertThat(ex).isNotNull();
     assertThat(ex.getMessage()).isEqualTo(expectedExceptionMsg);

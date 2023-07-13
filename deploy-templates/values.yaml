@@ -52,6 +52,7 @@ registryConfigs:
   diiaConfigurationName: diia-configuration
   externalSystemsConfigurationName: external-systems-configuration
   externalSystemsEndpointConfigurationName: external-systems-endpoint-configuration
+  notificationBlacklistConfigurationName: notification-blacklist-configuration
 
 db:
   url: citus-master
