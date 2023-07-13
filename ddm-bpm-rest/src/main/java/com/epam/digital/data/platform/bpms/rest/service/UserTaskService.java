@@ -169,6 +169,11 @@ public class UserTaskService {
     signableUserTaskDto.setProcessDefinitionName(processDefinition.getName());
     log.trace("Task was filled with process definition name");
 
+    var processInstance = getProcessInstanceOrThrow(taskDto.getProcessInstanceId());
+    var rootProcessInstanceId = getRootProcessInstance(processInstance).getId();
+    signableUserTaskDto.setRootProcessInstanceId(rootProcessInstanceId);
+    log.trace("Found user task root process-instance id {}", rootProcessInstanceId);
+
     var properties = getTaskProperties(id);
     signableUserTaskDto.setESign(Boolean.parseBoolean(properties.get(SIGN_PROPERTY)));
     signableUserTaskDto.setFormVariables(
@@ -189,6 +194,7 @@ public class UserTaskService {
    * @param id  the task id
    * @param dto dto with request variables
    * @return {@link DdmCompletedTaskDto}
+   *
    * @throws RestException           in case of any process engine exception
    * @throws InvalidRequestException in case of any rest exception
    */
@@ -198,12 +204,7 @@ public class UserTaskService {
     var processInstanceId = getTask(id).getProcessInstanceId();
     log.trace("Found user task process-instance id {}", processInstanceId);
 
-    var processInstance = getProcessInstance(processInstanceId)
-        .orElseThrow(() -> {
-          var message = String.format("Process instance %s is missed before task %s completion",
-              processInstanceId, id);
-          return new IllegalStateException(message);
-        });
+    var processInstance = getProcessInstanceOrThrow(processInstanceId);
     var rootProcessInstanceId = getRootProcessInstance(processInstance).getId();
     log.trace("Found user task root process-instance id {}", rootProcessInstanceId);
 
@@ -221,6 +222,15 @@ public class UserTaskService {
         .rootProcessInstanceEnded(rootProcessInstanceEnded)
         .variables(taskMapper.toDdmVariableValueDtoMap(responseVariables))
         .build();
+  }
+
+  private ProcessInstance getProcessInstanceOrThrow(String processInstanceId) {
+    return getProcessInstance(processInstanceId)
+        .orElseThrow(() -> {
+          var message = String.format("Process instance %s is missed before task completion",
+              processInstanceId);
+          return new IllegalStateException(message);
+        });
   }
 
   private Optional<ProcessInstance> getProcessInstance(String processInstanceId) {
