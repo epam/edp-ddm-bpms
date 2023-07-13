@@ -29,7 +29,7 @@ data-platform:
         "[enable.idempotence]": true
     consumer:
       enabled: true
-      group-id: registry-kafka-api
+      group-id: bpms
       key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       trusted-packages:
