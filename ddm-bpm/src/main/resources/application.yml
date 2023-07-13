@@ -28,7 +28,7 @@ data-platform:
         "[transactional.id]": tx-${random.uuid}
         "[enable.idempotence]": true
     consumer:
-      enabled: true
+      enabled: false
       group-id: bpms
       key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
