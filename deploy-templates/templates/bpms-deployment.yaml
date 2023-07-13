@@ -173,6 +173,8 @@ spec:
             mountPath: "{{ .Values.registryConfigs.configRootPath }}/{{ .Values.registryConfigs.trembitaRegistriesConfigurationName }}"
       {{- end }}
     {{- end }}
+          - name: {{ .Values.registryConfigs.notificationBlacklistConfigurationName }}
+            mountPath: "{{ .Values.registryConfigs.configRootPath }}/{{ .Values.registryConfigs.notificationBlacklistConfigurationName }}"
     {{- if (index .Values "external-systems").diia }}
           - name: {{ .Values.registryConfigs.diiaConfigurationName }}
             mountPath: "{{ .Values.registryConfigs.configRootPath }}/{{ .Values.registryConfigs.diiaConfigurationName }}"
@@ -259,6 +261,9 @@ spec:
             secretName: {{ .Values.registrySecrets.trembitaRegistriesSecretsName }}
 {{- end }}
   {{- end }}
+        - name: {{ .Values.registryConfigs.notificationBlacklistConfigurationName }}
+          configMap:
+            name: {{ .Values.registryConfigs.notificationBlacklistConfigurationName }}
   {{- if (index .Values "external-systems").diia }}
         - name: {{ .Values.registryConfigs.diiaConfigurationName }}
           configMap:

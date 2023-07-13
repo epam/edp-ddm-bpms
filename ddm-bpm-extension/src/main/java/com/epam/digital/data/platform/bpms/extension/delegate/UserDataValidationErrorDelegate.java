@@ -19,8 +19,6 @@ package com.epam.digital.data.platform.bpms.extension.delegate;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.starter.errorhandling.dto.ErrorDetailDto;
-import com.epam.digital.data.platform.starter.errorhandling.dto.ErrorsListDto;
-import com.epam.digital.data.platform.starter.errorhandling.dto.ValidationErrorDto;
 import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,8 +28,9 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.springframework.stereotype.Component;
+
+import static com.epam.digital.data.platform.bpms.extension.delegate.UserDataValidationUtils.createUserDataValidationErrorDto;
 
 /**
  * The class represents an implementation of {@link JavaDelegate} that is used to throw a user data
@@ -42,9 +41,6 @@ import org.springframework.stereotype.Component;
 public class UserDataValidationErrorDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "userDataValidationErrorDelegate";
-  public static final String VALIDATION_ERROR_MSG_PATTERN =
-      "Business validation failure occurred during process execution: "
-          + "process definition key %s, process instance id %s, activity id %s";
 
   private final ObjectMapper objectMapper;
 
@@ -67,21 +63,6 @@ public class UserDataValidationErrorDelegate extends BaseJavaDelegate {
     } catch (JsonProcessingException ex) {
       throw new IllegalStateException(String.format("couldn't serialize %s", value), ex);
     }
-  }
-
-  private ValidationErrorDto createUserDataValidationErrorDto(
-      List<ErrorDetailDto> validationErrorDtos, DelegateExecution execution) {
-    return ValidationErrorDto.builder()
-        .code("VALIDATION_ERROR")
-        .message(buildValidationErrorMsg(execution))
-        .details(new ErrorsListDto(validationErrorDtos))
-        .build();
-  }
-
-  private String buildValidationErrorMsg(DelegateExecution execution) {
-    return String.format(VALIDATION_ERROR_MSG_PATTERN,
-        ((ExecutionEntity) execution).getProcessDefinition().getKey(),
-        execution.getProcessInstanceId(), execution.getCurrentActivityId());
   }
 
   @Override

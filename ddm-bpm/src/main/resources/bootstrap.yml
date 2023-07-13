@@ -15,6 +15,7 @@ spring:
           - /app/config/registry-regulation/diia-configuration/diia-configuration.yml
           - /app/config/registry-regulation/external-systems-configuration/external-systems-configuration.yml
           - /app/config/registry-regulation/external-systems-endpoint-configuration/external-systems-endpoint-configuration.yml
+          - /app/config/registry-regulation/notification-blacklist-configuration/notification-blacklist-configuration.yml
       secrets:
         enabled: true
         enable-api: false

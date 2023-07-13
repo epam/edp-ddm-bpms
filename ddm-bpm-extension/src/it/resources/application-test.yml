@@ -277,3 +277,25 @@ external-systems:
     protocol: REST
     auth:
       type: BEARER
+
+validation:
+  email:
+    blacklist:
+      domains:
+        - "mail.ru"
+        - "internet.ru"
+        - "list.ru"
+        - "bk.ru"
+        - "inbox.ru"
+        - "mail.ua"
+        - "mail.kz"
+        - "mail.md"
+        - "yandex.ru"
+        - "yandex.ua"
+        - "mail.yandex.ru"
+        - "mail.yandex.ua"
+        - "ya.ru"
+        - "ya.ua"
+        - "yandex.kz"
+        - "yandex.by"
+        - "yandex.com"

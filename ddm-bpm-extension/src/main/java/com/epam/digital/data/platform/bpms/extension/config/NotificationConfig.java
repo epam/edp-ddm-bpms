@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,14 @@
 
 package com.epam.digital.data.platform.bpms.extension.config;
 
+import com.epam.digital.data.platform.bpms.extension.delegate.notification.SendUserNotificationByAddress;
 import com.epam.digital.data.platform.bpms.extension.delegate.notification.SendUserNotificationDelegate;
 import com.epam.digital.data.platform.starter.notifications.facade.UserKafkaNotificationFacade;
 import com.epam.digital.data.platform.starter.notifications.facade.UserNotificationFacade;
 import com.epam.digital.data.platform.starter.notifications.producer.NotificationProducer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -45,5 +47,17 @@ public class NotificationConfig {
   public SendUserNotificationDelegate sendUserNotificationDelegate(
       UserNotificationFacade notificationFacade) {
     return new SendUserNotificationDelegate(notificationFacade);
+  }
+
+  @Bean(name = SendUserNotificationByAddress.DELEGATE_NAME)
+  public SendUserNotificationByAddress sendUserNotificationByAddress(
+          UserNotificationFacade notificationFacade) {
+    return new SendUserNotificationByAddress(notificationFacade, blackList());
+  }
+
+  @Bean
+  @ConfigurationProperties(prefix = "blacklist.email")
+  public BlackListEmailDomainsProperties blackList() {
+    return new BlackListEmailDomainsProperties();
   }
 }
