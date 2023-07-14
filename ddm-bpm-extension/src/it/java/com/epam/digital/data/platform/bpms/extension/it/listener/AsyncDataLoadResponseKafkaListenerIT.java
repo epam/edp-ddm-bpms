@@ -68,10 +68,10 @@ class AsyncDataLoadResponseKafkaListenerIT extends BaseIT {
     var expectedResult = new Result(status, details);
     Message<AsyncDataLoadResponse> message = MessageBuilder
         .withPayload(payload)
-        .copyHeaders(Map.of(TOPIC, kafkaProperties.getTopics().get("data-load-csv-topic-outbound")))
+        .copyHeaders(Map.of(TOPIC, kafkaProperties.getAdditionalTopics().get("data-load-csv-topic-outbound")))
         .build();
 
-    kafkaTemplate.executeInTransaction(kafkaOperations -> kafkaTemplate.send(message));
+    kafkaTemplate.send(message);
 
     await().atMost(10, TimeUnit.SECONDS).pollDelay(100, TimeUnit.MILLISECONDS).untilAsserted(() -> {
       BpmnAwareTests.assertThat(processInstance).variables().containsKey(resultVariableName);

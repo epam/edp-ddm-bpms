@@ -28,7 +28,7 @@ data-platform:
         "[transactional.id]": tx-${random.uuid}
         "[enable.idempotence]": true
     consumer:
-      enabled: false
+      enabled: true
       group-id: bpms
       key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
@@ -46,6 +46,7 @@ data-platform:
       history-process-instance-topic: bpm-history-process
       history-task-topic: bpm-history-task
       user-notifications: user-notifications
+    additional-topics:
       data-load-csv-topic-inbound: data-load.csv.inbound
       data-load-csv-topic-outbound: data-load.csv.outbound
 

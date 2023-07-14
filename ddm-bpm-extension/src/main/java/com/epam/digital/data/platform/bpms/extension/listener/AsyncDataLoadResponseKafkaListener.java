@@ -42,7 +42,7 @@ public class AsyncDataLoadResponseKafkaListener {
   @Autowired
   private KafkaProperties kafkaProperties;
 
-  @KafkaListener(topics = "#{kafkaProperties.topics.get('data-load-csv-topic-outbound')}",
+  @KafkaListener(topics = "#{kafkaProperties.additionalTopics.get('data-load-csv-topic-outbound')}",
       groupId = "#{kafkaProperties.consumer.groupId}")
   public void processAsyncMessages(
       @Payload AsyncDataLoadResponse message,

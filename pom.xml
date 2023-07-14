@@ -59,14 +59,14 @@
     <ddm-digital-document-client.version>1.9.0.5</ddm-digital-document-client.version>
     <excerpt-model.version>1.6.0.1</excerpt-model.version>
     <process-history-model.version>1.6.0.1</process-history-model.version>
-    <ddm-starter-kafka.version>1.6.0.2</ddm-starter-kafka.version>
+    <ddm-starter-kafka.version>1.6.0-KRAKEN-DEV-SNAPSHOT</ddm-starter-kafka.version>
     <p6spy-spring-boot-starter.version>1.7.1</p6spy-spring-boot-starter.version>
     <spring-security-core.version>5.7.5</spring-security-core.version>
     <dso.version>1.9.6.1</dso.version>
     <log4j.version>2.19.0</log4j.version>
     <zonky.embedded.postgres.version>2.0.2</zonky.embedded.postgres.version>
     <embedded.database.spring-test.version>2.2.0</embedded.database.spring-test.version>
-    <ddm-starter-notifications.version>1.6.0.4</ddm-starter-notifications.version>
+    <ddm-starter-notifications.version>1.6.0-KRAKEN-DEV-SNAPSHOT</ddm-starter-notifications.version>
     <ddm-notification-service-api.version>1.9.6.1</ddm-notification-service-api.version>
     <commons-io.version>2.11.0</commons-io.version>
     <embedded-redis.version>0.7.1</embedded-redis.version>
