@@ -158,7 +158,6 @@ data-platform:
       custom-config:
         "[spring.serializer.key.delegate.class]": org.apache.kafka.common.serialization.StringSerializer
         "[spring.serializer.value.delegate.class]": org.springframework.kafka.support.serializer.JsonSerializer
-        "[transactional.id]": tx-${random.uuid}
         "[enable.idempotence]": true
     topic-properties:
       creation:
@@ -167,6 +166,7 @@ data-platform:
         replication-factor: 1
     topics:
       user-notifications: user-notifications
+    additional-topics:
       data-load-csv-topic-inbound: data-load.csv.inbound
       data-load-csv-topic-outbound: data-load.csv.outbound
     error-handler:
