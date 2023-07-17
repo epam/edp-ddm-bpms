@@ -68,7 +68,7 @@ class AsyncDataLoadResponseKafkaListenerIT extends BaseIT {
     var expectedResult = new Result(status, details);
     Message<AsyncDataLoadResponse> message = MessageBuilder
         .withPayload(payload)
-        .copyHeaders(Map.of(TOPIC, kafkaProperties.getAdditionalTopics().get("data-load-csv-topic-outbound")))
+        .copyHeaders(Map.of(TOPIC, kafkaProperties.getTopics().get("data-load-csv-topic-outbound")))
         .build();
 
     kafkaTemplate.send(message);
