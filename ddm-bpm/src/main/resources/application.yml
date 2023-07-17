@@ -46,9 +46,8 @@ data-platform:
       history-process-instance-topic: bpm-history-process
       history-task-topic: bpm-history-task
       user-notifications: user-notifications
-    additional-topics:
-      data-load-csv-topic-inbound: data-load.csv.inbound
-      data-load-csv-topic-outbound: data-load.csv.outbound
+      data-load-csv-topic-inbound: data-load.csv.incoming
+      data-load-csv-topic-outbound: data-load.csv.outcoming
 
 registry-rest-api:
   url: http://registry-rest-api:8080
