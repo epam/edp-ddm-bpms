@@ -166,9 +166,8 @@ data-platform:
         replication-factor: 1
     topics:
       user-notifications: user-notifications
-    additional-topics:
-      data-load-csv-topic-inbound: data-load.csv.inbound
-      data-load-csv-topic-outbound: data-load.csv.outbound
+      data-load-csv-topic-inbound: data-load.csv.incoming
+      data-load-csv-topic-outbound: data-load.csv.outcoming
     error-handler:
       initial-interval: 1500
       max-elapsed-time: 6000

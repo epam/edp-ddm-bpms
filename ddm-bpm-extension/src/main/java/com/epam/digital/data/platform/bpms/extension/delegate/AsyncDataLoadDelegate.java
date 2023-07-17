@@ -24,7 +24,6 @@ import com.epam.digital.data.platform.bpms.extension.delegate.dto.AsyncDataLoadR
 import com.epam.digital.data.platform.bpms.extension.service.DigitalSystemSignatureService;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
-import com.epam.digital.data.platform.datafactory.feign.model.response.ConnectorResponse;
 import com.epam.digital.data.platform.starter.kafka.config.properties.KafkaProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
@@ -115,7 +114,7 @@ public class AsyncDataLoadDelegate extends BaseJavaDelegate {
     headers.put(ENTITY_NAME_HEADER, entityVariable.from(execution).get());
     headers.put(RESULT_VARIABLE_HEADER, responseVariable.from(execution).get());
 
-    var topicName = kafkaProperties.getAdditionalTopics().get("data-load-csv-topic-inbound");
+    var topicName = kafkaProperties.getTopics().get("data-load-csv-topic-inbound");
     headers.put(KafkaHeaders.TOPIC, topicName);
 
     return headers;
