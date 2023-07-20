@@ -59,6 +59,8 @@ public class AsyncDataLoadDelegateIT extends BaseIT {
   @Deployment(resources = {"bpmn/delegate/testAsyncDataLoadDelegate.bpmn"})
   public void shouldSendMessageToKafka() throws JsonProcessingException {
     var response = SignResponseDto.builder().signature("test").build();
+    var expectedPayload = "{\"file\":{\"checksum\":\"test-checksum\",\"id\":\"file-id\"},\"derivedFile\":{\"checksum\":\"derived-checksum\",\"id\":\"derived-file-id\"}}";
+
     digitalSignatureMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo("/api/eseal/sign"))
             .withHeader("Content-Type", equalTo("application/json"))
@@ -78,12 +80,11 @@ public class AsyncDataLoadDelegateIT extends BaseIT {
       var storage = listener.getStorage();
       assertThat(storage).hasSize(1);
       var message = storage.get(processInstance.getProcessInstanceId());
-      assertThat(message.getPayload().getFile().getId()).isEqualTo("file-id");
-      assertThat(message.getPayload().getFile().getChecksum()).isEqualTo("test-checksum");
+      assertThat(message.getPayload()).isEqualTo(expectedPayload);
 
       var headers = message.getHeaders();
-      assertThat(headers.get(AsyncDataLoadDelegate.ENTITY_NAME_HEADER)).isEqualTo("test");
-      assertThat(headers.get(AsyncDataLoadDelegate.RESULT_VARIABLE_HEADER)).isEqualTo("resultVariable");
+      assertThat(headers).containsEntry(AsyncDataLoadDelegate.ENTITY_NAME_HEADER, "test");
+      assertThat(headers).containsEntry(AsyncDataLoadDelegate.RESULT_VARIABLE_HEADER, "resultVariable");
     });
   }
 }
