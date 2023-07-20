@@ -19,6 +19,8 @@ package com.epam.digital.data.platform.bpms.extension.listener;
 import com.epam.digital.data.platform.bpms.extension.delegate.dto.AsyncDataLoadResponse;
 import com.epam.digital.data.platform.bpms.extension.delegate.dto.Result;
 import com.epam.digital.data.platform.starter.kafka.config.properties.KafkaProperties;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
 import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,17 +43,20 @@ public class AsyncDataLoadResponseKafkaListener {
   private RuntimeService runtimeService;
   @Autowired
   private KafkaProperties kafkaProperties;
+  @Autowired
+  private ObjectMapper mapper;
 
   @KafkaListener(topics = "#{kafkaProperties.topics.get('data-load-csv-topic-outbound')}",
       groupId = "#{kafkaProperties.consumer.groupId}")
   public void processAsyncMessages(
-      @Payload AsyncDataLoadResponse message,
+      @Payload String message,
       MessageHeaders headers) {
-    var payload = message.getPayload();
-    var requestContext = message.getRequestContext();
-    var result = new Result(message.getStatus(), message.getDetails());
+    var asyncDataLoadResponse = readKafkaResponse(message);
+    var payload = asyncDataLoadResponse.getPayload();
+    var requestContext = asyncDataLoadResponse.getRequestContext();
+    var result = new Result(asyncDataLoadResponse.getStatus(), asyncDataLoadResponse.getDetails());
 
-    runtimeService.createMessageCorrelation(createMessageName(message))
+    runtimeService.createMessageCorrelation(createMessageName(asyncDataLoadResponse))
         .processInstanceId(requestContext.getBusinessProcessInstanceId())
         .setVariable(payload.getResultVariable(), result)
         .correlate();
@@ -60,5 +65,13 @@ public class AsyncDataLoadResponseKafkaListener {
   private String createMessageName(AsyncDataLoadResponse message) {
     return message.getPayload().getEntityName() + ACTION + CaseFormat.LOWER_UNDERSCORE.to(
         CaseFormat.UPPER_CAMEL, message.getStatus());
+  }
+
+  private AsyncDataLoadResponse readKafkaResponse(String payload) {
+    try {
+      return mapper.readValue(payload, AsyncDataLoadResponse.class);
+    } catch (JsonProcessingException e) {
+      throw new IllegalArgumentException("Unable to read value from Kafka", e);
+    }
   }
 }

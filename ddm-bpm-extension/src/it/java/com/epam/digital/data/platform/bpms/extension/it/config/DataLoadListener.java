@@ -17,7 +17,6 @@
 package com.epam.digital.data.platform.bpms.extension.it.config;
 
 import com.epam.digital.data.platform.bpms.api.dto.enums.PlatformHttpHeader;
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.AsyncDataLoadRequest;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -28,18 +27,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataLoadListener {
 
-  private Map<String, Message<AsyncDataLoadRequest>> storage;
+  private Map<String, Message<String>> storage;
 
   @KafkaListener(
       topics = "#{kafkaProperties.topics.get('data-load-csv-topic-inbound')}",
       groupId = "#{kafkaProperties.consumer.groupId}",
       containerFactory = "concurrentKafkaListenerContainerFactory", autoStartup = "true")
-  public void receive(Message<AsyncDataLoadRequest> input) {
+  public void receive(Message<String> input) {
     storage.put((String) input.getHeaders()
         .get(PlatformHttpHeader.X_SOURCE_BUSINESS_PROCESS_INSTANCE_ID.getName()), input);
   }
 
-  public Map<String, Message<AsyncDataLoadRequest>> getStorage() {
+  public Map<String, Message<String>> getStorage() {
     return storage;
   }
 }
