@@ -20,7 +20,6 @@ package com.epam.digital.data.platform.bpms.extension.delegate;
 
 import com.epam.digital.data.platform.bpms.api.dto.enums.PlatformHttpHeader;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.header.builder.HeaderBuilderFactory;
-import com.epam.digital.data.platform.bpms.extension.delegate.dto.AsyncDataLoadRequest;
 import com.epam.digital.data.platform.bpms.extension.service.DigitalSystemSignatureService;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
@@ -91,12 +90,11 @@ public class AsyncDataLoadDelegate extends BaseJavaDelegate {
         DigitalSystemSignatureService.SystemSignatureDto.builder().payload(payload).build();
     var storageKey = digitalSystemSignatureService.sign(systemSignatureDto);
 
-    var asyncDataLoadRequest = mapper.readValue(payload.toString(), AsyncDataLoadRequest.class);
-
-    Message<AsyncDataLoadRequest> message = MessageBuilder
-        .withPayload(asyncDataLoadRequest)
+    Message<String> message = MessageBuilder
+        .withPayload(payload.toString())
         .copyHeaders(createMessageHeaders(storageKey, execution))
         .build();
+
     kafkaTemplate.send(message);
     log.debug("Data sent to Kafka successfully");
   }

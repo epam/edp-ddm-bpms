@@ -26,6 +26,8 @@ import com.epam.digital.data.platform.bpms.extension.delegate.dto.RequestContext
 import com.epam.digital.data.platform.bpms.extension.delegate.dto.Result;
 import com.epam.digital.data.platform.bpms.extension.it.BaseIT;
 import com.epam.digital.data.platform.starter.kafka.config.properties.KafkaProperties;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
@@ -45,11 +47,13 @@ class AsyncDataLoadResponseKafkaListenerIT extends BaseIT {
   private KafkaTemplate<String, Object> kafkaTemplate;
   @Autowired
   private KafkaProperties kafkaProperties;
+  @Autowired
+  private ObjectMapper mapper;
 
   @ParameterizedTest(name = "{0}")
   @MethodSource("testArgumentProvider")
   @Deployment(resources = {"bpmn/listener/testAsyncDataLoadListener.bpmn"})
-  void shouldReceiveKafkaMessage(String status, String details) {
+  void shouldReceiveKafkaMessage(String status, String details) throws JsonProcessingException {
     var resultVariableName = "response";
     var entityName = "item";
     var processInstance = runtimeService
@@ -66,8 +70,8 @@ class AsyncDataLoadResponseKafkaListenerIT extends BaseIT {
             .build())
         .build();
     var expectedResult = new Result(status, details);
-    Message<AsyncDataLoadResponse> message = MessageBuilder
-        .withPayload(payload)
+    Message<String> message = MessageBuilder
+        .withPayload(mapper.writeValueAsString(payload))
         .copyHeaders(Map.of(TOPIC, kafkaProperties.getTopics().get("data-load-csv-topic-outbound")))
         .build();
 
