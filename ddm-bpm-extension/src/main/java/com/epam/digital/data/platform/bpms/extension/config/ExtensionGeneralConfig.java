@@ -28,6 +28,7 @@ import com.epam.digital.data.platform.datafactory.factory.client.DataFactoryFeig
 import com.epam.digital.data.platform.datafactory.factory.client.PlatformGatewayFeignClient;
 import com.epam.digital.data.platform.datafactory.settings.client.UserSettingsFeignClient;
 import com.epam.digital.data.platform.dso.client.DigitalSealRestClient;
+import com.epam.digital.data.platform.dso.client.DigitalSignatureRestClient;
 import com.epam.digital.data.platform.integration.idm.service.IdmService;
 import com.epam.digital.data.platform.starter.trembita.integration.dracs.service.DracsRemoteService;
 import com.epam.digital.data.platform.starter.trembita.integration.edr.service.EdrRemoteService;
@@ -68,6 +69,7 @@ import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor;
 @EnableFeignClients(
     clients = {
         DigitalSealRestClient.class,
+        DigitalSignatureRestClient.class,
         DataFactoryFeignClient.class,
         ExcerptFeignClient.class,
         UserSettingsFeignClient.class,
