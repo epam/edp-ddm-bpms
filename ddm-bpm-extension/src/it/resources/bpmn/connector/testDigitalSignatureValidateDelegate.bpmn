@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_017tdio" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.17.0">
+  <bpmn:collaboration id="Collaboration_1cl5k3j">
+    <bpmn:participant id="Participant_1l7bxrf" name="Test Digital Signature Successful Validation Response" processRef="testDigitalSignatureSuccessfulValidationResponse" />
+    <bpmn:participant id="Participant_1esbald" name="Test Digital Signature Failed Validation Response" processRef="testDigitalSignatureFailedValidationResponse" />
+  </bpmn:collaboration>
+  <bpmn:process id="testDigitalSignatureSuccessfulValidationResponse" name="Test Digital Signature Successful Validation Response" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="Stat">
+      <bpmn:outgoing>Flow_0qrozuw</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0qrozuw" sourceRef="StartEvent_1" targetRef="Activity_03wufnz" />
+    <bpmn:sequenceFlow id="Flow_07urj6d" sourceRef="Activity_03wufnz" targetRef="Activity_0ewresf" />
+    <bpmn:endEvent id="Event_0y3gi30" name="End">
+      <bpmn:incoming>Flow_05lqzxw</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_05lqzxw" sourceRef="Activity_0ewresf" targetRef="Event_0y3gi30" />
+    <bpmn:scriptTask id="Activity_0ewresf" name="Asset" scriptFormat="groovy">
+      <bpmn:incoming>Flow_07urj6d</bpmn:incoming>
+      <bpmn:outgoing>Flow_05lqzxw</bpmn:outgoing>
+      <bpmn:script>import com.epam.digital.data.platform.dso.api.dto.SignFormat
+
+        assert validationResult.isValid() == true
+        assert validationResult.getContainer() == SignFormat.CADES
+        assert validationResult.getError() == null</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:serviceTask id="Activity_03wufnz" name="Validate signed data" camunda:modelerTemplate="digitalSignatureValidateDelegate" camunda:delegateExpression="${digitalSignatureValidateDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="x_access_token">token</camunda:inputParameter>
+          <camunda:inputParameter name="signedData">dGVzdCBkYXRh</camunda:inputParameter>
+          <camunda:inputParameter name="containerType">CADES</camunda:inputParameter>
+          <camunda:outputParameter name="validationResult">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0qrozuw</bpmn:incoming>
+      <bpmn:outgoing>Flow_07urj6d</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmn:process id="testDigitalSignatureFailedValidationResponse" name="Test Digital Signature Failed Validation Response" isExecutable="true">
+    <bpmn:startEvent id="Event_03yyn3h" name="Start">
+      <bpmn:outgoing>Flow_1o8czsy</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1o8czsy" sourceRef="Event_03yyn3h" targetRef="Activity_0h5681o" />
+    <bpmn:sequenceFlow id="Flow_10iubp1" sourceRef="Activity_0h5681o" targetRef="Activity_1v69uxk" />
+    <bpmn:endEvent id="Event_1ww7foo" name="End">
+      <bpmn:incoming>Flow_1h61bvh</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1h61bvh" sourceRef="Activity_1v69uxk" targetRef="Event_1ww7foo" />
+    <bpmn:scriptTask id="Activity_1v69uxk" name="Assert" scriptFormat="groovy">
+      <bpmn:incoming>Flow_10iubp1</bpmn:incoming>
+      <bpmn:outgoing>Flow_1h61bvh</bpmn:outgoing>
+      <bpmn:script>import com.epam.digital.data.platform.dso.api.dto.SignFormat
+
+        assert validationResult.isValid() == false
+        assert validationResult.getContainer() == SignFormat.UNDEFINED
+        assert validationResult.getError().getCode() == 'ERROR_PKI_FORMATS_FAILED'</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:serviceTask id="Activity_0h5681o" name="Validate signed data" camunda:modelerTemplate="digitalSignatureValidateDelegate" camunda:delegateExpression="${digitalSignatureValidateDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="x_access_token">token</camunda:inputParameter>
+          <camunda:inputParameter name="signedData">dGVzdCBkYXRh</camunda:inputParameter>
+          <camunda:inputParameter name="containerType">ASIC</camunda:inputParameter>
+          <camunda:outputParameter name="validationResult">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1o8czsy</bpmn:incoming>
+      <bpmn:outgoing>Flow_10iubp1</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1cl5k3j">
+      <bpmndi:BPMNShape id="Participant_1l7bxrf_di" bpmnElement="Participant_1l7bxrf" isHorizontal="true">
+        <dc:Bounds x="120" y="52" width="550" height="250" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_05lqzxw_di" bpmnElement="Flow_05lqzxw">
+        <di:waypoint x="530" y="177" />
+        <di:waypoint x="592" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07urj6d_di" bpmnElement="Flow_07urj6d">
+        <di:waypoint x="370" y="177" />
+        <di:waypoint x="430" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qrozuw_di" bpmnElement="Flow_0qrozuw">
+        <di:waypoint x="215" y="177" />
+        <di:waypoint x="270" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="159" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="187" y="202" width="21" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0y3gi30_di" bpmnElement="Event_0y3gi30">
+        <dc:Bounds x="592" y="159" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="600" y="202" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0581egw_di" bpmnElement="Activity_0ewresf">
+        <dc:Bounds x="430" y="137" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1hgsft9_di" bpmnElement="Activity_03wufnz">
+        <dc:Bounds x="270" y="137" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_1esbald_di" bpmnElement="Participant_1esbald" isHorizontal="true">
+        <dc:Bounds x="120" y="340" width="550" height="250" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1h61bvh_di" bpmnElement="Flow_1h61bvh">
+        <di:waypoint x="520" y="470" />
+        <di:waypoint x="582" y="470" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10iubp1_di" bpmnElement="Flow_10iubp1">
+        <di:waypoint x="360" y="470" />
+        <di:waypoint x="420" y="470" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1o8czsy_di" bpmnElement="Flow_1o8czsy">
+        <di:waypoint x="208" y="470" />
+        <di:waypoint x="260" y="470" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_03yyn3h_di" bpmnElement="Event_03yyn3h">
+        <dc:Bounds x="172" y="452" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="178" y="495" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1ww7foo_di" bpmnElement="Event_1ww7foo">
+        <dc:Bounds x="582" y="452" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="590" y="495" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0xerpsv_di" bpmnElement="Activity_1v69uxk">
+        <dc:Bounds x="420" y="430" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0mv2eck_di" bpmnElement="Activity_0h5681o">
+        <dc:Bounds x="260" y="430" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
