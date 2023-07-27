@@ -38,9 +38,9 @@
     <bpmn:sequenceFlow id="Flow_1qxe8da" sourceRef="Gateway_1qe9m2s" targetRef="Event_0rp42oj" />
     <bpmn:sequenceFlow id="Flow_0hik22o" sourceRef="Event_0rp42oj" targetRef="Event_1rna2u5" />
   </bpmn:process>
-  <bpmn:message id="Message_10aeig9" name="itemDataLoadCsvSuccess" />
-  <bpmn:message id="Message_2sdg11p" name="itemDataLoadCsvConstraintViolation" />
-  <bpmn:message id="Message_2fdcdua" name="itemDataLoadCsvOperationFailed" />
+  <bpmn:message id="Message_10aeig9" name="item__data-load-csv__success" />
+  <bpmn:message id="Message_2sdg11p" name="item__data-load-csv__constraint-violation" />
+  <bpmn:message id="Message_2fdcdua" name="item__data-load-csv__operation-failed" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testAsyncDataLoadListener_key">
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">

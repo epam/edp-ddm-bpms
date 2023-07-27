@@ -35,10 +35,11 @@ import org.springframework.stereotype.Component;
  * about the completion of data load.
  */
 @Component
-@ConditionalOnProperty(prefix = "data-platform", name = {"kafka.consumer.enabled"}, havingValue = "true")
+@ConditionalOnProperty(prefix = "data-platform", name = {
+    "kafka.consumer.enabled"}, havingValue = "true")
 public class AsyncDataLoadResponseKafkaListener {
 
-  private static final String ACTION = "DataLoadCsv";
+  private static final String ACTION = "__data-load-csv__";
   @Autowired
   private RuntimeService runtimeService;
   @Autowired
@@ -63,8 +64,8 @@ public class AsyncDataLoadResponseKafkaListener {
   }
 
   private String createMessageName(AsyncDataLoadResponse message) {
-    return message.getPayload().getEntityName() + ACTION + CaseFormat.LOWER_UNDERSCORE.to(
-        CaseFormat.UPPER_CAMEL, message.getStatus());
+    return message.getPayload().getEntityName() + ACTION + CaseFormat.UPPER_UNDERSCORE.to(
+        CaseFormat.LOWER_HYPHEN, message.getStatus());
   }
 
   private AsyncDataLoadResponse readKafkaResponse(String payload) {
