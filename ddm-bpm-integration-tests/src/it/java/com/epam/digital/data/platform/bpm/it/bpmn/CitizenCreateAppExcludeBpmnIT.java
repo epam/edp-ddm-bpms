@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,18 +64,18 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
   @Deployment(resources = {"bpmn/citizen-create-app-exclude.bpmn", "system-signature-bp"})
   public void testHappyPathWithHeadOfficerActivity() throws IOException {
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", headOfficerToken))
         .resource("solution-type-equal-constant-code")
-        .queryParams(Maps.of("constantCode", "EXCLUDE"))
+        .requestBody("{\"constantCode\":\"EXCLUDE\"}")
         .response(
             "/json/citizen-create-app-exclude/data-factory/solutionTypeEqualConstantCodeExcludeResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", headOfficerToken))
         .resource("application-type-equal-constant-code")
-        .queryParams(Maps.of("constantCode", "EXCLUDE"))
+        .requestBody("{\"constantCode\":\"EXCLUDE\"}")
         .response(
             "/json/citizen-create-app-exclude/data-factory/applicationTypeEqualConstantCodeExcludeResponse.json")
         .build());
@@ -320,18 +320,18 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
   @Deployment(resources = {"bpmn/citizen-create-app-exclude.bpmn", "system-signature-bp"})
   public void testDenyPathWithoutHeadOfficerActivity() throws IOException {
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", officerToken))
         .resource("solution-type-equal-constant-code")
-        .queryParams(Maps.of("constantCode", "WO_CONSIDER"))
+        .requestBody("{\"constantCode\":\"WO_CONSIDER\"}")
         .response(
             "/json/citizen-create-app-exclude/data-factory/solutionTypeEqualConstantCodeWoConsiderResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", headOfficerToken))
         .resource("application-type-equal-constant-code")
-        .queryParams(Maps.of("constantCode", "EXCLUDE"))
+        .requestBody("{\"constantCode\":\"EXCLUDE\"}")
         .response(
             "/json/citizen-create-app-exclude/data-factory/applicationTypeEqualConstantCodeExcludeResponse.json")
         .build());
@@ -500,10 +500,10 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
   @Deployment(resources = {"bpmn/citizen-create-app-exclude.bpmn", "system-signature-bp"})
   public void testValidationError() throws IOException {
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", citizenToken))
         .resource("last-laboratory-solution")
-        .queryParams(Maps.of("laboratoryId", "3fa85f64-5717-4562-b3fc-2c963f66afa6"))
+        .requestBody("{\"laboratoryId\":\"3fa85f64-5717-4562-b3fc-2c963f66afa6\"}")
         .response(
             "/json/citizen-create-app-exclude/data-factory/lastLaboratorySolutionDenyResponse.json")
         .build());
@@ -523,26 +523,26 @@ public class CitizenCreateAppExcludeBpmnIT extends BaseBpmnIT {
 
   private void stubCitizenActivities() {
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", citizenToken))
         .resource("last-laboratory-solution")
-        .queryParams(Maps.of("laboratoryId", "3fa85f64-5717-4562-b3fc-2c963f66afa6"))
+        .requestBody("{\"laboratoryId\":\"3fa85f64-5717-4562-b3fc-2c963f66afa6\"}")
         .response(
             "/json/citizen-create-app-exclude/data-factory/lastLaboratorySolutionResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", citizenToken))
         .resource("application-type-equal-constant-code")
-        .queryParams(Maps.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response(
             "/json/citizen-create-app-exclude/data-factory/applicationTypeEqualConstantCodeAddResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", citizenToken))
         .resource("solution-type-equal-constant-code")
-        .queryParams(Maps.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response(
             "/json/citizen-create-app-exclude/data-factory/solutionTypeEqualConstantCodeAddResponse.json")
         .build());

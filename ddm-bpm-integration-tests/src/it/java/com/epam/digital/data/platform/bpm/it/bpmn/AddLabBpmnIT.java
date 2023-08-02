@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,10 +40,10 @@ public class AddLabBpmnIT extends BaseBpmnIT {
   @Deployment(resources = {"bpmn/add-lab.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void testHappyPath() throws IOException {
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("laboratory-equal-edrpou-name-count")
-        .queryParams(Maps.of("name", "labName", "edrpou", "77777777"))
+        .requestBody("{\"name\":\"labName\",\"edrpou\":\"77777777\"}")
         .response("[]")
         .build());
     stubDigitalSignatureRequest(StubData.builder()
@@ -117,10 +117,10 @@ public class AddLabBpmnIT extends BaseBpmnIT {
   @Deployment(resources = {"bpmn/add-lab.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void testValidationError() throws IOException {
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("laboratory-equal-edrpou-name-count")
-        .queryParams(Maps.of("name", "labName", "edrpou", "77777777"))
+        .requestBody("{\"name\":\"labName\",\"edrpou\":\"77777777\"}")
         .response("/json/add-lab/data-factory/lab-count.json")
         .build());
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,9 +68,10 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
         new UsernamePasswordAuthenticationToken(testUserName, legalUserToken));
 
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .resource("subject-equal-subject-type-equal-subject-code")
-        .queryParams(Map.of("subjectType", LEGAL_SUBJECT_TYPE, "subjectCode", LEGAL_SUBJECT_CODE))
+        .requestBody("{\"subjectType\":\"" + LEGAL_SUBJECT_TYPE + "\",\"subjectCode\":\"" +
+            LEGAL_SUBJECT_CODE + "\"}")
         .headers(Map.of("X-Access-Token", legalUserToken))
         .response("[]")
         .build());
@@ -139,10 +140,10 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
         new UsernamePasswordAuthenticationToken(testUserName, indUserToken));
 
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .resource("subject-equal-subject-type-equal-subject-code")
-        .queryParams(Map.of("subjectType", ENTREPRENEUR_SUBJECT_TYPE, "subjectCode",
-            ENTREPRENEUR_SUBJECT_CODE))
+        .requestBody("{\"subjectType\":\"" + ENTREPRENEUR_SUBJECT_TYPE + "\",\"subjectCode\":\"" +
+            ENTREPRENEUR_SUBJECT_CODE + "\"}")
         .headers(Map.of("X-Access-Token", indUserToken))
         .response("[]")
         .build());
@@ -211,9 +212,10 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
   @Test
   public void testValidationErrorSubjectCreated() throws Exception {
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .resource("subject-equal-subject-type-equal-subject-code")
-        .queryParams(Map.of("subjectType", LEGAL_SUBJECT_TYPE, "subjectCode", LEGAL_SUBJECT_CODE))
+        .requestBody("{\"subjectType\":\"" + LEGAL_SUBJECT_TYPE + "\",\"subjectCode\":\"" +
+            LEGAL_SUBJECT_CODE + "\"}")
         .headers(Map.of("X-Access-Token", legalUserToken))
         .response(
             "/json/officer-create-subject/data-factory/subjectEqualSubjectTypeEqualSubjectCodeExistResponse.json")
@@ -237,9 +239,10 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
   @Test
   public void testValidationErrorSubjectHasCanceledOrSuspendedState() throws Exception {
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .resource("subject-equal-subject-type-equal-subject-code")
-        .queryParams(Map.of("subjectType", LEGAL_SUBJECT_TYPE, "subjectCode", LEGAL_SUBJECT_CODE))
+        .requestBody("{\"subjectType\":\"" + LEGAL_SUBJECT_TYPE + "\",\"subjectCode\":\"" +
+            LEGAL_SUBJECT_CODE + "\"}")
         .headers(Map.of("X-Access-Token", legalUserToken))
         .response("[]")
         .build());
@@ -260,9 +263,10 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
   @Test
   public void testValidationErrorSubjectNotFound() throws IOException {
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .resource("subject-equal-subject-type-equal-subject-code")
-        .queryParams(Map.of("subjectType", LEGAL_SUBJECT_TYPE, "subjectCode", LEGAL_SUBJECT_CODE))
+        .requestBody("{\"subjectType\":\"" + LEGAL_SUBJECT_TYPE + "\",\"subjectCode\":\"" +
+            LEGAL_SUBJECT_CODE + "\"}")
         .headers(Map.of("X-Access-Token", legalUserToken))
         .response("[]")
         .build());
@@ -286,10 +290,10 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
         new UsernamePasswordAuthenticationToken(testUserName, indUserToken));
 
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .resource("subject-equal-subject-type-equal-subject-code")
-        .queryParams(Map.of("subjectType", ENTREPRENEUR_SUBJECT_TYPE, "subjectCode",
-            ENTREPRENEUR_SUBJECT_CODE))
+        .requestBody("{\"subjectType\":\"" + ENTREPRENEUR_SUBJECT_TYPE + "\",\"subjectCode\":\"" +
+            ENTREPRENEUR_SUBJECT_CODE + "\"}")
         .headers(Map.of("X-Access-Token", indUserToken))
         .response("[]")
         .build());

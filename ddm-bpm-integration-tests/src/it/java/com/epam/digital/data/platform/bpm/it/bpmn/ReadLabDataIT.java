@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,10 +53,10 @@ public class ReadLabDataIT extends BaseBpmnIT {
         .response("/json/read-lab/data-factory/koatuuByIdResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("koatuu-equal-koatuu-id-name")
-        .queryParams(Map.of("koatuuId", "92cb1462-ec57-4b87-9e8d-594e0c322996"))
+        .requestBody("{\"koatuuId\":\"92cb1462-ec57-4b87-9e8d-594e0c322996\"}")
         .response("/json/read-lab/data-factory/koatuuEqualKoatuuIdName.json")
         .build());
     stubDataFactoryRequest(StubData.builder()

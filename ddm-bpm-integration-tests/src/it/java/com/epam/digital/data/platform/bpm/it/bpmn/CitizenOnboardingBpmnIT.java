@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,10 +79,10 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
 
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject-equal-subject-type-equal-subject-code")
-        .queryParams(Map.of("subjectType", "INDIVIDUAL", "subjectCode", "1010101010"))
+        .requestBody("{\"subjectType\":\"INDIVIDUAL\",\"subjectCode\":\"1010101010\"}")
         .response("[]")
         .build());
     stubSettingsRequest(StubData.builder()
@@ -131,10 +131,10 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         .response("{}")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject-equal-subject-type-equal-subject-code")
-        .queryParams(Map.of("subjectType", "INDIVIDUAL", "subjectCode", "1010101010"))
+        .requestBody("{\"subjectType\":\"INDIVIDUAL\",\"subjectCode\":\"1010101010\"}")
         .response("/json/citizen-onboarding/data-factory/searchSubjectResponse.json")
         .build());
     stubDigitalSignatureRequest(StubData.builder()
@@ -221,10 +221,10 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
 
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject-equal-subject-type-equal-subject-code")
-        .queryParams(Map.of("subjectType", "ENTREPRENEUR", "subjectCode", "1010101010"))
+        .requestBody("{\"subjectType\":\"ENTREPRENEUR\",\"subjectCode\":\"1010101010\"}")
         .response("/json/citizen-onboarding/data-factory/searchSubjectResponse.json")
         .build());
     stubSettingsRequest(
@@ -235,10 +235,10 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
             .response("/json/citizen-onboarding/data-factory/getSettingsResponse.json")
             .build());
     stubDataFactoryRequest(StubData.builder()
-            .httpMethod(HttpMethod.GET)
+            .httpMethod(HttpMethod.POST)
             .headers(Map.of("X-Access-Token", testUserToken))
             .resource("subject-settings-equal-settings-id")
-            .queryParams(Map.of("settingsId", "c2c19401-f1b7-4954-a230-ab15566e7318"))
+            .requestBody("{\"settingsId\":\"c2c19401-f1b7-4954-a230-ab15566e7318\"}")
             .response("[]")
             .build());
 
@@ -269,10 +269,10 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         .build());
 
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject-equal-subject-type-equal-subject-code")
-        .queryParams(Map.of("subjectType", "ENTREPRENEUR", "subjectCode", "1010101010"))
+        .requestBody("{\"subjectType\":\"ENTREPRENEUR\",\"subjectCode\":\"1010101010\"}")
         .response("/json/citizen-onboarding/data-factory/searchSubjectResponse.json")
         .build());
     stubDigitalSignatureRequest(StubData.builder()
@@ -353,10 +353,10 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
 
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject-equal-subject-type-equal-subject-code")
-        .queryParams(Map.of("subjectType", "LEGAL", "subjectCode", "1010101010"))
+        .requestBody("{\"subjectType\":\"LEGAL\",\"subjectCode\":\"1010101010\"}")
         .response("/json/citizen-onboarding/data-factory/searchSubjectResponse.json")
         .build());
     stubSettingsRequest(StubData.builder()
@@ -366,10 +366,10 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
             .response("/json/citizen-onboarding/data-factory/getSettingsResponse.json")
             .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject-settings-equal-settings-id")
-        .queryParams(Map.of("settingsId", "c2c19401-f1b7-4954-a230-ab15566e7318"))
+        .requestBody("{\"settingsId\":\"c2c19401-f1b7-4954-a230-ab15566e7318\"}")
         .response("[]")
         .build());
 
@@ -400,10 +400,10 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         .build());
 
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject-equal-subject-type-equal-subject-code")
-        .queryParams(Map.of("subjectType", "INDIVIDUAL", "subjectCode", "1010101010"))
+        .requestBody("{\"subjectType\":\"INDIVIDUAL\",\"subjectCode\":\"1010101010\"}")
         .response("/json/citizen-onboarding/data-factory/searchSubjectResponse.json")
         .build());
     stubDigitalSignatureRequest(StubData.builder()
@@ -486,10 +486,10 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
         new UsernamePasswordAuthenticationToken(testUserName, testUserToken));
 
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject-equal-subject-type-equal-subject-code")
-        .queryParams(Map.of("subjectType", "ENTREPRENEUR", "subjectCode", "1010101010"))
+        .requestBody("{\"subjectType\":\"ENTREPRENEUR\",\"subjectCode\":\"1010101010\"}")
         .response("/json/citizen-onboarding/data-factory/searchSubjectResponse.json")
         .build());
     stubSettingsRequest(
@@ -500,10 +500,10 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
             .response("/json/citizen-onboarding/data-factory/getSettingsResponse.json")
             .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject-settings-equal-settings-id")
-        .queryParams(Map.of("settingsId", "c2c19401-f1b7-4954-a230-ab15566e7318"))
+        .requestBody("{\"settingsId\":\"c2c19401-f1b7-4954-a230-ab15566e7318\"}")
         .response("[{}]")
         .build());
 

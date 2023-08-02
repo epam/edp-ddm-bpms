@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,10 +38,10 @@ public class UpdateDictBpmnIT extends BaseBpmnIT {
   @Deployment(resources = {"bpmn/update-dict.bpmn", "bpmn/system-signature-bp.bpmn"})
   public void testHappyPath() throws IOException {
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("factor-equal-factor-type-name-count")
-        .queryParams(Map.of("name", "testName"))
+        .requestBody("{\"name\":\"testName\"}")
         .response("[]")
         .build());
     stubDigitalSignatureRequest(StubData.builder()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ public class DataFactoryConnectorSearchDelegate extends BaseJavaDelegate {
   @SystemVariable(name = "response", isTransient = true)
   protected NamedVariableAccessor<ConnectorResponse> responseVariable;
   @SystemVariable(name = "searchConditions")
-  private NamedVariableAccessor<Map<String, String>> searchConditionsVariable;
+  private NamedVariableAccessor<Map<String, Object>> searchConditionsVariable;
 
   private final DataFactoryFeignClient dataFactoryFeignClient;
   private final HeaderBuilderFactory headerBuilderFactory;

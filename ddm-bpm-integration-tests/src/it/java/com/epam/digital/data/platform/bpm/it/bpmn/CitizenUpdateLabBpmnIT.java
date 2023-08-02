@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,10 +76,10 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         .response("/json/citizen-update-lab/data-factory/labToUpdateKoatuu.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("koatuu-equal-koatuu-id-name")
-        .queryParams(Map.of("koatuuId", "labToUpdateKoatuu"))
+        .requestBody("{\"koatuuId\":\"labToUpdateKoatuu\"}")
         .response("/json/citizen-update-lab/data-factory/koatuuEqualKoatuuIdName.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
@@ -97,10 +97,10 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         .response("/json/citizen-update-lab/data-factory/labToUpdateKopfg.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("laboratory-equal-edrpou-name-count")
-        .queryParams(Map.of("edrpou", "01010101", "name", "updatedLabName"))
+        .requestBody("{\"edrpou\":\"01010101\",\"name\":\"updatedLabName\"}")
         .response("[]")
         .build());
     mockKeycloakGetUsersByRole("officer", "[]");
@@ -276,10 +276,10 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         .response("/json/citizen-update-lab/data-factory/labToUpdateKoatuu.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("koatuu-equal-koatuu-id-name")
-        .queryParams(Map.of("koatuuId", "labToUpdateKoatuu"))
+        .requestBody("{\"koatuuId\":\"labToUpdateKoatuu\"}")
         .response("/json/citizen-update-lab/data-factory/koatuuEqualKoatuuIdName.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
@@ -440,10 +440,10 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         .response("/json/citizen-update-lab/data-factory/labToUpdateKoatuu.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("koatuu-equal-koatuu-id-name")
-        .queryParams(Map.of("koatuuId", "labToUpdateKoatuu"))
+        .requestBody("{\"koatuuId\":\"labToUpdateKoatuu\"}")
         .response("/json/citizen-update-lab/data-factory/koatuuEqualKoatuuIdName.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
@@ -468,10 +468,10 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
         .response("/json/citizen-update-lab/data-factory/labToUpdateKopfg.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("laboratory-equal-edrpou-name-count")
-        .queryParams(Map.of("edrpou", "01010101", "name", "updatedLabName"))
+        .requestBody("{\"edrpou\":\"01010101\",\"name\":\"updatedLabName\"}")
         .response("[{\"cnt\":1}]")
         .build());
 
