@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,10 +50,10 @@ public class CitizenReadLabBpmnIT extends BaseBpmnIT {
         .response("/json/citizen-read-lab/data-factory/labToReadKoatuu.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("koatuu-equal-koatuu-id-name")
-        .queryParams(Map.of("koatuuId", "labToReadKoatuu"))
+        .requestBody("{\"koatuuId\":\"labToReadKoatuu\"}")
         .response("/json/citizen-read-lab/data-factory/koatuuEqualKoatuuIdName.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
