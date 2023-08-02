@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package com.epam.digital.data.platform.bpms.extension.it;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
@@ -41,9 +40,9 @@ public class RegistryConnectorDelegatesIT extends BaseIT {
   @Deployment(resources = "bpmn/connector/registryConnectors.bpmn")
   public void searchInAnotherRegistry() {
     platformGatewayMockServer.addStubMapping(
-        stubFor(get(urlPathEqualTo(
+        stubFor(post(urlPathEqualTo(
             "/data-factory/another_registry/test_resource"))
-            .withQueryParam("searchVariable", equalTo("searchValue"))
+            .withRequestBody(equalTo("{\"searchVariable\":\"searchValue\"}"))
             .withHeader("Content-Type", equalTo("application/json"))
             .withHeader("X-Source-System", equalTo("Low-code Platform"))
             .withHeader("X-Source-Application", equalTo("ddm-bpm-extension"))

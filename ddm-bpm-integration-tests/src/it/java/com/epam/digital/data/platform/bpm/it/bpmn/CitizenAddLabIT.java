@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,18 +57,18 @@ public class CitizenAddLabIT extends BaseBpmnIT {
   public void happyPathTest() throws JsonProcessingException {
     stubSearchSubjects("/xml/citizen-add-lab/searchSubjectsActiveResponse.xml");
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("laboratory-equal-edrpou-name-count")
         .response("[]")
-        .queryParams(Map.of("edrpou", "01010101", "name", "labName"))
+        .requestBody("{\"edrpou\":\"01010101\",\"name\":\"labName\"}")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject-equal-subject-type-equal-subject-code")
         .response("/json/citizen-add-lab/data-factory/searchSubjectResponse.json")
-        .queryParams(Map.of("subjectType", "LEGAL", "subjectCode", "01010101"))
+        .requestBody("{\"subjectType\":\"LEGAL\",\"subjectCode\":\"01010101\"}")
         .build());
     mockKeycloakGetUsersByRole("officer", "[]");
     stubDigitalSignatureRequest(StubData.builder()
@@ -198,18 +198,18 @@ public class CitizenAddLabIT extends BaseBpmnIT {
   public void duplicateLabCheckFailedTest() throws JsonProcessingException {
     stubSearchSubjects("/xml/citizen-add-lab/searchSubjectsActiveResponse.xml");
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("laboratory-equal-edrpou-name-count")
         .response("[]")
-        .queryParams(Map.of("edrpou", "01010101", "name", "labName"))
+        .requestBody("{\"edrpou\":\"01010101\",\"name\":\"labName\"}")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("subject-equal-subject-type-equal-subject-code")
         .response("/json/citizen-add-lab/data-factory/searchSubjectResponse.json")
-        .queryParams(Map.of("subjectType", "LEGAL", "subjectCode", "01010101"))
+        .requestBody("{\"subjectType\":\"LEGAL\",\"subjectCode\":\"01010101\"}")
         .build());
     mockKeycloakGetUsersByRole("officer", "[]");
 
@@ -302,11 +302,11 @@ public class CitizenAddLabIT extends BaseBpmnIT {
   public void duplicateLabTest() throws JsonProcessingException {
     stubSearchSubjects("/xml/citizen-add-lab/searchSubjectsActiveResponse.xml");
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("laboratory-equal-edrpou-name-count")
         .response("[{\"cnt\":1}]")
-        .queryParams(Map.of("edrpou", "01010101", "name", "labName"))
+        .requestBody("{\"edrpou\":\"01010101\",\"name\":\"labName\"}")
         .build());
 
     var processInstanceId = startProcessInstance("citizen-add-lab", testUserToken);

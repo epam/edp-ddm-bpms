@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,25 +80,25 @@ public class CitizenCreateAppExpanseIT extends BaseBpmnIT {
         .response("/json/citizen-create-expanse/data-factory/subjectResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("solution-type-equal-constant-code")
-        .queryParams(Map.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/citizen-create-expanse/data-factory/solutionTypeAddResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("application-type-equal-constant-code")
-        .queryParams(Map.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response(
             "/json/citizen-create-expanse/data-factory/applicationTypeResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("last-laboratory-solution")
-        .queryParams(Map.of("laboratoryId", labId))
+        .requestBody("{\"laboratoryId\":\"" + labId + "\"}")
         .response("/json/citizen-create-expanse/data-factory/lastLaboratorySolutionDeny.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
@@ -110,26 +110,26 @@ public class CitizenCreateAppExpanseIT extends BaseBpmnIT {
             "/json/citizen-create-expanse/data-factory/labWithoutAccreditation.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("staff-equal-laboratory-id-count")
-        .queryParams(Map.of("laboratoryId", labId))
+        .requestBody("{\"laboratoryId\":\"" + labId + "\"}")
         .response("[{\"cnt\":1}]")
         .build());
     mockKeycloakGetUsersByRole("officer",
         "/json/citizen-create-expanse/keycloak/users-by-role-response.json");
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", headOfficerToken))
         .resource("solution-type-equal-constant-code")
-        .queryParams(Map.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/citizen-create-expanse/data-factory/solutionTypeAddResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", headOfficerToken))
         .resource("application-type-equal-constant-code")
-        .queryParams(Map.of("constantCode", "EXPANSE"))
+        .requestBody("{\"constantCode\":\"EXPANSE\"}")
         .response(
             "/json/citizen-create-expanse/data-factory/applicationTypeResponse.json")
         .build());
@@ -361,25 +361,25 @@ public class CitizenCreateAppExpanseIT extends BaseBpmnIT {
         .build());
     stubSearchSubjects("/xml/citizen-create-app/searchSubjectsActiveResponse.xml");
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("solution-type-equal-constant-code")
-        .queryParams(Map.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/citizen-create-expanse/data-factory/solutionTypeAddResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("application-type-equal-constant-code")
-        .queryParams(Map.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response(
             "/json/citizen-create-expanse/data-factory/applicationTypeResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("last-laboratory-solution")
-        .queryParams(Map.of("laboratoryId", labId))
+        .requestBody("{\"laboratoryId\":\"" + labId + "\"}")
         .response("/json/citizen-create-expanse/data-factory/lastLaboratorySolutionDeny.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
@@ -391,26 +391,26 @@ public class CitizenCreateAppExpanseIT extends BaseBpmnIT {
             "/json/citizen-create-expanse/data-factory/labWithoutAccreditation.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("staff-equal-laboratory-id-count")
-        .queryParams(Map.of("laboratoryId", labId))
+        .requestBody("{\"laboratoryId\":\"" + labId + "\"}")
         .response("[{\"cnt\":1}]")
         .build());
     mockKeycloakGetUsersByRole("officer",
         "/json/citizen-create-expanse/keycloak/users-by-role-response.json");
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         //.headers(Map.of("X-Access-Token", headOfficerToken))
         .resource("solution-type-equal-constant-code")
-        .queryParams(Map.of("constantCode", "WO_CONSIDER"))
+        .requestBody("{\"constantCode\":\"WO_CONSIDER\"}")
         .response("/json/citizen-create-expanse/data-factory/solutionTypeWoConsiderResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", headOfficerToken))
         .resource("application-type-equal-constant-code")
-        .queryParams(Map.of("constantCode", "EXPANSE"))
+        .requestBody("{\"constantCode\":\"EXPANSE\"}")
         .response(
             "/json/citizen-create-expanse/data-factory/applicationTypeResponse.json")
         .build());
@@ -669,24 +669,24 @@ public class CitizenCreateAppExpanseIT extends BaseBpmnIT {
         .build());
     stubSearchSubjects("/xml/create-app/searchSubjectsActiveResponse.xml");
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("last-laboratory-solution")
-        .queryParams(Map.of("laboratoryId", labId))
+        .requestBody("{\"laboratoryId\":\"" + labId + "\"}")
         .response("/json/citizen-create-expanse/data-factory/last-laboratory-no-solution.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("solution-type-equal-constant-code")
-        .queryParams(Map.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/citizen-create-expanse/data-factory/solutionTypeAddResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("application-type-equal-constant-code")
-        .queryParams(Map.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/citizen-create-expanse/data-factory/applicationTypeResponse.json")
         .build());
 
@@ -716,24 +716,24 @@ public class CitizenCreateAppExpanseIT extends BaseBpmnIT {
         .build());
     stubSearchSubjects("/xml/create-app/searchSubjectsActiveResponse.xml");
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("last-laboratory-solution")
-        .queryParams(Map.of("laboratoryId", labId))
+        .requestBody("{\"laboratoryId\":\"" + labId + "\"}")
         .response("/json/citizen-create-expanse/data-factory/lastLaboratorySolutionDeny.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("solution-type-equal-constant-code")
-        .queryParams(Map.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/citizen-create-expanse/data-factory/solutionTypeAddResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("application-type-equal-constant-code")
-        .queryParams(Map.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/citizen-create-expanse/data-factory/applicationTypeResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
@@ -745,10 +745,10 @@ public class CitizenCreateAppExpanseIT extends BaseBpmnIT {
             "/json/citizen-create-expanse/data-factory/labWithoutAccreditation.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("staff-equal-laboratory-id-count")
-        .queryParams(Map.of("laboratoryId", labId))
+        .requestBody("{\"laboratoryId\":\"" + labId + "\"}")
         .response("[]")
         .build());
 

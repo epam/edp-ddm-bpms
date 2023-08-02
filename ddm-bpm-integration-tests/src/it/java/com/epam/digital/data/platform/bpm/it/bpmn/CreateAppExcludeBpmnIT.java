@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,25 +41,25 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
     var laboratoryId = "d2943186-0f1f-4a77-9de9-a5a59c07db02";
 
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("last-laboratory-solution")
-        .queryParams(Maps.of("laboratoryId", laboratoryId))
+        .requestBody("{\"laboratoryId\":\"" + laboratoryId + "\"}")
         .response("/json/create-app-exclude/data-factory/lastLaboratorySolutionResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("application-type-equal-constant-code")
-        .queryParams(Maps.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response(
             "/json/create-app-exclude/data-factory/applicationTypeEqualConstantCodeAddResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("solution-type-equal-constant-code")
-        .queryParams(Maps.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response(
             "/json/create-app-exclude/data-factory/solutionTypeEqualConstantCodeAddResponse.json")
         .build());
@@ -71,18 +71,18 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
         .response("/json/create-app-exclude/data-factory/laboratoryByIdResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("solution-type-equal-constant-code")
-        .queryParams(Maps.of("constantCode", "EXCLUDE"))
+        .requestBody("{\"constantCode\":\"EXCLUDE\"}")
         .response(
             "/json/create-app-exclude/data-factory/solutionTypeEqualConstantCodeResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("application-type-equal-constant-code")
-        .queryParams(Maps.of("constantCode", "EXCLUDE"))
+        .requestBody("{\"constantCode\":\"EXCLUDE\"}")
         .response(
             "/json/create-app-exclude/data-factory/applicationTypeEqualConstantCodeResponse.json")
         .build());
@@ -212,25 +212,25 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
   public void testPathWithMistakes() throws IOException {
     var laboratoryId = "d2943186-0f1f-4a77-9de9-a5a59c07db02";
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("last-laboratory-solution")
-        .queryParams(Maps.of("laboratoryId", laboratoryId))
+        .requestBody("{\"laboratoryId\":\"" + laboratoryId + "\"}")
         .response("/json/create-app-exclude/data-factory/lastLaboratorySolutionResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("application-type-equal-constant-code")
-        .queryParams(Maps.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response(
             "/json/create-app-exclude/data-factory/applicationTypeEqualConstantCodeAddResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("solution-type-equal-constant-code")
-        .queryParams(Maps.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response(
             "/json/create-app-exclude/data-factory/solutionTypeEqualConstantCodeAddResponse.json")
         .build());
@@ -242,18 +242,18 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
         .response("/json/create-app-exclude/data-factory/laboratoryByIdResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("solution-type-equal-constant-code")
-        .queryParams(Maps.of("constantCode", "WO_CONSIDER"))
+        .requestBody("{\"constantCode\":\"WO_CONSIDER\"}")
         .response(
             "/json/create-app-exclude/data-factory/solutionTypeEqualConstantCodeWoConsiderResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("application-type-equal-constant-code")
-        .queryParams(Maps.of("constantCode", "EXCLUDE"))
+        .requestBody("{\"constantCode\":\"EXCLUDE\"}")
         .response(
             "/json/create-app-exclude/data-factory/applicationTypeEqualConstantCodeResponse.json")
         .build());
@@ -385,25 +385,25 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
     var laboratoryId = "d2943186-0f1f-4a77-9de9-a5a59c07db02";
 
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("last-laboratory-solution")
-        .queryParams(Maps.of("laboratoryId", laboratoryId))
+        .requestBody("{\"laboratoryId\":\"" + laboratoryId + "\"}")
         .response("/json/create-app-exclude/data-factory/lastLaboratorySolutionDenyResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("application-type-equal-constant-code")
-        .queryParams(Maps.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response(
             "/json/create-app-exclude/data-factory/applicationTypeEqualConstantCodeAddResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("solution-type-equal-constant-code")
-        .queryParams(Maps.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response(
             "/json/create-app-exclude/data-factory/solutionTypeEqualConstantCodeAddResponse.json")
         .build());

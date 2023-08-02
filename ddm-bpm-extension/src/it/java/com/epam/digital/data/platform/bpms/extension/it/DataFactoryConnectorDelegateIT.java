@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -259,7 +259,7 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
             .willReturn(aResponse().withStatus(200))));
 
     dataFactoryMockServer.addStubMapping(
-        stubFor(get(urlEqualTo("/mock-server/laboratory"))
+        stubFor(post(urlEqualTo("/mock-server/laboratory"))
             .withHeader("Content-Type", equalTo("application/json"))
             .withHeader("X-Source-System", equalTo("Low-code Platform"))
             .withHeader("X-Source-Application", equalTo("ddm-bpm-extension"))

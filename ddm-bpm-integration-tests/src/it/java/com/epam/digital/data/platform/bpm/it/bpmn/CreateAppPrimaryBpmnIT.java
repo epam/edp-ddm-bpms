@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,24 +50,24 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
         .response("/json/common/data-factory/subjectResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("last-laboratory-solution")
-        .queryParams(Map.of("laboratoryId", labId))
+        .requestBody("{\"laboratoryId\":\"" + labId + "\"}")
         .response("/json/create-app/data-factory/last-laboratory-solution-deny.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("solution-type-equal-constant-code")
-        .queryParams(Map.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/create-app/data-factory/solutionTypeAddResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("application-type-equal-constant-code")
-        .queryParams(Map.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/create-app/data-factory/applicationTypeResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
@@ -253,17 +253,17 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
         .response("/json/create-app/data-factory/findLaboratoryResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("solution-type-equal-constant-code")
-        .queryParams(Map.of("constantCode", "WO_CONSIDER"))
+        .requestBody("{\"constantCode\":\"WO_CONSIDER\"}")
         .response("/json/create-app/data-factory/solutionTypeWoConsiderResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("application-type-equal-constant-code")
-        .queryParams(Map.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/create-app/data-factory/applicationTypeResponse.json")
         .build());
     stubDigitalSignatureRequest(StubData.builder()
@@ -451,24 +451,24 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
         .response("/json/common/data-factory/subjectResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("last-laboratory-solution")
-        .queryParams(Map.of("laboratoryId", labId))
+        .requestBody("{\"laboratoryId\":\"" + labId + "\"}")
         .response("/json/create-app/data-factory/last-laboratory-solution-deny.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("solution-type-equal-constant-code")
-        .queryParams(Map.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/create-app/data-factory/solutionTypeAddResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("application-type-equal-constant-code")
-        .queryParams(Map.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/create-app/data-factory/applicationTypeResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
@@ -479,10 +479,10 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
         .response("/json/create-app/data-factory/findLaboratoryWithoutAccreditationResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("staff-equal-laboratory-id-count")
-        .queryParams(Map.of("laboratoryId", labId))
+        .requestBody("{\"laboratoryId\":\"" + labId + "\"}")
         .response("[]")
         .build());
 
@@ -510,24 +510,24 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
         .response("/json/common/data-factory/subjectResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("last-laboratory-solution")
-        .queryParams(Map.of("laboratoryId", labId))
+        .requestBody("{\"laboratoryId\":\"" + labId + "\"}")
         .response("/json/create-app/data-factory/last-laboratory-solution-deny.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("solution-type-equal-constant-code")
-        .queryParams(Map.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/create-app/data-factory/solutionTypeAddResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("application-type-equal-constant-code")
-        .queryParams(Map.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/create-app/data-factory/applicationTypeResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
@@ -539,10 +539,10 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
             "/json/create-app/data-factory/findLaboratoryWithoutAccreditationResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("staff-equal-laboratory-id-count")
-        .queryParams(Map.of("laboratoryId", labId))
+        .requestBody("{\"laboratoryId\":\"" + labId + "\"}")
         .response("[{\"cnt\":1}]")
         .build());
 
@@ -577,24 +577,24 @@ public class CreateAppPrimaryBpmnIT extends BaseBpmnIT {
         .response("/json/common/data-factory/subjectResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("last-laboratory-solution")
-        .queryParams(Map.of("laboratoryId", labId))
+        .requestBody("{\"laboratoryId\":\"" + labId + "\"}")
         .response("/json/create-app/data-factory/last-laboratory-solution-add.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("solution-type-equal-constant-code")
-        .queryParams(Map.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/create-app/data-factory/solutionTypeAddResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
-        .httpMethod(HttpMethod.GET)
+        .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
         .resource("application-type-equal-constant-code")
-        .queryParams(Map.of("constantCode", "ADD"))
+        .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/create-app/data-factory/applicationTypeResponse.json")
         .build());
 
