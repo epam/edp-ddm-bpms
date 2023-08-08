@@ -96,6 +96,8 @@ class UserTaskServiceTest {
 
   @Test
   void getTaskById_emptyFormVariables() {
+    var processInstanceId = "processInstanceId";
+    var rootProcessInstanceId = "rootProcessInstanceId";
     var processDefinitionId = "processDefinitionId";
     var processDefinitionName = "processDefinitionName";
     var processDefinition = mock(ProcessDefinition.class);
@@ -105,16 +107,29 @@ class UserTaskServiceTest {
     var taskDto = new TaskDto();
     taskDto.setId(taskId);
     ReflectionTestUtils.setField(taskDto, "processDefinitionId", processDefinitionId);
+    ReflectionTestUtils.setField(taskDto, "processInstanceId", processInstanceId);
 
     when(taskRuntimeService.getTaskById(taskId)).thenReturn(Optional.of(taskDto));
     when(processDefinitionRepositoryService.getProcessDefinitionById(processDefinitionId))
         .thenReturn(processDefinition);
+
+    var processInstance = new ExecutionEntity();
+    processInstance.setId(processInstanceId);
+    processInstance.setRootProcessInstanceId(rootProcessInstanceId);
+    when(processInstanceRuntimeService.getProcessInstance(processInstanceId))
+        .thenReturn(Optional.of(processInstance));
+
+    var rootProcessInstance = new ExecutionEntity();
+    rootProcessInstance.setId(rootProcessInstanceId);
+    when(processInstanceRuntimeService.getRootProcessInstance(processInstance))
+        .thenReturn(rootProcessInstance);
 
     var result = service.getTaskById(taskId);
 
     assertThat(result)
         .hasFieldOrPropertyWithValue("id", taskId)
         .hasFieldOrPropertyWithValue("processDefinitionId", processDefinitionId)
+        .hasFieldOrPropertyWithValue("rootProcessInstanceId", rootProcessInstanceId)
         .hasFieldOrPropertyWithValue("processDefinitionName", processDefinitionName)
         .hasFieldOrPropertyWithValue("eSign", false)
         .hasFieldOrPropertyWithValue("signatureValidationPack", Set.of())
@@ -136,6 +151,8 @@ class UserTaskServiceTest {
 
   @Test
   void getTaskById() {
+    var processInstanceId = "processInstanceId";
+    var rootProcessInstanceId = "rootProcessInstanceId";
     var processDefinitionId = "processDefinitionId";
     var processDefinitionName = "processDefinitionName";
     var processDefinition = mock(ProcessDefinition.class);
@@ -145,6 +162,7 @@ class UserTaskServiceTest {
     var taskDto = new TaskDto();
     taskDto.setId(taskId);
     ReflectionTestUtils.setField(taskDto, "processDefinitionId", processDefinitionId);
+    ReflectionTestUtils.setField(taskDto, "processInstanceId", processInstanceId);
 
     when(taskRuntimeService.getTaskById(taskId)).thenReturn(Optional.of(taskDto));
     when(processDefinitionRepositoryService.getProcessDefinitionById(processDefinitionId))
@@ -163,12 +181,24 @@ class UserTaskServiceTest {
             Subject.INDIVIDUAL.name(), "false"
         ));
 
+    var processInstance = new ExecutionEntity();
+    processInstance.setId(processInstanceId);
+    processInstance.setRootProcessInstanceId(rootProcessInstanceId);
+    when(processInstanceRuntimeService.getProcessInstance(processInstanceId))
+        .thenReturn(Optional.of(processInstance));
+
+    var rootProcessInstance = new ExecutionEntity();
+    rootProcessInstance.setId(rootProcessInstanceId);
+    when(processInstanceRuntimeService.getRootProcessInstance(processInstance))
+        .thenReturn(rootProcessInstance);
+
     var result = service.getTaskById(taskId);
 
     assertThat(result)
         .hasFieldOrPropertyWithValue("id", taskId)
         .hasFieldOrPropertyWithValue("processDefinitionId", processDefinitionId)
         .hasFieldOrPropertyWithValue("processDefinitionName", processDefinitionName)
+        .hasFieldOrPropertyWithValue("rootProcessInstanceId", rootProcessInstanceId)
         .hasFieldOrPropertyWithValue("eSign", true)
         .hasFieldOrPropertyWithValue("signatureValidationPack",
             Set.of(Subject.ENTREPRENEUR, Subject.LEGAL))
@@ -321,7 +351,7 @@ class UserTaskServiceTest {
     var ex = assertThrows(IllegalStateException.class, () -> service.completeTask("id", null));
 
     assertThat(ex).isNotNull()
-        .hasMessage("Process instance processInstance is missed before task id completion");
+        .hasMessage("Process instance processInstance is missed before task completion");
 
     verify(taskRuntimeService, never()).completeTask(any(), any());
     verify(processInstanceRuntimeService).getProcessInstance(any());

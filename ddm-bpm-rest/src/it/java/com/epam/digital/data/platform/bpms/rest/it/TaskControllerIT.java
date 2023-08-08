@@ -26,6 +26,7 @@ import com.epam.digital.data.platform.bpms.api.dto.DdmTaskDto;
 import com.epam.digital.data.platform.dso.api.dto.Subject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Map;
+import lombok.SneakyThrows;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.jupiter.api.Test;
 
@@ -55,7 +56,6 @@ class TaskControllerIT extends BaseIT {
   void shouldGetChildTaskWithParentProcessDefinitionName() throws JsonProcessingException {
     var startResult = postForObject("api/process-definition/key/parent/start",
         "{\"businessKey\":\"parent\"}", Map.class);
-    var processId = (String) startResult.get("id");
 
     var result = postForObject("api/extended/task",
         "{\"assignee\": \"testuser\"}",
@@ -155,6 +155,25 @@ class TaskControllerIT extends BaseIT {
         .containsAllEntriesOf(Map.of("formVariable", "var1", "formVariable2", "var2"));
     assertThat(result.getSignatureValidationPack()).hasSize(1).contains(Subject.ENTREPRENEUR);
     assertThat(result.isESign()).isTrue();
+  }
+
+  @Test
+  @Deployment(resources = {"bpmn/testParent.bpmn", "bpmn/testSubprocess1.bpmn",
+      "bpmn/testSubprocess2.bpmn"})
+  @SneakyThrows
+  void shouldGetTaskAndReturnCorrectRootProcessInstanceId() {
+    var startResult = postForObject("api/process-definition/key/parent/start",
+        "{\"businessKey\":\"parent\"}", Map.class);
+    var processId = (String) startResult.get("id");
+
+    var tasks = postForObject("api/extended/task/lightweight",
+        "{\"rootProcessInstanceId\": \"" + processId + "\"}",
+        DdmLightweightTaskDto[].class);
+    var task = tasks[0];
+    var result = getForObject("api/extended/task/" + task.getId(), DdmSignableTaskDto.class);
+
+    assertThat(result).isNotNull();
+    assertThat(result.getRootProcessInstanceId()).isEqualTo(processId);
   }
 
   @Deployment(resources = "bpmn/rootBpWith3Layers.bpmn")
