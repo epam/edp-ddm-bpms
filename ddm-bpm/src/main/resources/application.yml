@@ -8,6 +8,7 @@ camunda:
   bpm:
     generic-properties:
       properties:
+        enable-exceptions-after-unhandled-bpmn-error: true
         user-resource-whitelist-pattern: '[a-zA-Z0-9_@.]+|camunda-admin'
         history-cleanup-enabled: true
         history-cleanup-strategy: removalTimeBased
