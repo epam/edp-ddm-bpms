@@ -40,6 +40,7 @@ public class DdmSignableTaskDto {
   private String description;
   private String processDefinitionName;
   private String processInstanceId;
+  private String rootProcessInstanceId;
   private String processDefinitionId;
   private String formKey;
   private boolean suspended;
