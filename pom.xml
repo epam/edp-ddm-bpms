@@ -23,7 +23,7 @@
   <parent>
     <groupId>com.epam.digital.data.platform</groupId>
     <artifactId>low-code-platform-parent</artifactId>
-    <version>1.6.0.6</version>
+    <version>1.6.0-KRAKEN-DEV-SNAPSHOT</version>
     <relativePath/>
   </parent>
 
@@ -61,7 +61,6 @@
     <process-history-model.version>1.6.0.1</process-history-model.version>
     <ddm-starter-kafka.version>1.6.0.2</ddm-starter-kafka.version>
     <p6spy-spring-boot-starter.version>1.7.1</p6spy-spring-boot-starter.version>
-    <spring-security-core.version>5.7.5</spring-security-core.version>
     <dso.version>1.9.6.1</dso.version>
     <log4j.version>2.19.0</log4j.version>
     <zonky.embedded.postgres.version>2.0.2</zonky.embedded.postgres.version>
@@ -79,11 +78,6 @@
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-core</artifactId>
-        <version>${spring-security-core.version}</version>
-      </dependency>
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-api</artifactId>
@@ -136,6 +130,7 @@
       <version>${embedded-redis.version}</version>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
 
   <build>
