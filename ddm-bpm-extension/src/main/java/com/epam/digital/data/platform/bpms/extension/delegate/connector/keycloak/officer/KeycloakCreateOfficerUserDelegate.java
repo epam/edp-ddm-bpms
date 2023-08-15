@@ -80,6 +80,8 @@ public class KeycloakCreateOfficerUserDelegate extends BaseJavaDelegate {
 
   @Override
   protected void executeInternal(DelegateExecution execution) throws Exception {
+    userNameResponseVariable.on(execution).set("");
+
     var fullName = fullNameVariable.from(execution).getOrThrow();
     validateSystemAttribute(fullName, FULL_NAME_REGEX, ATTRIBUTE_FULL_NAME);
     var edrpou = edrpouVariable.from(execution).getOrThrow();

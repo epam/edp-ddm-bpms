@@ -82,6 +82,8 @@ public class ExternalSystemConnectorDelegate extends BaseRestTemplateConnectorDe
 
   @Override
   protected void executeInternal(DelegateExecution execution) throws Exception {
+    responseVariable.on(execution).set(RegistryConnectorResponse.builder().build());
+
     var externalSystemName = systemNameVariable.from(execution).getOrThrow();
     var operationName = defineOperationName(execution);
 

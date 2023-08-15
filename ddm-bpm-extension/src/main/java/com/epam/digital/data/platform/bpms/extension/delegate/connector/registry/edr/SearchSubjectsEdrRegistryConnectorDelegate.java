@@ -46,6 +46,8 @@ public class SearchSubjectsEdrRegistryConnectorDelegate extends BaseEdrRegistryC
 
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
+    responseVariable.on(execution).set(RegistryConnectorResponse.builder().build());
+
     var code = codeVariable.from(execution).get();
 
     log.debug("Start searching subjects by code {}", code);

@@ -65,6 +65,8 @@ public class ExcerptConnectorGenerateDelegate extends BaseJavaDelegate {
 
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
+    responseVariable.on(execution).set(ConnectorResponse.builder().build());
+
     var excerptType = excerptTypeVariable.from(execution).get();
     var excerptInputData = excerptInputDataVariable.from(execution).getOrDefault(Map.of());
     var requiresSystemSignature =

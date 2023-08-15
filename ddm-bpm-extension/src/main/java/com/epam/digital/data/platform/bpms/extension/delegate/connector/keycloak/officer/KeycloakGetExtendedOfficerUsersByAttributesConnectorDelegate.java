@@ -51,6 +51,8 @@ public class KeycloakGetExtendedOfficerUsersByAttributesConnectorDelegate extend
 
   @Override
   public void executeInternal(@NonNull DelegateExecution execution) throws Exception {
+    usersByAttributeVariable.on(execution).set(List.of());
+
     var searchUsersQuery = SearchUserQuery.builder()
         .attributes(attributes.from(execution).get()).build();
 
