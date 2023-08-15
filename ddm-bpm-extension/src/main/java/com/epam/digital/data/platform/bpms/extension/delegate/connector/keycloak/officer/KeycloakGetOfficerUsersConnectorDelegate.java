@@ -49,6 +49,8 @@ public class KeycloakGetOfficerUsersConnectorDelegate extends BaseJavaDelegate {
 
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
+    usersByRoleVariable.on(execution).set(List.of());
+
     var role = roleNameVariable.from(execution).getOrDefault(DEFAULT_ROLE);
 
     var roleUserMembers = idmService.getRoleUserMembers(role);

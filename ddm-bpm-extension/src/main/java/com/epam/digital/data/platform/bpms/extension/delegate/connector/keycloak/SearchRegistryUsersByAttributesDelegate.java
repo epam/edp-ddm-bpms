@@ -77,6 +77,8 @@ public class SearchRegistryUsersByAttributesDelegate extends BaseJavaDelegate {
 
   @Override
   protected void executeInternal(DelegateExecution execution) throws Exception {
+    usersResponseVariable.on(execution).set(IdmUsersResponse.builder().build());
+
     var realm = realmVariable.from(execution).getOrThrow();
     var idmService = getIdmService(realm);
 

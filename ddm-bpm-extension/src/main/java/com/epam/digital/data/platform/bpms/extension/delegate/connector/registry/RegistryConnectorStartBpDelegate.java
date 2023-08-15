@@ -55,6 +55,8 @@ public class RegistryConnectorStartBpDelegate extends BaseJavaDelegate {
 
   @Override
   public void executeInternal(DelegateExecution execution) {
+    responseVariable.on(execution).set(ConnectorResponse.builder().build());
+
     var registry = registryVariable.from(execution).get();
     var businessProcessKey = businessProcessKeyVariable.from(execution).get();
     var startVariables = startVariablesVariable.from(execution).getOrDefault(Map.of());

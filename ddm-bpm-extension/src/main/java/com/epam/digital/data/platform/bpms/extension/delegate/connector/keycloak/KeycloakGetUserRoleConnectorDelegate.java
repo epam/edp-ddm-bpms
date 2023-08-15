@@ -54,6 +54,8 @@ public class KeycloakGetUserRoleConnectorDelegate extends BaseJavaDelegate {
 
   @Override
   protected void executeInternal(DelegateExecution execution) throws Exception {
+    responseVariable.on(execution).set(List.of());
+
     var realm = realmVariable.from(execution).getOrThrow();
     var roleType = roleTypeVariable.from(execution).getOrThrow();
     var userName = userNameVariable.from(execution).getOrThrow();

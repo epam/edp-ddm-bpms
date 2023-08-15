@@ -54,6 +54,8 @@ public class DataFactoryConnectorUpdateDelegate extends BaseJavaDelegate {
 
   @Override
   public void executeInternal(DelegateExecution execution) throws JsonProcessingException {
+    responseVariable.on(execution).set(ConnectorResponse.builder().build());
+
     var resource = resourceVariable.from(execution).get();
     var id = resourceIdVariable.from(execution).get();
     var payload = payloadVariable.from(execution).getOptional();
