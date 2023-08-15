@@ -56,6 +56,8 @@ public class KeycloakGetOfficerUsersByAttributesConnectorDelegate extends BaseJa
 
   @Override
   public void executeInternal(@NonNull DelegateExecution execution) throws Exception {
+    usersByAttributeVariable.on(execution).set(List.of());
+
     var edrpou = getRequiredEdrpou(execution);
     var drfo = drfoVariable.from(execution).getOptional();
 

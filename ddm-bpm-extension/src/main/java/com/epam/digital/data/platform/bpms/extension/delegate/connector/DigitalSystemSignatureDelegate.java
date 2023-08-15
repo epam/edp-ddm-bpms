@@ -49,6 +49,8 @@ public class DigitalSystemSignatureDelegate extends BaseJavaDelegate {
 
   @Override
   public void executeInternal(DelegateExecution execution) throws JsonProcessingException {
+    systemSignatureStorageKey.on(execution).set("");
+
     var payload = payloadVariable.from(execution).get();
 
     if (Objects.isNull(payload)) {

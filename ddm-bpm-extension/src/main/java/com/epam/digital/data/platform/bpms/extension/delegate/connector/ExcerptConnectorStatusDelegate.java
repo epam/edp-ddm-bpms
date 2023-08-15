@@ -48,6 +48,8 @@ public class ExcerptConnectorStatusDelegate extends BaseJavaDelegate {
 
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
+    responseVariable.on(execution).set(ConnectorResponse.builder().build());
+
     var excerptIdentifier = excerptIdentifierVariable.from(execution).get();
     log.debug("Start getting excerpt status by id {}", excerptIdentifier);
 

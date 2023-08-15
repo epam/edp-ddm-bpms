@@ -16,6 +16,7 @@
 
 package com.epam.digital.data.platform.bpms.extension.delegate.connector.registry.dracs;
 
+import com.epam.digital.data.platform.bpms.extension.delegate.dto.RegistryConnectorResponse;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.starter.trembita.integration.dracs.dto.DracsGetByBirthDateRequestDto;
@@ -24,7 +25,6 @@ import com.epam.digital.data.platform.starter.trembita.integration.dracs.service
 import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.springframework.stereotype.Component;
 
 /**
  * The java delegate that allows getting certificate from Dracs registry by partial id and
@@ -53,6 +53,8 @@ public class GetCertificateByBirthdateDracsRegistryDelegate extends BaseDracsReg
 
   @Override
   protected void executeInternal(DelegateExecution execution) throws Exception {
+    responseVariable.on(execution).set(RegistryConnectorResponse.builder().build());
+
     var request = createRequest(execution);
     log.debug("Start searching certificate by birthdate, request {}", request);
     var result = dracsRemoteService.getCertByNumRoleBirthDate(request);
