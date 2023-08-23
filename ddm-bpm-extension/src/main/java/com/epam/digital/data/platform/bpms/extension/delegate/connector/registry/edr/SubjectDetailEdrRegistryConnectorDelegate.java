@@ -46,6 +46,8 @@ public class SubjectDetailEdrRegistryConnectorDelegate extends BaseEdrRegistryCo
 
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
+    responseVariable.on(execution).set(RegistryConnectorResponse.builder().build());
+
     var id = idVariable.from(execution).get();
     Objects.requireNonNull(id,
         "'id' parameter is null in subjectDetailEdrRegistryConnectorDelegate");
