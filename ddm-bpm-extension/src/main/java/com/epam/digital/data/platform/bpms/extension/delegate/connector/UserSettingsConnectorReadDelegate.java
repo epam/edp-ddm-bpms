@@ -56,6 +56,7 @@ public class UserSettingsConnectorReadDelegate extends BaseJavaDelegate {
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
     log.debug("Start reading user settings");
+    responseVariable.on(execution).set(ConnectorResponse.builder().build());
 
     var headers = headerBuilderFactory.builder()
         .contentTypeJson()

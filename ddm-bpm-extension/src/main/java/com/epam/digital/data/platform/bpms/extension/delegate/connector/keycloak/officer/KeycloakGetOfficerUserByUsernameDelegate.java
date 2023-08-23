@@ -42,6 +42,8 @@ public class KeycloakGetOfficerUserByUsernameDelegate extends BaseJavaDelegate {
 
   @Override
   protected void executeInternal(DelegateExecution execution) throws Exception {
+    user.on(execution).set(IdmUser.builder().build());
+
     var userByUserName = idmService.getUserByUserName(username.from(execution).get());
 
     user.on(execution).set(userByUserName.get(0));

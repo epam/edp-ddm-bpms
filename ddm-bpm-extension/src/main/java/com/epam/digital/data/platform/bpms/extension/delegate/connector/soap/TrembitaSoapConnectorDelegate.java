@@ -43,6 +43,7 @@ import com.epam.digital.data.platform.starter.trembita.integration.base.config.T
 import com.epam.digital.data.platform.starter.trembita.integration.base.config.TrembitaSubsystemProperties;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -94,6 +95,8 @@ public class TrembitaSoapConnectorDelegate extends BaseJavaDelegate {
 
   @Override
   protected void executeInternal(DelegateExecution execution) throws Exception {
+    responseVariable.on(execution).set(Spin.XML(Map.of()));
+
     var trembitaSystemName = systemNameVariable.from(execution).getOrThrow();
     var soapAction = trembitaSoapActionVariable.from(execution).getOrThrow();
     var payload = payloadVariable.from(execution).getOrThrow();

@@ -52,6 +52,8 @@ public class DigitalSignatureValidateDelegate extends BaseJavaDelegate {
 
   @Override
   protected void executeInternal(DelegateExecution execution) throws Exception {
+    responseVariable.on(execution).set(new ValidationResponseDto());
+
     var signedData = signedDataVariable.from(execution).getOrThrow();
     var containerType = containerTypeVariable.from(execution).getOrThrow();
     var container = SignFormat.valueOf(containerType);

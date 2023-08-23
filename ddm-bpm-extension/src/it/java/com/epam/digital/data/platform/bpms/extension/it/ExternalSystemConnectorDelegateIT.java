@@ -224,6 +224,15 @@ public class ExternalSystemConnectorDelegateIT extends BaseIT {
         "Operation operation1 in external-system system-without-operations not configured");
   }
 
+  @Test
+  @Deployment(resources = "bpmn/connector/testBpWithErrorHandler.bpmn")
+  public void externalSystemWithErrorHandler() {
+    var processInstance = runtimeService
+        .startProcessInstanceByKey("bp_with_error_handler");
+
+    BpmnAwareTests.assertThat(processInstance).isEnded();
+  }
+
   @SneakyThrows
   private String generateJWT(Instant instant) {
     var key = new ECKeyGenerator(Curve.SECP256K1)

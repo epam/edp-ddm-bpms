@@ -59,6 +59,8 @@ public class KeycloakGetOfficerUsersByAttributesEqualsAndStartWith extends BaseJ
 
   @Override
   protected void executeInternal(DelegateExecution execution) throws Exception {
+    usersByAttributeVariable.on(execution).set(List.of());
+
     var attributesEqualsVal = attributesEquals.from(execution).get();
     var attributesStartWithVal = attributesStartWith.from(execution).get();
 
