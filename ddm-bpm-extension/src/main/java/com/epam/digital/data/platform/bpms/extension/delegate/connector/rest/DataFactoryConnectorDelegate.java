@@ -70,6 +70,8 @@ public class DataFactoryConnectorDelegate extends BaseRestTemplateConnectorDeleg
 
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
+    responseVariable.on(execution).set(RegistryConnectorResponse.builder().build());
+
     var methodString = methodParameterVariable.from(execution).getOrThrow();
     var path = pathVariable.from(execution).getOrThrow();
 

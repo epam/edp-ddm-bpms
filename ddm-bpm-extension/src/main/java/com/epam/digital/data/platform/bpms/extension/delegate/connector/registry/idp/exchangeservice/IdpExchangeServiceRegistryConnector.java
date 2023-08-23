@@ -54,6 +54,8 @@ public class IdpExchangeServiceRegistryConnector extends BaseJavaDelegate {
 
   @Override
   protected void executeInternal(DelegateExecution execution) throws Exception {
+    responseVariable.on(execution).set(RegistryConnectorResponse.builder().build());
+
     var url = urlVariable.from(execution).getOrThrow();
     var method = methodVariable.from(execution).getOrThrow();
     var body = bodyVariable.from(execution).get();

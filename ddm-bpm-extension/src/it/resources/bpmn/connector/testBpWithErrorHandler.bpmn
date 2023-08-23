@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rrm="http://registry-regulation-management" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.10.0" rrm:created="2023-07-30T15:20:02.711Z" rrm:modified="2023-08-01T14:37:18.825Z">
+  <bpmn:collaboration id="Collaboration_0jmaaly">
+    <bpmn:participant id="Participant_17lly9e" name="directorytypeinput" processRef="bp_with_error_handler" />
+  </bpmn:collaboration>
+  <bpmn:process id="bp_with_error_handler" name="Обробка помилки при пост запиті_ Anton-testing" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="start" camunda:initiator="initiator">
+      <bpmn:outgoing>Flow_0iwyi3j</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_0ow3et9" name="end">
+      <bpmn:incoming>Flow_1a6y8vb</bpmn:incoming>
+      <bpmn:incoming>Flow_0rf2w88</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1a6y8vb" sourceRef="Activity_0l5fhst" targetRef="Event_0ow3et9" />
+    <bpmn:sequenceFlow id="Flow_0iwyi3j" sourceRef="StartEvent_1" targetRef="Activity_0l5fhst" />
+    <bpmn:sequenceFlow id="Flow_0rf2w88" sourceRef="Event_1l8jvga" targetRef="Event_0ow3et9" />
+    <bpmn:serviceTask id="Activity_0l5fhst" name="post_cli" camunda:modelerTemplate="externalSystemConnectorDelegateV2" camunda:delegateExpression="${externalSystemConnectorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="systemName">terminologycli</camunda:inputParameter>
+          <camunda:inputParameter name="operationName">createterminology</camunda:inputParameter>
+          <camunda:inputParameter name="requestParameters">
+            <camunda:map>
+              <camunda:entry key="zipUrl">zipUrl</camunda:entry>
+              <camunda:entry key="validationUrl">validationUrl</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0iwyi3j</bpmn:incoming>
+      <bpmn:outgoing>Flow_1a6y8vb</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:boundaryEvent id="Event_1l8jvga" name="error catch event" attachedToRef="Activity_0l5fhst">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="response" value="sometext" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_0rf2w88</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_1xksu0t" errorRef="Error_1h000d6" />
+    </bpmn:boundaryEvent>
+  </bpmn:process>
+  <bpmn:error id="Error_0nzsds2" camunda:errorMessage="codemessage" />
+  <bpmn:error id="Error_1h000d6" name="Exception" errorCode="java.lang.Exception" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0jmaaly">
+      <bpmndi:BPMNShape id="Participant_17lly9e_di" bpmnElement="Participant_17lly9e" isHorizontal="true">
+        <dc:Bounds x="160" y="85" width="1260" height="250" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="212" y="192" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="219" y="235" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0ow3et9_di" bpmnElement="Event_0ow3et9">
+        <dc:Bounds x="1222" y="192" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1230" y="168" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0xtqivq" bpmnElement="Activity_0l5fhst">
+        <dc:Bounds x="710" y="170" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0xqit9p_di" bpmnElement="Event_1l8jvga">
+        <dc:Bounds x="732" y="232" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="758" y="278" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1a6y8vb_di" bpmnElement="Flow_1a6y8vb">
+        <di:waypoint x="810" y="210" />
+        <di:waypoint x="1222" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0iwyi3j_di" bpmnElement="Flow_0iwyi3j">
+        <di:waypoint x="248" y="210" />
+        <di:waypoint x="710" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0rf2w88_di" bpmnElement="Flow_0rf2w88">
+        <di:waypoint x="750" y="268" />
+        <di:waypoint x="750" y="288" />
+        <di:waypoint x="1240" y="288" />
+        <di:waypoint x="1240" y="228" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

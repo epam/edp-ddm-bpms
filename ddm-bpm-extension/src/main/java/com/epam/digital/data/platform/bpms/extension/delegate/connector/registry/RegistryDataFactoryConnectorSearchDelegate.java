@@ -53,6 +53,8 @@ public class RegistryDataFactoryConnectorSearchDelegate extends BaseJavaDelegate
 
   @Override
   public void executeInternal(DelegateExecution execution) {
+    responseVariable.on(execution).set(ConnectorResponse.builder().build());
+
     var registry = registryVariable.from(execution).get();
     var resource = resourceVariable.from(execution).get();
     var searchConditions = searchConditionsVariable.from(execution).getOrDefault(Map.of());

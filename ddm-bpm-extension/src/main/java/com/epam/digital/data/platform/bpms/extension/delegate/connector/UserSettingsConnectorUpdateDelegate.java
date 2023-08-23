@@ -63,6 +63,8 @@ public class UserSettingsConnectorUpdateDelegate extends BaseJavaDelegate {
 
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
+    responseVariable.on(execution).set(ConnectorResponse.builder().build());
+
     var payload = payloadVariable.from(execution).getOptional();
 
     log.debug("Start creating or updating user settings");

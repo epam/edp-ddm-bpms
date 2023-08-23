@@ -63,6 +63,8 @@ public class DataFactoryConnectorBatchCreateDelegateV2 extends BaseJavaDelegate 
 
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
+    responseVariable.on(execution).set(ConnectorResponse.builder().build());
+
     var resource = resourceVariable.from(execution).get();
     var payload = payloadVariable.from(execution).getOrDefault(Spin.JSON(Map.of()));
     var uploadTypeString = uploadType.from(execution).getOrThrow();

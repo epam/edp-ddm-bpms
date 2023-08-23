@@ -28,6 +28,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.spin.Spin;
 import org.camunda.spin.json.SpinJsonNode;
 import org.springframework.stereotype.Component;
 
@@ -54,6 +55,8 @@ public class DigitalSignatureConnectorDelegate extends BaseJavaDelegate {
 
   @Override
   public void executeInternal(DelegateExecution execution) throws JsonProcessingException {
+    dsoResponseVariable.on(execution).set(Spin.JSON("{}"));
+
     var payload = payloadVariable.from(execution).get();
 
     log.debug("Start sending data to sign");

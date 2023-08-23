@@ -51,6 +51,8 @@ public class DataFactoryConnectorSearchDelegate extends BaseJavaDelegate {
 
   @Override
   public void executeInternal(DelegateExecution execution) {
+    responseVariable.on(execution).set(ConnectorResponse.builder().build());
+
     var resource = resourceVariable.from(execution).get();
     var searchConditions = searchConditionsVariable.from(execution).getOrDefault(Map.of());
 
