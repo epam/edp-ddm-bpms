@@ -57,6 +57,8 @@ public class HeaderBuilder {
         execution.getProcessInstanceId());
     httpHeadersList.add(PlatformHttpHeader.X_SOURCE_BUSINESS_PROCESS_DEFINITION_ID.getName(),
         execution.getProcessDefinitionId());
+    httpHeadersList.add(PlatformHttpHeader.X_SOURCE_ROOT_BUSINESS_PROCESS_INSTANCE_ID.getName(),
+        ((ExecutionEntity) execution).getRootProcessInstanceId());
     return this;
   }
 
