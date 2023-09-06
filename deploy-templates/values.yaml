@@ -1,17 +1,23 @@
 global:
-  disableRequestsLimits: false
   kafkaOperator:
     replicationFactor: 3
   registry:
     bpms:
+      replicas: 1
+      hpa:
+        enabled: false
+        minReplicas: 1
+        maxReplicas: 3
       istio:
         sidecar:
           enabled: true
           resources:
-            limits: {}
             requests: {}
+            limits: {}
       container:
-        resources: {}
+        resources:
+          requests: {}
+          limits: {}
         envVars: {}
 
 podAnnotations: {}
@@ -22,7 +28,6 @@ port: 8080
 service:
   type: ClusterIP
   port: 8080
-replicas: 1
 appConfigMountPath: "/app/config/main"
 camundaVarsMountPath: "/app/config/camunda"
 appSecretsMountPath: "/app/secrets/main"
