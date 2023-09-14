@@ -1,0 +1,8 @@
+spring:
+  cloud:
+    kubernetes:
+      config:
+        enabled: false
+        enable-api: false
+logging:
+  config: classpath:log4j2-local-console.xml
