@@ -116,6 +116,13 @@ platform:
       enabled: false
     primary-url:
       enabled: true
+  security:
+    enabled: true
+    whitelist:
+      - /openapi
+      - /v3/api-docs/**
+      - /swagger-ui/**
+      - /actuator/**
 
 logbook:
   feign:
@@ -125,6 +132,9 @@ logbook:
   strategy: without-body
   exclude:
     - /actuator/**
+    - /openapi
+    - /v3/api-docs/**
+    - /swagger-ui/**
   obfuscate:
     headers:
       - x-access-token
@@ -138,10 +148,13 @@ decorator:
     p6spy:
       enable-logging: false
 
-# Reducing logging level of TraceListenerStrategy because of "TODO" logs
-logging.level.org.springframework.cloud.sleuth.instrument.jdbc.TraceListenerStrategy: WARN
-
 storage:
   backend:
     redis:
       scan-count: 100
+
+springdoc:
+  swagger-ui:
+    path: /openapi
+    disable-swagger-default-url: true
+    filter: true
