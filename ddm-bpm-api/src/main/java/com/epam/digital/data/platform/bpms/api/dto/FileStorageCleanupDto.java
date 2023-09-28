@@ -16,16 +16,18 @@
 
 package com.epam.digital.data.platform.bpms.api.dto;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Dto representation of file storage cleanup request. Used to sent to Kafka from end event listener
  * for file cleaning.
  */
-@RequiredArgsConstructor
-@Getter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class FileStorageCleanupDto {
 
-  private final String processInstanceId;
+  private String processInstanceId;
 }
