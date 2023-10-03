@@ -53,7 +53,6 @@ public class TaskRuntimeService {
   private final RepositoryService repositoryService;
   private final ProcessEngine processEngine;
   private final ObjectMapper objectMapper;
-  private final ProcessInstanceRuntimeService processInstanceRuntimeService;
 
   /**
    * Get task list by given parameters

@@ -81,7 +81,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("subject-equal-subject-type-equal-subject-code")
+        .resource("/search/subject-equal-subject-type-equal-subject-code")
         .requestBody("{\"subjectType\":\"INDIVIDUAL\",\"subjectCode\":\"1010101010\"}")
         .response("[]")
         .build());
@@ -133,7 +133,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("subject-equal-subject-type-equal-subject-code")
+        .resource("/search/subject-equal-subject-type-equal-subject-code")
         .requestBody("{\"subjectType\":\"INDIVIDUAL\",\"subjectCode\":\"1010101010\"}")
         .response("/json/citizen-onboarding/data-factory/searchSubjectResponse.json")
         .build());
@@ -223,7 +223,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("subject-equal-subject-type-equal-subject-code")
+        .resource("/search/subject-equal-subject-type-equal-subject-code")
         .requestBody("{\"subjectType\":\"ENTREPRENEUR\",\"subjectCode\":\"1010101010\"}")
         .response("/json/citizen-onboarding/data-factory/searchSubjectResponse.json")
         .build());
@@ -237,7 +237,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
             .httpMethod(HttpMethod.POST)
             .headers(Map.of("X-Access-Token", testUserToken))
-            .resource("subject-settings-equal-settings-id")
+            .resource("/search/subject-settings-equal-settings-id")
             .requestBody("{\"settingsId\":\"c2c19401-f1b7-4954-a230-ab15566e7318\"}")
             .response("[]")
             .build());
@@ -271,7 +271,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("subject-equal-subject-type-equal-subject-code")
+        .resource("/search/subject-equal-subject-type-equal-subject-code")
         .requestBody("{\"subjectType\":\"ENTREPRENEUR\",\"subjectCode\":\"1010101010\"}")
         .response("/json/citizen-onboarding/data-factory/searchSubjectResponse.json")
         .build());
@@ -355,7 +355,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("subject-equal-subject-type-equal-subject-code")
+        .resource("/search/subject-equal-subject-type-equal-subject-code")
         .requestBody("{\"subjectType\":\"LEGAL\",\"subjectCode\":\"1010101010\"}")
         .response("/json/citizen-onboarding/data-factory/searchSubjectResponse.json")
         .build());
@@ -368,7 +368,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("subject-settings-equal-settings-id")
+        .resource("/search/subject-settings-equal-settings-id")
         .requestBody("{\"settingsId\":\"c2c19401-f1b7-4954-a230-ab15566e7318\"}")
         .response("[]")
         .build());
@@ -402,7 +402,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("subject-equal-subject-type-equal-subject-code")
+        .resource("/search/subject-equal-subject-type-equal-subject-code")
         .requestBody("{\"subjectType\":\"INDIVIDUAL\",\"subjectCode\":\"1010101010\"}")
         .response("/json/citizen-onboarding/data-factory/searchSubjectResponse.json")
         .build());
@@ -488,7 +488,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("subject-equal-subject-type-equal-subject-code")
+        .resource("/search/subject-equal-subject-type-equal-subject-code")
         .requestBody("{\"subjectType\":\"ENTREPRENEUR\",\"subjectCode\":\"1010101010\"}")
         .response("/json/citizen-onboarding/data-factory/searchSubjectResponse.json")
         .build());
@@ -502,7 +502,7 @@ public class CitizenOnboardingBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("subject-settings-equal-settings-id")
+        .resource("/search/subject-settings-equal-settings-id")
         .requestBody("{\"settingsId\":\"c2c19401-f1b7-4954-a230-ab15566e7318\"}")
         .response("[{}]")
         .build());

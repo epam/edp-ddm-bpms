@@ -32,6 +32,7 @@ import org.mapstruct.ReportingPolicy;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring",
     uses = LocalDateTimeMapper.class)
+@Deprecated(forRemoval = true)
 public interface ProcessInstanceMapper {
 
   @Mapping(target = "id", source = "dto.id")

@@ -78,7 +78,7 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("koatuu-equal-koatuu-id-name")
+        .resource("/search/koatuu-equal-koatuu-id-name")
         .requestBody("{\"koatuuId\":\"labToUpdateKoatuu\"}")
         .response("/json/citizen-update-lab/data-factory/koatuuEqualKoatuuIdName.json")
         .build());
@@ -99,7 +99,7 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("laboratory-equal-edrpou-name-count")
+        .resource("/search/laboratory-equal-edrpou-name-count")
         .requestBody("{\"edrpou\":\"01010101\",\"name\":\"updatedLabName\"}")
         .response("[]")
         .build());
@@ -278,7 +278,7 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("koatuu-equal-koatuu-id-name")
+        .resource("/search/koatuu-equal-koatuu-id-name")
         .requestBody("{\"koatuuId\":\"labToUpdateKoatuu\"}")
         .response("/json/citizen-update-lab/data-factory/koatuuEqualKoatuuIdName.json")
         .build());
@@ -442,7 +442,7 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("koatuu-equal-koatuu-id-name")
+        .resource("/search/koatuu-equal-koatuu-id-name")
         .requestBody("{\"koatuuId\":\"labToUpdateKoatuu\"}")
         .response("/json/citizen-update-lab/data-factory/koatuuEqualKoatuuIdName.json")
         .build());
@@ -470,7 +470,7 @@ public class CitizenUpdateLabBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("laboratory-equal-edrpou-name-count")
+        .resource("/search/laboratory-equal-edrpou-name-count")
         .requestBody("{\"edrpou\":\"01010101\",\"name\":\"updatedLabName\"}")
         .response("[{\"cnt\":1}]")
         .build());

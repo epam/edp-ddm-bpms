@@ -40,7 +40,7 @@ public class UpdateDictBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("factor-equal-factor-type-name-count")
+        .resource("/search/factor-equal-factor-type-name-count")
         .requestBody("{\"name\":\"testName\"}")
         .response("[]")
         .build());

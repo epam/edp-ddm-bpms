@@ -40,7 +40,7 @@ public class CephFormDataStorageServiceConfig {
   }
 
   @Bean
-  public FormDataStorageService formDataStorageService(StorageServiceFactory formDataStorageServiceFactory,
+  public FormDataStorageService<?> formDataStorageService(StorageServiceFactory formDataStorageServiceFactory,
       CephStorageConfiguration formDataCephStorageConfiguration) {
     return formDataStorageServiceFactory.formDataStorageService(formDataCephStorageConfiguration);
   }

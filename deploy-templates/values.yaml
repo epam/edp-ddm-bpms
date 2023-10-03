@@ -1,9 +1,21 @@
 global:
+  container:
+    requestsLimitsEnabled: true
+  istio:
+    sidecar:
+      requestsLimitsEnabled: true
+      resources:
+        requests: {}
+        limits: {}
   kafkaOperator:
     replicationFactor: 3
   registry:
     bpms:
-      replicas: 1
+      container:
+        envVars: {}
+        resources:
+          requests: {}
+          limits: {}
       hpa:
         enabled: false
         minReplicas: 1
@@ -14,12 +26,10 @@ global:
           resources:
             requests: {}
             limits: {}
-      container:
-        resources:
-          requests: {}
-          limits: {}
-        envVars: {}
-
+      replicas: 1
+      springOpenfeign:
+        defaultReadTimeout: 60000
+        defaultConnectTimeout: 10000
 podAnnotations: {}
 image:
   name: business-process-management
@@ -42,9 +52,11 @@ readinessPath: "/actuator/health/readiness"
 livenessPath: "/actuator/health/liveness"
 officerConfigMountPath: "/app/config/registry-regulation/officer-roles"
 citizenConfigMountPath: "/app/config/registry-regulation/citizen-roles"
+externalSystemConfigMountPath: "/app/config/registry-regulation/external-system-roles"
 redisSecretsMountPath: "/app/secrets/redis"
 officerConfigMapName: officer-roles
 citizenConfigMapName: citizen-roles
+externalSystemConfigMapName: external-system-roles
 
 registrySecrets:
   secretRootPath: "/app/secrets"
@@ -65,10 +77,21 @@ db:
   name: camunda
   secret: operational-pguser-postgres
 
-camunda:
-  bpm:
-    historyLevel: AUDIT
-    databaseHistoryLevel: ACTIVITY
+bpms:
+  datasource:
+    maxPoolSize: 10
+  camunda:
+    bpm:
+      jobExecution:
+        deploymentAware: false
+        corePoolSize: 3
+        maxPoolSize: 10
+        maxJobsPerAcquisition: 3
+        queueCapacity: 3
+      historyLevel: AUDIT
+      databaseHistoryLevel: ACTIVITY
+      database:
+        schemaUpdate: false
 
 ingress: # expose the service with a route or an ingress depending on platform type
   platform: openshift # openshift or kubernetes
@@ -113,12 +136,10 @@ deployProfile: prod
 storage:
   form-data:
     type: redis
-    cleaningEndEventEnabled: true
   message-payload:
     type: redis
   backend:
     redis:
-      scan-count: 100
       password: ${REDIS_PASSWORD}
       sentinel:
         master: mymaster
@@ -160,3 +181,11 @@ readSecretsRoleName: read-secrets-role
 
 redis:
   secretName: redis-auth
+
+cleanup:
+  bp-end-listeners:
+    thread-pool-size: 10
+    file-cleaner:
+      enabled: true
+    form-data-cleaner:
+      enabled: true

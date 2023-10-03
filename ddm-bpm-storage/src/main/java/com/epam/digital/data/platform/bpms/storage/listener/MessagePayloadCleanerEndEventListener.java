@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,18 +38,22 @@ public class MessagePayloadCleanerEndEventListener implements ExecutionListener 
 
   private final MessagePayloadStorageService messagePayloadStorageService;
   private final StartMessagePayloadStorageKeyVariable startMessagePayloadStorageKeyVariable;
+  private final TaskExecutor endEventListenerExecutor;
 
   @Override
   public void notify(DelegateExecution execution) {
     var startMessagePayloadStorageKey = startMessagePayloadStorageKeyVariable.from(execution).get();
     var processInstanceId = execution.getProcessInstanceId();
-    try {
-      deleteMessagePayload(startMessagePayloadStorageKey);
-    } catch (RuntimeException ex) {
-      log.warn(
-          "Error while deleting message payload from ceph, processDefinitionId={}, processInstanceId={}, startFormDataCephKey={}",
-          execution.getProcessDefinitionId(), processInstanceId, startMessagePayloadStorageKey, ex);
-    }
+    var processDefinitionId = execution.getProcessDefinitionId();
+    endEventListenerExecutor.execute(() -> {
+      try {
+        deleteMessagePayload(startMessagePayloadStorageKey);
+      } catch (RuntimeException ex) {
+        log.warn(
+                "Error while deleting message payload from storage, processDefinitionId={}, processInstanceId={}, startFormDataCephKey={}",
+                processDefinitionId, processInstanceId, startMessagePayloadStorageKey, ex);
+      }
+    });
   }
 
   private void deleteMessagePayload(String startMessagePayloadStorageKey) {

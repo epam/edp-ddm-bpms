@@ -40,9 +40,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 class KeycloakCreateOfficerUserDelegateIT extends BaseIT {
 
   private static final String REQUEST_BODY_USER = "/json/keycloak/createKeycloakUserRequest.json";
+  private static final String REQUEST_BODY_WITHOUT_EDRPOU_USER = "/json/keycloak/createKeycloakUserRequestWithoutEdrpou.json";
   private static final String REQUEST_BODY_ROLES = "/json/keycloak/createKeycloakUserRequestBodyRolesToAdd.json";
   private static final String RESPONSE_BODY_ROLES = "/json/keycloak/createKeycloakUserRolesResponse.json";
   private static final String RESPONSE_BODY_USER = "/json/keycloak/createKeycloakUserResponse.json";
+  private static final String RESPONSE_BODY_WITHOUT_EDRPOU_USER = "/json/keycloak/createKeycloakUserResponseWithoutEdrpou.json";
 
   @Test
   @Deployment(resources = {"bpmn/connector/testKeycloakCreateUser.bpmn"})
@@ -53,7 +55,8 @@ class KeycloakCreateOfficerUserDelegateIT extends BaseIT {
     mockKeycloakGetUsersByAttributes(officerRealm, requestAttributes,
         "/json/keycloak/keycloakUsersByAttributesEmptyResponse.json");
     mockKeycloakGetRoles();
-    mockKeycloakCreateUser(officerRealm);
+    mockKeycloakCreateUser(
+        officerRealm, convertJsonToString(KeycloakCreateOfficerUserDelegateIT.REQUEST_BODY_USER));
     mockKeycloakGetUserByUsername(username, officerRealm, RESPONSE_BODY_USER);
     mockKeycloakAddRoles();
 
@@ -64,6 +67,30 @@ class KeycloakCreateOfficerUserDelegateIT extends BaseIT {
     var requestBody = convertJsonToString(REQUEST_BODY_USER);
     keycloakMockServer.verify(postRequestedFor(urlEqualTo(userMappingsUrl))
         .withRequestBody(equalToJson(requestBody)));
+    BpmnAwareTests.assertThat(processInstance).isEnded();
+  }
+
+  @Test
+  @Deployment(resources = {"bpmn/connector/testKeycloakCreateUser.bpmn"})
+  void shouldCreateOfficerUserWithoutEdrpou() {
+    var requestAttributes = "{\"attributes\":{\"drfo\":\"1234567890\", \"fullName\":\"Іванов Іван Іванович\"}}";
+    var username = "dee7fda4487da26fa11e82cef89c33525dd6e961c694219e3bca915249778a6e";
+    mockConnectToKeycloak(officerRealm);
+    mockKeycloakGetUsersByAttributes(officerRealm, requestAttributes,
+            "/json/keycloak/keycloakUsersByAttributesEmptyResponse.json");
+    mockKeycloakGetRoles();
+    mockKeycloakCreateUser(
+        officerRealm, convertJsonToString(KeycloakCreateOfficerUserDelegateIT.REQUEST_BODY_WITHOUT_EDRPOU_USER));
+    mockKeycloakGetUserByUsername(username, officerRealm, RESPONSE_BODY_WITHOUT_EDRPOU_USER);
+    mockKeycloakAddRoles();
+
+    var processInstance = runtimeService.startProcessInstanceByKey(
+            "test-create-keycloak-user-edrpou-not-defined");
+
+    var userMappingsUrl = String.format("/auth/admin/realms/%s/users", officerRealm);
+    var requestBody = convertJsonToString(REQUEST_BODY_WITHOUT_EDRPOU_USER);
+    keycloakMockServer.verify(postRequestedFor(urlEqualTo(userMappingsUrl))
+            .withRequestBody(equalToJson(requestBody)));
     BpmnAwareTests.assertThat(processInstance).isEnded();
   }
 
@@ -106,19 +133,18 @@ class KeycloakCreateOfficerUserDelegateIT extends BaseIT {
             "Value of the Keycloak attribute [edrpou] do not match the regex: ^\\d{8}(?:\\d{2})?$"),
         arguments("test-create-keycloak-user-invalid-full-name-value",
             "Value of the Keycloak attribute [fullName] do not match the regex: ^[ '`’—–\\-\\p{IsCyrillic}\\p{IsLatin}\\d]{1,255}$"),
-        arguments("test-create-keycloak-user-edrpou-not-defined", "Variable edrpou not found"),
         arguments("test-create-keycloak-user-drfo-not-defined", "Variable drfo not found"),
         arguments("test-create-keycloak-user-full-name-not-defined", "Variable fullName not found")
     );
   }
 
-  private void mockKeycloakCreateUser(String realm) {
+  private void mockKeycloakCreateUser(String realm, String requestBody) {
     var roleMappingsUrl = String.format("/auth/admin/realms/%s/users", realm);
     keycloakMockServer.addStubMapping(
-        stubFor(post(urlPathEqualTo(roleMappingsUrl)).withRequestBody(
-                equalToJson(convertJsonToString(
-                    KeycloakCreateOfficerUserDelegateIT.REQUEST_BODY_USER)))
-            .willReturn(aResponse().withStatus(201))));
+        stubFor(
+            post(urlPathEqualTo(roleMappingsUrl))
+                .withRequestBody(equalToJson(requestBody))
+                .willReturn(aResponse().withStatus(201))));
   }
 
   private void mockKeycloakGetRoles() {

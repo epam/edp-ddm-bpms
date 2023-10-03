@@ -33,7 +33,6 @@
 
     <ddm-file-storage.version>1.7.0.1</ddm-file-storage.version>
     <ddm-message-payload-storage.version>1.8.0.1</ddm-message-payload-storage.version>
-    <ddm-form-data-storage.version>1.8.0.3</ddm-form-data-storage.version>
     <camunda.bpm.assert.version>7.0.0</camunda.bpm.assert.version>
   </properties>
 
@@ -121,6 +120,12 @@
       <groupId>com.epam.digital.data.platform</groupId>
       <artifactId>ddm-bpm-engine</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

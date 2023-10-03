@@ -20,6 +20,7 @@ import com.epam.digital.data.platform.bpms.extension.delegate.connector.header.b
 import com.epam.digital.data.platform.dso.api.dto.SignRequestDto;
 import com.epam.digital.data.platform.dso.client.DigitalSealRestClient;
 import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.dto.FormDataInputWrapperDto;
 import com.epam.digital.data.platform.storage.form.service.FormDataKeyProvider;
 import com.epam.digital.data.platform.storage.form.service.FormDataStorageService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -30,6 +31,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.context.DelegateExecutionContext;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.spin.json.SpinJsonNode;
 import org.springframework.stereotype.Component;
@@ -44,7 +46,7 @@ public class DigitalSystemSignatureService {
   private final DigitalSealRestClient digitalSealRestClient;
   private final HeaderBuilderFactory headerBuilderFactory;
   private final ObjectMapper objectMapper;
-  private final FormDataStorageService formDataStorageService;
+  private final FormDataStorageService<?> formDataStorageService;
   private final FormDataKeyProvider formDataKeyProvider;
 
   public String sign(SystemSignatureDto systemSignatureDto)
@@ -63,17 +65,24 @@ public class DigitalSystemSignatureService {
             .signature(response.getSignature())
             .build();
 
-    var storageKey = generateStorageKey(systemSignatureDto);
+    var execution = DelegateExecutionContext.getCurrentDelegationExecution();
+
+    var storageKey = generateStorageKey(systemSignatureDto, execution);
 
     log.debug("Start putting signature to storage");
-    formDataStorageService.putFormData(storageKey, signedFormData);
+    var formDataInputWrapper =
+        FormDataInputWrapperDto.builder()
+            .key(storageKey)
+            .formData(signedFormData)
+            .processInstanceId(((ExecutionEntity) execution).getRootProcessInstanceId())
+            .build();
+    formDataStorageService.putFormData(formDataInputWrapper);
     log.debug("Signature put successfully");
     return storageKey;
   }
 
   private String generateStorageKey(
-      SystemSignatureDto systemSignatureDto) {
-    var execution = DelegateExecutionContext.getCurrentDelegationExecution();
+      SystemSignatureDto systemSignatureDto, DelegateExecution execution) {
     var index = systemSignatureDto.getIndex();
     if (Objects.nonNull(index)) {
       return formDataKeyProvider.generateBatchSystemSignatureKey(

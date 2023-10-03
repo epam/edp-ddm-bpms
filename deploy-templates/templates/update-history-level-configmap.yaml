@@ -5,7 +5,7 @@ metadata:
 data:
   update-history-level.sql: |-
     SELECT 'UPDATE ACT_GE_PROPERTY SET VALUE_ = '||
-    case '{{ .Values.camunda.bpm.historyLevel }}'
+    case '{{ .Values.bpms.camunda.bpm.historyLevel }}'
     when 'NONE' then 0
     when 'ACTIVITY' then 1
     when 'AUDIT' then 2

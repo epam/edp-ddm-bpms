@@ -23,6 +23,7 @@ import com.google.common.collect.Maps;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.apache.logging.log4j.util.Strings;
 
 public class KeycloakOfficerDelegateUtils {
@@ -111,6 +112,11 @@ public class KeycloakOfficerDelegateUtils {
         .attributes(queryAttributes)
         .build();
     var idmUsers = idmService.searchUsers(query);
+    if (!queryAttributes.containsKey(ATTRIBUTE_EDRPOU)) {
+      idmUsers = idmUsers.stream()
+          .filter(user -> !user.getAttributes().containsKey(ATTRIBUTE_EDRPOU))
+          .collect(Collectors.toList());
+    }
     if (!idmUsers.isEmpty()) {
       throw new KeycloakException(
           String.format("Found %s users with the same attributes", idmUsers.size()));

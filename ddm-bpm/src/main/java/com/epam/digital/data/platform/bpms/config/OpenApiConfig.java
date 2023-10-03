@@ -20,6 +20,7 @@ import com.epam.digital.data.platform.bpms.deserializer.SchemaKeyDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.Schema;
 import java.io.IOException;
@@ -41,11 +42,11 @@ public class OpenApiConfig {
 
     try {
       var extendedOpenapiStream = this.getClass().getClassLoader()
-          .getResourceAsStream("extended-openapi.json");
+          .getResourceAsStream("openapi/swagger.yml");
       var openapiStream = this.getClass().getClassLoader().getResourceAsStream("openapi.json");
 
       var openapiJsonNode = objectMapper.readValue(openapiStream, JsonNode.class);
-      openapiJsonNode = objectMapper.readerForUpdating(openapiJsonNode)
+      openapiJsonNode = new YAMLMapper().readerForUpdating(openapiJsonNode)
           .readValue(extendedOpenapiStream);
 
       var openApi = objectMapper.convertValue(openapiJsonNode, OpenAPI.class);

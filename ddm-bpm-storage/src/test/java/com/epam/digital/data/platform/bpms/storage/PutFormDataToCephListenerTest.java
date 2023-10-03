@@ -52,7 +52,7 @@ class PutFormDataToCephListenerTest {
   @InjectMocks
   private PutFormDataToStorageTaskListener putFormDataToStorageTaskListener;
   @Mock
-  private FormDataStorageService formDataStorageService;
+  private FormDataStorageService<?> formDataStorageService;
   @Mock
   private ObjectMapper objectMapper;
   @Mock
@@ -103,6 +103,6 @@ class PutFormDataToCephListenerTest {
   void testPutFormDataToCephTaskListener_noInputParams() {
     putFormDataToStorageTaskListener.notify(delegateTask);
 
-    verify(formDataStorageService, never()).putFormData(any(), any());
+    verify(formDataStorageService, never()).putFormData(any());
   }
 }

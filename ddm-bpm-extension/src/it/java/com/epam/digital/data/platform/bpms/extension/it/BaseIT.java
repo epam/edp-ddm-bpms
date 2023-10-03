@@ -31,6 +31,7 @@ import com.epam.digital.data.platform.bpms.extension.it.builder.StubData;
 import com.epam.digital.data.platform.bpms.extension.it.config.TestCephServiceImpl;
 import com.epam.digital.data.platform.bpms.extension.it.util.TestUtils;
 import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.dto.FormDataInputWrapperDto;
 import com.epam.digital.data.platform.storage.form.service.FormDataKeyProvider;
 import com.epam.digital.data.platform.storage.form.service.FormDataKeyProviderImpl;
 import com.epam.digital.data.platform.storage.form.service.FormDataStorageService;
@@ -89,7 +90,7 @@ public abstract class BaseIT {
   @Inject
   protected TestCephServiceImpl cephService;
   @Inject
-  protected FormDataStorageService formDataStorageService;
+  protected FormDataStorageService<?> formDataStorageService;
   @Inject
   protected MessagePayloadStorageService messagePayloadStorageService;
   protected FormDataKeyProvider formDataKeyProvider;
@@ -143,7 +144,13 @@ public abstract class BaseIT {
 
   protected void completeTask(String taskId, String processInstanceId, String formData) {
     var storageKey = formDataKeyProvider.generateKey(taskId, processInstanceId);
-    formDataStorageService.putFormData(storageKey, deserializeFormData(formData));
+    var formDataInputWrapper =
+        FormDataInputWrapperDto.builder()
+            .key(storageKey)
+            .formData(deserializeFormData(formData))
+            .processInstanceId(processInstanceId)
+            .build();
+    formDataStorageService.putFormData(formDataInputWrapper);
     String id = taskService.createTaskQuery().taskDefinitionKey(taskId).singleResult().getId();
     taskService.complete(id);
   }

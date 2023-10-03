@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 EPAM Systems.
+ * Copyright 2023 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,8 @@ public class CamundaRegistryRoles {
   @Setter
   private RegistryRolesDto citizen;
   @Setter
+  private RegistryRolesDto externalSystem;
+  @Setter
   @Value("${camunda.admin-group-id:camunda-admin}")
   private String camundaAdminRole;
 
@@ -55,13 +57,14 @@ public class CamundaRegistryRoles {
   public void initRegistryRolesSet() {
     var officerStream = getRoleNameStream(officer);
     var citizenStream = getRoleNameStream(citizen);
+    var externalSystemStream = getRoleNameStream(externalSystem);
     var camundaAdminStream = Stream.of(camundaAdminRole);
     var systemRolesStream = Stream.of(SystemRole.getRoleNames());
     var platformRolesStream = Stream.of(KeycloakPlatformRole.values())
         .map(KeycloakPlatformRole::getName);
 
-    this.availableAuthorizedRoles = Stream.of(officerStream, citizenStream, camundaAdminStream,
-            systemRolesStream, platformRolesStream)
+    this.availableAuthorizedRoles = Stream.of(officerStream, citizenStream, externalSystemStream,
+            camundaAdminStream, systemRolesStream, platformRolesStream)
         .flatMap(Function.identity())
         .collect(Collectors.toUnmodifiableSet());
   }

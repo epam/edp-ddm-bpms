@@ -64,7 +64,7 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("subject-equal-subject-type-equal-subject-code")
+        .resource("/search/subject-equal-subject-type-equal-subject-code")
         .requestBody("{\"subjectType\":\"LEGAL\",\"subjectCode\":\"01010101\"}")
         .response("/json/citizen-attestation-excerpt/data-factory/searchSubjectsResponse.json")
         .build());
@@ -85,7 +85,7 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("last-laboratory-solution")
+        .resource("/search/last-laboratory-solution")
         .requestBody("{\"laboratoryId\":\"laboratory1\"}")
         .response(
             "/json/citizen-attestation-excerpt/data-factory/lastLaboratorySolutionAddResponse.json")
@@ -93,14 +93,14 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("application-type-equal-constant-code")
+        .resource("/search/application-type-equal-constant-code")
         .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/citizen-attestation-excerpt/data-factory/addApplicationResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("solution-type-equal-constant-code")
+        .resource("/search/solution-type-equal-constant-code")
         .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/citizen-attestation-excerpt/data-factory/addSolutionTypeResponse.json")
         .build());
@@ -196,7 +196,7 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("subject-equal-subject-type-equal-subject-code")
+        .resource("/search/subject-equal-subject-type-equal-subject-code")
         .requestBody("{\"subjectType\":\"LEGAL\",\"subjectCode\":\"01010101\"}")
         .response("/json/citizen-attestation-excerpt/data-factory/searchSubjectsResponse.json")
         .build());
@@ -217,7 +217,7 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("last-laboratory-solution")
+        .resource("/search/last-laboratory-solution")
         .requestBody("{\"laboratoryId\":\"laboratory1\"}")
         .response(
             "/json/citizen-attestation-excerpt/data-factory/lastLaboratorySolutionAddResponse.json")
@@ -225,14 +225,14 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("application-type-equal-constant-code")
+        .resource("/search/application-type-equal-constant-code")
         .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/citizen-attestation-excerpt/data-factory/addApplicationResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("solution-type-equal-constant-code")
+        .resource("/search/solution-type-equal-constant-code")
         .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/citizen-attestation-excerpt/data-factory/addSolutionTypeResponse.json")
         .build());
@@ -331,7 +331,7 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("subject-equal-subject-type-equal-subject-code")
+        .resource("/search/subject-equal-subject-type-equal-subject-code")
         .requestBody("{\"subjectType\":\"LEGAL\",\"subjectCode\":\"01010101\"}")
         .response("/json/citizen-attestation-excerpt/data-factory/searchSubjectsResponse.json")
         .build());
@@ -352,7 +352,7 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("last-laboratory-solution")
+        .resource("/search/last-laboratory-solution")
         .requestBody("{\"laboratoryId\":\"laboratory1\"}")
         .response(
             "/json/citizen-attestation-excerpt/data-factory/lastLaboratorySolutionAddResponse.json")
@@ -360,14 +360,14 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("application-type-equal-constant-code")
+        .resource("/search/application-type-equal-constant-code")
         .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/citizen-attestation-excerpt/data-factory/addApplicationResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("solution-type-equal-constant-code")
+        .resource("/search/solution-type-equal-constant-code")
         .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/citizen-attestation-excerpt/data-factory/addSolutionTypeResponse.json")
         .build());
@@ -461,7 +461,7 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("subject-equal-subject-type-equal-subject-code")
+        .resource("/search/subject-equal-subject-type-equal-subject-code")
         .requestBody("{\"subjectType\":\"LEGAL\",\"subjectCode\":\"01010101\"}")
         .response("/json/citizen-attestation-excerpt/data-factory/searchSubjectsResponse.json")
         .build());
@@ -482,7 +482,7 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("last-laboratory-solution")
+        .resource("/search/last-laboratory-solution")
         .requestBody("{\"laboratoryId\":\"laboratory1\"}")
         .response(
             "/json/citizen-attestation-excerpt/data-factory/lastLaboratorySolutionAddResponse.json")
@@ -490,14 +490,14 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("application-type-equal-constant-code")
+        .resource("/search/application-type-equal-constant-code")
         .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/citizen-attestation-excerpt/data-factory/addApplicationResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("solution-type-equal-constant-code")
+        .resource("/search/solution-type-equal-constant-code")
         .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/citizen-attestation-excerpt/data-factory/addSolutionTypeResponse.json")
         .build());
@@ -597,7 +597,7 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("subject-equal-subject-type-equal-subject-code")
+        .resource("/search/subject-equal-subject-type-equal-subject-code")
         .requestBody("{\"subjectType\":\"LEGAL\",\"subjectCode\":\"01010101\"}")
         .response("/json/citizen-attestation-excerpt/data-factory/searchSubjectsResponse.json")
         .build());
@@ -618,7 +618,7 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("last-laboratory-solution")
+        .resource("/search/last-laboratory-solution")
         .requestBody("{\"laboratoryId\":\"laboratory1\"}")
         .response(
             "/json/citizen-attestation-excerpt/data-factory/lastLaboratorySolutionRefuseResponse.json")
@@ -626,14 +626,14 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("application-type-equal-constant-code")
+        .resource("/search/application-type-equal-constant-code")
         .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/citizen-attestation-excerpt/data-factory/addApplicationResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("solution-type-equal-constant-code")
+        .resource("/search/solution-type-equal-constant-code")
         .requestBody("{\"constantCode\":\"ADD\"}")
         .response("/json/citizen-attestation-excerpt/data-factory/addSolutionTypeResponse.json")
         .build());
@@ -692,7 +692,7 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("subject-equal-subject-type-equal-subject-code")
+        .resource("/search/subject-equal-subject-type-equal-subject-code")
         .requestBody("{\"subjectType\":\"LEGAL\",\"subjectCode\":\"01010101\"}")
         .response("/json/citizen-attestation-excerpt/data-factory/searchSubjectsResponse.json")
         .build());
@@ -739,7 +739,7 @@ public class CitizenAttestationExcerptIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("subject-equal-subject-type-equal-subject-code")
+        .resource("/search/subject-equal-subject-type-equal-subject-code")
         .requestBody("{\"subjectType\":\"LEGAL\",\"subjectCode\":\"01010101\"}")
         .response("[]")
         .build());

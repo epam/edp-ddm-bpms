@@ -69,7 +69,7 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
-        .resource("subject-equal-subject-type-equal-subject-code")
+        .resource("/search/subject-equal-subject-type-equal-subject-code")
         .requestBody("{\"subjectType\":\"" + LEGAL_SUBJECT_TYPE + "\",\"subjectCode\":\"" +
             LEGAL_SUBJECT_CODE + "\"}")
         .headers(Map.of("X-Access-Token", legalUserToken))
@@ -141,7 +141,7 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
-        .resource("subject-equal-subject-type-equal-subject-code")
+        .resource("/search/subject-equal-subject-type-equal-subject-code")
         .requestBody("{\"subjectType\":\"" + ENTREPRENEUR_SUBJECT_TYPE + "\",\"subjectCode\":\"" +
             ENTREPRENEUR_SUBJECT_CODE + "\"}")
         .headers(Map.of("X-Access-Token", indUserToken))
@@ -213,7 +213,7 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
   public void testValidationErrorSubjectCreated() throws Exception {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
-        .resource("subject-equal-subject-type-equal-subject-code")
+        .resource("/search/subject-equal-subject-type-equal-subject-code")
         .requestBody("{\"subjectType\":\"" + LEGAL_SUBJECT_TYPE + "\",\"subjectCode\":\"" +
             LEGAL_SUBJECT_CODE + "\"}")
         .headers(Map.of("X-Access-Token", legalUserToken))
@@ -240,7 +240,7 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
   public void testValidationErrorSubjectHasCanceledOrSuspendedState() throws Exception {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
-        .resource("subject-equal-subject-type-equal-subject-code")
+        .resource("/search/subject-equal-subject-type-equal-subject-code")
         .requestBody("{\"subjectType\":\"" + LEGAL_SUBJECT_TYPE + "\",\"subjectCode\":\"" +
             LEGAL_SUBJECT_CODE + "\"}")
         .headers(Map.of("X-Access-Token", legalUserToken))
@@ -264,7 +264,7 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
   public void testValidationErrorSubjectNotFound() throws IOException {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
-        .resource("subject-equal-subject-type-equal-subject-code")
+        .resource("/search/subject-equal-subject-type-equal-subject-code")
         .requestBody("{\"subjectType\":\"" + LEGAL_SUBJECT_TYPE + "\",\"subjectCode\":\"" +
             LEGAL_SUBJECT_CODE + "\"}")
         .headers(Map.of("X-Access-Token", legalUserToken))
@@ -291,7 +291,7 @@ public class OfficerCreateSubjectIT extends BaseBpmnIT {
 
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
-        .resource("subject-equal-subject-type-equal-subject-code")
+        .resource("/search/subject-equal-subject-type-equal-subject-code")
         .requestBody("{\"subjectType\":\"" + ENTREPRENEUR_SUBJECT_TYPE + "\",\"subjectCode\":\"" +
             ENTREPRENEUR_SUBJECT_CODE + "\"}")
         .headers(Map.of("X-Access-Token", indUserToken))

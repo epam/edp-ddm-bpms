@@ -86,7 +86,7 @@ public abstract class BaseIT {
   @Inject
   protected TestCephServiceImpl cephService;
   @Inject
-  protected FormDataStorageService formDataStorageService;
+  protected FormDataStorageService<?> formDataStorageService;
   @Inject
   protected MessagePayloadStorageService messagePayloadStorageService;
   @Inject

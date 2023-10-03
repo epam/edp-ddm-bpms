@@ -43,7 +43,7 @@ import java.util.Map;
 public class SendUserNotificationByAddress extends BaseJavaDelegate {
   public static final String DELEGATE_NAME = "sendUserNotificationByAddressDelegate";
   private static final String NOTIFICATION_ADDRESS_VALIDATION_ERROR_CODE = "NOTIFICATION_ADDRESS_VALIDATION_ERROR";
-  private static final String EMAIL_NOTIFICATION_REGEX = "^(([^<>()\\[\\]\\\\.,;:\\s@\"]+(\\.\\[^<>()\\[\\]\\\\.,;:\\s@\"\\]+)*)|(\".+\"))@(([[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z-0-9]+\\.)+[a-zA-Z]{2,}))$";
+  private static final String EMAIL_NOTIFICATION_REGEX = "^[a-zA-Z0-9][a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]*[a-zA-Z0-9]@[a-zA-Z0-9.-/]+\\.[a-zA-Z0-9]{2,}$";
 
   private final UserNotificationFacade notificationFacade;
   private final BlackListEmailDomainsProperties blackListEmailDomainsProperties;

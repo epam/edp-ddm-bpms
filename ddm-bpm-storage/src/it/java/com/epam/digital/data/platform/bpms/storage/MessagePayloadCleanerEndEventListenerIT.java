@@ -19,10 +19,14 @@ package com.epam.digital.data.platform.bpms.storage;
 import com.epam.digital.data.platform.dataaccessor.sysvar.StartMessagePayloadStorageKeyVariable;
 import com.epam.digital.data.platform.storage.message.dto.MessagePayloadDto;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.junit.jupiter.api.Test;
+
+import static org.awaitility.Awaitility.await;
 
 class MessagePayloadCleanerEndEventListenerIT extends BaseIT {
 
@@ -47,6 +51,11 @@ class MessagePayloadCleanerEndEventListenerIT extends BaseIT {
     BpmnAwareTests.complete(BpmnAwareTests.task(processInstance));
 
     BpmnAwareTests.assertThat(processInstance).isEnded();
-    Assertions.assertThat(messagePayloadStorageService.getMessagePayload(storageKey)).isEmpty();
+    await()
+        .atMost(10, TimeUnit.SECONDS)
+        .untilAsserted(
+            () ->
+                Assertions.assertThat(messagePayloadStorageService.getMessagePayload(storageKey))
+                    .isEmpty());
   }
 }

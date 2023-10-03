@@ -55,7 +55,7 @@ public class ReadLabDataIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("koatuu-equal-koatuu-id-name")
+        .resource("/search/koatuu-equal-koatuu-id-name")
         .requestBody("{\"koatuuId\":\"92cb1462-ec57-4b87-9e8d-594e0c322996\"}")
         .response("/json/read-lab/data-factory/koatuuEqualKoatuuIdName.json")
         .build());

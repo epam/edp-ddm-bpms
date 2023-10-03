@@ -37,6 +37,7 @@ import com.epam.digital.data.platform.bpm.it.util.CamundaAssertionUtil;
 import com.epam.digital.data.platform.bpm.it.util.TestUtils;
 import com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable;
 import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.dto.FormDataInputWrapperDto;
 import com.epam.digital.data.platform.storage.form.service.FormDataKeyProvider;
 import com.epam.digital.data.platform.storage.form.service.FormDataKeyProviderImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -290,7 +291,9 @@ public abstract class BaseBpmnIT extends BaseIT {
 
   protected Map startProcessInstanceWithStartForm(String processDefinitionKey, String token,
       FormDataDto formDataDto) throws JsonProcessingException {
-    formDataStorageService.putFormData(START_FORM_CEPH_KEY, formDataDto);
+    var startFormInputDto =
+        FormDataInputWrapperDto.builder().key(START_FORM_CEPH_KEY).formData(formDataDto).build();
+    formDataStorageService.putFormData(startFormInputDto);
 
     var startProcessInstanceDto = new StartProcessInstanceDto();
     var variableValueDto = new VariableValueDto();
