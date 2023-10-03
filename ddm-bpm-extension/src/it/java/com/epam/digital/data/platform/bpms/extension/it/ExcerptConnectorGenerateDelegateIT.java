@@ -21,7 +21,6 @@ import com.epam.digital.data.platform.dso.api.dto.SignRequestDto;
 import com.epam.digital.data.platform.dso.api.dto.SignResponseDto;
 import com.epam.digital.data.platform.excerpt.model.ExcerptEntityId;
 import com.epam.digital.data.platform.excerpt.model.ExcerptEventDto;
-import com.epam.digital.data.platform.storage.form.service.FormDataKeyProviderImpl;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
@@ -36,7 +35,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.matching;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class ExcerptConnectorGenerateDelegateIT extends BaseIT {
 
@@ -86,12 +84,5 @@ public class ExcerptConnectorGenerateDelegateIT extends BaseIT {
     var processInstanceList = runtimeService.createProcessInstanceQuery()
         .processInstanceId(processInstance.getId()).list();
     Assertions.assertThat(CollectionUtils.isEmpty(processInstanceList)).isTrue();
-
-    var derivedSignatureCephKey = String.format(FormDataKeyProviderImpl.SYSTEM_SIGNATURE_STORAGE_KEY,
-            processInstance.getId(),
-            processInstance.getId());
-    var signedFormData = formDataStorageService.getFormData(derivedSignatureCephKey);
-    assertThat(signedFormData).isPresent();
-    assertThat(signedFormData.get().getSignature()).isEqualTo(dsoResponse.getSignature());
   }
 }

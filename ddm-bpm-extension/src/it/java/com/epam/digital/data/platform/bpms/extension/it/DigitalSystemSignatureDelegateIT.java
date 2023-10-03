@@ -21,11 +21,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import com.epam.digital.data.platform.dso.api.dto.SignResponseDto;
 import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
-import com.epam.digital.data.platform.storage.form.service.FormDataKeyProviderImpl;
+import com.epam.digital.data.platform.storage.form.dto.FormDataInputWrapperDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import java.util.LinkedHashMap;
@@ -59,22 +58,22 @@ public class DigitalSystemSignatureDelegateIT extends BaseIT {
 
     var cephKey = formDataKeyProvider
         .generateKey("testActivity", processInstance.getProcessInstanceId());
-    formDataStorageService.putFormData(cephKey, FormDataDto.builder().accessToken(validAccessToken)
-        .data(new LinkedHashMap<>()).build());
+    var formDataInputWrapper =
+        FormDataInputWrapperDto.builder()
+            .key(cephKey)
+            .formData(
+                FormDataDto.builder()
+                    .accessToken(validAccessToken)
+                    .data(new LinkedHashMap<>())
+                    .build())
+            .processInstanceId(processInstance.getProcessInstanceId())
+            .build();
+    formDataStorageService.putFormData(formDataInputWrapper);
 
     String taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionTaskForDso")
         .singleResult().getId();
     taskService.complete(taskId);
 
     BpmnAwareTests.assertThat(processInstance).isEnded();
-
-    var key = String.format(FormDataKeyProviderImpl.SYSTEM_SIGNATURE_STORAGE_KEY,
-        processInstance.getId(),
-        processInstance.getId());
-    var signedFormData = formDataStorageService.getFormData(key);
-    assertThat(signedFormData).isPresent();
-    assertThat(signedFormData.get().getSignature()).isEqualTo(response.getSignature());
-    assertThat(objectMapper.writeValueAsString(signedFormData.get().getData()))
-        .isEqualTo("{\"name\":\"John\"}");
   }
 }

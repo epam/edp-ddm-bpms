@@ -29,7 +29,11 @@ spec:
         {{- if .Values.global.registry.bpms.istio.sidecar.enabled }}
         traffic.sidecar.istio.io/excludeOutboundPorts: '5432,6379'
         sidecar.istio.io/inject: 'true'
+        {{- if .Values.global.istio.sidecar.requestsLimitsEnabled }}
         {{- include "bpms.istioResources" . | nindent 8 }}
+        {{- else }}
+        inject.istio.io/templates: 'sidecar,emptyRequestsLimits'
+        {{- end }}
         {{- end }}
       {{- end }}
       labels:
@@ -79,6 +83,9 @@ spec:
           httpGet:
             path: {{ .Values.livenessPath }}
             port: {{ .Values.port }}
+            httpHeaders:
+              - name: X-B3-Sampled
+                value: "0"
           failureThreshold: 10
           initialDelaySeconds: 65
           periodSeconds: 10
@@ -88,19 +95,22 @@ spec:
           httpGet:
             path: {{ .Values.readinessPath }}
             port: {{ .Values.port }}
+            httpHeaders:
+              - name: X-B3-Sampled
+                value: "0"
           failureThreshold: 10
           initialDelaySeconds: 65
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 5
-        {{- if or .Values.global.registry.bpms.container.resources.requests .Values.global.registry.bpms.container.resources.limits }}
+        {{- if .Values.global.container.requestsLimitsEnabled }}
         resources:
           {{- toYaml .Values.global.registry.bpms.container.resources | nindent 10 }}
         {{- end }}
         env:
           {{- range $name, $value := .Values.global.registry.bpms.container.envVars }}
           - name: {{ $name }}
-            value: {{ $value | quote}}
+            value: {{ $value | quote }}
           {{- end }}
           - name: CEPH_BUCKET_HOST
             valueFrom:
@@ -162,6 +172,8 @@ spec:
             mountPath: {{ .Values.officerConfigMountPath }}
           - name: {{ .Values.citizenConfigMapName }}
             mountPath: {{ .Values.citizenConfigMountPath }}
+          - name: {{ .Values.externalSystemConfigMapName }}
+            mountPath: {{ .Values.externalSystemConfigMountPath }}
           - name: {{ .Chart.Name }}-redis-credentials
             mountPath: {{ .Values.redisSecretsMountPath }}
     {{- if .Values.trembita }}
@@ -252,6 +264,9 @@ spec:
         - name: {{ .Values.citizenConfigMapName }}
           configMap:
             name: {{ .Values.citizenConfigMapName }}
+        - name: {{ .Values.externalSystemConfigMapName }}
+          configMap:
+            name: {{ .Values.externalSystemConfigMapName }}
 {{- if .Values.trembita }}
         - name: {{ .Values.registryConfigs.trembitaRegistriesConfigurationName }}
           configMap:

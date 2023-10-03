@@ -42,10 +42,13 @@ import org.springframework.stereotype.Service;
 /**
  * The service for managing process instances extended with process definition names, process
  * instance start time and pending status
+ *
+ * @deprecated as has broken startTime sorting, moved to another service
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Deprecated(forRemoval = true)
 public class ProcessInstanceService {
 
   private final ProcessInstanceRuntimeService processInstanceRuntimeService;

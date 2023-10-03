@@ -16,8 +16,6 @@
 
 package com.epam.digital.data.platform.bpms.extension.delegate;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -25,6 +23,7 @@ import com.epam.digital.data.platform.bpms.extension.delegate.storage.PutContent
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableReadAccessor;
 import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.dto.FormDataInputWrapperDto;
 import com.epam.digital.data.platform.storage.form.service.FormDataStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -37,6 +36,9 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 @RunWith(MockitoJUnitRunner.class)
 public class PutContentToCephDelegateTest {
 
@@ -45,7 +47,7 @@ public class PutContentToCephDelegateTest {
   @InjectMocks
   private PutContentToCephDelegate putContentToCephDelegate;
   @Mock
-  private FormDataStorageService formDataStorageService;
+  private FormDataStorageService<?> formDataStorageService;
   @Mock
   private ExecutionEntity delegateExecution;
   @Spy
@@ -78,7 +80,14 @@ public class PutContentToCephDelegateTest {
 
     putContentToCephDelegate.execute(delegateExecution);
 
-    verify(formDataStorageService).putFormData(eq("someKey"), any(FormDataDto.class));
+    var formDataInputWrapper =
+        FormDataInputWrapperDto.builder()
+            .key("someKey")
+            .formData(
+                FormDataDto.builder().data(new LinkedHashMap<>(Map.of())).build())
+            .build();
+
+    verify(formDataStorageService).putFormData(formDataInputWrapper);
   }
 
 }

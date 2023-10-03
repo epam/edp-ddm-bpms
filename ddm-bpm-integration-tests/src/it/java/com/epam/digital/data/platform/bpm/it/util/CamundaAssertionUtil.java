@@ -40,16 +40,16 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperty;
 @Slf4j
 public final class CamundaAssertionUtil {
 
-  private static final ThreadLocal<FormDataStorageService> fromDataStorageService = new ThreadLocal<>();
+  private static final ThreadLocal<FormDataStorageService<?>> fromDataStorageService = new ThreadLocal<>();
 
   private CamundaAssertionUtil() {
   }
 
-  public static FormDataStorageService formDataStorageService() {
+  public static FormDataStorageService<?> formDataStorageService() {
     return fromDataStorageService.get();
   }
 
-  public static void setFromDataStorageService(FormDataStorageService formDataStorageService) {
+  public static void setFromDataStorageService(FormDataStorageService<?> formDataStorageService) {
     fromDataStorageService.set(formDataStorageService);
   }
 

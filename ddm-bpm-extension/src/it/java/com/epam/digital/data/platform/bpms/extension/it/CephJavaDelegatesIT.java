@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
 import com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable;
 import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.dto.FormDataInputWrapperDto;
 import com.google.common.collect.ImmutableMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -123,7 +124,13 @@ public class CephJavaDelegatesIT extends BaseIT {
     var data = new LinkedHashMap<String, Object>();
     data.put("prop1", "value1");
 
-    formDataStorageService.putFormData("cephKey", FormDataDto.builder().data(data).build());
+    var formDataInputWrapper =
+        FormDataInputWrapperDto.builder()
+            .key("cephKey")
+            .formData(FormDataDto.builder().data(data).build())
+            .build();
+
+    formDataStorageService.putFormData(formDataInputWrapper);
 
     var processInstance = runtimeService
         .startProcessInstanceByKey("testStartFormKey", "key", vars);

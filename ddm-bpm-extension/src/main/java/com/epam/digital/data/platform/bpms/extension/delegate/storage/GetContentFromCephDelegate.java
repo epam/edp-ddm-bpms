@@ -38,10 +38,10 @@ import org.springframework.stereotype.Component;
 public class GetContentFromCephDelegate extends BaseCephDelegate {
 
   public static final String DELEGATE_NAME = "getContentFromCephDelegate";
-  private final FormDataStorageService formDataStorageService;
+  private final FormDataStorageService<?> formDataStorageService;
   private final ObjectMapper objectMapper;
 
-  public GetContentFromCephDelegate(FormDataStorageService formDataStorageService,
+  public GetContentFromCephDelegate(FormDataStorageService<?> formDataStorageService,
       ObjectMapper objectMapper) {
     this.formDataStorageService = formDataStorageService;
     this.objectMapper = objectMapper;

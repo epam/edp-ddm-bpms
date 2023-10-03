@@ -42,10 +42,9 @@ public class RedisFormDataStorageServiceConfig {
   }
 
   @Bean
-  public FormDataStorageService formDataStorageService(StorageServiceFactory factory,
-                                                       RedisConnectionFactory redisConnectionFactory,
-                                                       RedisStorageConfiguration config) {
-    return factory.formDataStorageService(redisConnectionFactory, config);
+  public FormDataStorageService<?> formDataStorageService(StorageServiceFactory factory,
+                                                       RedisConnectionFactory redisConnectionFactory) {
+    return factory.formDataStorageService(redisConnectionFactory);
   }
 
   @Bean

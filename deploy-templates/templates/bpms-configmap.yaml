@@ -4,13 +4,23 @@ metadata:
   name: {{ .Chart.Name }}
 data:
   application.yml: |-
-    spring.datasource.driver-class-name: org.postgresql.Driver
-    spring.datasource.url: jdbc:postgresql://{{ .Values.db.url }}:{{ .Values.db.port }}/{{ .Values.db.name }}
-    spring.zipkin.baseUrl: http://zipkin.istio-system:9411
-    camunda.bpm.job-execution.deployment-aware: false
-    camunda.bpm.database.schema-update: false
-    camunda.bpm.history-level: {{ .Values.camunda.bpm.historyLevel }}
-    camunda.bpm.database-history-level: {{ .Values.camunda.bpm.databaseHistoryLevel }}
+    spring:
+      datasource: 
+        driver-class-name: org.postgresql.Driver
+        url: jdbc:postgresql://{{ .Values.db.url }}:{{ .Values.db.port }}/{{ .Values.db.name }}
+        hikari:
+          maximum-pool-size: {{ .Values.bpms.datasource.maxPoolSize }}
+      zipkin:
+        baseUrl: http://zipkin.istio-system:9411
+      rest-template:
+        ssl-checking-enabled: {{ .Values.restTemplate.sslCheckingEnabled }}
+    feign:
+      client:
+        config:
+          default:
+            connectTimeout: {{ .Values.global.registry.bpms.springOpenfeign.defaultConnectTimeout }}
+            readTimeout: {{ .Values.global.registry.bpms.springOpenfeign.defaultReadTimeout }}
+
     dso.url: http://digital-signature-ops:8080
     ceph.http-endpoint: {{ .Values.ceph.host }}
     keycloak.url: {{ template "keycloak.url" . }}
@@ -33,8 +43,8 @@ data:
     s3: {{ .Values.s3 | toYaml | nindent 6 }}
     data-platform.kafka.enabled: true
     data-platform.kafka.bootstrap: {{ .Values.kafka.service }}
-    data-platform.kafka.topic-properties.num-partitions: {{ .Values.kafka.numPartitions }}
-    data-platform.kafka.topic-properties.replication-factor: {{ .Values.global.kafkaOperator.replicationFactor }}
+    data-platform.kafka.topic-properties.creation.num-partitions: {{ .Values.kafka.numPartitions }}
+    data-platform.kafka.topic-properties.creation.replication-factor: {{ .Values.global.kafkaOperator.replicationFactor }}
     data-platform.kafka.ssl.enabled: {{ .Values.kafka.sslEnabled }}
     data-platform.kafka.ssl.keystore-certificate: {{ .Values.kafka.sslUserCertificate }}
     data-platform.kafka.ssl.keystore-key: {{ .Values.kafka.sslUserKey }}
@@ -44,5 +54,31 @@ data:
     data-platform.kafka.error-handler.initial-interval: {{ .Values.kafka.errorHandlerInitialInterval }}
     data-platform.kafka.error-handler.max-elapsed-time: {{ .Values.kafka.errorHandlerMaxElapsedTime }}
     data-platform.kafka.error-handler.multiplier: {{ .Values.kafka.errorHandlerMultiplier }}
-    spring.rest-template.ssl-checking-enabled: {{ .Values.restTemplate.sslCheckingEnabled }}
     digital-document-service.url: http://digital-document-service:8080
+    camunda:
+      bpm:
+        history-level: {{ .Values.bpms.camunda.bpm.historyLevel }}
+        database-history-level: {{ .Values.bpms.camunda.bpm.databaseHistoryLevel }}
+        database:
+          schema-update: {{ .Values.bpms.camunda.bpm.database.schemaUpdate }}
+        job-execution:
+          {{- with .Values.bpms.camunda.bpm.jobExecution }}
+          deployment-aware: {{ .deploymentAware }}
+          core-pool-size: {{ .corePoolSize }}
+          max-pool-size: {{ .maxPoolSize }}
+          max-jobs-per-acquisition: {{ .maxJobsPerAcquisition }}
+          queue-capacity: {{ .queueCapacity }}
+          {{- end }}
+
+    # Use logging.level.<logger-name> for setting the logging level for that logger.
+    # Possible values are ERROR, WARN, INFO, DEBUG or TRACE. Ordered from the least detailed log to the most.
+    logging.level.org.camunda.bpm.engine: INFO
+    logging.level.org.camunda.bpm.engine.persistence: INFO
+    logging.level.org.camunda.bpm.engine.impl.persistence.entity: INFO
+    logging.level.org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity: INFO
+    logging.level.org.camunda.bpm.engine.impl.persistence.entity.JobEntity: INFO
+    logging.level.org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity: INFO
+    logging.level.org.camunda.bpm.engine.impl.history.event: INFO
+    logging.level.org.camunda.bpm.engine.history: INFO
+
+    cleanup: {{ toYaml .Values.cleanup | nindent 6 }}

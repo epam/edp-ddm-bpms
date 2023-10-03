@@ -60,7 +60,7 @@ instruction only for usage for local development.
     ```
 2. Copy the application jar file to root project directory
     ```shell
-    cp ddm-bpm/target/ddm-bpm-1.9.0.jar target/
+    mkdir -p target && cp ddm-bpm/target/ddm-bpm-1.9.0.jar target/
     ```
 3. Run Docker-compose
     ```shell
@@ -73,7 +73,7 @@ instruction only for usage for local development.
    remote debug.
 5. In case if you need to rebuild the service you also need to remove service docker image:
    ```shell
-   docker rmi bpms_business-process-management-service -f
+   docker rmi bpms-business-process-management-service -f
    ```
 
 #### Installation with Kafka

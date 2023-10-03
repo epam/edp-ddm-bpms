@@ -34,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.epam.digital.data.platform.starter.errorhandling.exception.SystemException;
 import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.dto.FormDataInputWrapperDto;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.google.common.collect.ImmutableMap;
 import java.util.LinkedHashMap;
@@ -167,8 +168,12 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
   @Test
   @Deployment(resources = {"bpmn/connector/testDataFactoryConnectorUpdateDelegate.bpmn"})
   public void testDataFactoryConnectorUpdateDelegate() {
-    formDataStorageService.putFormData("cephKey", FormDataDto.builder()
-        .accessToken("token").build());
+    var formDataInputWrapper =
+        FormDataInputWrapperDto.builder()
+            .key("cephKey")
+            .formData(FormDataDto.builder().accessToken("token").build())
+            .build();
+    formDataStorageService.putFormData(formDataInputWrapper);
 
     dataFactoryMockServer.addStubMapping(
         stubFor(put(urlPathEqualTo("/mock-server/laboratory/id"))
@@ -202,8 +207,12 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
   @Test
   @Deployment(resources = {"bpmn/connector/testDataFactoryConnectorPartialUpdateDelegate.bpmn"})
   public void testDataFactoryConnectorPartialUpdateDelegate() {
-    formDataStorageService.putFormData("cephKey", FormDataDto.builder()
-        .accessToken("token").build());
+    var formDataInputWrapper =
+        FormDataInputWrapperDto.builder()
+            .key("cephKey")
+            .formData(FormDataDto.builder().accessToken("token").build())
+            .build();
+    formDataStorageService.putFormData(formDataInputWrapper);
 
     dataFactoryMockServer.addStubMapping(
         stubFor(patch(urlPathEqualTo("/mock-server/partial/laboratory/id"))
@@ -226,8 +235,12 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
   @Test
   @Deployment(resources = {"bpmn/connector/testDataFactoryConnectorDelegate.bpmn"})
   public void testDataFactoryConnectorDelegate_withPartialUpdate() {
-    formDataStorageService.putFormData("cephKey", FormDataDto.builder()
-        .accessToken("token").build());
+    var formDataInputWrapper =
+        FormDataInputWrapperDto.builder()
+            .key("cephKey")
+            .formData(FormDataDto.builder().accessToken("token").build())
+            .build();
+    formDataStorageService.putFormData(formDataInputWrapper);
 
     dataFactoryMockServer.addStubMapping(
         stubFor(patch(urlPathEqualTo("/mock-server/laboratory/id"))
@@ -251,7 +264,7 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
   @Deployment(resources = {"bpmn/connector/testDataFactoryConnectorSearchDelegate.bpmn"})
   public void testDataFactoryConnectorSearchDelegate() {
     dataFactoryMockServer.addStubMapping(
-        stubFor(get(urlPathEqualTo("/mock-server/laboratory"))
+        stubFor(get(urlPathEqualTo("/mock-server/search/laboratory"))
             .withQueryParam("id", equalTo("id1"))
             .withHeader("Content-Type", equalTo("application/json"))
             .withHeader("X-Source-System", equalTo("Low-code Platform"))
@@ -259,7 +272,7 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
             .willReturn(aResponse().withStatus(200))));
 
     dataFactoryMockServer.addStubMapping(
-        stubFor(post(urlEqualTo("/mock-server/laboratory"))
+        stubFor(post(urlEqualTo("/mock-server/search/laboratory"))
             .withHeader("Content-Type", equalTo("application/json"))
             .withHeader("X-Source-System", equalTo("Low-code Platform"))
             .withHeader("X-Source-Application", equalTo("ddm-bpm-extension"))
@@ -321,8 +334,17 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
 
     var cephKeyToken = formDataKeyProvider
         .generateKey("test_token", processInstance.getProcessInstanceId());
-    formDataStorageService.putFormData(cephKeyToken, FormDataDto.builder().accessToken(validAccessToken)
-        .data(new LinkedHashMap<>()).build());
+    var formDataInputWrapper =
+        FormDataInputWrapperDto.builder()
+            .key(cephKeyToken)
+            .formData(
+                FormDataDto.builder()
+                    .accessToken(validAccessToken)
+                    .data(new LinkedHashMap<>())
+                    .build())
+            .processInstanceId(processInstance.getProcessInstanceId())
+            .build();
+    formDataStorageService.putFormData(formDataInputWrapper);
 
     var taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionTask").singleResult()
         .getId();
@@ -358,8 +380,17 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
 
     var storageKeyToken = formDataKeyProvider
         .generateKey("test_token", processInstance.getProcessInstanceId());
-    formDataStorageService.putFormData(storageKeyToken, FormDataDto.builder().accessToken(validAccessToken)
-        .data(new LinkedHashMap<>()).build());
+    var formDataInputWrapper =
+            FormDataInputWrapperDto.builder()
+                    .key(storageKeyToken)
+                    .formData(
+                            FormDataDto.builder()
+                                    .accessToken(validAccessToken)
+                                    .data(new LinkedHashMap<>())
+                                    .build())
+                    .processInstanceId(processInstance.getProcessInstanceId())
+                    .build();
+    formDataStorageService.putFormData(formDataInputWrapper);
 
     var taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionTask").singleResult()
         .getId();
@@ -395,9 +426,17 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
 
     var storageKeyToken = formDataKeyProvider
         .generateKey("test_token", processInstance.getProcessInstanceId());
-    formDataStorageService.putFormData(storageKeyToken, FormDataDto.builder().accessToken(validAccessToken)
-        .data(new LinkedHashMap<>()).build());
-
+    var formDataInputWrapper =
+        FormDataInputWrapperDto.builder()
+            .key(storageKeyToken)
+            .formData(
+                FormDataDto.builder()
+                    .accessToken(validAccessToken)
+                    .data(new LinkedHashMap<>())
+                    .build())
+            .processInstanceId(processInstance.getProcessInstanceId())
+            .build();
+    formDataStorageService.putFormData(formDataInputWrapper);
     var taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionTask").singleResult()
         .getId();
     taskService.complete(taskId);
@@ -449,8 +488,17 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
 
     var cephKeyToken = formDataKeyProvider
         .generateKey("test_token", processInstance.getProcessInstanceId());
-    formDataStorageService.putFormData(cephKeyToken,
-        FormDataDto.builder().accessToken(validAccessToken).data(new LinkedHashMap<>()).build());
+    var formDataInputWrapper =
+            FormDataInputWrapperDto.builder()
+                    .key(cephKeyToken)
+                    .formData(
+                            FormDataDto.builder()
+                                    .accessToken(validAccessToken)
+                                    .data(new LinkedHashMap<>())
+                                    .build())
+                    .processInstanceId(processInstance.getProcessInstanceId())
+                    .build();
+    formDataStorageService.putFormData(formDataInputWrapper);
 
     var taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionCreateDelegateTask")
         .singleResult()
@@ -475,9 +523,17 @@ public class DataFactoryConnectorDelegateIT extends BaseIT {
 
     var cephKeyToken = formDataKeyProvider
         .generateKey("test_token", processInstance.getProcessInstanceId());
-    formDataStorageService.putFormData(cephKeyToken,
-        FormDataDto.builder().accessToken(validAccessToken)
-            .data(new LinkedHashMap<>()).build());
+    var formDataInputWrapper =
+            FormDataInputWrapperDto.builder()
+                    .key(cephKeyToken)
+                    .formData(
+                            FormDataDto.builder()
+                                    .accessToken(validAccessToken)
+                                    .data(new LinkedHashMap<>())
+                                    .build())
+                    .processInstanceId(processInstance.getProcessInstanceId())
+                    .build();
+    formDataStorageService.putFormData(formDataInputWrapper);
 
     var taskId = taskService.createTaskQuery().taskDefinitionKey("waitConditionCreateDelegateTask")
         .singleResult()

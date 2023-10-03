@@ -33,10 +33,13 @@ import org.springframework.stereotype.Component;
 /**
  * The controller that contains additional and extended endpoints for managing and getting
  * historical process instances.
+ *
+ * @deprecated as has broken startTime sorting, moved to another service
  */
 @Component
 @RequiredArgsConstructor
 @Path("/extended/process-instance")
+@Deprecated(forRemoval = true)
 public class ProcessInstanceController {
 
   private final ProcessInstanceService processInstanceService;

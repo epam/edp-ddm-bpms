@@ -43,7 +43,7 @@ public class PutFormDataToStorageTaskListener implements TaskListener {
   private static final PutFormDataToStorageTaskListener.LinkedHashMapTypeReference FORM_DATA_TYPE =
       new PutFormDataToStorageTaskListener.LinkedHashMapTypeReference();
 
-  private final FormDataStorageService formDataStorageService;
+  private final FormDataStorageService<?> formDataStorageService;
   private final ObjectMapper objectMapper;
 
   @SystemVariable(name = "userTaskInputFormDataPrepopulate", isTransient = true)

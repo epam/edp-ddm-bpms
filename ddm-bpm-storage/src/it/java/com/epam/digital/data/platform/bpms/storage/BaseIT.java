@@ -41,7 +41,7 @@ public abstract class BaseIT {
   @Autowired
   protected TaskService taskService;
   @Autowired
-  protected FormDataStorageService formDataStorageService;
+  protected FormDataStorageService<?> formDataStorageService;
   @Autowired
   protected FormDataFileStorageService formDataFileStorageService;
   @Autowired

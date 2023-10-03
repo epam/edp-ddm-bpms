@@ -59,14 +59,14 @@ public class CitizenAddLabIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("laboratory-equal-edrpou-name-count")
+        .resource("/search/laboratory-equal-edrpou-name-count")
         .response("[]")
         .requestBody("{\"edrpou\":\"01010101\",\"name\":\"labName\"}")
         .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("subject-equal-subject-type-equal-subject-code")
+        .resource("/search/subject-equal-subject-type-equal-subject-code")
         .response("/json/citizen-add-lab/data-factory/searchSubjectResponse.json")
         .requestBody("{\"subjectType\":\"LEGAL\",\"subjectCode\":\"01010101\"}")
         .build());
@@ -200,14 +200,14 @@ public class CitizenAddLabIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("laboratory-equal-edrpou-name-count")
+        .resource("/search/laboratory-equal-edrpou-name-count")
         .response("[]")
         .requestBody("{\"edrpou\":\"01010101\",\"name\":\"labName\"}")
         .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("subject-equal-subject-type-equal-subject-code")
+        .resource("/search/subject-equal-subject-type-equal-subject-code")
         .response("/json/citizen-add-lab/data-factory/searchSubjectResponse.json")
         .requestBody("{\"subjectType\":\"LEGAL\",\"subjectCode\":\"01010101\"}")
         .build());
@@ -304,7 +304,7 @@ public class CitizenAddLabIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("laboratory-equal-edrpou-name-count")
+        .resource("/search/laboratory-equal-edrpou-name-count")
         .response("[{\"cnt\":1}]")
         .requestBody("{\"edrpou\":\"01010101\",\"name\":\"labName\"}")
         .build());

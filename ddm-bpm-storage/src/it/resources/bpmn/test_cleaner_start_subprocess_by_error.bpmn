@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:rrm="http://registry-regulation-management" id="Definitions_0b91o5k" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.8.0">
+  <bpmn:collaboration id="Collaboration_1ffhp7x">
+    <bpmn:participant id="Participant_0js9mvg" name="start sub process by catch error" processRef="check-start-by-catch-error-event" />
+  </bpmn:collaboration>
+  <bpmn:process id="check-start-by-catch-error-event" name="Підпроцес, що ініціюється помилкою - catch error event" isExecutable="true">
+    <bpmn:scriptTask id="Activity_13tqzgr" name="throw exception" scriptFormat="groovy">
+      <bpmn:incoming>Flow_04sx880</bpmn:incoming>
+      <bpmn:outgoing>Flow_1yr8ntd</bpmn:outgoing>
+      <bpmn:script>throw new java.lang.Exception()</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="Event_1l3lntx" name="end">
+      <bpmn:incoming>Flow_1yr8ntd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:subProcess id="Activity_1n7lwnx" triggeredByEvent="true">
+      <bpmn:startEvent id="Event_0729f0j" name="start subprocess by error">
+        <bpmn:outgoing>Flow_1g0dwnt</bpmn:outgoing>
+        <bpmn:errorEventDefinition id="ErrorEventDefinition_045ftq6" errorRef="Error_1rs8fgc" />
+      </bpmn:startEvent>
+      <bpmn:endEvent id="Event_0q15e3o" name="end">
+        <bpmn:incoming>Flow_1pyai4u</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_1g0dwnt" sourceRef="Event_0729f0j" targetRef="child-process-task" />
+      <bpmn:sequenceFlow id="Flow_1pyai4u" sourceRef="child-process-task" targetRef="Event_0q15e3o" />
+      <bpmn:userTask id="child-process-task" name="Task from subprocess started by catch error" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="feature-add-order-bp-add-order" camunda:assignee="${initiator}">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="userTaskInputFormDataPrepopulate" />
+          </camunda:inputOutput>
+          <camunda:properties>
+            <camunda:property name="formVariables" value="" />
+          </camunda:properties>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_1g0dwnt</bpmn:incoming>
+        <bpmn:outgoing>Flow_1pyai4u</bpmn:outgoing>
+      </bpmn:userTask>
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_1vwmfkq" sourceRef="Event_0jk7dr2" targetRef="parent-process-task" />
+    <bpmn:sequenceFlow id="Flow_1yr8ntd" sourceRef="Activity_13tqzgr" targetRef="Event_1l3lntx" />
+    <bpmn:startEvent id="Event_0jk7dr2" name="start" camunda:initiator="initiator">
+      <bpmn:outgoing>Flow_1vwmfkq</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="parent-process-task" name="Task from parent process with error" camunda:modelerTemplate="formUserTaskTemplate" camunda:formKey="feature-auto-form-with-one-field-copy1" camunda:assignee="${initiator}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="userTaskInputFormDataPrepopulate" />
+        </camunda:inputOutput>
+        <camunda:properties>
+          <camunda:property name="formVariables" value="" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1vwmfkq</bpmn:incoming>
+      <bpmn:outgoing>Flow_04sx880</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_04sx880" sourceRef="parent-process-task" targetRef="Activity_13tqzgr" />
+  </bpmn:process>
+  <bpmn:error id="Error_1rs8fgc" name="newError" errorCode="java.lang.Exception" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1ffhp7x">
+      <bpmndi:BPMNShape id="Participant_0js9mvg_di" bpmnElement="Participant_0js9mvg" isHorizontal="true">
+        <dc:Bounds x="160" y="100" width="740" height="250" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_13tqzgr_di" bpmnElement="Activity_13tqzgr">
+        <dc:Bounds x="470" y="120" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1l3lntx_di" bpmnElement="Event_1l3lntx">
+        <dc:Bounds x="648" y="142" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="657" y="185" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1n7lwnx_di" bpmnElement="Activity_1n7lwnx" isExpanded="true">
+        <dc:Bounds x="260" y="210" width="570" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0729f0j_di" bpmnElement="Event_0729f0j">
+        <dc:Bounds x="280" y="252" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="270" y="295" width="81" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0q15e3o_di" bpmnElement="Event_0q15e3o">
+        <dc:Bounds x="762" y="252" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="771" y="295" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1lxacfy_di" bpmnElement="child-process-task">
+        <dc:Bounds x="490" y="230" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1g0dwnt_di" bpmnElement="Flow_1g0dwnt">
+        <di:waypoint x="316" y="270" />
+        <di:waypoint x="490" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1pyai4u_di" bpmnElement="Flow_1pyai4u">
+        <di:waypoint x="590" y="270" />
+        <di:waypoint x="762" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0jk7dr2_di" bpmnElement="Event_0jk7dr2">
+        <dc:Bounds x="242" y="142" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="250" y="185" width="22" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_11nw6nu_di" bpmnElement="parent-process-task">
+        <dc:Bounds x="310" y="120" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1vwmfkq_di" bpmnElement="Flow_1vwmfkq">
+        <di:waypoint x="278" y="160" />
+        <di:waypoint x="310" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1yr8ntd_di" bpmnElement="Flow_1yr8ntd">
+        <di:waypoint x="570" y="160" />
+        <di:waypoint x="648" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_04sx880_di" bpmnElement="Flow_04sx880">
+        <di:waypoint x="410" y="160" />
+        <di:waypoint x="470" y="160" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

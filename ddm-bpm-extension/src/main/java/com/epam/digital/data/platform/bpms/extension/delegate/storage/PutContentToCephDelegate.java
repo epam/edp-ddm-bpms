@@ -18,6 +18,7 @@ package com.epam.digital.data.platform.bpms.extension.delegate.storage;
 
 import com.epam.digital.data.platform.integration.ceph.service.CephService;
 import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.dto.FormDataInputWrapperDto;
 import com.epam.digital.data.platform.storage.form.service.FormDataStorageService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -45,10 +46,10 @@ public class PutContentToCephDelegate extends BaseCephDelegate {
   public static final String PROP_DATA = "data";
   public static final String PROP_SIGNATURE = "signature";
 
-  private final FormDataStorageService formDataStorageService;
+  private final FormDataStorageService<?> formDataStorageService;
   private final ObjectMapper objectMapper;
 
-  public PutContentToCephDelegate(FormDataStorageService formDataStorageService,
+  public PutContentToCephDelegate(FormDataStorageService<?> formDataStorageService,
       ObjectMapper objectMapper) {
     this.formDataStorageService = formDataStorageService;
     this.objectMapper = objectMapper;
@@ -60,7 +61,9 @@ public class PutContentToCephDelegate extends BaseCephDelegate {
     var content = contentVariable.from(execution).get();
 
     log.debug("Start putting content with key {}", key);
-    formDataStorageService.putFormData(key, deserializeContent(content));
+    var formDataInputWrapper =
+        FormDataInputWrapperDto.builder().key(key).formData(deserializeContent(content)).build();
+    formDataStorageService.putFormData(formDataInputWrapper);
     log.debug("Content put successfully with key {}", key);
   }
 

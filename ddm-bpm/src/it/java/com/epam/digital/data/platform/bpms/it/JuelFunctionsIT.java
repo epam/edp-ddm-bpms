@@ -25,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.epam.digital.data.platform.dataaccessor.sysvar.StartFormCephKeyVariable;
 import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.dto.FormDataInputWrapperDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -96,8 +97,12 @@ public class JuelFunctionsIT extends BaseIT {
 
     formDataStorageService.putFormData(taskDefinitionKey, processInstance.getId(),
         FormDataDto.builder().data(formData).build());
-    formDataStorageService.putFormData(startFormCephKey,
-        FormDataDto.builder().data(formData).build());
+    var startFormDto =
+        FormDataInputWrapperDto.builder()
+            .key(startFormCephKey)
+            .formData(FormDataDto.builder().data(formData).build())
+            .build();
+    formDataStorageService.putFormData(startFormDto);
 
     String taskId = taskService.createTaskQuery().taskDefinitionKey(taskDefinitionKey)
         .singleResult().getId();
@@ -122,8 +127,12 @@ public class JuelFunctionsIT extends BaseIT {
 
     formDataStorageService.putFormData(taskDefinitionKey, processInstance.getId(),
         FormDataDto.builder().data(data).signature(signature).build());
-    formDataStorageService.putFormData(startFormCephKey,
-        FormDataDto.builder().data(data).signature(signature).build());
+    var startFormDto =
+        FormDataInputWrapperDto.builder()
+            .key(startFormCephKey)
+            .formData(FormDataDto.builder().data(data).signature(signature).build())
+            .build();
+    formDataStorageService.putFormData(startFormDto);
 
     String taskId = taskService.createTaskQuery().taskDefinitionKey(taskDefinitionKey)
         .singleResult().getId();

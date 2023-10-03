@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
  * Extended Camunda {@link ProcessInstanceQueryDto} with a possibility of custom {@link
  * DdmProcessInstanceDto process-instance} sorting
  */
+@Deprecated(forRemoval = true)
 public class ProcessInstanceExtendedQueryDto extends ProcessInstanceQueryDto {
 
   private static final Set<String> DEFAULT_SORT_BY_VALUES = Set.of(

@@ -2,8 +2,6 @@ package com.epam.digital.data.platform.bpms.rest.dto;
 
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessExcerptIdVariable;
-
-import java.time.LocalDateTime;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 
@@ -15,6 +13,7 @@ import lombok.RequiredArgsConstructor;
  * <li>excerptId - sys-var-process-excerpt-id</li>
  */
 @RequiredArgsConstructor
+@Deprecated(forRemoval = true)
 public class SystemVariablesDto {
 
   private final Map<String, Object> variables;

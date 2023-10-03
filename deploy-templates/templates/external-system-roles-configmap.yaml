@@ -1,0 +1,13 @@
+{{- $configmap := (lookup "v1" "ConfigMap" .Release.Namespace .Values.externalSystemConfigMapName) -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.externalSystemConfigMapName }}
+data:
+  external-system-roles.yml: |-
+  {{- if $configmap }}
+    {{- index $configmap "data" "external-system-roles.yml" | nindent 4 }}
+  {{- else }}
+    roles:
+      []
+  {{- end -}}

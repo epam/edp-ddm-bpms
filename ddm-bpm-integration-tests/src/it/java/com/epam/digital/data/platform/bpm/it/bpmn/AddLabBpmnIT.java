@@ -42,7 +42,7 @@ public class AddLabBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("laboratory-equal-edrpou-name-count")
+        .resource("/search/laboratory-equal-edrpou-name-count")
         .requestBody("{\"name\":\"labName\",\"edrpou\":\"77777777\"}")
         .response("[]")
         .build());
@@ -119,7 +119,7 @@ public class AddLabBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("laboratory-equal-edrpou-name-count")
+        .resource("/search/laboratory-equal-edrpou-name-count")
         .requestBody("{\"name\":\"labName\",\"edrpou\":\"77777777\"}")
         .response("/json/add-lab/data-factory/lab-count.json")
         .build());

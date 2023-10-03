@@ -23,7 +23,6 @@ import com.epam.digital.data.platform.bpms.extension.delegate.storage.GetContent
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableReadAccessor;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableWriteAccessor;
-import com.epam.digital.data.platform.integration.ceph.service.CephService;
 import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
 import com.epam.digital.data.platform.storage.form.service.FormDataStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,12 +41,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 @RunWith(MockitoJUnitRunner.class)
 public class GetContentFromCephDelegateTest {
 
-  private static final String CEPH_BUCKET_NAME = "cephBucket";
-
   @InjectMocks
   private GetContentFromCephDelegate getContentFromCephDelegate;
   @Mock
-  private FormDataStorageService formDataStorageService;
+  private FormDataStorageService<?> formDataStorageService;
   @Mock
   private ExecutionEntity delegateExecution;
   @Spy

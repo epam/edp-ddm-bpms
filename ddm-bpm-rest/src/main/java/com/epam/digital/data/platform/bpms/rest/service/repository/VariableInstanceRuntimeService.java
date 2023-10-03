@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Deprecated(forRemoval = true)
 public class VariableInstanceRuntimeService {
 
   private final RuntimeService runtimeService;

@@ -69,7 +69,7 @@ public abstract class BaseIT {
   @Inject
   protected TaskService taskService;
   @Inject
-  protected FormDataStorageService formDataStorageService;
+  protected FormDataStorageService<?> formDataStorageService;
   @Inject
   private ObjectMapper objectMapper;
   @Inject
