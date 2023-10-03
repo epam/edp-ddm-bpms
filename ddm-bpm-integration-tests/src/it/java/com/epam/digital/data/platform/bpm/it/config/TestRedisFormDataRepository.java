@@ -17,6 +17,8 @@
 package com.epam.digital.data.platform.bpm.it.config;
 
 import com.epam.digital.data.platform.storage.form.dto.FormDataDto;
+import com.epam.digital.data.platform.storage.form.dto.FormDataInputWrapperDto;
+import com.epam.digital.data.platform.storage.form.model.RedisKeysSearchParams;
 import com.epam.digital.data.platform.storage.form.repository.FormDataRepository;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +33,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @AllArgsConstructor
-public class TestRedisFormDataRepository implements FormDataRepository {
+public class TestRedisFormDataRepository implements FormDataRepository<RedisKeysSearchParams> {
 
   private final Map<String, Object> storage = new HashMap<>();
 
@@ -44,26 +46,21 @@ public class TestRedisFormDataRepository implements FormDataRepository {
   }
 
   @Override
-  public void putFormData(String key, FormDataDto formDataDto) {
-    storage.put(key, formDataDto);
+  public void putFormData(FormDataInputWrapperDto formDataInputWrapperDto) {
+    storage.put(formDataInputWrapperDto.getKey(), formDataInputWrapperDto.getFormData());
   }
 
   @Override
-  public Set<String> getKeys(String prefix) {
+  public Set<String> getKeysBySearchParams(RedisKeysSearchParams searchParams) {
     return storage.keySet().stream()
-        .filter(s -> s.startsWith(prefix))
-        .collect(Collectors.toSet());
+            .filter(key -> key.contains(searchParams.getProcessInstanceId()))
+            .collect(Collectors.toSet());
   }
 
   @Override
   public void delete(Set<String> keys) {
     var systemSignaturePrefix = "lowcode_";
     keys.stream().filter(k -> !k.startsWith(systemSignaturePrefix)).peek(storage::remove);
-  }
-
-  @Override
-  public Set<String> keys() {
-    throw new UnsupportedOperationException();
   }
 
   public void clearStorage() {

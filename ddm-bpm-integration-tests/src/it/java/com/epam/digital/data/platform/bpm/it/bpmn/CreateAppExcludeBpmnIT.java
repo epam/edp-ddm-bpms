@@ -43,14 +43,14 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("last-laboratory-solution")
+        .resource("/search/last-laboratory-solution")
         .requestBody("{\"laboratoryId\":\"" + laboratoryId + "\"}")
         .response("/json/create-app-exclude/data-factory/lastLaboratorySolutionResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("application-type-equal-constant-code")
+        .resource("/search/application-type-equal-constant-code")
         .requestBody("{\"constantCode\":\"ADD\"}")
         .response(
             "/json/create-app-exclude/data-factory/applicationTypeEqualConstantCodeAddResponse.json")
@@ -58,7 +58,7 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("solution-type-equal-constant-code")
+        .resource("/search/solution-type-equal-constant-code")
         .requestBody("{\"constantCode\":\"ADD\"}")
         .response(
             "/json/create-app-exclude/data-factory/solutionTypeEqualConstantCodeAddResponse.json")
@@ -73,7 +73,7 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("solution-type-equal-constant-code")
+        .resource("/search/solution-type-equal-constant-code")
         .requestBody("{\"constantCode\":\"EXCLUDE\"}")
         .response(
             "/json/create-app-exclude/data-factory/solutionTypeEqualConstantCodeResponse.json")
@@ -81,7 +81,7 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("application-type-equal-constant-code")
+        .resource("/search/application-type-equal-constant-code")
         .requestBody("{\"constantCode\":\"EXCLUDE\"}")
         .response(
             "/json/create-app-exclude/data-factory/applicationTypeEqualConstantCodeResponse.json")
@@ -214,14 +214,14 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("last-laboratory-solution")
+        .resource("/search/last-laboratory-solution")
         .requestBody("{\"laboratoryId\":\"" + laboratoryId + "\"}")
         .response("/json/create-app-exclude/data-factory/lastLaboratorySolutionResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("application-type-equal-constant-code")
+        .resource("/search/application-type-equal-constant-code")
         .requestBody("{\"constantCode\":\"ADD\"}")
         .response(
             "/json/create-app-exclude/data-factory/applicationTypeEqualConstantCodeAddResponse.json")
@@ -229,7 +229,7 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("solution-type-equal-constant-code")
+        .resource("/search/solution-type-equal-constant-code")
         .requestBody("{\"constantCode\":\"ADD\"}")
         .response(
             "/json/create-app-exclude/data-factory/solutionTypeEqualConstantCodeAddResponse.json")
@@ -244,7 +244,7 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("solution-type-equal-constant-code")
+        .resource("/search/solution-type-equal-constant-code")
         .requestBody("{\"constantCode\":\"WO_CONSIDER\"}")
         .response(
             "/json/create-app-exclude/data-factory/solutionTypeEqualConstantCodeWoConsiderResponse.json")
@@ -252,7 +252,7 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("application-type-equal-constant-code")
+        .resource("/search/application-type-equal-constant-code")
         .requestBody("{\"constantCode\":\"EXCLUDE\"}")
         .response(
             "/json/create-app-exclude/data-factory/applicationTypeEqualConstantCodeResponse.json")
@@ -387,14 +387,14 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("last-laboratory-solution")
+        .resource("/search/last-laboratory-solution")
         .requestBody("{\"laboratoryId\":\"" + laboratoryId + "\"}")
         .response("/json/create-app-exclude/data-factory/lastLaboratorySolutionDenyResponse.json")
         .build());
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("application-type-equal-constant-code")
+        .resource("/search/application-type-equal-constant-code")
         .requestBody("{\"constantCode\":\"ADD\"}")
         .response(
             "/json/create-app-exclude/data-factory/applicationTypeEqualConstantCodeAddResponse.json")
@@ -402,7 +402,7 @@ public class CreateAppExcludeBpmnIT extends BaseBpmnIT {
     stubDataFactoryRequest(StubData.builder()
         .httpMethod(HttpMethod.POST)
         .headers(Map.of("X-Access-Token", testUserToken))
-        .resource("solution-type-equal-constant-code")
+        .resource("/search/solution-type-equal-constant-code")
         .requestBody("{\"constantCode\":\"ADD\"}")
         .response(
             "/json/create-app-exclude/data-factory/solutionTypeEqualConstantCodeAddResponse.json")

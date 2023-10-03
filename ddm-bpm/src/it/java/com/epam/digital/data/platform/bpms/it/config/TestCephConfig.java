@@ -21,8 +21,10 @@ import com.epam.digital.data.platform.storage.file.repository.CephFormDataFileRe
 import com.epam.digital.data.platform.storage.file.repository.FormDataFileRepository;
 import com.epam.digital.data.platform.storage.file.service.FormDataFileKeyProviderImpl;
 import com.epam.digital.data.platform.storage.file.service.FormDataFileStorageService;
+import com.epam.digital.data.platform.storage.form.model.CephKeysSearchParams;
 import com.epam.digital.data.platform.storage.form.repository.CephFormDataRepository;
 import com.epam.digital.data.platform.storage.form.repository.FormDataRepository;
+import com.epam.digital.data.platform.storage.form.service.CephFormDataStorageService;
 import com.epam.digital.data.platform.storage.form.service.FormDataKeyProviderImpl;
 import com.epam.digital.data.platform.storage.form.service.FormDataStorageService;
 import com.epam.digital.data.platform.storage.message.repository.CephMessagePayloadRepository;
@@ -53,7 +55,7 @@ public class TestCephConfig {
 
   @Bean
   @Primary
-  public FormDataRepository formDataRepository(CephService cephService) {
+  public FormDataRepository<?> formDataRepository(CephService cephService) {
     return CephFormDataRepository.builder()
         .cephBucketName(cephBucketName)
         .objectMapper(objectMapper)
@@ -83,8 +85,8 @@ public class TestCephConfig {
   @Bean
   @Primary
   @ConditionalOnProperty(prefix = "storage.form-data", name = "type", havingValue = "test-ceph")
-  public FormDataStorageService formDataStorageService(FormDataRepository formDataRepository) {
-    return FormDataStorageService.builder()
+  public FormDataStorageService<?> formDataStorageService(FormDataRepository<CephKeysSearchParams> formDataRepository) {
+    return CephFormDataStorageService.builder()
         .keyProvider(new FormDataKeyProviderImpl())
         .repository(formDataRepository)
         .build();

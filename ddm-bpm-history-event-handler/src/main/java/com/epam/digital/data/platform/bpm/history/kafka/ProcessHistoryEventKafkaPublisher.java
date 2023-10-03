@@ -22,6 +22,7 @@ import com.epam.digital.data.platform.bpm.history.base.publisher.ProcessHistoryE
 import com.epam.digital.data.platform.starter.kafka.config.properties.KafkaProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
 
 /**
@@ -56,19 +57,23 @@ public class ProcessHistoryEventKafkaPublisher implements ProcessHistoryEventPub
 
   private void sendHistoryProcessInstanceDto(HistoryProcess dto) {
     var topicName = kafkaProperties.getTopics().get("history-process-instance-topic");
-    send(topicName, dto);
+    var producerRecord =
+        new ProducerRecord<String, Object>(topicName, dto.getProcessInstanceId(), dto);
+    send(producerRecord);
   }
 
   private void sendHistoryTaskDto(HistoryTask dto) {
     var topicName = kafkaProperties.getTopics().get("history-task-topic");
-    send(topicName, dto);
+    var producerRecord =
+        new ProducerRecord<String, Object>(topicName, dto.getActivityInstanceId(), dto);
+    send(producerRecord);
   }
 
-  private <T> void send(String topic, T dto) {
-    var future = kafkaTemplate.send(topic, dto);
+  private void send(ProducerRecord<String, Object> record) {
+    var future = kafkaTemplate.send(record);
 
-    future.addCallback(result -> log.debug("Successful sending message {} to topic {}", dto, topic),
-        ex -> log.warn("Sending message {} to topic {} failed: Cause {}", dto, topic,
+    future.addCallback(result -> log.debug("Successful sending message {} to topic {}", record.value(), record.topic()),
+        ex -> log.warn("Sending message {} to topic {} failed: Cause {}", record.value(), record.topic(),
             ex.getMessage(), ex));
   }
 }

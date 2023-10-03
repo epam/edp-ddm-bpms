@@ -41,8 +41,6 @@ data-platform:
     topic-properties:
       creation:
         enabled: true
-        num-partitions: 1
-        replication-factor: 1
     topics:
       history-process-instance-topic: bpm-history-process
       history-task-topic: bpm-history-task
@@ -160,3 +158,11 @@ springdoc:
     path: /openapi
     disable-swagger-default-url: true
     filter: true
+
+cleanup:
+  bp-end-listeners:
+    thread-pool-size: 10
+    file-cleaner:
+      enabled: true
+    form-data-cleaner:
+      enabled: true

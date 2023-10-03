@@ -41,7 +41,7 @@ public class GetStartFormDataFromCephDelegate extends BaseFormDataDelegate {
 
   private final StartFormCephKeyVariable startFormCephKeyVariable;
 
-  public GetStartFormDataFromCephDelegate(FormDataStorageService formDataStorageService,
+  public GetStartFormDataFromCephDelegate(FormDataStorageService<?> formDataStorageService,
       StartFormCephKeyVariable startFormCephKeyVariable) {
     super(formDataStorageService);
     this.startFormCephKeyVariable = startFormCephKeyVariable;

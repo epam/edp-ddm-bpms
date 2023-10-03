@@ -22,10 +22,12 @@ import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.integration.idm.model.IdmUser;
 import com.epam.digital.data.platform.integration.idm.service.IdmService;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -38,6 +40,8 @@ public class KeycloakGetOfficerUsersConnectorDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "keycloakGetUsersConnectorDelegate";
   private static final String DEFAULT_ROLE = "officer";
+  private static final Integer DEFAULT_OFFSET= 0;
+  private static final Integer DEFAULT_LIMIT = 100;
 
   @Qualifier("officer-keycloak-client-service")
   private final IdmService idmService;
@@ -46,19 +50,32 @@ public class KeycloakGetOfficerUsersConnectorDelegate extends BaseJavaDelegate {
   private NamedVariableAccessor<String> roleNameVariable;
   @SystemVariable(name = "usersByRole")
   private NamedVariableAccessor<List<IdmUser>> usersByRoleVariable;
+  @SystemVariable(name = "limit")
+  private NamedVariableAccessor<String> limitVariable;
+  @SystemVariable(name = "offset")
+  private NamedVariableAccessor<String> offsetVariable;
 
   @Override
   public void executeInternal(DelegateExecution execution) throws Exception {
     usersByRoleVariable.on(execution).set(List.of());
 
     var role = roleNameVariable.from(execution).getOrDefault(DEFAULT_ROLE);
+    var offset = toInteger(offsetVariable.from(execution).get());
+    var limit = toInteger(limitVariable.from(execution).get());
 
-    var roleUserMembers = idmService.getRoleUserMembers(role);
+    var roleUserMembers = idmService.getRoleUserMembers(role,
+        Objects.requireNonNullElse(offset, DEFAULT_OFFSET),
+        Objects.requireNonNullElse(limit, DEFAULT_LIMIT));
     usersByRoleVariable.on(execution).set(roleUserMembers);
   }
 
   @Override
   public String getDelegateName() {
     return DELEGATE_NAME;
+  }
+
+  @Nullable
+  private Integer toInteger(@Nullable String value) {
+    return Objects.isNull(value) ? null : Integer.valueOf(value);
   }
 }

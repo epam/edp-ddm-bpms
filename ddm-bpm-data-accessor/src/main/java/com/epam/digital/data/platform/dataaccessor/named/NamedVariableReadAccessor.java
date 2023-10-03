@@ -37,6 +37,14 @@ public interface NamedVariableReadAccessor<T> {
   T get();
 
   /**
+   * Get nullable variable value from storage
+   *
+   * @return return variable value if variable is present or {@code null}
+   */
+  @Nullable
+  T getLocal();
+
+  /**
    * Get name of variable
    *
    * @return variable name

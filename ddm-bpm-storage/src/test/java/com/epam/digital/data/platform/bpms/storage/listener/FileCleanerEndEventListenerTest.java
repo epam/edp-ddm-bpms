@@ -27,6 +27,7 @@ import com.epam.digital.data.platform.dgtldcmnt.client.DigitalDocumentServiceRes
 import com.epam.digital.data.platform.integration.idm.service.IdmService;
 import com.epam.digital.data.platform.starter.kafka.config.properties.KafkaProperties;
 import java.util.Map;
+
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.util.concurrent.FailureCallback;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.SuccessCallback;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @ExtendWith(MockitoExtension.class)
 class FileCleanerEndEventListenerTest {
@@ -56,9 +58,12 @@ class FileCleanerEndEventListenerTest {
   @Mock
   private KafkaProperties kafkaProperties;
   private FileCleanerEndEventListener fileCleanerEndEventListener;
+  private ThreadPoolTaskExecutor taskExecutor;
 
   @BeforeEach
   void setUp() {
+    taskExecutor = new ThreadPoolTaskExecutor();
+    taskExecutor.initialize();
     Mockito.doReturn(PROCESS_INSTANCE_ID).when(executionEntity).getProcessInstanceId();
   }
 

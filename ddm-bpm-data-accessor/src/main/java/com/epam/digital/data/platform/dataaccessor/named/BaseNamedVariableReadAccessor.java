@@ -33,6 +33,10 @@ public class BaseNamedVariableReadAccessor<T> implements NamedVariableReadAccess
     return accessor.getVariable(name);
   }
 
+  public T getLocal() {
+    return accessor.getVariableLocal(name);
+  }
+
   @Override
   public String getName() {
     return this.name;

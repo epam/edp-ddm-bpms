@@ -37,7 +37,7 @@ public class GetFormDataFromCephDelegate extends BaseFormDataDelegate {
 
   public static final String DELEGATE_NAME = "getFormDataFromCephDelegate";
 
-  public GetFormDataFromCephDelegate(FormDataStorageService formDataStorageService) {
+  public GetFormDataFromCephDelegate(FormDataStorageService<?> formDataStorageService) {
     super(formDataStorageService);
   }
 

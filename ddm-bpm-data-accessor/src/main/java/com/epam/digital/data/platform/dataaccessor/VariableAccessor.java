@@ -37,6 +37,18 @@ public interface VariableAccessor {
   <T> T getVariable(@NonNull String name);
 
   /**
+   * Returns nullable variable value from local scope of variable storage
+   *
+   * @param name name of the variable
+   * @param <T>  type of the variable
+   * @return variable value or {@code null} if variable doesn't exist
+   * @throws ClassCastException in case if variable in variable storage has different type than
+   *                            expected
+   */
+  @Nullable
+  <T> T getVariableLocal(@NonNull String name);
+
+  /**
    * Set new or override existed variable in variable storage
    *
    * @param name  name of the variable

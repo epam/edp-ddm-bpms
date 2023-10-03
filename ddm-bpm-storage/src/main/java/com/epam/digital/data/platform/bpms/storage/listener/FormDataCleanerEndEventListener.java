@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,28 +36,31 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FormDataCleanerEndEventListener implements ExecutionListener {
 
-  private final FormDataStorageService formDataStorageService;
+  private final FormDataStorageService<?> formDataStorageService;
   private final StartFormCephKeyVariable startFormCephKeyVariable;
+  private final TaskExecutor endEventListenerExecutor;
 
   @Override
-  public void notify(DelegateExecution execution) throws Exception {
+  public void notify(DelegateExecution execution) {
     var startFormDataCephKey = startFormCephKeyVariable.from(execution).get();
     var processInstanceId = execution.getProcessInstanceId();
-    try {
-      deleteFormData(processInstanceId, startFormDataCephKey);
-      formDataStorageService.deleteSystemSignaturesByRootProcessInstanceId(processInstanceId);
-    } catch (RuntimeException ex) {
-      log.warn(
-          "Error while deleting form data from ceph, processDefinitionId={}, processInstanceId={}, startFormDataCephKey={}",
-          execution.getProcessDefinitionId(), processInstanceId, startFormDataCephKey, ex);
-    }
+    var processDefinitionId = execution.getProcessDefinitionId();
+    endEventListenerExecutor.execute(() -> {
+      try {
+        deleteFormData(processInstanceId, startFormDataCephKey);
+      } catch (RuntimeException ex) {
+        log.warn(
+                "Error while deleting form data from storage, processDefinitionId={}, processInstanceId={}, startFormDataCephKey={}",
+                processDefinitionId, processInstanceId, startFormDataCephKey, ex);
+      }
+    });
   }
 
   private void deleteFormData(String processInstanceId, String startFormDataCephKey) {
     if (Objects.isNull(startFormDataCephKey)) {
-      formDataStorageService.deleteByProcessInstanceId(processInstanceId);
+      formDataStorageService.deleteByProcessInstance(processInstanceId);
     } else {
-      formDataStorageService.deleteByProcessInstanceId(processInstanceId, startFormDataCephKey);
+      formDataStorageService.deleteByProcessInstance(processInstanceId, startFormDataCephKey);
     }
   }
 }

@@ -1,0 +1,37 @@
+{
+  "self": null,
+  "id": null,
+  "origin": null,
+  "createdTimestamp": null,
+  "username": "dee7fda4487da26fa11e82cef89c33525dd6e961c694219e3bca915249778a6e",
+  "enabled": true,
+  "totp": null,
+  "emailVerified": null,
+  "firstName": "Іван Іванович",
+  "lastName": "Іванов",
+  "email": null,
+  "federationLink": null,
+  "serviceAccountClientId": null,
+  "attributes": {
+    "drfo": [
+      "1234567890"
+    ],
+    "fullName": [
+      "Іванов Іван Іванович"
+    ]
+  },
+  "credentials": null,
+  "disableableCredentialTypes": null,
+  "requiredActions": null,
+  "federatedIdentities": null,
+  "realmRoles": [
+    "officer"
+  ],
+  "clientRoles": null,
+  "clientConsents": null,
+  "notBefore": null,
+  "applicationRoles": null,
+  "socialLinks": null,
+  "groups": null,
+  "access": null
+}

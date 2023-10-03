@@ -40,6 +40,14 @@ public class DelegateExecutionVariableAccessor implements VariableAccessor {
     return Objects.isNull(variable) ? null : (T) variable;
   }
 
+  @SuppressWarnings("unchecked")
+  @Nullable
+  @Override
+  public <T> T getVariableLocal(@NonNull String name) {
+    var variable = execution.getVariableLocal(name);
+    return Objects.isNull(variable) ? null : (T) variable;
+  }
+
   @Override
   public void setVariable(@NonNull String name, @Nullable Object value) {
     execution.setVariable(name, value);

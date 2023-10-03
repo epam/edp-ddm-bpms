@@ -24,6 +24,7 @@ import lombok.Data;
  */
 @Data
 @Builder
+@Deprecated(forRemoval = true)
 public class DdmProcessInstanceQueryDto {
 
   private boolean rootProcessInstances;

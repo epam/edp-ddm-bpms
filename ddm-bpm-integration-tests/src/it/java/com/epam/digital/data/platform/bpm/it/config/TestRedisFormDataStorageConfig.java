@@ -16,8 +16,10 @@
 
 package com.epam.digital.data.platform.bpm.it.config;
 
+import com.epam.digital.data.platform.storage.form.model.RedisKeysSearchParams;
 import com.epam.digital.data.platform.storage.form.service.FormDataKeyProviderImpl;
 import com.epam.digital.data.platform.storage.form.service.FormDataStorageService;
+import com.epam.digital.data.platform.storage.form.service.RedisFormDataStorageService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,8 +29,8 @@ public class TestRedisFormDataStorageConfig {
 
   @Bean
   @ConditionalOnProperty(prefix = "storage.form-data", name = "type", havingValue = "test-redis")
-  public FormDataStorageService redisFormDataStorageService(TestRedisFormDataRepository redisFormDataRepository) {
-    return FormDataStorageService.builder()
+  public FormDataStorageService<RedisKeysSearchParams> redisFormDataStorageService(TestRedisFormDataRepository redisFormDataRepository) {
+    return RedisFormDataStorageService.builder()
         .keyProvider(new FormDataKeyProviderImpl())
         .repository(redisFormDataRepository)
         .build();

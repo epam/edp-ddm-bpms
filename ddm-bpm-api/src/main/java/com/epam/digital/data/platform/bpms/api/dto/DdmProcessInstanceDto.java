@@ -27,6 +27,7 @@ import lombok.ToString;
 @Builder
 @ToString
 @EqualsAndHashCode
+@Deprecated(forRemoval = true)
 public class DdmProcessInstanceDto {
 
   private String id;

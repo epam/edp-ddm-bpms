@@ -25,8 +25,8 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,26 +44,29 @@ public class StorageBpmnParseListener extends AbstractBpmnParseListener {
   private final FileCleanerEndEventListener fileCleanerEndEventListener;
   private final FormDataCleanerEndEventListener formDataCleanerEndEventListener;
   private final MessagePayloadCleanerEndEventListener messagePayloadCleanerEndEventListener;
-  @Value("${storage.form-data.cleaningEndEventEnabled:true}")
+  @Value("${cleanup.bp-end-listeners.form-data-cleaner.enabled:true}")
   private final boolean isEnabledFormDataCleaningEndEvent;
+  @Value("${cleanup.bp-end-listeners.file-cleaner.enabled:true}")
+  private final boolean isEnabledFileCleaningEndEvent;
+
+  @Override
+  public void parseProcess(Element processElement, ProcessDefinitionEntity processDefinition) {
+    if (isEnabledFileCleaningEndEvent) {
+      processDefinition.addBuiltInListener(
+          ExecutionListener.EVENTNAME_END, fileCleanerEndEventListener);
+    }
+    if (isEnabledFormDataCleaningEndEvent) {
+      processDefinition.addBuiltInListener(ExecutionListener.EVENTNAME_END,
+          formDataCleanerEndEventListener);
+    }
+    processDefinition.addBuiltInListener(ExecutionListener.EVENTNAME_END,
+        messagePayloadCleanerEndEventListener);
+  }
 
   @Override
   public void parseUserTask(Element userTaskElement, ScopeImpl scope, ActivityImpl activity) {
     var userTaskActivityBehavior = ((UserTaskActivityBehavior) activity.getActivityBehavior());
     var taskDefinition = userTaskActivityBehavior.getTaskDefinition();
     taskDefinition.addTaskListener(TaskListener.EVENTNAME_CREATE, putFormDataToStorageTaskListener);
-  }
-
-  @Override
-  public void parseEndEvent(Element endEventElement, ScopeImpl scope, ActivityImpl endActivity) {
-    if (scope instanceof ProcessDefinitionImpl) {
-      endActivity.addBuiltInListener(ExecutionListener.EVENTNAME_END, fileCleanerEndEventListener);
-      if (isEnabledFormDataCleaningEndEvent) {
-        endActivity.addBuiltInListener(ExecutionListener.EVENTNAME_END,
-                formDataCleanerEndEventListener);
-      }
-      endActivity.addBuiltInListener(ExecutionListener.EVENTNAME_END,
-          messagePayloadCleanerEndEventListener);
-    }
   }
 }

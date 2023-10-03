@@ -4,6 +4,7 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+ddm-bpm/src/main/resources/openapi/
 
 ### STS ###
 .apt_generated

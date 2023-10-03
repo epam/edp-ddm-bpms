@@ -84,7 +84,7 @@ public class KeycloakCreateOfficerUserDelegate extends BaseJavaDelegate {
 
     var fullName = fullNameVariable.from(execution).getOrThrow();
     validateSystemAttribute(fullName, FULL_NAME_REGEX, ATTRIBUTE_FULL_NAME);
-    var edrpou = edrpouVariable.from(execution).getOrThrow();
+    var edrpou = edrpouVariable.from(execution).get();
     validateSystemAttribute(edrpou, EDRPOU_REGEX, ATTRIBUTE_EDRPOU);
     var drfo = drfoVariable.from(execution).getOrThrow();
     validateSystemAttribute(drfo, DRFO_REGEX, ATTRIBUTE_DRFO);

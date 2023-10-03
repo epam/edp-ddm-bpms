@@ -45,7 +45,7 @@ public class PutFormDataToCephDelegate extends BaseFormDataDelegate {
 
   private final ObjectMapper objectMapper;
 
-  public PutFormDataToCephDelegate(FormDataStorageService formDataStorageService,
+  public PutFormDataToCephDelegate(FormDataStorageService<?> formDataStorageService,
       ObjectMapper objectMapper) {
     super(formDataStorageService);
     this.objectMapper = objectMapper;

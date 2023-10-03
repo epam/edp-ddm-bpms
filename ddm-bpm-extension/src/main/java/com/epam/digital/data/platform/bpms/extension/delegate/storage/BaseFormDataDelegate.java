@@ -30,7 +30,7 @@ import org.camunda.spin.json.SpinJsonNode;
 @RequiredArgsConstructor
 public abstract class BaseFormDataDelegate extends BaseJavaDelegate {
 
-  protected final FormDataStorageService formDataStorageService;
+  protected final FormDataStorageService<?> formDataStorageService;
 
   @SystemVariable(name = "taskDefinitionKey")
   protected NamedVariableAccessor<String> taskDefinitionKeyVariable;

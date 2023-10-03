@@ -41,7 +41,7 @@ public class RegistryConnectorDelegatesIT extends BaseIT {
   public void searchInAnotherRegistry() {
     platformGatewayMockServer.addStubMapping(
         stubFor(post(urlPathEqualTo(
-            "/data-factory/another_registry/test_resource"))
+            "/data-factory/another_registry/search/test_resource"))
             .withRequestBody(equalTo("{\"searchVariable\":\"searchValue\"}"))
             .withHeader("Content-Type", equalTo("application/json"))
             .withHeader("X-Source-System", equalTo("Low-code Platform"))

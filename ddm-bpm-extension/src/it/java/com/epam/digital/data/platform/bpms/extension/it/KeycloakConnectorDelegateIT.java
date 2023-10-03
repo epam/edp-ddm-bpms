@@ -127,7 +127,7 @@ public class KeycloakConnectorDelegateIT extends BaseIT {
   @Test
   @Deployment(resources = {"bpmn/connector/testGetUsersByDefinedRoleKeycloak.bpmn"})
   public void shouldGetUsersByRoleFromKeycloak() {
-    var getUsersUrl = "/auth/admin/realms/officer-realm/roles/test-role-name/users";
+    var getUsersUrl = "/auth/admin/realms/officer-realm/roles/test-role-name/users?first=0&max=100";
     mockConnectToKeycloak(officerRealm);
     mockKeycloakGetUsersByRole("test-role-name",
         "/json/keycloak/keycloakUsersByDefinedRoleResponse.json");
@@ -141,7 +141,7 @@ public class KeycloakConnectorDelegateIT extends BaseIT {
   @Test
   @Deployment(resources = {"bpmn/connector/testGetUsersByNotDefinedRoleKeycloak.bpmn"})
   public void shouldGetUsersByDefaultRoleFromKeycloak() {
-    var getUsersUrl = "/auth/admin/realms/officer-realm/roles/officer/users";
+    var getUsersUrl = "/auth/admin/realms/officer-realm/roles/officer/users?first=0&max=100";
     mockConnectToKeycloak(officerRealm);
     mockKeycloakGetUsersByRole("officer",
         "/json/keycloak/keycloakUsersByNotDefinedRoleResponse.json");
