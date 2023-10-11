@@ -1,0 +1,115 @@
+version: '3.1'
+
+services:
+  bpm-db:
+    image: postgres:9.6
+    container_name: bpm-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: camunda
+      POSTGRES_USER: bpms
+      POSTGRES_PASSWORD: password
+
+  redis-master:
+    image: redis:6.2.6-alpine
+    volumes:
+      - "redis:/data"
+    ports:
+      - "6379:6379"
+
+  redis-slave:
+    image: redis:6.2.6-alpine
+    command: redis-server --slaveof 127.0.0.1 6379
+    links:
+      - redis-master
+    volumes:
+      - "redis:/data"
+    depends_on:
+      - redis-master
+
+  redis-sentinel:
+    image: redis:6.2.6-alpine
+    restart: always
+    ports:
+      - '26379-26381:26379'
+    command: redis-server /redis/sentinel.conf '--sentinel'
+    volumes:
+      - redis:/data
+      - ./docker-local/redis:/redis/
+    depends_on:
+      - redis-master
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:redis-master:6379
+      - HTTP_USER=root
+      - HTTP_PASSWORD=qwerty
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis-master
+
+  digital-signature-ops-mock:
+    image: holomekc/wiremock-gui:latest
+    container_name: digital-signature-ops-mock
+    ports:
+      - "8100:8080"
+    volumes:
+      - ./docker-local/digital-signature-ops-mock:/home/wiremock/mappings
+
+  registry-rest-api-mock:
+    image: holomekc/wiremock-gui:latest
+    container_name: registry-rest-api-mock
+    ports:
+      - "8877:8080"
+
+  excerpt-service-api-mock:
+    image: holomekc/wiremock-gui:latest
+    container_name: excerpt-service-api-mock
+    ports:
+      - "9999:8080"
+
+  keycloak-mock:
+    image: holomekc/wiremock-gui:latest
+    container_name: keycloak-mock
+    ports:
+      - "8200:8080"
+
+  digital-document-service-mock:
+    image: holomekc/wiremock-gui:latest
+    container_name: digital-document-service-mock
+    ports:
+      - "8082:8080"
+
+  business-process-management-service:
+    build: .
+    platform: linux/x86_64
+    container_name: business-process-management-service
+    user: root
+    ports:
+      - "8080:8080"
+      - "5005:5005"
+    environment:
+      JAVA_OPTS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dspring.profiles.active=local"
+    depends_on:
+      - bpm-db
+      - redis-sentinel
+      - digital-document-service-mock
+      - digital-signature-ops-mock
+      - registry-rest-api-mock
+      - excerpt-service-api-mock
+      - keycloak-mock
+    links:
+      - bpm-db
+      - redis-sentinel
+      - digital-document-service-mock
+      - digital-signature-ops-mock
+      - registry-rest-api-mock
+      - excerpt-service-api-mock
+      - keycloak-mock
+
+volumes:
+  redis:
+    driver: local

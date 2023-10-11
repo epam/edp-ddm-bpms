@@ -95,6 +95,12 @@
       <artifactId>spring-cloud-starter-openfeign</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.epam.digital.data.platform</groupId>
+      <artifactId>ddm-starter-kafka</artifactId>
+      <version>${ddm-starter-kafka.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.camunda.bpm.assert</groupId>
       <artifactId>camunda-bpm-assert</artifactId>
       <version>${camunda.bpm.assert.version}</version>
