@@ -1,3 +1,4 @@
+# Camunda engine configuration
 camunda:
   bpm:
     authorization:
@@ -5,49 +6,62 @@ camunda:
     job-execution:
       deployment-aware: true
     database:
-      schema-update: false
+      schema-update: true
     admin-user:
       id: ${camunda.admin-user-id}
       password: camunda
     history-level: AUDIT
     database-history-level: ACTIVITY
 
+# Kafka configuration
 data-platform:
   kafka:
     enabled: false
+    bootstrap: docker-desktop:${NODE_PORT}
+    consumer:
+      enabled: false
+    topic-properties:
+      num-partitions: 15
+      replication-factor: 3
+    ssl:
+      enabled: false
+    error-handler:
+      initial-interval: 1500
+      max-elapsed-time: 6000
+      multiplier: 2
 
-registry-rest-api:
-  url: http://localhost:8877/mock-server
-
+# Spring configuration
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/camunda
+    url: jdbc:postgresql://bpm-db:5432/camunda
     username: bpms
     password: password
+  zipkin:
+    enabled: false
 
-lowcode:
+# Platform-security config
+platform:
   security:
     enabled: false
 
+# Digital-signature-ops service url
 dso:
-  url: http://localhost:8100
+  url: http://digital-signature-ops-mock:8080
+
+# Excerpt-service-api service url
 excerpt-service-api:
-  url: http://localhost:9999
+  url: http://excerpt-service-api-mock:8080
 
-ceph:
-  http-endpoint: http://localhost:8100
-  access-key: access-key
-  secret-key: secret-key
-  bucket: bucket
+# Digital-document-service url
+digital-document-service:
+  url: http://digital-document-service-mock:8080
 
-s3:
-  config:
-    client:
-      protocol: http
-    options:
-      pathStyleAccess: true
+# Url for registry-rest-api service
+registry-rest-api:
+  url: http://registry-rest-api-mock:8080
 
+# Form-data storage configuration
 storage:
   form-data:
     type: redis
@@ -57,18 +71,11 @@ storage:
     redis:
       sentinel:
         master: mymaster
-        nodes: 127.0.0.1:26379
-  file-data:
-    type: ceph
-    backend:
-      ceph:
-        http-endpoint: ${ceph.http-endpoint}
-        access-key: access-key
-        secret-key: secret-key
-        bucket: bucket
+        nodes: redis-sentinel:26379
 
+# Keycloak service integration configuration
 keycloak:
-  url: http://localhost:8200
+  url: http://keycloak-mock:8080
   citizen:
     realm: citizenRealm
     client-id: citizenClientId
@@ -81,6 +88,3 @@ keycloak:
     realm: systemUserRealm
     client-id: systemUserClientId
     client-secret: systemUserClientSecret
-
-digital-document-service:
-  url: http://localhost:8082

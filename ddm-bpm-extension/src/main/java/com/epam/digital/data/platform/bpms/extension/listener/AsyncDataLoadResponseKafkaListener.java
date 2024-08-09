@@ -16,6 +16,7 @@
 
 package com.epam.digital.data.platform.bpms.extension.listener;
 
+import com.epam.digital.data.platform.bpms.extension.delegate.AsyncDataLoadDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.dto.AsyncDataLoadResponse;
 import com.epam.digital.data.platform.bpms.extension.delegate.dto.Result;
 import com.epam.digital.data.platform.starter.kafka.config.properties.KafkaProperties;
@@ -24,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
 import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.MessageHeaders;
@@ -37,6 +39,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnProperty(prefix = "data-platform", name = {
     "kafka.consumer.enabled"}, havingValue = "true")
+@ConditionalOnBean(AsyncDataLoadDelegate.class)
 public class AsyncDataLoadResponseKafkaListener {
 
   private static final String ACTION = "__data-load-csv__";

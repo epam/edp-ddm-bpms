@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPattern": "/api/eseal/sign"
+  },
+  "response": {
+    "status": 200,
+    "body": "{\"signature\":\"someSignature\"}",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

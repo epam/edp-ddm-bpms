@@ -1,4 +1,4 @@
-{{- if not .Values.global.disableRequestsLimits }}
+{{- if .Values.global.registry.bpms.hpa.enabled }}
 kind: HorizontalPodAutoscaler
 apiVersion: {{ include "horizontalPodAutoscaler.apiVersion" . }}
 metadata:
@@ -11,8 +11,8 @@ spec:
     kind: Deployment
     name: {{ .Chart.Name }}
     apiVersion: apps/v1
-  minReplicas: 1
-  maxReplicas: 3
+  minReplicas: {{ .Values.global.registry.bpms.hpa.minReplicas }}
+  maxReplicas: {{ .Values.global.registry.bpms.hpa.maxReplicas }}
   metrics:
     - type: Resource
       resource:

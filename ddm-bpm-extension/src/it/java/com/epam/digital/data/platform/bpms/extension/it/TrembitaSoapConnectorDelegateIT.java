@@ -35,7 +35,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-public class TrembitaSoapConnectorDelegateIT extends BaseIT{
+public class TrembitaSoapConnectorDelegateIT extends BaseIT {
 
   @Inject
   @Qualifier("soap-connector")
@@ -43,11 +43,26 @@ public class TrembitaSoapConnectorDelegateIT extends BaseIT{
 
   @Test
   @Deployment(resources = {"bpmn/connector/testTrembitaSoapConnectorDelegate.bpmn"})
-  public void shouldPassWithoutErrors() throws Exception {
-    stubSoapHttpConnector();
+  public void shouldPassWithoutErrorsXmlResponse() throws Exception {
+    var response = Files.readString(
+        Paths.get(TestUtils.class.getResource("/xml/trembitaSoapConnectorResponse.xml").toURI()),
+        StandardCharsets.UTF_8);
+    stubSoapHttpConnector(response);
 
     var processInstance = runtimeService
         .startProcessInstanceByKey("trembita-soap-delegate");
+
+    assertThat(processInstance.isEnded()).isTrue();
+  }
+
+  @Test
+  @Deployment(resources = {"bpmn/connector/testTrembitaSoapConnectorDelegateStringResponse.bpmn"})
+  public void shouldPassWithoutErrorsStringResponse() throws Exception {
+    var response = "Could not find addresses for service provider";
+    stubSoapHttpConnector(response);
+
+    var processInstance = runtimeService
+        .startProcessInstanceByKey("trembita-soap-delegate-string-response");
 
     assertThat(processInstance.isEnded()).isTrue();
   }
@@ -81,7 +96,8 @@ public class TrembitaSoapConnectorDelegateIT extends BaseIT{
   public void trembitaSoapConnectorWrongSystemNameDefined() {
     var ex = assertThrows(IllegalArgumentException.class, () -> runtimeService
         .startProcessInstanceByKey("trembita_soap_connector_wrong_system_name_defined"));
-    assertThat(ex.getMessage()).isEqualTo("Trembita system configuration with name system not configured");
+    assertThat(ex.getMessage()).isEqualTo(
+        "Trembita system configuration with name system not configured");
   }
 
   @Test
@@ -89,14 +105,12 @@ public class TrembitaSoapConnectorDelegateIT extends BaseIT{
   public void trembitaSoapConnectorNoSubsystemPropertiesDefined() {
     var ex = assertThrows(IllegalArgumentException.class, () -> runtimeService
         .startProcessInstanceByKey("trembita_soap_connector_no_subsystem_properties_defined"));
-    assertThat(ex.getMessage()).isEqualTo("Trembita system configuration with name system-without-subsystem-properties not configured");
+    assertThat(ex.getMessage()).isEqualTo(
+        "Trembita system configuration with name system-without-subsystem-properties not configured");
   }
 
 
-  private void stubSoapHttpConnector() throws Exception {
-    var response = Files.readString(
-        Paths.get(TestUtils.class.getResource("/xml/trembitaSoapConnectorResponse.xml").toURI()),
-        StandardCharsets.UTF_8);
+  private void stubSoapHttpConnector(String response) throws Exception {
     var systemHeaders = Files.readString(
         Paths.get(TestUtils.class.getResource("/xml/trembitaSystemHeadersRequest.xml").toURI()),
         StandardCharsets.UTF_8);
