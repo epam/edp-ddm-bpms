@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.spin.Spin;
 import org.camunda.spin.json.SpinJsonNode;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
@@ -47,6 +48,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @RequiredArgsConstructor
 @Component(AsyncDataLoadDelegate.DELEGATE_NAME)
+@ConditionalOnBean(KafkaProperties.class)
 public class AsyncDataLoadDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "asyncDataLoadDelegate";

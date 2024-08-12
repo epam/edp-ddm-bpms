@@ -18,12 +18,14 @@ package com.epam.digital.data.platform.bpms.extension.delegate.connector;
 
 import com.epam.digital.data.platform.bpms.extension.delegate.BaseJavaDelegate;
 import com.epam.digital.data.platform.bpms.extension.delegate.connector.header.builder.HeaderBuilderFactory;
+import com.epam.digital.data.platform.bpms.extension.exception.SignatureValidationException;
 import com.epam.digital.data.platform.dataaccessor.annotation.SystemVariable;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessor;
 import com.epam.digital.data.platform.dso.api.dto.SignFormat;
 import com.epam.digital.data.platform.dso.api.dto.SignInfoRequestDto;
 import com.epam.digital.data.platform.dso.api.dto.ValidationResponseDto;
 import com.epam.digital.data.platform.dso.client.DigitalSignatureRestClient;
+import com.epam.digital.data.platform.dso.client.exception.InternalServerErrorException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -62,10 +64,16 @@ public class DigitalSignatureValidateDelegate extends BaseJavaDelegate {
         .contentTypeJson()
         .accessTokenHeader()
         .build();
-    var reqBody = SignInfoRequestDto.builder().data(signedData).container(container).build();
-    var validationResult = digitalSignatureRestClient.validate(reqBody, headers);
-    log.debug("Validation finished, result - {}", validationResult.isValid());
-
+    ValidationResponseDto validationResult;
+    try {
+      var reqBody = SignInfoRequestDto.builder().data(signedData).container(container).build();
+      validationResult = digitalSignatureRestClient.validate(reqBody, headers);
+      log.debug("Validation finished, result - {}", validationResult.isValid());
+    } catch (InternalServerErrorException ex) {
+      throw new SignatureValidationException(ex.getErrorDto().getMessage());
+    } catch (Exception exception) {
+      throw new SignatureValidationException(exception.getMessage());
+    }
     responseVariable.on(execution).set(validationResult);
   }
 

@@ -22,7 +22,12 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.matchesPattern;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.epam.digital.data.platform.bpms.extension.exception.SignatureValidationException;
 import com.epam.digital.data.platform.dso.api.dto.ErrorDto;
 import com.epam.digital.data.platform.dso.api.dto.SignFormat;
 import com.epam.digital.data.platform.dso.api.dto.ValidationResponseDto;
@@ -77,5 +82,44 @@ public class DigitalSignatureValidateDelegateIT extends BaseIT {
         .startProcessInstanceByKey("testDigitalSignatureFailedValidationResponse");
 
     BpmnAwareTests.assertThat(processInstance).isEnded();
+  }
+
+  @Test
+  @Deployment(resources = {"bpmn/connector/testDigitalSignatureValidateDelegate.bpmn"})
+  public void shouldGetTechnicalErrorResponse() throws JsonProcessingException {
+    var error = ErrorDto.builder()
+        .code("ERROR_UNKNOWN")
+        .message("Something went wrong")
+        .build();
+    digitalSignatureMockServer.addStubMapping(
+        stubFor(post(urlPathEqualTo("/api/esignature/validate"))
+            .withHeader("Content-Type", equalTo("application/json"))
+            .withHeader("X-Access-Token", equalTo("token"))
+            .withRequestBody(equalTo("{\"data\":\"dGVzdCBkYXRh\",\"container\":\"ASIC\"}"))
+            .willReturn(aResponse().withHeader("Content-Type", "application/json").withStatus(500)
+                .withBody(objectMapper.writeValueAsString(error)))));
+
+    var exception = assertThrows(SignatureValidationException.class,
+        () -> runtimeService.startProcessInstanceByKey(
+            "testDigitalSignatureFailedValidationResponse"));
+    assertEquals("Something went wrong", exception.getMessage());
+  }
+
+  @Test
+  @Deployment(resources = {"bpmn/connector/testDigitalSignatureValidateDelegate.bpmn"})
+  public void shouldGetRuntimeErrorResponse() {
+    digitalSignatureMockServer.addStubMapping(
+        stubFor(post(urlPathEqualTo("/api/esignature/validate"))
+            .withHeader("Content-Type", equalTo("application/json"))
+            .withHeader("X-Access-Token", equalTo("token"))
+            .withRequestBody(equalTo("{\"data\":\"dGVzdCBkYXRh\",\"container\":\"ASIC\"}"))
+            .willReturn(aResponse().withHeader("Content-Type", "application/json").withStatus(502)
+                .withBody("{\"message\":\"Bad Gateway\"}"))));
+
+    var exception = assertThrows(SignatureValidationException.class,
+        () -> runtimeService.startProcessInstanceByKey(
+            "testDigitalSignatureFailedValidationResponse"));
+    assertThat(exception.getMessage(),
+        matchesPattern("\\[502 Bad Gateway] .*"));
   }
 }

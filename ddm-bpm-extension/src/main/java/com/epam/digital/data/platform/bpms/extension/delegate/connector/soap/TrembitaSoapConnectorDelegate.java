@@ -60,7 +60,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.connect.httpclient.soap.SoapHttpConnector;
 import org.camunda.spin.Spin;
-import org.camunda.spin.xml.SpinXmlElement;
 import org.springframework.stereotype.Component;
 
 /**
@@ -72,6 +71,7 @@ import org.springframework.stereotype.Component;
 public class TrembitaSoapConnectorDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "trembitaSoapConnectorDelegate";
+  public static final String STRING_RESPONSE_TYPE = "string";
 
   private final SoapHttpConnector soapHttpConnector;
   private final TrembitaExchangeGatewayProperties trembitaExchangeGatewayProperties;
@@ -84,8 +84,10 @@ public class TrembitaSoapConnectorDelegate extends BaseJavaDelegate {
   private NamedVariableAccessor<String> payloadVariable;
   @SystemVariable(name = "contentType")
   private NamedVariableAccessor<String> contentTypeVariable;
+  @SystemVariable(name = "responseType")
+  private NamedVariableAccessor<String> responseTypeVariable;
   @SystemVariable(name = "response")
-  private NamedVariableAccessor<SpinXmlElement> responseVariable;
+  private NamedVariableAccessor<Object> responseVariable;
 
   public TrembitaSoapConnectorDelegate(SoapHttpConnector soapHttpConnector,
       TrembitaExchangeGatewayProperties trembitaExchangeGatewayProperties) {
@@ -97,6 +99,7 @@ public class TrembitaSoapConnectorDelegate extends BaseJavaDelegate {
   protected void executeInternal(DelegateExecution execution) throws Exception {
     responseVariable.on(execution).set(Spin.XML(Map.of()));
 
+    var responseType = responseTypeVariable.from(execution).get();
     var trembitaSystemName = systemNameVariable.from(execution).getOrThrow();
     var soapAction = trembitaSoapActionVariable.from(execution).getOrThrow();
     var payload = payloadVariable.from(execution).getOrThrow();
@@ -123,8 +126,9 @@ public class TrembitaSoapConnectorDelegate extends BaseJavaDelegate {
         .execute();
     log.debug("Got response with status: {}", soapHttpResponse.getStatusCode());
 
-    var xmlElementResponse = Spin.XML(soapHttpResponse.getResponse());
-    responseVariable.on(execution).set(xmlElementResponse);
+    var response = STRING_RESPONSE_TYPE.equals(responseType) ? soapHttpResponse.getResponse()
+        : Spin.XML(soapHttpResponse.getResponse());
+    responseVariable.on(execution).set(response);
   }
 
   @Override
@@ -135,7 +139,8 @@ public class TrembitaSoapConnectorDelegate extends BaseJavaDelegate {
   private RegistryProperties getTrembitaRegistryProperties(String systemName) {
     return Optional.ofNullable(trembitaExchangeGatewayProperties.getRegistries().get(systemName))
         .orElseThrow(() -> new IllegalArgumentException(
-            String.format("Trembita system configuration with name %s not configured", systemName)));
+            String.format("Trembita system configuration with name %s not configured",
+                systemName)));
   }
 
   private void addSystemTrembitaHeader(SOAPMessage soapMessage,
@@ -189,7 +194,8 @@ public class TrembitaSoapConnectorDelegate extends BaseJavaDelegate {
     var serviceCode = service.getServiceCode();
     var serviceVersion = service.getServiceVersion();
     addOptionalChildHeaderElement(soapHeaderElement, TREMBITA_PROPERTY_SERVICE_CODE, serviceCode);
-    addOptionalChildHeaderElement(soapHeaderElement, TREMBITA_PROPERTY_SERVICE_VERSION, serviceVersion);
+    addOptionalChildHeaderElement(soapHeaderElement, TREMBITA_PROPERTY_SERVICE_VERSION,
+        serviceVersion);
   }
 
   private void checkTrembitaSubsystemProperties(TrembitaSubsystemProperties subsystemProperties,
