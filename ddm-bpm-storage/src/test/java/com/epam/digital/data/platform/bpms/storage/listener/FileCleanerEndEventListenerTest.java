@@ -23,15 +23,19 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 import com.epam.digital.data.platform.bpms.api.dto.FileStorageCleanupDto;
+import com.epam.digital.data.platform.dataaccessor.transaction.TransactionalActionRegistrar;
 import com.epam.digital.data.platform.dgtldcmnt.client.DigitalDocumentServiceRestClient;
 import com.epam.digital.data.platform.integration.idm.service.IdmService;
 import com.epam.digital.data.platform.starter.kafka.config.properties.KafkaProperties;
 import java.util.Map;
 
+import java.util.function.Consumer;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -59,6 +63,12 @@ class FileCleanerEndEventListenerTest {
   private KafkaProperties kafkaProperties;
   private FileCleanerEndEventListener fileCleanerEndEventListener;
   private ThreadPoolTaskExecutor taskExecutor;
+  @Mock
+  private TransactionalActionRegistrar registrar;
+  @Captor
+  private ArgumentCaptor<Consumer<FileStorageCleanupDto>> kafkaCallbackCaptor;
+  @Captor
+  private ArgumentCaptor<FileStorageCleanupDto> kafkaPayloadCaptor;
 
   @BeforeEach
   void setUp() {
@@ -70,7 +80,7 @@ class FileCleanerEndEventListenerTest {
   @Test
   void shouldDeleteFilesByListOfKeys_http() {
     fileCleanerEndEventListener = new FileCleanerEndEventListener(idmService, client, false,
-        kafkaTemplate, kafkaProperties);
+        kafkaTemplate, kafkaProperties, registrar);
 
     Mockito.doReturn("token").when(idmService).getClientAccessToken();
 
@@ -85,7 +95,7 @@ class FileCleanerEndEventListenerTest {
   @SuppressWarnings("unchecked")
   void shouldDeleteFilesByListOfKeys_kafka() {
     fileCleanerEndEventListener = new FileCleanerEndEventListener(idmService, client, true,
-        kafkaTemplate, kafkaProperties);
+        kafkaTemplate, kafkaProperties, registrar);
 
     final var topics = Map.of(FileCleanerEndEventListener.TOPIC_KEY, TOPIC_NAME);
     Mockito.doReturn(topics).when(kafkaProperties).getTopics();
@@ -94,6 +104,13 @@ class FileCleanerEndEventListenerTest {
     Mockito.doReturn(resultFuture).when(kafkaTemplate).send(eq(TOPIC_NAME), refEq(expectedData));
 
     fileCleanerEndEventListener.notify(executionEntity);
+
+    verify(registrar).onCommitting(
+        kafkaCallbackCaptor.capture(),
+        kafkaPayloadCaptor.capture()
+    );
+
+    kafkaCallbackCaptor.getValue().accept(kafkaPayloadCaptor.getValue());
 
     verify(kafkaTemplate).send(eq(TOPIC_NAME), refEq(expectedData));
     verify(resultFuture).addCallback(any(SuccessCallback.class), any(FailureCallback.class));

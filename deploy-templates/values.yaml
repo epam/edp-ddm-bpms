@@ -44,7 +44,6 @@ appSecretsMountPath: "/app/secrets/main"
 cephSecretMountPath: "/app/secrets/ceph"
 fileStorageSecretMountPath: "/app/secrets/fileStorage"
 systemUserKeycloakClientSecretsMountPath: "/app/secrets/system-user-client"
-officerSystemClientSecretsMountPath: "/app/secrets/officer-system-client"
 citizenKeycloakClientSecretsMountPath: "/app/secrets/citizen-realm-admin-client"
 officerKeycloakClientSecretsMountPath: "/app/secrets/officer-realm-admin-client"
 prometheusScrapePath: "/actuator/prometheus"
@@ -53,7 +52,6 @@ livenessPath: "/actuator/health/liveness"
 officerConfigMountPath: "/app/config/registry-regulation/officer-roles"
 citizenConfigMountPath: "/app/config/registry-regulation/citizen-roles"
 externalSystemConfigMountPath: "/app/config/registry-regulation/external-system-roles"
-redisSecretsMountPath: "/app/secrets/redis"
 officerConfigMapName: officer-roles
 citizenConfigMapName: citizen-roles
 externalSystemConfigMapName: external-system-roles
@@ -107,25 +105,20 @@ monitoring:
 
 keycloak:
   citizenClient:
-    clientName: realm-admin
+    clientName: bpms-user-management
     realm: citizen-portal
     public: false
-    secretName: keycloak-realm-admin-citizen-client-secret
+    secretName: keycloak-user-management-citizen-client-secret
   officerClient:
-    clientName: realm-admin
+    clientName: bpms-user-management
     realm: officer-portal
     public: false
-    secretName: keycloak-realm-admin-officer-client-secret
+    secretName: keycloak-user-management-officer-client-secret
   systemUserClient:
     clientName: system-user
     realm: officer-portal
     public: false
     secretName: keycloak-system-user-officer-client-secret
-  officerSystemClient:
-    clientName: user-attributes-management
-    realm: officer-portal
-    public: false
-    secretName: keycloak-realm-officer-user-attributes-management-client-secret
   realms:
     admin: admin
     external: external-system
@@ -140,6 +133,7 @@ storage:
     type: redis
   backend:
     redis:
+      username: ${REDIS_USERNAME}
       password: ${REDIS_PASSWORD}
       sentinel:
         master: mymaster
@@ -180,7 +174,7 @@ restTemplate:
 readSecretsRoleName: read-secrets-role
 
 redis:
-  secretName: redis-auth
+  secretName: redis-bpms-user-secret
 
 cleanup:
   bp-end-listeners:

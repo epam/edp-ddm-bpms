@@ -21,6 +21,7 @@ import com.epam.digital.data.platform.bpm.history.base.mapper.HistoryMapper;
 import com.epam.digital.data.platform.bpm.history.base.publisher.ProcessHistoryEventPublisher;
 import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessInstanceRuntimeService;
 import com.epam.digital.data.platform.bpms.security.CamundaImpersonationFactory;
+import com.epam.digital.data.platform.dataaccessor.transaction.TransactionalActionRegistrar;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessCompletionResultVariable;
 import com.epam.digital.data.platform.dataaccessor.sysvar.ProcessExcerptIdVariable;
 import java.util.List;
@@ -58,7 +59,8 @@ public class ProcessPublisherHistoryEventHandler implements HistoryEventHandler 
   @Lazy
   @Autowired
   private ProcessInstanceRuntimeService processInstanceRuntimeService;
-
+  @Autowired
+  private TransactionalActionRegistrar transactionalActionRegistrar;
 
   /**
    * Handle list of fired {@link HistoryEvent}
@@ -104,10 +106,11 @@ public class ProcessPublisherHistoryEventHandler implements HistoryEventHandler 
     var historyDto = historyMapper.toHistoryProcess(processInstanceEvent);
 
     if (processInstanceEvent.isEventOfType(HistoryEventTypes.PROCESS_INSTANCE_START)) {
-      publisher.put(historyDto);
+      transactionalActionRegistrar.onCommitting(publisher::put, historyDto);
+      return;
     }
 
-    publisher.patch(historyDto);
+    transactionalActionRegistrar.onCommitting(publisher::patch, historyDto);
   }
 
   /**
@@ -128,7 +131,8 @@ public class ProcessPublisherHistoryEventHandler implements HistoryEventHandler 
         || variableUpdateEvent.isEventOfType(HistoryEventTypes.VARIABLE_INSTANCE_DELETE)) {
       return;
     }
-    publisher.patch(historyMapper.toHistoryProcess(variableUpdateEvent));
+    var historyProcessEvent = historyMapper.toHistoryProcess(variableUpdateEvent);
+    transactionalActionRegistrar.onCommitting(publisher::patch, historyProcessEvent);
   }
 
   /**
@@ -141,10 +145,10 @@ public class ProcessPublisherHistoryEventHandler implements HistoryEventHandler 
     var historyDto = historyMapper.toHistoryTask(taskInstanceEvent);
 
     if (taskInstanceEvent.isEventOfType(HistoryEventTypes.TASK_INSTANCE_CREATE)) {
-      publisher.put(historyDto);
+      transactionalActionRegistrar.onCommitting(publisher::put, historyDto);
+      return;
     }
-
-    publisher.patch(historyDto);
+    transactionalActionRegistrar.onCommitting(publisher::patch, historyDto);
   }
 
   private boolean isCompletionResultOrExcerptId(String variableName) {

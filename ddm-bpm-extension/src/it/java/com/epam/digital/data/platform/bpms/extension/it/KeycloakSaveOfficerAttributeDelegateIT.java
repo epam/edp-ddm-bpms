@@ -30,17 +30,17 @@ class KeycloakSaveOfficerAttributeDelegateIT extends BaseIT {
   @Deployment(resources = {"bpmn/connector/testKeycloakSaveOfficerAttributeDelegate.bpmn"})
   void shouldSaveAttribute() {
     var userId = "7004ebde-68cf-4e25-bb76-b1642a3814e5";
-    mockConnectToKeycloak(officerSystemClientRealm);
-    mockKeycloakGetUserByUsername("testuser", officerSystemClientRealm,
+    mockConnectToKeycloak(officerRealm);
+    mockKeycloakGetUserByUsername("testuser", officerRealm,
         "/json/keycloak/keycloakUserResponse.json");
-    mockGetKeycloakGetUserById(userId, officerSystemClientRealm,
+    mockGetKeycloakGetUserById(userId, officerRealm,
         "/json/keycloak/keycloakUserByIdResponse.json");
-    mockKeycloakUpdateUser(userId, officerSystemClientRealm,
+    mockKeycloakUpdateUser(userId, officerRealm,
         "/json/keycloak/keycloakUpdateUserWithAttributesRequestBody.json");
 
     var processInstance = runtimeService.startProcessInstanceByKey("test_save_attribute");
 
-    var userMappingsUrl = String.format("/auth/admin/realms/%s/users/%s", officerSystemClientRealm,
+    var userMappingsUrl = String.format("/auth/admin/realms/%s/users/%s", officerRealm,
         userId);
     var requestBodyRoles = convertJsonToString(
         "/json/keycloak/keycloakUpdateUserWithAttributesRequestBody.json");

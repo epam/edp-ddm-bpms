@@ -34,7 +34,7 @@ public class KeycloakSaveOfficerAttributeDelegate extends BaseJavaDelegate {
 
   public static final String DELEGATE_NAME = "keycloakSaveOfficerAttributeDelegate";
 
-  @Qualifier("officer-system-client-service")
+  @Qualifier("officer-keycloak-client-service")
   private final IdmService idmService;
 
   @SystemVariable(name = "username")

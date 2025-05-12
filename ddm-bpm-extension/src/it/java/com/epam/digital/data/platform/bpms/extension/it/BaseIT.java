@@ -121,8 +121,6 @@ public abstract class BaseIT {
   protected String citizenRealm;
   @Value("${keycloak.officer.realm}")
   protected String officerRealm;
-  @Value("${keycloak.officer-system-client.realm}")
-  protected String officerSystemClientRealm;
 
   protected static String validAccessToken;
 

@@ -18,14 +18,12 @@ package com.epam.digital.data.platform.bpm.history.base.handler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.epam.digital.data.platform.bphistory.model.HistoryProcess;
 import com.epam.digital.data.platform.bphistory.model.HistoryTask;
+
+import com.epam.digital.data.platform.dataaccessor.transaction.TransactionalActionRegistrar;
 import com.epam.digital.data.platform.bpm.history.base.mapper.HistoryMapper;
 import com.epam.digital.data.platform.bpm.history.base.publisher.ProcessHistoryEventPublisher;
 import com.epam.digital.data.platform.bpms.rest.service.repository.ProcessInstanceRuntimeService;
@@ -38,6 +36,7 @@ import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
@@ -51,11 +50,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -77,11 +72,16 @@ class ProcessPublisherHistoryEventHandlerTest {
   private RepositoryService repositoryService;
   @Mock
   private ProcessInstanceRuntimeService processInstanceRuntimeService;
+  @Mock
+  private TransactionalActionRegistrar actionRegistrar;
+
 
   @Captor
   private ArgumentCaptor<HistoryProcess> historyProcessArgumentCaptor;
   @Captor
   private ArgumentCaptor<HistoryTask> historyTaskArgumentCaptor;
+  @Captor
+  private ArgumentCaptor<Consumer<HistoryTask>> committingActionCaptor;
 
   @BeforeEach
   void setUp() {
@@ -91,6 +91,7 @@ class ProcessPublisherHistoryEventHandlerTest {
         repositoryService);
     ReflectionTestUtils.setField(processPublisherHistoryEventHandler, "historyMapper", historyMapper);
     ReflectionTestUtils.setField(processPublisherHistoryEventHandler, "processInstanceRuntimeService", processInstanceRuntimeService);
+    ReflectionTestUtils.setField(processPublisherHistoryEventHandler, "transactionalActionRegistrar", actionRegistrar);
     lenient().when(camundaImpersonationFactory.getCamundaImpersonation())
         .thenReturn(Optional.of(camundaImpersonation));
     lenient().doAnswer(invocation -> {
@@ -138,7 +139,7 @@ class ProcessPublisherHistoryEventHandlerTest {
 
     processPublisherHistoryEventHandler.handleEvent(event);
 
-    verify(publisher).put(historyProcessArgumentCaptor.capture());
+    verify(actionRegistrar).onCommitting(any(), historyProcessArgumentCaptor.capture());
 
     var value = historyProcessArgumentCaptor.getValue();
     assertThat(value)
@@ -169,7 +170,7 @@ class ProcessPublisherHistoryEventHandlerTest {
 
     processPublisherHistoryEventHandler.handleEvent(event);
 
-    verify(publisher).patch(historyProcessArgumentCaptor.capture());
+    verify(actionRegistrar).onCommitting(any(), historyProcessArgumentCaptor.capture());
 
     var value = historyProcessArgumentCaptor.getValue();
     assertThat(value)
@@ -208,8 +209,7 @@ class ProcessPublisherHistoryEventHandlerTest {
 
     processPublisherHistoryEventHandler.handleEvent(processCompletionResult);
 
-    verify(publisher, never()).put(any(HistoryProcess.class));
-    verify(publisher, never()).patch(any(HistoryProcess.class));
+    verify(actionRegistrar, never()).onCommitting(any(), any());
     verify(publisher, never()).put(any(HistoryTask.class));
   }
 
@@ -223,7 +223,7 @@ class ProcessPublisherHistoryEventHandlerTest {
     processCompletionResult.setEventType(HistoryEventTypes.VARIABLE_INSTANCE_CREATE.getEventName());
 
     processPublisherHistoryEventHandler.handleEvent(processCompletionResult);
-    verify(publisher).patch(historyProcessArgumentCaptor.capture());
+    verify(actionRegistrar).onCommitting(any(), historyProcessArgumentCaptor.capture());
     var processCompletionValue = historyProcessArgumentCaptor.getValue();
     assertThat(processCompletionValue)
         .hasFieldOrPropertyWithValue("processInstanceId", "processInstanceId")
@@ -239,7 +239,7 @@ class ProcessPublisherHistoryEventHandlerTest {
     excerptId.setEventType(HistoryEventTypes.VARIABLE_INSTANCE_CREATE.getEventName());
 
     processPublisherHistoryEventHandler.handleEvent(excerptId);
-    verify(publisher).patch(historyProcessArgumentCaptor.capture());
+    verify(actionRegistrar).onCommitting(any(), historyProcessArgumentCaptor.capture());
     var excerptValue = historyProcessArgumentCaptor.getValue();
     assertThat(excerptValue)
         .hasFieldOrPropertyWithValue("processInstanceId", "processInstanceId")
@@ -262,7 +262,11 @@ class ProcessPublisherHistoryEventHandlerTest {
     taskEvent.setAssignee("assignee");
 
     processPublisherHistoryEventHandler.handleEvent(taskEvent);
-    verify(publisher).put(historyTaskArgumentCaptor.capture());
+    Mockito.verify(actionRegistrar).onCommitting(
+        committingActionCaptor.capture(),
+        historyTaskArgumentCaptor.capture()
+    );
+    committingActionCaptor.getValue().accept(historyTaskArgumentCaptor.getValue());
     var value = historyTaskArgumentCaptor.getValue();
     assertThat(value)
         .hasFieldOrPropertyWithValue("activityInstanceId", "activityInstanceId")
@@ -294,7 +298,13 @@ class ProcessPublisherHistoryEventHandlerTest {
     taskEvent.setAssignee("assignee");
 
     processPublisherHistoryEventHandler.handleEvent(taskEvent);
-    verify(publisher).patch(historyTaskArgumentCaptor.capture());
+
+    Mockito.verify(actionRegistrar).onCommitting(
+        committingActionCaptor.capture(),
+        historyTaskArgumentCaptor.capture()
+    );
+    committingActionCaptor.getValue().accept(historyTaskArgumentCaptor.getValue());
+
     var value = historyTaskArgumentCaptor.getValue();
     assertThat(value)
         .hasFieldOrPropertyWithValue("activityInstanceId", "activityInstanceId")
@@ -328,7 +338,11 @@ class ProcessPublisherHistoryEventHandlerTest {
     taskEvent.setAssignee("assignee");
 
     processPublisherHistoryEventHandler.handleEvent(taskEvent);
-    verify(publisher).patch(historyTaskArgumentCaptor.capture());
+    Mockito.verify(actionRegistrar).onCommitting(
+        committingActionCaptor.capture(),
+        historyTaskArgumentCaptor.capture()
+    );
+    committingActionCaptor.getValue().accept(historyTaskArgumentCaptor.getValue());
     var value = historyTaskArgumentCaptor.getValue();
     assertThat(value)
         .hasFieldOrPropertyWithValue("activityInstanceId", "activityInstanceId")
@@ -342,5 +356,54 @@ class ProcessPublisherHistoryEventHandlerTest {
         .hasFieldOrPropertyWithValue("startTime", null)
         .hasFieldOrPropertyWithValue("endTime", LocalDateTime.of(2021, 12, 10, 18, 22))
         .hasFieldOrPropertyWithValue("assignee", "assignee");
+  }
+
+  @Test
+  void shouldPublishPatchRequestForTaskEvent() {
+    var taskEvent = new HistoricTaskInstanceEventEntity();
+    taskEvent.setEventType(HistoryEventTypes.TASK_INSTANCE_COMPLETE.getEventName());
+    taskEvent.setProcessInstanceId("processInstanceId");
+    taskEvent.setProcessDefinitionId("processDefinitionId");
+
+    processPublisherHistoryEventHandler.handleHistoricTaskEvent(taskEvent);
+
+    Mockito.verify(actionRegistrar).onCommitting(
+        committingActionCaptor.capture(),
+        historyTaskArgumentCaptor.capture()
+    );
+    committingActionCaptor.getValue().accept(historyTaskArgumentCaptor.getValue());
+
+    Mockito.verify(publisher).patch(historyMapper.toHistoryTask(taskEvent));
+    Mockito.verify(publisher, never()).put(historyMapper.toHistoryTask(taskEvent));
+  }
+
+  @Test
+  void shouldPublishPutRequestForTaskEvent() {
+    var taskEvent = new HistoricTaskInstanceEventEntity();
+    taskEvent.setEventType(HistoryEventTypes.TASK_INSTANCE_CREATE.getEventName());
+    taskEvent.setProcessInstanceId("processInstanceId");
+    taskEvent.setProcessDefinitionId("processDefinitionId");
+
+    processPublisherHistoryEventHandler.handleHistoricTaskEvent(taskEvent);
+
+    Mockito.verify(actionRegistrar).onCommitting(
+        committingActionCaptor.capture(),
+        historyTaskArgumentCaptor.capture()
+    );
+    committingActionCaptor.getValue().accept(historyTaskArgumentCaptor.getValue());
+
+    Mockito.verify(publisher).put(historyMapper.toHistoryTask(taskEvent));
+    Mockito.verify(publisher, never()).patch(historyMapper.toHistoryTask(taskEvent));
+  }
+
+  @Test
+  void shouldPublishSingleRequestForProcessEvent() {
+    var event = new HistoricProcessInstanceEventEntity();
+    event.setEventType(HistoryEventTypes.PROCESS_INSTANCE_END.getEventName());
+    event.setProcessInstanceId("processInstanceId");
+    event.setProcessDefinitionId("processDefinitionId");
+    processPublisherHistoryEventHandler.handleProcessInstanceEvent(event);
+
+    verify(actionRegistrar, times(1)).onCommitting(any(), any());
   }
 }

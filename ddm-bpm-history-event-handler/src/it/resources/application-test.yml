@@ -1,3 +1,7 @@
+spring:
+  application:
+    name: ddm-bpm-history-event-handler
+
 camunda:
   bpm:
     database-history-level: NONE

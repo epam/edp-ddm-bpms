@@ -83,6 +83,12 @@ public class TestCephServiceImpl implements CephService {
   }
 
   @Override
+  public CephObjectMetadata put(String cephBucketName, String key, String contentType, long contentLength,
+                                Map<String, String> userMetadata, InputStream fileInputStream) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public void delete(String cephBucketName, Set<String> keys) {
     verifyBucketName(cephBucketName);
     keys.forEach(storage::remove);
@@ -108,6 +114,11 @@ public class TestCephServiceImpl implements CephService {
   }
 
   @Override
+  public Set<String> getKeys(String s) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public List<CephObjectMetadata> getMetadata(String cephBucketName, Set<String> keys) {
     boolean allContains = keys.stream().allMatch(storage::containsKey);
     if (!allContains) {
@@ -115,6 +126,16 @@ public class TestCephServiceImpl implements CephService {
     }
     return keys.stream().map(k -> ((CephObject) storage.get(k)).getMetadata())
         .collect(Collectors.toList());
+  }
+
+  @Override
+  public List<CephObjectMetadata> getMetadata(String s, String s1) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public CephObjectMetadata setUserMetadata(String s, String s1, Map<String, String> map) {
+    throw new UnsupportedOperationException();
   }
 
   public void clearStorage() {

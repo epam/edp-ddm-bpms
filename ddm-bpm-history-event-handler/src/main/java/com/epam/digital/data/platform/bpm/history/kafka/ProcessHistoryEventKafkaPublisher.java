@@ -19,11 +19,15 @@ package com.epam.digital.data.platform.bpm.history.kafka;
 import com.epam.digital.data.platform.bphistory.model.HistoryProcess;
 import com.epam.digital.data.platform.bphistory.model.HistoryTask;
 import com.epam.digital.data.platform.bpm.history.base.publisher.ProcessHistoryEventPublisher;
+import com.epam.digital.data.platform.bpm.history.kafka.util.KafkaHeaderBuilder;
+import com.epam.digital.data.platform.bpms.api.dto.enums.PlatformHttpHeader;
 import com.epam.digital.data.platform.starter.kafka.config.properties.KafkaProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * {@link ProcessHistoryEventPublisher} implementation which sends history dtos to Kafka
@@ -34,6 +38,9 @@ public class ProcessHistoryEventKafkaPublisher implements ProcessHistoryEventPub
 
   private final KafkaTemplate<String, Object> kafkaTemplate;
   private final KafkaProperties kafkaProperties;
+
+  @Value("${spring.application.name}")
+  private String springAppName;
 
   @Override
   public void put(HistoryProcess dto) {
@@ -70,6 +77,20 @@ public class ProcessHistoryEventKafkaPublisher implements ProcessHistoryEventPub
   }
 
   private void send(ProducerRecord<String, Object> record) {
+    var headerBuilder = new KafkaHeaderBuilder()
+        .withDefaultSourceSystem()
+        .withSourceApplication(springAppName);
+
+    var authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication != null) {
+      Object credentials = authentication.getCredentials();
+      if (credentials instanceof String) {
+        headerBuilder.add(PlatformHttpHeader.X_ACCESS_TOKEN.getName(), (String) credentials);
+      }
+    }
+
+    headerBuilder.build().forEach(record.headers()::add);
+
     var future = kafkaTemplate.send(record);
 
     future.addCallback(result -> log.debug("Successful sending message {} to topic {}", record.value(), record.topic()),

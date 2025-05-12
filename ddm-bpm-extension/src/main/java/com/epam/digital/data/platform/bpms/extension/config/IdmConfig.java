@@ -49,13 +49,6 @@ public class IdmConfig {
     return new KeycloakClientProperties();
   }
 
-  @Bean
-  @ConditionalOnProperty(prefix = "keycloak.officer-system-client", name = "realm")
-  @ConfigurationProperties(prefix = "keycloak.officer-system-client")
-  public KeycloakClientProperties officerSystemClientRealmProperties() {
-    return new KeycloakClientProperties();
-  }
-
   @Bean("officer-keycloak-client-service")
   @ConditionalOnBean(name = "officerRealmProperties")
   public IdmService officerIdmService(KeycloakClientProperties officerRealmProperties) {
@@ -70,14 +63,5 @@ public class IdmConfig {
     return idmServiceFactory.createIdmService(citizenRealmProperties.getRealm(),
         citizenRealmProperties.getClientId(),
         citizenRealmProperties.getClientSecret());
-  }
-
-  @Bean("officer-system-client-service")
-  @ConditionalOnBean(name = "officerSystemClientRealmProperties")
-  public IdmService officerSystemUserIdmService(
-      KeycloakClientProperties officerSystemClientRealmProperties) {
-    return idmServiceFactory.createIdmService(officerSystemClientRealmProperties.getRealm(),
-        officerSystemClientRealmProperties.getClientId(),
-        officerSystemClientRealmProperties.getClientSecret());
   }
 }

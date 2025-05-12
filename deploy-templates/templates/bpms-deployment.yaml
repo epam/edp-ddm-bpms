@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: {{ .Chart.Name }}
   annotations:
-    secret.reloader.stakater.com/reload: "trembita-registries-secrets,external-systems-secrets,{{ .Values.db.secret }}"
+    secret.reloader.stakater.com/reload: "trembita-registries-secrets,external-systems-secrets,{{ .Values.db.secret }},{{ .Values.redis.secretName }}"
     configmap.reloader.stakater.com/reload: "trembita-registries-configuration,external-systems-configuration,diia-configuration"
   labels:
     app: {{ .Chart.Name }}
@@ -51,7 +51,7 @@ spec:
         imagePullPolicy: IfNotPresent
         name: {{ .Chart.Name }}-init
       - name: update-history-level
-        image: {{ template "imageRegistry" . -}} bitnami/postgresql:latest
+        image: {{ template "imageRegistry" . -}} bitnami/postgresql:14.5.0-debian-11-r28
         env:
           - name: PSQL_USER
             valueFrom:
@@ -146,6 +146,11 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+          - name: REDIS_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.redis.secretName }}
+                key: username
           - name: REDIS_PASSWORD
             valueFrom:
               secretKeyRef:
@@ -166,16 +171,12 @@ spec:
             mountPath: {{ .Values.officerKeycloakClientSecretsMountPath }}
           - name: {{ .Values.keycloak.systemUserClient.secretName }}
             mountPath: {{ .Values.systemUserKeycloakClientSecretsMountPath }}
-          - name: {{ .Values.keycloak.officerSystemClient.secretName }}
-            mountPath: {{ .Values.officerSystemClientSecretsMountPath }}
           - name: {{ .Values.officerConfigMapName }}
             mountPath: {{ .Values.officerConfigMountPath }}
           - name: {{ .Values.citizenConfigMapName }}
             mountPath: {{ .Values.citizenConfigMountPath }}
           - name: {{ .Values.externalSystemConfigMapName }}
             mountPath: {{ .Values.externalSystemConfigMountPath }}
-          - name: {{ .Chart.Name }}-redis-credentials
-            mountPath: {{ .Values.redisSecretsMountPath }}
     {{- if .Values.trembita }}
       {{- if .Values.trembita.registries }}
 {{- $trembitaSecret := (lookup "v1" "Secret" .Values.namespace "trembita-registries-secrets") }}
@@ -252,12 +253,6 @@ spec:
             items:
             - key: clientSecret
               path: keycloak.system-user.client-secret
-        - name: {{ .Values.keycloak.officerSystemClient.secretName }}
-          secret:
-            secretName: {{ .Values.keycloak.officerSystemClient.secretName }}
-            items:
-              - key: clientSecret
-                path: keycloak.officer-system-client.client-secret
         - name: {{ .Values.officerConfigMapName }}
           configMap:
             name: {{ .Values.officerConfigMapName }}
@@ -300,12 +295,6 @@ spec:
             secretName: {{ .Values.registrySecrets.externalSystemsSecretsName }}
 {{- end }}
   {{- end }}
-        - name: {{ .Chart.Name }}-redis-credentials
-          secret:
-            secretName: {{ .Values.redis.secretName }}
-            items:
-            - key: password
-              path: redis.password
         - name: update-history-level-configmap
           configMap:
             name: update-history-level-configmap

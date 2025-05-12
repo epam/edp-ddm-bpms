@@ -18,6 +18,7 @@ package com.epam.digital.data.platform.bpms.storage.listener;
 
 import com.epam.digital.data.platform.bpms.api.dto.FileStorageCleanupDto;
 import com.epam.digital.data.platform.bpms.api.dto.enums.PlatformHttpHeader;
+import com.epam.digital.data.platform.dataaccessor.transaction.TransactionalActionRegistrar;
 import com.epam.digital.data.platform.dgtldcmnt.client.DigitalDocumentServiceRestClient;
 import com.epam.digital.data.platform.integration.idm.service.IdmService;
 import com.epam.digital.data.platform.starter.kafka.config.properties.KafkaProperties;
@@ -55,11 +56,14 @@ public class FileCleanerEndEventListener implements ExecutionListener {
   private final KafkaTemplate<String, Object> kafkaTemplate;
   @Lazy
   private final KafkaProperties kafkaProperties;
+  private final TransactionalActionRegistrar registrar;
 
   @Override
   public void notify(DelegateExecution execution) {
     if (kafkaEnabled) {
-      sendToKafka(execution);
+      var processInstanceId = execution.getProcessInstanceId();
+      var data = new FileStorageCleanupDto(processInstanceId);
+      registrar.onCommitting(this::sendToKafka, data);
     } else {
       sendThroughHttp(execution);
     }
@@ -84,18 +88,16 @@ public class FileCleanerEndEventListener implements ExecutionListener {
     return headers;
   }
 
-  private void sendToKafka(DelegateExecution execution) {
+  private void sendToKafka(FileStorageCleanupDto data) {
     var topic = kafkaProperties.getTopics().get(TOPIC_KEY);
-    var processInstanceId = execution.getProcessInstanceId();
-    var data = new FileStorageCleanupDto(processInstanceId);
 
     var future = kafkaTemplate.send(topic, data);
 
     future.addCallback(
         result -> log.info("Successful sent message about file cleanup in process {}",
-            processInstanceId),
+            data.getProcessInstanceId()),
         ex -> log.error("Failed sending message about file cleanup in process {}. Cause : {}",
-            processInstanceId, ex.getMessage(), ex)
+            data.getProcessInstanceId(), ex.getMessage(), ex)
     );
   }
 }

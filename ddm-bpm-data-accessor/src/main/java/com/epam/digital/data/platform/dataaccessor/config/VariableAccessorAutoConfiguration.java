@@ -23,6 +23,8 @@ import com.epam.digital.data.platform.dataaccessor.completer.BaseCompleterVariab
 import com.epam.digital.data.platform.dataaccessor.completer.CompleterVariablesAccessor;
 import com.epam.digital.data.platform.dataaccessor.initiator.BaseInitiatorVariablesAccessor;
 import com.epam.digital.data.platform.dataaccessor.initiator.InitiatorVariablesAccessor;
+import com.epam.digital.data.platform.dataaccessor.transaction.CamundaTransactionActionRegistrar;
+import com.epam.digital.data.platform.dataaccessor.transaction.TransactionalActionRegistrar;
 import com.epam.digital.data.platform.dataaccessor.named.BaseNamedVariableAccessorFactory;
 import com.epam.digital.data.platform.dataaccessor.named.NamedVariableAccessorFactory;
 import com.epam.digital.data.platform.dataaccessor.sysvar.CallerProcessInstanceIdVariable;
@@ -118,4 +120,10 @@ public class VariableAccessorAutoConfiguration {
       VariableAccessorFactory variableAccessorFactory) {
     return new BaseInitiatorVariablesAccessor(variableAccessorFactory);
   }
+
+  @Bean
+  @ConditionalOnMissingBean(TransactionalActionRegistrar.class)
+  public TransactionalActionRegistrar transactionalActionRegistrar() {
+    return new CamundaTransactionActionRegistrar();
+  };
 }

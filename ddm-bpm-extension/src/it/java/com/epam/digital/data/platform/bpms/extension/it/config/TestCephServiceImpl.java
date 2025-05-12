@@ -66,6 +66,11 @@ public class TestCephServiceImpl implements CephService {
   }
 
   @Override
+  public CephObjectMetadata put(String s, String s1, String s2, long l, Map<String, String> map, InputStream inputStream) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public void delete(String cephBucketName, Set<String> keys) {
     verifyBucketName(cephBucketName);
     keys.forEach(storage::remove);
@@ -90,7 +95,22 @@ public class TestCephServiceImpl implements CephService {
   }
 
   @Override
+  public Set<String> getKeys(String s) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public List<CephObjectMetadata> getMetadata(String cephBucketName, Set<String> keys) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public List<CephObjectMetadata> getMetadata(String s, String s1) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public CephObjectMetadata setUserMetadata(String s, String s1, Map<String, String> map) {
     throw new UnsupportedOperationException();
   }
 

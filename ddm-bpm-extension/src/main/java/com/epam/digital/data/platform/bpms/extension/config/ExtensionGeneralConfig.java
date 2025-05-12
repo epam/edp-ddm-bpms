@@ -161,9 +161,9 @@ public class ExtensionGeneralConfig {
   }
 
   @Bean(KeycloakSaveOfficerAttributeDelegate.DELEGATE_NAME)
-  @ConditionalOnProperty(prefix = "keycloak.officer-system-client", name = "realm")
+  @ConditionalOnProperty(prefix = "keycloak.officer", name = "realm")
   public KeycloakSaveOfficerAttributeDelegate keycloakSaveOfficerAttributeDelegate(
-      @Qualifier("officer-system-client-service") IdmService officerSystemUserIdmService) {
+      @Qualifier("officer-keycloak-client-service") IdmService officerSystemUserIdmService) {
     return new KeycloakSaveOfficerAttributeDelegate(officerSystemUserIdmService);
   }
 
